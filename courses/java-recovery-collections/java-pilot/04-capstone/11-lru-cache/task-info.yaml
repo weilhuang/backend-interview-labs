@@ -1,0 +1,25 @@
+type: edu
+custom_name: 11 · 基于访问顺序的 LRU 缓存
+files:
+- name: src/labs/LruCache.java
+  visible: true
+  placeholders:
+  - offset: 371
+    length: 85
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+  - offset: 500
+    length: 293
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+  - offset: 844
+    length: 46
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/LruCacheTest.java
+  visible: false
+- name: test/LruCacheExamplesTest.java
+  visible: true

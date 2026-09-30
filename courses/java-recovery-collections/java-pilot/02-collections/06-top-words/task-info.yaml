@@ -1,0 +1,15 @@
+type: edu
+custom_name: 06 · 聚合、Comparator 与确定性 Top-K
+files:
+- name: src/labs/TopWords.java
+  visible: true
+  placeholders:
+  - offset: 206
+    length: 688
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/TopWordsTest.java
+  visible: false
+- name: test/TopWordsExamplesTest.java
+  visible: true

@@ -1,0 +1,7 @@
+# Upstream provenance
+
+- Course structure, Gradle educational failure-output protocol and wrapper files derive from [JetBrains Academy Java course template, commit c23b40acc8e1a0628e036598935ee6139cca0077](https://github.com/jetbrains-academy/java-course-template/tree/c23b40acc8e1a0628e036598935ee6139cca0077), MIT. License retained in LICENSE-JetBrains-template. Original wrapper launcher is from template Gradle 8.3; distribution intentionally points to Gradle 8.10.2 to support running on JDK17/21. This is not an official JetBrains course.
+- Wrapper JAR SHA-256: a8451eeda314d0568b5340498b36edf147a8f0d692c5ff58082d477abe9146e4. Gradle distribution SHA-256 is verified by gradle-wrapper.properties; obtained from services.gradle.org/distributions/gradle-8.10.2-bin.zip.sha256.
+- JUnit5 dependencies are from Maven Central (BOM 5.11.4, Platform 1.11.4). Standalone verifier pins console SHA-256 b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc. Dependency JARs are not committed.
+- Task Java implementations, tests and Chinese explanations were authored for this project. No OpenJDK implementation source is copied into the learner course. Reading assignments link to OpenJDK 17 GA tag jdk-17+35; the teaching IntVector is intentionally not an exact ArrayList clone.
+- YAML structure checked against the official template and JetBrains educational-plugin edu-format YAML serializers. Static checks cannot establish compatibility with a particular installed Academy plugin.

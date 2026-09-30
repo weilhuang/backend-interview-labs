@@ -1,0 +1,283 @@
+{
+  "metadata": "passed",
+  "compiler": [
+    "java",
+    "com.sun.tools.javac.Main"
+  ],
+  "compiler_flags": [
+    "-source",
+    "17",
+    "-target",
+    "17"
+  ],
+  "jdk17_api_verified": false,
+  "junit_console_sha256": "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc",
+  "gradle": "not run by this script",
+  "idea_academy": "not run",
+  "tasks": [
+    {
+      "task": "java-pilot/01-recovery/01-money-total",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/01-recovery/02-parse-ids",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/01-recovery/03-bounded-stack",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/04-stable-dedup",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 1,
+          "failed": 4
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/05-map-key",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 1,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/06-top-words",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/07-snapshot",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 4,
+          "failed": 2
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/08-safe-removal",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 2,
+          "failed": 3
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/03-internals/09-mini-array-list",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/03-internals/10-hash-index",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/04-capstone/11-lru-cache",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/04-capstone/12-recent-ids",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 1,
+        "failed": 4
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    }
+  ],
+  "reference": {
+    "found": 65,
+    "successful": 65,
+    "failed": 0
+  },
+  "timeout_probe": {
+    "found": 1,
+    "successful": 0,
+    "failed": 1
+  },
+  "alternative_correct_implementations_passed": 12,
+  "status": "passed",
+  "untouched_learner_tasks_rejected": 12,
+  "mutants_rejected": 12,
+  "checked_date_utc": "2026-09-30",
+  "runtime": "OpenJDK 21.0.12.1+1-1-deb13u1-Debian",
+  "runtime_launcher": "java",
+  "compiler_note": "Installed jdk.compiler module; no javac launcher or ct.sym. Language/source and classfile target17 only. No JDK17 API compatibility validation.",
+  "learner_copy": {
+    "source_files": 12,
+    "todo_placeholders": 20,
+    "reference_solution_directories_copied": false,
+    "academy_course_root_or_archive": false
+  }
+}

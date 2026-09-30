@@ -1,0 +1,57 @@
+name: Java Academy pilot checks
+on:
+  push:
+    paths:
+      - 'courses/java-recovery-collections/**'
+      - '.github/workflows/java-pilot.yml'
+  pull_request:
+    paths:
+      - 'courses/java-recovery-collections/**'
+      - '.github/workflows/java-pilot.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['17', '21']
+    defaults:
+      run:
+        working-directory: courses/java-recovery-collections
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record actual tool versions
+        run: |
+          java -version
+          javac -version
+          ./gradlew --version
+      - name: Install metadata checker
+        run: python -m pip install -r authoring/requirements.txt
+      - name: Check author metadata
+        run: python authoring/validate_course.py
+      - name: Run real Gradle JUnit tests with release 17
+        run: ./gradlew --no-daemon test
+      - name: Fetch pinned JUnit console for negative/alternate checks
+        run: |
+          curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$RUNNER_TEMP/junit-console.jar"
+          echo "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc  $RUNNER_TEMP/junit-console.jar" | sha256sum --check
+      - name: Check all learner stubs, mutants and alternate correct solutions
+        run: python authoring/verify.py --junit-console "$RUNNER_TEMP/junit-console.jar"
+      - name: Retain reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-pilot-reports-jdk${{ matrix.java }}
+          path: |
+            courses/java-recovery-collections/build/verification/
+            courses/java-recovery-collections/java-pilot/**/build/reports/tests/
+          retention-days: 7

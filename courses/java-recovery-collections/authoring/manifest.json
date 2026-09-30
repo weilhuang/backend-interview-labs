@@ -1,0 +1,194 @@
+[
+  {
+    "task": "java-pilot/01-recovery/01-money-total",
+    "class": "PaidTotals",
+    "source": "src/labs/PaidTotals.java",
+    "test": "test/PaidTotalsTest.java",
+    "placeholder_count": 1,
+    "minutes": 35,
+    "mutations": [
+      [
+        "Math.addExact(sum, order.cents())",
+        "sum + order.cents()"
+      ]
+    ],
+    "examples": "test/PaidTotalsExamplesTest.java",
+    "alternative": "authoring/alternatives/PaidTotals.java"
+  },
+  {
+    "task": "java-pilot/01-recovery/02-parse-ids",
+    "class": "IdParser",
+    "source": "src/labs/IdParser.java",
+    "test": "test/IdParserTest.java",
+    "placeholder_count": 1,
+    "minutes": 40,
+    "mutations": [
+      [
+        "input.split(\",\", -1)",
+        "input.split(\",\")"
+      ]
+    ],
+    "examples": "test/IdParserExamplesTest.java",
+    "alternative": "authoring/alternatives/IdParser.java"
+  },
+  {
+    "task": "java-pilot/01-recovery/03-bounded-stack",
+    "class": "BoundedStack",
+    "source": "src/labs/BoundedStack.java",
+    "test": "test/BoundedStackTest.java",
+    "placeholder_count": 3,
+    "minutes": 40,
+    "mutations": [
+      [
+        "values.pollFirst()",
+        "values.pollLast()"
+      ]
+    ],
+    "examples": "test/BoundedStackExamplesTest.java",
+    "alternative": "authoring/alternatives/BoundedStack.java"
+  },
+  {
+    "task": "java-pilot/02-collections/04-stable-dedup",
+    "class": "StableDedup",
+    "source": "src/labs/StableDedup.java",
+    "test": "test/StableDedupTest.java",
+    "placeholder_count": 1,
+    "minutes": 35,
+    "mutations": [
+      [
+        "new LinkedHashSet<>(input)",
+        "new ArrayList<>(input)"
+      ]
+    ],
+    "examples": "test/StableDedupExamplesTest.java",
+    "alternative": "authoring/alternatives/StableDedup.java"
+  },
+  {
+    "task": "java-pilot/02-collections/05-map-key",
+    "class": "TenantKey",
+    "source": "src/labs/TenantKey.java",
+    "test": "test/TenantKeyTest.java",
+    "placeholder_count": 2,
+    "minutes": 45,
+    "mutations": [
+      [
+        "tenant.equals(that.tenant)",
+        "tenant == that.tenant"
+      ]
+    ],
+    "examples": "test/TenantKeyExamplesTest.java",
+    "alternative": "authoring/alternatives/TenantKey.java"
+  },
+  {
+    "task": "java-pilot/02-collections/06-top-words",
+    "class": "TopWords",
+    "source": "src/labs/TopWords.java",
+    "test": "test/TopWordsTest.java",
+    "placeholder_count": 1,
+    "minutes": 50,
+    "mutations": [
+      [
+        "toLowerCase(Locale.ROOT)",
+        "toLowerCase()"
+      ]
+    ],
+    "examples": "test/TopWordsExamplesTest.java",
+    "alternative": "authoring/alternatives/TopWords.java"
+  },
+  {
+    "task": "java-pilot/02-collections/07-snapshot",
+    "class": "Snapshots",
+    "source": "src/labs/Snapshots.java",
+    "test": "test/SnapshotsTest.java",
+    "placeholder_count": 1,
+    "minutes": 45,
+    "mutations": [
+      [
+        "List.copyOf(input.subList(from, to))",
+        "Collections.unmodifiableList(input.subList(from, to))"
+      ]
+    ],
+    "examples": "test/SnapshotsExamplesTest.java",
+    "alternative": "authoring/alternatives/Snapshots.java"
+  },
+  {
+    "task": "java-pilot/02-collections/08-safe-removal",
+    "class": "SafeRemoval",
+    "source": "src/labs/SafeRemoval.java",
+    "test": "test/SafeRemovalTest.java",
+    "placeholder_count": 1,
+    "minutes": 45,
+    "mutations": [
+      [
+        "it.remove();",
+        "values.remove(Integer.valueOf(-1));"
+      ]
+    ],
+    "examples": "test/SafeRemovalExamplesTest.java",
+    "alternative": "authoring/alternatives/SafeRemoval.java"
+  },
+  {
+    "task": "java-pilot/03-internals/09-mini-array-list",
+    "class": "IntVector",
+    "source": "src/labs/IntVector.java",
+    "test": "test/IntVectorTest.java",
+    "placeholder_count": 2,
+    "minutes": 60,
+    "mutations": [
+      [
+        "size - index - 1",
+        "0"
+      ]
+    ],
+    "examples": "test/IntVectorExamplesTest.java",
+    "alternative": "authoring/alternatives/IntVector.java"
+  },
+  {
+    "task": "java-pilot/03-internals/10-hash-index",
+    "class": "HashIndex",
+    "source": "src/labs/HashIndex.java",
+    "test": "test/HashIndexTest.java",
+    "placeholder_count": 2,
+    "minutes": 60,
+    "mutations": [
+      [
+        "hash >>> 16",
+        "hash >> 16"
+      ]
+    ],
+    "examples": "test/HashIndexExamplesTest.java",
+    "alternative": "authoring/alternatives/HashIndex.java"
+  },
+  {
+    "task": "java-pilot/04-capstone/11-lru-cache",
+    "class": "LruCache",
+    "source": "src/labs/LruCache.java",
+    "test": "test/LruCacheTest.java",
+    "placeholder_count": 3,
+    "minutes": 60,
+    "mutations": [
+      [
+        "entries.get(Objects.requireNonNull(key, \"key\"))",
+        "entries.containsKey(Objects.requireNonNull(key, \"key\")) ? entries.entrySet().stream().filter(e -> e.getKey().equals(key)).findFirst().orElseThrow().getValue() : null"
+      ]
+    ],
+    "examples": "test/LruCacheExamplesTest.java",
+    "alternative": "authoring/alternatives/LruCache.java"
+  },
+  {
+    "task": "java-pilot/04-capstone/12-recent-ids",
+    "class": "RecentIds",
+    "source": "src/labs/RecentIds.java",
+    "test": "test/RecentIdsTest.java",
+    "placeholder_count": 2,
+    "minutes": 65,
+    "mutations": [
+      [
+        "if (order.size() == capacity) seen.remove(order.removeFirst());",
+        "if (order.size() == capacity) order.removeFirst();"
+      ]
+    ],
+    "examples": "test/RecentIdsExamplesTest.java",
+    "alternative": "authoring/alternatives/RecentIds.java"
+  }
+]

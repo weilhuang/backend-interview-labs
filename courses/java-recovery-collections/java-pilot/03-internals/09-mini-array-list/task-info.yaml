@@ -1,0 +1,20 @@
+type: edu
+custom_name: 09 · 手写动态数组与摊还分析
+files:
+- name: src/labs/IntVector.java
+  visible: true
+  placeholders:
+  - offset: 251
+    length: 150
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+  - offset: 512
+    length: 173
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/IntVectorTest.java
+  visible: false
+- name: test/IntVectorExamplesTest.java
+  visible: true

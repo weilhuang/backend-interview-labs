@@ -1,0 +1,15 @@
+type: edu
+custom_name: 02 · 解析边界与稳定去重
+files:
+- name: src/labs/IdParser.java
+  visible: true
+  placeholders:
+  - offset: 144
+    length: 613
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/IdParserTest.java
+  visible: false
+- name: test/IdParserExamplesTest.java
+  visible: true

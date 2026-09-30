@@ -1,0 +1,20 @@
+type: edu
+custom_name: 12 · 近期去重窗口：组合数据结构
+files:
+- name: src/labs/RecentIds.java
+  visible: true
+  placeholders:
+  - offset: 401
+    length: 303
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+  - offset: 747
+    length: 35
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/RecentIdsTest.java
+  visible: false
+- name: test/RecentIdsExamplesTest.java
+  visible: true

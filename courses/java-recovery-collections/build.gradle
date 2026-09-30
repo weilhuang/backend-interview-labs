@@ -1,0 +1,47 @@
+import java.time.Duration
+import org.gradle.api.tasks.testing.TestResult
+
+plugins { id 'base' }
+allprojects {
+    group = providers.gradleProperty('courseGroup').get()
+    version = providers.gradleProperty('courseVersion').get()
+    repositories { mavenCentral() }
+}
+subprojects {
+    apply plugin: 'java'
+    sourceSets {
+        main { java.setSrcDirs(['src']) }
+        test { java.setSrcDirs(['test']) }
+    }
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.11.4')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+        options.release = 17
+    }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        if (!project.hasProperty('debugLab')) timeout = Duration.ofSeconds(60)
+        systemProperty 'junit.jupiter.execution.timeout.mode', 'disabled_on_debug'
+        outputs.upToDateWhen { false }
+        testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+        // Protocol used by the official JetBrains Academy Java template.
+        afterTest { descriptor, result ->
+            if (result.resultType == TestResult.ResultType.FAILURE) {
+                String message = result.exception?.message ?: 'Wrong answer'
+                def lines = message.split('\n', -1)
+                println "#educational_plugin FAILED + ${lines[0]}"
+                lines.drop(1).each { println "#educational_plugin${it}" }
+                println ''
+            }
+        }
+    }
+    // Template-compatible no-op: these tasks are checked through JUnit, not main().
+    tasks.register('run') { group = 'application' }
+}
+tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
+tasks.named('check') { dependsOn tasks.named('test') }
+tasks.named('wrapper') { gradleVersion = providers.gradleProperty('gradleVersion').get() }

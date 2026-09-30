@@ -1,0 +1,7 @@
+custom_name: 集合契约：顺序、身份与视图
+content:
+- 04-stable-dedup
+- 05-map-key
+- 06-top-words
+- 07-snapshot
+- 08-safe-removal

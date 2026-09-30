@@ -1,0 +1,15 @@
+type: edu
+custom_name: 07 · subList 视图、快照与不可变
+files:
+- name: src/labs/Snapshots.java
+  visible: true
+  placeholders:
+  - offset: 163
+    length: 159
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/SnapshotsTest.java
+  visible: false
+- name: test/SnapshotsExamplesTest.java
+  visible: true

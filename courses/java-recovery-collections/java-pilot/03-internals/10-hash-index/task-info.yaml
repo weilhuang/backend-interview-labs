@@ -1,0 +1,20 @@
+type: edu
+custom_name: 10 · HashMap 扰动与桶索引
+files:
+- name: src/labs/HashIndex.java
+  visible: true
+  placeholders:
+  - offset: 113
+    length: 37
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+  - offset: 210
+    length: 201
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/HashIndexTest.java
+  visible: false
+- name: test/HashIndexExamplesTest.java
+  visible: true

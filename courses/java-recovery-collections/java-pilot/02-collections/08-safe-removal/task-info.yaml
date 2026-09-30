@@ -1,0 +1,15 @@
+type: edu
+custom_name: 08 · Iterator 与安全原地删除
+files:
+- name: src/labs/SafeRemoval.java
+  visible: true
+  placeholders:
+  - offset: 157
+    length: 372
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/SafeRemovalTest.java
+  visible: false
+- name: test/SafeRemovalExamplesTest.java
+  visible: true

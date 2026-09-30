@@ -1,0 +1,20 @@
+type: edu
+custom_name: 05 · 不可变 Map Key 的身份契约
+files:
+- name: src/labs/TenantKey.java
+  visible: true
+  placeholders:
+  - offset: 545
+    length: 170
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+  - offset: 759
+    length: 63
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/TenantKeyTest.java
+  visible: false
+- name: test/TenantKeyExamplesTest.java
+  visible: true

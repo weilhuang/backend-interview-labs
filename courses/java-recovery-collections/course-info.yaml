@@ -1,0 +1,21 @@
+type: marketplace
+title: Java 后端面试实验室：编码恢复与集合
+language: Chinese
+summary: 通过十二个可检查的编码实验恢复 Java 手感，理解集合契约，结合 OpenJDK17 固定版本源码和面试表达。此为完整课程体系的首个试运行模块。
+programming_language: Java
+content:
+- java-pilot
+environment_settings:
+  jvm_language_level: JDK_17
+additional_files:
+- name: build.gradle
+- name: settings.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: THIRD_PARTY_NOTICES.md
+- name: LICENSE-JetBrains-template
+yaml_version: 2

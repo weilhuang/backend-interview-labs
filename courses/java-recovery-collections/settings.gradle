@@ -1,0 +1,11 @@
+rootProject.name = 'java-recovery-collections'
+// Match Academy task directories only. Never recursively import generated previews.
+file('java-pilot').eachDir { lesson ->
+    lesson.eachDir { task ->
+        if (new File(task, 'task-info.yaml').isFile()) {
+            String module = "java-pilot-${lesson.name}-${task.name}"
+            include(module)
+            project(":${module}").projectDir = task
+        }
+    }
+}

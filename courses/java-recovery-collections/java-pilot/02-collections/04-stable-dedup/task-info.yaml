@@ -1,0 +1,15 @@
+type: edu
+custom_name: 04 · equals、hashCode 与稳定去重
+files:
+- name: src/labs/StableDedup.java
+  visible: true
+  placeholders:
+  - offset: 152
+    length: 108
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/StableDedupTest.java
+  visible: false
+- name: test/StableDedupExamplesTest.java
+  visible: true

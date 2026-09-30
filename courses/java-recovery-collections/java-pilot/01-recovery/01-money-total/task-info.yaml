@@ -1,0 +1,15 @@
+type: edu
+custom_name: 01 · 金额累计：重新找回编码手感
+files:
+- name: src/labs/PaidTotals.java
+  visible: true
+  placeholders:
+  - offset: 280
+    length: 430
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+
+      '
+- name: test/PaidTotalsTest.java
+  visible: false
+- name: test/PaidTotalsExamplesTest.java
+  visible: true
