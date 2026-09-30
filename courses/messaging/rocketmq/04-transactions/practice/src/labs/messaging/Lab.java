@@ -9,12 +9,13 @@ public final class Lab {
     public static void initialize(Inbox database) throws Exception {
         try (Connection c = database.connection();
                 var statement = c.createStatement()) {
-            statement.execute(
-                    "CREATE TABLE local_orders (event_id VARCHAR(100) PRIMARY KEY, cents BIGINT NOT"
-                        + " NULL)");
-            statement.execute(
-                    "CREATE TABLE local_tx (event_id VARCHAR(100) PRIMARY KEY, state VARCHAR(20)"
-                        + " NOT NULL)");
+            String idType = Inbox.identifierSqlType(c);
+            statement.execute("CREATE TABLE local_orders (event_id " + idType
+                    + " PRIMARY KEY, cents BIGINT NOT NULL)");
+            statement.execute("CREATE TABLE local_tx (event_id " + idType
+                    + " PRIMARY KEY, state VARCHAR(20) NOT NULL)");
+            Inbox.requireIdentifierCollation(c, "local_orders", "event_id");
+            Inbox.requireIdentifierCollation(c, "local_tx", "event_id");
         }
     }
 

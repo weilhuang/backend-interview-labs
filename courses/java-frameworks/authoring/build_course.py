@@ -502,9 +502,9 @@ public class Usage {public static void main(String[] args){System.out.println("�
 task('06-runtime-lifecycle','06 生命周期健康与优雅关闭','01-boot','C04-06',
 '服务停机时应停止接单，并在有限预算内处理已有任务。健康状态必须表达真实资源状态，而不是永远返回UP。',
 '1. 运行Usage让真实Spring上下文启动并关闭任务池\n2. 实现Gate.stop停止接单、有限等待、必要中断和恢复中断标记\n3. 用latch控制在途任务，不用sleep猜顺序\n4. 检查HealthIndicator与关闭后拒绝提交',
-'上下文启动后接单；stop后拒绝新任务；stop等待上限2秒，超时调用shutdownNow；线程中断标记不能被吞。关闭后不留下本实验线程。健康UP/DOWN来自实际running状态。',
+'上下文启动后接单；stop后拒绝新任务。关闭总等待预算2秒，其中正常完成最多1.5秒；超时或调用线程中断后执行shutdownNow，并将移出队列的Future显式取消，不能留下永远未完成的Future。余下预算等待工作线程退出；不响应中断而耗尽预算时明确报错，不能冒充安全强杀。退出时恢复调用线程中断标记。健康UP/DOWN来自实际running状态。',
 '[DefaultLifecycleProcessor](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-context/src/main/java/org/springframework/context/support/DefaultLifecycleProcessor.java)：onRefresh/startBeans与onClose/stopBeans；SmartLifecycle的phase与关闭顺序。',
-'SmartLifecycle将资源生命周期交给真实Spring容器。先改变接单状态再shutdown，避免关闭期间持续接收任务。优雅等待有预算，超时中断也是协作信号；不响应中断的业务仍需额外保护，不能声称任何任务都能安全强杀。',
+'SmartLifecycle把资源生命周期交给真实Spring容器。先停止接单，再允许有界正常完成；shutdownNow只发中断并返回尚未执行的Runnable，它不会自动把这些FutureTask标为已取消。因此必须显式cancel移出队列的Future，并在同一总预算内等待工作线程结束。调用方被中断时也必须完成有界清理，最后恢复中断标记。业务不响应中断时只能明确报告关闭失败，不能声称任何任务都能安全强杀。',
 '- readiness与liveness为什么不是同一件事？一个能否接流量，一个是否需重启\n- 为什么shutdown不等于任务立刻结束？已提交任务继续执行\n- 中断标记为何要恢复？让上层知道当前线程被要求停止\n- 关闭预算如何分配给多种资源？需要考虑依赖顺序和总预算',
 '''package labs.frameworks;
 import java.util.concurrent.*;
@@ -521,10 +521,42 @@ public class Lab {
   public boolean isRunning(){return running;}
   public void stop(){
 // 练习区开始
-   ExecutorService current;
-   synchronized(this){if(!running)return;running=false;current=executor;current.shutdown();}
-   try{if(!current.awaitTermination(2,TimeUnit.SECONDS))current.shutdownNow();}
-   catch(InterruptedException e){current.shutdownNow();Thread.currentThread().interrupt();}
+      ExecutorService current;
+      synchronized (this) {
+        if (!running) return;
+        running = false;
+        current = executor;
+        current.shutdown();
+      }
+      // 总预算2秒：先给正常完成1.5秒，再为中断后的资源清理预留时间。
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
+      boolean interrupted = false;
+      try {
+        boolean complete = false;
+        try {
+          complete = current.awaitTermination(1500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+          interrupted = true;
+        }
+        if (!complete) {
+          // shutdownNow只移出等待队列，不会替调用方取消那些Future。
+          for (Runnable task : current.shutdownNow()) {
+            if (task instanceof Future<?> future) future.cancel(false);
+          }
+          while (!current.isTerminated()) {
+            long remaining = deadline - System.nanoTime();
+            if (remaining <= 0) throw new IllegalStateException("任务未响应取消，关闭预算已耗尽");
+            try {
+              if (current.awaitTermination(remaining, TimeUnit.NANOSECONDS)) break;
+            } catch (InterruptedException e) {
+              // 清理仍受同一总预算约束；退出时再恢复调用线程的中断信号。
+              interrupted = true;
+            }
+          }
+        }
+      } finally {
+        if (interrupted) Thread.currentThread().interrupt();
+      }
 // 练习区结束
   }
   public boolean terminated(){return executor!=null && executor.isTerminated();}
@@ -544,9 +576,63 @@ class LabTest {
  @Test void 已接收任务有机会完成() throws Exception {var gate=new Lab.Gate();gate.start();var started=new CountDownLatch(1);var release=new CountDownLatch(1);var result=gate.submit(()->{started.countDown();release.await();return 7;});assertThat(started.await(2,TimeUnit.SECONDS)).isTrue();try(var closer=Executors.newSingleThreadExecutor()){var stopped=closer.submit((Runnable)gate::stop);release.countDown();stopped.get(3,TimeUnit.SECONDS);}assertThat(result.get()).isEqualTo(7);assertThat(gate.terminated()).isTrue();}
  @Test void 队列饱和明确拒绝()throws Exception{var gate=new Lab.Gate();gate.start();var entered=new CountDownLatch(1);var release=new CountDownLatch(1);try{gate.submit(()->{entered.countDown();release.await();return 1;});assertThat(entered.await(2,TimeUnit.SECONDS)).isTrue();gate.submit(()->2);gate.submit(()->3);assertThatThrownBy(()->gate.submit(()->4)).isInstanceOf(RejectedExecutionException.class);}finally{release.countDown();gate.stop();}assertThat(gate.terminated()).isTrue();}
  @Test void 重复停止幂等(){var gate=new Lab.Gate();gate.start();gate.stop();gate.stop();assertThat(gate.isRunning()).isFalse();}
+
+  @Test
+  @Timeout(5)
+  void 超时强制关闭会取消排队Future并等待线程退出() throws Exception {
+    验证强制关闭(false);
+  }
+
+  @Test
+  @Timeout(5)
+  void 中断关闭会取消排队Future并恢复中断标记() throws Exception {
+    验证强制关闭(true);
+  }
+
+  private void 验证强制关闭(boolean interruptCaller) throws Exception {
+    var gate = new Lab.Gate();
+    gate.start();
+    var entered = new CountDownLatch(1);
+    var release = new CountDownLatch(1);
+    var interruptedWorker = new java.util.concurrent.atomic.AtomicBoolean();
+    var runningTask = gate.submit(() -> {
+      entered.countDown();
+      try {
+        release.await();
+      } catch (InterruptedException e) {
+        interruptedWorker.set(true);
+        throw e;
+      }
+      return 1;
+    });
+    Future<Integer> queued = null;
+    try {
+      assertThat(entered.await(2, TimeUnit.SECONDS)).isTrue();
+      queued = gate.submit(() -> 2);
+      if (interruptCaller) Thread.currentThread().interrupt();
+      gate.stop();
+      assertThat(Thread.currentThread().isInterrupted()).isEqualTo(interruptCaller);
+      assertThat(gate.isRunning()).isFalse();
+      assertThat(gate.terminated()).isTrue();
+      assertThat(interruptedWorker.get()).isTrue();
+      assertThat(runningTask.isDone()).isTrue();
+      assertThat(queued.isDone()).isTrue();
+      assertThat(queued.isCancelled()).isTrue();
+      Future<Integer> rejectedFuture = queued;
+      assertThatThrownBy(rejectedFuture::get).isInstanceOf(CancellationException.class);
+    } finally {
+      // 即使断言失败也释放fixture；不污染后续测试的中断状态或线程。
+      Thread.interrupted();
+      release.countDown();
+      if (queued != null) queued.cancel(true);
+      runningTask.cancel(true);
+      gate.stop();
+    }
+  }
+
 }''',
 '''package labs.frameworks;
-public class Usage {public static void main(String[] args) throws Exception {Lab.main(args);}}''',mutations=[['running=false;current=executor;','current=executor;']])
+public class Usage {public static void main(String[] args) throws Exception {Lab.main(args);}}''',mutations=[['running=false;current=executor;','current=executor;'],['if (task instanceof Future<?> future) future.cancel(false);','if (task instanceof Future<?> future) future.isDone();']])
 
 # 综合应用保留上一节HTTP合同，将存储替换成真实JDBC事务；前端无需学习者改写。
 http_code=(ROOT/'framework-course/01-boot/02-http-contract/src/labs/frameworks/Lab.java').read_text()
@@ -988,5 +1074,5 @@ import java.net.*;import java.net.http.*;import java.util.Map;
 import org.springframework.boot.SpringApplication;import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 public class Usage {public static void main(String[] args)throws Exception {var app=new SpringApplication(Lab.class);app.setDefaultProperties(Map.of("server.port","0","server.address","127.0.0.1"));try(var c=(ServletWebServerApplicationContext)app.run()){var client=HttpClient.newHttpClient();String base="http://127.0.0.1:"+c.getWebServer().getPort();int publicCode=client.send(HttpRequest.newBuilder(URI.create(base+"/public/ping")).build(),HttpResponse.BodyHandlers.discarding()).statusCode();int protectedCode=client.send(HttpRequest.newBuilder(URI.create(base+"/orders")).build(),HttpResponse.BodyHandlers.discarding()).statusCode();if(publicCode!=200 || protectedCode!=401)throw new AssertionError("真实HTTP安全合同不满足");System.out.println("公开接口200，受保护接口匿名401；角色/CSRF完整测试见公开测试文件");}}}
 ''')
-DIAGRAMS={'01-configuration': '[默认值] -> [配置文件/活动配置] -> [命令行覆盖]\n                                      |\n                                      v\n                              [绑定] -> [启动校验] -> [业务数量校验]', '02-http-contract': '[中文页面/调用方] -> [JSON解析与校验] -> [请求编号查重]\n                                              |\n                          +-------------------+------------------+\n                          |                   |                  |\n                       [新建201]          [同内容200]        [冲突409]', '03-transactions': '[事务开始] -> [查重] -> [条件扣库存] -> [插入订单] -> [提交]\n                             |              |\n                             +-- 任一步失败 -+\n                                      |\n                                      v\n                              [库存与订单同时回滚]', '04-test-layers': '[单元]     纯对象 + 价格替身     -> 业务边界/调用次数\n[切片]     MockMvc + MVC装配   -> 参数/状态码/异常映射\n[集成]     真端口 + 完整Boot    -> HTTP传输/真实应用装配', '05-security': '[请求] -> [CORS] -> [CSRF] -> [认证] -> [授权] -> [控制器]\n                                |         |\n                             [匿名401] [越权403]\n关键链路示意省略了其他过滤器；实际顺序以固定源码为准。', '06-runtime-lifecycle': '[接单中] -> [有界队列] -> [工作线程]\n    |\n    +-- 停止 --> [拒绝新任务] -> [shutdown] -> [限时等待]\n                                                   |\n                                            [超时则请求中断]', '07-integrated-service': '[预置前端] -> [Controller] -> [事务服务] -> [JdbcTemplate] -> [数据库]\n                                    |                            |\n                               [错误回滚]                    [唯一约束]\n                                    |                            |\n                                    +---------- [稳定HTTP合同] --+', '08-container-di': '[按类型获取] -> [缓存命中?] --是--> [同一实例]\n                    |否\n                    v\n              [构造路径检查] -> [递归解析依赖] -> [创建并缓存]\n                    |\n                 [循环报错]', '09-bean-lifecycle': '[修改Bean定义]\n       |\n       v\n[构造] -> [属性注入] -> [初始化前处理] -> [初始化] -> [初始化后处理]\n                                                              |\n                                                        [关闭时销毁]', '10-circular-boundary': '属性循环：  [已构造A] --设置B--> [已构造B]\n                ^                 |\n                +---- 设置A ------+\n\n构造循环：  [创建A需要B] -> [创建B需要A] -> [A尚未构造，失败]', '11-aop-proxy': '外部调用： [客户端] -> [代理] -> [拦截器] -> [目标charge]\n自调用：   [客户端] -> [代理] -> [目标batch] -> [this.charge]\n                                                 |\n                                          [不重新经过代理]', '12-transaction-source': '[外层REQUIRED] -> [内层REQUIRED] -> [共享物理事务]\n                         |失败\n                         v\n                   [rollback-only] -> [外层提交时报错]\n\n[外层事务] --暂停--> [REQUIRES_NEW独立事务] --完成--> [恢复外层]', '13-mvc-source': '[Servlet过滤器] -> [DispatcherServlet] -> [拦截器前置]\n                                              |\n                                              v\n[返回值处理] <- [控制器方法] <- [参数解析与校验]\n                                   |失败\n                                   v\n                           [异常解析器与错误响应]', '14-autoconfiguration': '[imports候选] -> [类路径条件] -> [属性条件] -> [缺Bean条件]\n                                                       |\n                                     +-----------------+-------------+\n                                     |                               |\n                                [创建默认Bean]               [保留用户自定义Bean]'}
+DIAGRAMS={'01-configuration': '[默认值] -> [配置文件/活动配置] -> [命令行覆盖]\n                                      |\n                                      v\n                              [绑定] -> [启动校验] -> [业务数量校验]', '02-http-contract': '[中文页面/调用方] -> [JSON解析与校验] -> [请求编号查重]\n                                              |\n                          +-------------------+------------------+\n                          |                   |                  |\n                       [新建201]          [同内容200]        [冲突409]', '03-transactions': '[事务开始] -> [查重] -> [条件扣库存] -> [插入订单] -> [提交]\n                             |              |\n                             +-- 任一步失败 -+\n                                      |\n                                      v\n                              [库存与订单同时回滚]', '04-test-layers': '[单元]     纯对象 + 价格替身     -> 业务边界/调用次数\n[切片]     MockMvc + MVC装配   -> 参数/状态码/异常映射\n[集成]     真端口 + 完整Boot    -> HTTP传输/真实应用装配', '05-security': '[请求] -> [CORS] -> [CSRF] -> [认证] -> [授权] -> [控制器]\n                                |         |\n                             [匿名401] [越权403]\n关键链路示意省略了其他过滤器；实际顺序以固定源码为准。', '06-runtime-lifecycle': '[接单中] -> [有界队列] -> [工作线程]\n    |\n    +-- 停止 --> [拒绝新任务] -> [shutdown] -> [限时等待]\n                                                   |\n                                            [超时/中断 -> 取消排队Future -> 有界等退出]', '07-integrated-service': '[预置前端] -> [Controller] -> [事务服务] -> [JdbcTemplate] -> [数据库]\n                                    |                            |\n                               [错误回滚]                    [唯一约束]\n                                    |                            |\n                                    +---------- [稳定HTTP合同] --+', '08-container-di': '[按类型获取] -> [缓存命中?] --是--> [同一实例]\n                    |否\n                    v\n              [构造路径检查] -> [递归解析依赖] -> [创建并缓存]\n                    |\n                 [循环报错]', '09-bean-lifecycle': '[修改Bean定义]\n       |\n       v\n[构造] -> [属性注入] -> [初始化前处理] -> [初始化] -> [初始化后处理]\n                                                              |\n                                                        [关闭时销毁]', '10-circular-boundary': '属性循环：  [已构造A] --设置B--> [已构造B]\n                ^                 |\n                +---- 设置A ------+\n\n构造循环：  [创建A需要B] -> [创建B需要A] -> [A尚未构造，失败]', '11-aop-proxy': '外部调用： [客户端] -> [代理] -> [拦截器] -> [目标charge]\n自调用：   [客户端] -> [代理] -> [目标batch] -> [this.charge]\n                                                 |\n                                          [不重新经过代理]', '12-transaction-source': '[外层REQUIRED] -> [内层REQUIRED] -> [共享物理事务]\n                         |失败\n                         v\n                   [rollback-only] -> [外层提交时报错]\n\n[外层事务] --暂停--> [REQUIRES_NEW独立事务] --完成--> [恢复外层]', '13-mvc-source': '[Servlet过滤器] -> [DispatcherServlet] -> [拦截器前置]\n                                              |\n                                              v\n[返回值处理] <- [控制器方法] <- [参数解析与校验]\n                                   |失败\n                                   v\n                           [异常解析器与错误响应]', '14-autoconfiguration': '[imports候选] -> [类路径条件] -> [属性条件] -> [缺Bean条件]\n                                                       |\n                                     +-----------------+-------------+\n                                     |                               |\n                                [创建默认Bean]               [保留用户自定义Bean]'}
 finish()

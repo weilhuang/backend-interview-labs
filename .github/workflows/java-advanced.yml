@@ -1,6 +1,7 @@
 name: Java并发与JVM课程质量检查
 on:
   push:
+    branches: [main]
     paths:
       - 'courses/java-concurrency/**'
       - 'courses/java-jvm/**'
@@ -10,6 +11,9 @@ on:
       - 'courses/java-concurrency/**'
       - 'courses/java-jvm/**'
       - '.github/workflows/java-advanced.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

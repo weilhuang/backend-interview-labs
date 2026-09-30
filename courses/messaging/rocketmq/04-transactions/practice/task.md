@@ -59,6 +59,8 @@ src/labs/messaging/Usage.java 是可见命令行调用端；无参数打印准�
 
 ## 标准答案与逐步解析
 
+事件/订单标识符保留原始大小写与尾空格，MySQL六个身份列显式使用utf8mb4_0900_bin（NO PAD）；不能把自然语言ai_ci比较用在幂等或事务回查身份上。H2只验控制流，真实Case/case/尾空格与错身份回查由MySQL用例证明。
+
 事务状态表不是随后异步补写的日志，而是本地事务原子组成部分。checker只查询，不重复执行扣款/下单；数据库异常返回UNKNOWN并留给有界重查与运维兜底。原生产者close后重建客户端，真实回查由latch证据判定，最长等待90秒失败。本地提交已发生，不代表下游库存也已提交，后者需独立幂等事务。
 
 下方为与工程同源的完整实现及调用方，不隐藏答案。先自己完成再读；已读答案后需换条件盲做才能判断掌握程度。
@@ -77,12 +79,13 @@ public final class Lab {
     public static void initialize(Inbox database) throws Exception {
         try (Connection c = database.connection();
                 var statement = c.createStatement()) {
-            statement.execute(
-                    "CREATE TABLE local_orders (event_id VARCHAR(100) PRIMARY KEY, cents BIGINT NOT"
-                        + " NULL)");
-            statement.execute(
-                    "CREATE TABLE local_tx (event_id VARCHAR(100) PRIMARY KEY, state VARCHAR(20)"
-                        + " NOT NULL)");
+            String idType = Inbox.identifierSqlType(c);
+            statement.execute("CREATE TABLE local_orders (event_id " + idType
+                    + " PRIMARY KEY, cents BIGINT NOT NULL)");
+            statement.execute("CREATE TABLE local_tx (event_id " + idType
+                    + " PRIMARY KEY, state VARCHAR(20) NOT NULL)");
+            Inbox.requireIdentifierCollation(c, "local_orders", "event_id");
+            Inbox.requireIdentifierCollation(c, "local_tx", "event_id");
         }
     }
 

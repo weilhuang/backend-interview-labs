@@ -19,6 +19,8 @@ subprojects {
         testImplementation platform('org.junit:junit-bom:5.11.4')
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // 明确保留注解API，令官方POM离线验证与Gradle模块元数据的运行类路径锁一致。
+        testRuntimeOnly 'org.apiguardian:apiguardian-api:1.1.2'
         testRuntimeOnly 'com.h2database:h2:2.3.232'
         if (name != 'support') implementation project(':support')
     }

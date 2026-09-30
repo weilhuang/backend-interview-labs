@@ -73,9 +73,10 @@ class ReplicationIntegrationTest {
         assertEquals("写入已确认", r.get(key));
       }
       primary.crash();
-      try (var p = primary.connect()) {
-        assertThrows(RuntimeException.class, p::ping);
-      }
+      // Jedis 5 构造连接时就可能抛出网络异常，连接与命令必须都放在预期失败边界内。
+      assertThrows(redis.clients.jedis.exceptions.JedisConnectionException.class, () -> {
+        try (var p = primary.connect()) { p.ping(); }
+      });
       try (var r = replica.connect()) {
         Replication.promoteIsolatedReplica(r);
         assertEquals("写入已确认", r.get(key));

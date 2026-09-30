@@ -1,6 +1,7 @@
 name: 共享实验环境真实验收
 on:
   push:
+    branches: [main]
     paths:
       - 'infra/**'
       - 'scripts/**'
@@ -15,6 +16,9 @@ on:
       - 'courses/java-recovery-collections/**'
       - '.github/workflows/lab-environment.yml'
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

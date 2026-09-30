@@ -4,7 +4,7 @@ files:
 - name: src/labs/messaging/Lab.java
   visible: true
   placeholders:
-  - offset: 818
+  - offset: 968
     length: 660
     placeholder_text: '        throw new UnsupportedOperationException("TODO：请按题目实现本方法");
 

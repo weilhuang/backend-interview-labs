@@ -76,4 +76,57 @@ class LabTest {
     gate.stop();
     assertThat(gate.isRunning()).isFalse();
   }
+
+  @Test
+  @Timeout(5)
+  void 超时强制关闭会取消排队Future并等待线程退出() throws Exception {
+    验证强制关闭(false);
+  }
+
+  @Test
+  @Timeout(5)
+  void 中断关闭会取消排队Future并恢复中断标记() throws Exception {
+    验证强制关闭(true);
+  }
+
+  private void 验证强制关闭(boolean interruptCaller) throws Exception {
+    var gate = new Lab.Gate();
+    gate.start();
+    var entered = new CountDownLatch(1);
+    var release = new CountDownLatch(1);
+    var interruptedWorker = new java.util.concurrent.atomic.AtomicBoolean();
+    var runningTask = gate.submit(() -> {
+      entered.countDown();
+      try {
+        release.await();
+      } catch (InterruptedException e) {
+        interruptedWorker.set(true);
+        throw e;
+      }
+      return 1;
+    });
+    Future<Integer> queued = null;
+    try {
+      assertThat(entered.await(2, TimeUnit.SECONDS)).isTrue();
+      queued = gate.submit(() -> 2);
+      if (interruptCaller) Thread.currentThread().interrupt();
+      gate.stop();
+      assertThat(Thread.currentThread().isInterrupted()).isEqualTo(interruptCaller);
+      assertThat(gate.isRunning()).isFalse();
+      assertThat(gate.terminated()).isTrue();
+      assertThat(interruptedWorker.get()).isTrue();
+      assertThat(runningTask.isDone()).isTrue();
+      assertThat(queued.isDone()).isTrue();
+      assertThat(queued.isCancelled()).isTrue();
+      Future<Integer> rejectedFuture = queued;
+      assertThatThrownBy(rejectedFuture::get).isInstanceOf(CancellationException.class);
+    } finally {
+      // 即使断言失败也释放fixture；不污染后续测试的中断状态或线程。
+      Thread.interrupted();
+      release.countDown();
+      if (queued != null) queued.cancel(true);
+      runningTask.cancel(true);
+      gate.stop();
+    }
+  }
 }

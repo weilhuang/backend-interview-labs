@@ -26,4 +26,5 @@ additional_files:
 - name: docs/课程覆盖与验收边界.md
 - name: docs/验收摘要.json
 - name: docs/云端验收复现.md
+- name: scripts/test-process-control.py
 yaml_version: 2

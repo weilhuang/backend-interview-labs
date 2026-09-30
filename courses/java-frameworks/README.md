@@ -71,3 +71,7 @@ MySQL测试完整可见但独立放在integration-test源集，普通test不会�
 ## Linux云端启动脚本
 
 `scripts/course.sh doctor`检查JDK；`start 02-http-contract`或`start 07-integrated-service`启动；`check`等待真实HTTP就绪；`stop`只停止本课程登记且归属匹配的进程。脚本当前按Linux云端编写；其他学习环境可直接运行Gradle的run任务并用Ctrl+C停止。开发验证可显式用LAB_GRADLE_BIN选择已安装的同版本Gradle，LAB_OFFLINE=1使用已验证依赖缓存，不更换版本。
+
+## 进程管理与修复回归
+
+`python3 scripts/test-process-control.py`只在临时目录启动本测试的受控子进程，检查随机实例token与PID身份、退出状态和幂等停止。脚本采用Linux/macOS共同的ps接口，Linux9项回归已通过；Mac尚未实际运行，不能据此宣称跨平台实测通过。旧版未保存token的服务需在原启动终端结束，新脚本不会冒险认领。C04-06现有6项测试包含超时/中断时取消排队Future，正常退出才报告资源清理完成。

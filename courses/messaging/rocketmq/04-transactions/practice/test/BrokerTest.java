@@ -69,4 +69,27 @@ class BrokerTest {
             }
         }
     }
+
+    @Test
+    void 真实MySQL回查不得把其他大小写或尾空格身份认成已提交() throws Exception {
+        try (var mysql = new MySQLContainer<>(Images.get("MYSQL_IMAGE"))) {
+            mysql.start();
+            Inbox database = new Inbox(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
+            Lab.initialize(database);
+            Lab.commitLocal(database, new Event("Case", "o1", 1, 100));
+            assertEquals(TransactionResolution.COMMIT, Lab.check(database,"Case"));
+            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database,"case"));
+            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database,"Case "));
+            Lab.commitLocal(database, new Event("case", "o2", 1, 200));
+            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database,"case "));
+            Lab.commitLocal(database, new Event("case ", "o3", 1, 300));
+            for (String id : java.util.List.of("Case","case","case ")) {
+                assertEquals(TransactionResolution.COMMIT, Lab.check(database,id));
+            }
+            try (var c = database.connection(); var st = c.createStatement();
+                    var rows = st.executeQuery("SELECT COUNT(*),SUM(cents) FROM local_orders")) {
+                assertTrue(rows.next()); assertEquals(3,rows.getLong(1)); assertEquals(600,rows.getLong(2));
+            }
+        }
+    }
 }

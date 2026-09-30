@@ -1,6 +1,7 @@
 name: Java课程内部试点检查
 on:
   push:
+    branches: [main]
     paths:
       - 'courses/java-recovery-collections/**'
       - '.github/workflows/java-pilot.yml'
@@ -8,6 +9,9 @@ on:
     paths:
       - 'courses/java-recovery-collections/**'
       - '.github/workflows/java-pilot.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

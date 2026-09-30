@@ -1,9 +1,13 @@
 name: Java框架真实构建与前端验收
 on:
   push:
+    branches: [main]
     paths: ['courses/java-frameworks/**', 'infra/versions.env', '.github/workflows/java-frameworks.yml']
   pull_request:
     paths: ['courses/java-frameworks/**', 'infra/versions.env', '.github/workflows/java-frameworks.yml']
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -14,6 +18,7 @@ jobs:
       run:
         working-directory: courses/java-frameworks
     env:
+      LAB_SHARED_VERSIONS: ${{ github.workspace }}/infra/versions.env
       GRADLE_USER_HOME: ${{ github.workspace }}/courses/java-frameworks/build/gradle-home
     steps:
       - uses: actions/checkout@v4

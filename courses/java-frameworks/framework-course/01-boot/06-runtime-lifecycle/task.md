@@ -17,7 +17,7 @@
 
 ## 正确性合同
 
-上下文启动后接单；stop后拒绝新任务；stop等待上限2秒，超时调用shutdownNow；线程中断标记不能被吞。关闭后不留下本实验线程。健康UP/DOWN来自实际running状态。
+上下文启动后接单；stop后拒绝新任务。关闭总等待预算2秒，其中正常完成最多1.5秒；超时或调用线程中断后执行shutdownNow，并将移出队列的Future显式取消，不能留下永远未完成的Future。余下预算等待工作线程退出；不响应中断而耗尽预算时明确报错，不能冒充安全强杀。退出时恢复调用线程中断标记。健康UP/DOWN来自实际running状态。
 
 ## 核心机制与图解
 
@@ -26,10 +26,10 @@
     |
     +-- 停止 --> [拒绝新任务] -> [shutdown] -> [限时等待]
                                                    |
-                                            [超时则请求中断]
+                                            [超时/中断 -> 取消排队Future -> 有界等退出]
 ```
 
-SmartLifecycle将资源生命周期交给真实Spring容器。先改变接单状态再shutdown，避免关闭期间持续接收任务。优雅等待有预算，超时中断也是协作信号；不响应中断的业务仍需额外保护，不能声称任何任务都能安全强杀。
+SmartLifecycle把资源生命周期交给真实Spring容器。先停止接单，再允许有界正常完成；shutdownNow只发中断并返回尚未执行的Runnable，它不会自动把这些FutureTask标为已取消。因此必须显式cancel移出队列的Future，并在同一总预算内等待工作线程结束。调用方被中断时也必须完成有界清理，最后恢复中断标记。业务不响应中断时只能明确报告关闭失败，不能声称任何任务都能安全强杀。
 
 ## 固定版本源码阅读
 
@@ -55,15 +55,38 @@ SmartLifecycle将资源生命周期交给真实Spring容器。先改变接单状
         current = executor;
         current.shutdown();
       }
+      // 总预算2秒：先给正常完成1.5秒，再为中断后的资源清理预留时间。
+      long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(2);
+      boolean interrupted = false;
       try {
-        if (!current.awaitTermination(2, TimeUnit.SECONDS)) current.shutdownNow();
-      } catch (InterruptedException e) {
-        current.shutdownNow();
-        Thread.currentThread().interrupt();
+        boolean complete = false;
+        try {
+          complete = current.awaitTermination(1500, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+          interrupted = true;
+        }
+        if (!complete) {
+          // shutdownNow只移出等待队列，不会替调用方取消那些Future。
+          for (Runnable task : current.shutdownNow()) {
+            if (task instanceof Future<?> future) future.cancel(false);
+          }
+          while (!current.isTerminated()) {
+            long remaining = deadline - System.nanoTime();
+            if (remaining <= 0) throw new IllegalStateException("任务未响应取消，关闭预算已耗尽");
+            try {
+              if (current.awaitTermination(remaining, TimeUnit.NANOSECONDS)) break;
+            } catch (InterruptedException e) {
+              // 清理仍受同一总预算约束；退出时再恢复调用线程的中断信号。
+              interrupted = true;
+            }
+          }
+        }
+      } finally {
+        if (interrupted) Thread.currentThread().interrupt();
       }
 ```
 
-SmartLifecycle将资源生命周期交给真实Spring容器。先改变接单状态再shutdown，避免关闭期间持续接收任务。优雅等待有预算，超时中断也是协作信号；不响应中断的业务仍需额外保护，不能声称任何任务都能安全强杀。
+SmartLifecycle把资源生命周期交给真实Spring容器。先停止接单，再允许有界正常完成；shutdownNow只发中断并返回尚未执行的Runnable，它不会自动把这些FutureTask标为已取消。因此必须显式cancel移出队列的Future，并在同一总预算内等待工作线程结束。调用方被中断时也必须完成有界清理，最后恢复中断标记。业务不响应中断时只能明确报告关闭失败，不能声称任何任务都能安全强杀。
 
 ## 面试机制 边界与取舍
 

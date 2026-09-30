@@ -9,5 +9,49 @@
     "stop"
   ],
   "frontend_ui": "未执行，Chromium受当前沙箱限制",
-  "mode": "完整JDK21与已有Gradle8.10.2，已解析依赖离线运行"
+  "mode": "完整JDK21与已有Gradle8.10.2，已解析依赖离线运行",
+  "historical_scope": "原启动/HTTP记录属于修复前脚本；新版进程管理单独验证如下",
+  "process_control_regression": {
+    "status": "passed",
+    "platform": "linux",
+    "cases": [
+      {
+        "case": "无PID文件幂等停止",
+        "result": "没有本课程服务PID"
+      },
+      {
+        "case": "非法PID不能向进程组发信号",
+        "result": "PID记录格式无效，拒绝发送信号"
+      },
+      {
+        "case": "不存在PID清除过期记录",
+        "result": "服务已停止"
+      },
+      {
+        "case": "复用PID但token不匹配不误杀",
+        "result": "PID或随机实例标记归属不匹配，拒绝停止其他进程"
+      },
+      {
+        "case": "身份错误时check不探测其他HTTP服务",
+        "result": "服务未运行或实例身份不匹配，拒绝把其他HTTP服务当作本课程"
+      },
+      {
+        "case": "token相同但主类不匹配不误杀",
+        "result": "PID或随机实例标记归属不匹配，拒绝停止其他进程"
+      },
+      {
+        "case": "已经退出的PID安全清理",
+        "result": "服务已停止"
+      },
+      {
+        "case": "身份匹配只终止本测试子进程",
+        "result": "本课程服务已停止"
+      },
+      {
+        "case": "重复stop幂等",
+        "result": "没有本课程服务PID"
+      }
+    ],
+    "macos": "使用macOS支持的ps参数与Bash3语法；未在真实macOS执行，不能标记跨平台实测通过"
+  }
 }

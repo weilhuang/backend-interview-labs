@@ -104,14 +104,18 @@
     "unit": "C04-06",
     "scenario": "服务停机时应停止接单，并在有限预算内处理已有任务。健康状态必须表达真实资源状态，而不是永远返回UP。",
     "steps": "1. 运行Usage让真实Spring上下文启动并关闭任务池\n2. 实现Gate.stop停止接单、有限等待、必要中断和恢复中断标记\n3. 用latch控制在途任务，不用sleep猜顺序\n4. 检查HealthIndicator与关闭后拒绝提交",
-    "contract": "上下文启动后接单；stop后拒绝新任务；stop等待上限2秒，超时调用shutdownNow；线程中断标记不能被吞。关闭后不留下本实验线程。健康UP/DOWN来自实际running状态。",
+    "contract": "上下文启动后接单；stop后拒绝新任务。关闭总等待预算2秒，其中正常完成最多1.5秒；超时或调用线程中断后执行shutdownNow，并将移出队列的Future显式取消，不能留下永远未完成的Future。余下预算等待工作线程退出；不响应中断而耗尽预算时明确报错，不能冒充安全强杀。退出时恢复调用线程中断标记。健康UP/DOWN来自实际running状态。",
     "source": "[DefaultLifecycleProcessor](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-context/src/main/java/org/springframework/context/support/DefaultLifecycleProcessor.java)：onRefresh/startBeans与onClose/stopBeans；SmartLifecycle的phase与关闭顺序。",
-    "explain": "SmartLifecycle将资源生命周期交给真实Spring容器。先改变接单状态再shutdown，避免关闭期间持续接收任务。优雅等待有预算，超时中断也是协作信号；不响应中断的业务仍需额外保护，不能声称任何任务都能安全强杀。",
+    "explain": "SmartLifecycle把资源生命周期交给真实Spring容器。先停止接单，再允许有界正常完成；shutdownNow只发中断并返回尚未执行的Runnable，它不会自动把这些FutureTask标为已取消。因此必须显式cancel移出队列的Future，并在同一总预算内等待工作线程结束。调用方被中断时也必须完成有界清理，最后恢复中断标记。业务不响应中断时只能明确报告关闭失败，不能声称任何任务都能安全强杀。",
     "questions": "- readiness与liveness为什么不是同一件事？一个能否接流量，一个是否需重启\n- 为什么shutdown不等于任务立刻结束？已提交任务继续执行\n- 中断标记为何要恢复？让上层知道当前线程被要求停止\n- 关闭预算如何分配给多种资源？需要考虑依赖顺序和总预算",
     "mutations": [
       [
         "running=false;current=executor;",
         "current=executor;"
+      ],
+      [
+        "if (task instanceof Future<?> future) future.cancel(false);",
+        "if (task instanceof Future<?> future) future.isDone();"
       ]
     ]
   },

@@ -1,6 +1,7 @@
 name: 数据库与缓存课程真实服务检查
 on:
   push:
+    branches: [main]
     paths:
       - 'courses/data-storage/**'
       - 'infra/versions.env'
@@ -11,6 +12,9 @@ on:
       - 'infra/versions.env'
       - '.github/workflows/data-storage.yml'
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
