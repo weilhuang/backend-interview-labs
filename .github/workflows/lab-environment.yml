@@ -1,0 +1,92 @@
+name: 共享实验环境真实验收
+on:
+  push:
+    paths:
+      - 'infra/**'
+      - 'scripts/**'
+      - 'docs/environment/**'
+      - 'courses/java-recovery-collections/**'
+      - '.github/workflows/lab-environment.yml'
+  pull_request:
+    paths:
+      - 'infra/**'
+      - 'scripts/**'
+      - 'docs/environment/**'
+      - 'courses/java-recovery-collections/**'
+      - '.github/workflows/lab-environment.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-lab:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 静态约束与无Docker回归
+        run: |
+          bash -n scripts/lab.sh
+          python3 -m unittest discover -s scripts/tests -v
+          ./scripts/lab.sh verify
+      - name: 创建仅本次CI使用的独立项目
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          text = Path('infra/.env.example').read_text()
+          project = 'backend-interview-labs-ci-' + os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT']
+          Path('infra/.env').write_text(text.replace('LAB_PROJECT_NAME=backend-interview-labs', 'LAB_PROJECT_NAME=' + project))
+          Path('infra/.env').chmod(0o600)
+          PY
+      - name: 记录真实daemon版本并解析Compose
+        run: |
+          ./scripts/lab.sh doctor
+          ./scripts/lab.sh config
+          ./scripts/lab.sh images
+      - name: 启动core并验证真实数据库读写
+        run: |
+          ./scripts/lab.sh up core
+          ./scripts/lab.sh check core
+          python3 scripts/ci_smoke.py core-write
+          python3 scripts/ci_smoke.py logs
+          ./scripts/lab.sh down
+      - name: 重启后验证MySQL与Redis持久化
+        run: |
+          ./scripts/lab.sh up core
+          python3 scripts/ci_smoke.py core-read
+          python3 scripts/ci_smoke.py logs
+          ./scripts/lab.sh down
+      - name: 单独启动Kafka并验证真实消息收发
+        run: |
+          ./scripts/lab.sh up kafka
+          ./scripts/lab.sh check kafka
+          python3 scripts/ci_smoke.py kafka
+          python3 scripts/ci_smoke.py logs
+          ./scripts/lab.sh down
+      - name: 使用共享完整JDK21镜像和原GradleWrapper构建
+        run: |
+          ./scripts/lab.sh build . javac -version
+          ./scripts/lab.sh build . mvn -version
+          ./scripts/lab.sh build . sh -ec 'out=$(mktemp -d); javac --release 21 -d "$out" infra/testcontainers/LabImages.java infra/testcontainers/LabImagesProbe.java; java -cp "$out" lab.support.LabImagesProbe'
+          ./scripts/lab.sh build courses/java-recovery-collections bash ./gradlew --no-daemon test
+      - name: 收集最后状态的脱敏日志
+        if: always()
+        run: python3 scripts/ci_smoke.py logs
+      - name: 仅清理本次CI项目的一次性数据
+        if: always()
+        run: |
+          # 参数来自本次运行ID；脚本还核对 .env 中的精确项目名，不清理其他项目。
+          ./scripts/lab.sh reset --confirm-reset "backend-interview-labs-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      - name: 保存脱敏日志和构建测试报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab-environment-reports-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            infra/artifacts/*.log
+            courses/java-recovery-collections/java-pilot/**/build/reports/tests/
+          if-no-files-found: warn
+          retention-days: 7
