@@ -87,6 +87,8 @@ class LabTest {
         assertTrue(startup.contains("-Xmx128m"));
         assertTrue(startup.contains("useEndpointPortFromRequest\":true"));
         assertTrue(startup.contains("timerWheelEnable=true\n"));
+        // ProxyConfig独立读取namesrvAddr，不能只在Broker配置里设置。
+        assertTrue(startup.contains("\"namesrvAddr\":\"127.0.0.1:9876\""));
     }
 
     @Test

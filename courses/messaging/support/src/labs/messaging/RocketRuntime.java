@@ -26,7 +26,7 @@ public final class RocketRuntime {
                timerWheelEnable=true
                BROKER
                cat > /tmp/lab-proxy.json <<'PROXY'
-               {"rocketMQClusterName":"LabCluster","useEndpointPortFromRequest":true}
+               {"rocketMQClusterName":"LabCluster","namesrvAddr":"127.0.0.1:9876","useEndpointPortFromRequest":true}
                PROXY
                JAVA_OPT_EXT='-Xms64m -Xmx128m -Xmn32m -XX:MaxDirectMemorySize=32m' sh mqnamesrv &
                namesrv_pid=$!

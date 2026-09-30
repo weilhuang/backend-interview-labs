@@ -6,8 +6,18 @@
 - Gradle Wrapper8.10.2：仓库自带启动器，不需要另装Gradle。编译明确使用 `--release 21`
 - JUnit Jupiter5.11.4 / Platform1.11.4：由Gradle从Maven Central解析
 - Python3.11以上及PyYAML6.0.3：仅作者元数据、学员副本生成和质量回归脚本需要；普通Java学习不依赖Python
-- IntelliJ IDEA2026.1.5与兼容其构建版本的JetBrains Academy插件：仅Academy界面学习/导出需要。具体插件版本仍须实机确认
+- IntelliJ IDEA2026.1.5与兼容其构建版本的JetBrains Academy插件：仅Academy界面学习/导出需要。本次实测插件为2026.9-2026.1-1070，匹配IDE构建261.27258.48
 - 固定源码：OpenJDK21 GA，tag `jdk-21+35`，commit `890adb6410dab4606a4f26a942aed02fb2f55387`。运行时更新补丁与GA源码不完全相同时须分别记录
+
+### 先区分两种运行入口
+
+**Academy 官方 ZIP 导入或作者预览**：完成 Gradle 同步后，用题面的 **Check** 检查答案；打开每题 `src/labs/*Usage.java`，点击 `main` 旁的运行图标。也可在 Gradle 工具窗口运行本题模块的 `test` 或 `run` 任务。建议将 Task 面板拉宽到约600像素，便于阅读中文标题、代码和ASCII图。
+
+**源码仓库或普通 Gradle 学员副本**：仓库以及 `authoring/materialize_learner.py` 生成的普通工程自带 Wrapper，下面的 `./gradlew` 命令只用于这一入口。
+
+在IDEA2026.1.5与Academy2026.9-2026.1-1070的实际导出和干净导入中，官方课程ZIP不包含 `gradlew`、`gradlew.bat`、`gradle/wrapper/gradle-wrapper.jar`；导入目录只保留 `gradle/wrapper/gradle-wrapper.properties`。这不影响IDE里的Check和Usage运行，但不能照搬终端 `./gradlew` 命令。需要完整CLI教程时请使用源码仓库或普通Gradle学员副本，不必手工修改官方课程归档。
+
+下面是**源码或普通 Gradle 工程模式**的版本与运行检查：
 
 ```sh
 java -version
@@ -105,6 +115,8 @@ java-recovery-collections/
 
 ## 作者质量回归
 
+以下命令仅用于带Wrapper的作者源码工程：
+
 ```sh
 ./gradlew test
 python authoring/validate_course.py
@@ -119,7 +131,7 @@ python authoring/verify.py --junit-console /path/to/junit-platform-console-stand
 
 ## 超时与调试
 
-每项JUnit测试3秒，Gradle单任务60秒；独立验证子进程也有60秒上限。依赖下载与首次构建时间和单题执行超时分别处理。长断点调试使用：
+每项JUnit测试3秒，Gradle单任务60秒；独立验证子进程也有60秒上限。依赖下载与首次构建时间和单题执行超时分别处理。以下长断点命令用于带Wrapper的源码工程或普通Gradle学员副本；Academy导入模式可在IDE里直接Debug测试：
 
 ```sh
 ./gradlew :java-pilot-01-recovery-01-money-total:test --debug-jvm -PdebugLab
@@ -133,4 +145,4 @@ python authoring/verify.py --junit-console /path/to/junit-platform-console-stand
 
 ## 当前状态
 
-见authoring/VERIFICATION.md。本包始终标记为内部教学模板试点，既不代表完整V1完成，也不代表Academy学员归档已经验收。
+见authoring/VERIFICATION.md。本包始终标记为内部教学模板试点，既不代表完整V1完成，也不代表全部题目或其他课程已完成Academy界面验收。已执行的试点界面检查范围见仓库 `docs/界面验收报告.md`。

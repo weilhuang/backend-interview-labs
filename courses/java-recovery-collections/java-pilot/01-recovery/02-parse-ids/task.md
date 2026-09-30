@@ -2,7 +2,7 @@
 
 ## 依赖与完整项目结构
 
-本题依赖完整 JDK21、Gradle Wrapper8.10.2、JUnit Jupiter5.11.4 / Platform1.11.4。编译使用 --release21；无需为每题新建工程或单独安装Gradle。课程根README列出完整目录与环境步骤。
+本题使用完整 JDK21、Gradle8.10.2、JUnit Jupiter5.11.4 / Platform1.11.4，编译使用 --release21。源码仓库自带 Gradle Wrapper；Academy 导入课程由 IDE 管理 Gradle。无需为每题新建工程，具体入口见下面的运行说明。
 
 ```text
 02-parse-ids/
@@ -94,7 +94,11 @@ public final class IdParserUsage {
 
 ## 写代码、使用接口、验证结果
 
-在课程根目录执行（普通学员副本初始失败是预期行为）：
+**Academy 导入或预览模式**：用题面底部的 **Check** 验证答案；打开 `src/labs/IdParserUsage.java`，点击 `main` 旁的运行图标执行调用示例。也可在 Gradle 工具窗口选择本题模块的 `test` 或 `run` 任务。未完成 TODO 时，测试或调用失败是预期行为。
+
+**源码仓库或普通 Gradle 学员副本模式**：仅在包含 `gradlew`、`gradlew.bat` 和 `gradle/wrapper/gradle-wrapper.jar` 的工程根目录执行下面命令。普通学员副本由 `authoring/materialize_learner.py` 生成。
+
+实际验证的 Academy 官方导出 ZIP 和干净导入目录不包含上述三个 Wrapper 文件，不能直接在该导入目录执行 `./gradlew`。以下命令保留给源码与普通 Gradle 工程入口：
 
 ```sh
 ./gradlew :java-pilot-01-recovery-02-parse-ids:test
@@ -102,7 +106,7 @@ public final class IdParserUsage {
 ```
 
 1. 先读完整调用端和两份测试，列出正常路径、边界及异常
-2. 自己填写答案区，先跑 test，再跑 run 对照上面的输出
+2. 自己填写答案区；Academy 模式先点 Check 再运行 Usage，源码模式先跑 test 再跑 run，对照上面的输出
 3. 在 ExamplesTest 增加一个尚未覆盖的边界；解释为何预期如此
 4. 有错误先判断是编译、契约、状态变更还是输出理解错误，再修改实现
 5. 测试和调用端都正确后，按下面的源码机制口述，再与标准答案对照
