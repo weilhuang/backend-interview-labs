@@ -1,5 +1,6 @@
 package labs.support;
 
+import com.github.dockerjava.api.model.ExposedPort;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.function.BooleanSupplier;
@@ -12,6 +13,7 @@ import redis.clients.jedis.Jedis;
 /** 仅操作本对象创建的临时容器；不用宿主机Redis，不执行全库清空。 */
 public final class RedisLab implements AutoCloseable {
   public final GenericContainer<?> container;
+  private volatile int mappedPort;
   private final String prefix = "c07:" + UUID.randomUUID() + ":";
 
   public RedisLab(String... options) {
@@ -32,6 +34,7 @@ public final class RedisLab implements AutoCloseable {
 
   public RedisLab start() {
     container.start();
+    mappedPort = container.getMappedPort(6379);
     return this;
   }
 
@@ -40,7 +43,7 @@ public final class RedisLab implements AutoCloseable {
   }
 
   public Jedis connect() {
-    return new Jedis(container.getHost(), container.getMappedPort(6379), 500, 500);
+    return new Jedis(container.getHost(), mappedPort, 500, 500);
   }
 
   public void crash() {
@@ -56,8 +59,16 @@ public final class RedisLab implements AutoCloseable {
     await(
         "Redis重启就绪",
         () -> {
-          try (Jedis j = connect()) {
-            return "PONG".equals(j.ping());
+          try {
+            // Docker 再次 start 同一容器时随机发布端口可能变化，不能继续用 GenericContainer 的旧快照。
+            var state = DockerClientFactory.instance().client()
+                .inspectContainerCmd(container.getContainerId()).exec();
+            var bindings = state.getNetworkSettings().getPorts().getBindings().get(ExposedPort.tcp(6379));
+            if (bindings == null || bindings.length == 0) return false;
+            mappedPort = Integer.parseInt(bindings[0].getHostPortSpec());
+            try (Jedis j = connect()) {
+              return "PONG".equals(j.ping());
+            }
           } catch (RuntimeException e) {
             return false;
           }

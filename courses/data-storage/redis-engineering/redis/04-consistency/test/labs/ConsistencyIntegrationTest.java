@@ -90,6 +90,20 @@ class ConsistencyIntegrationTest {
   }
 
   @Test
+  void crashedContainerRestartsWithFreshReachableEndpoint() throws Exception {
+    try (var lab = new RedisLab("--appendonly", "no", "--save", "").start()) {
+      try (var before = lab.connect()) { assertEquals("PONG", before.ping()); }
+      lab.crash();
+      lab.restart();
+      try (var after = lab.connect()) {
+        assertEquals("PONG", after.ping());
+        assertEquals("OK", after.set(lab.key("restart-proof"), "recovered"));
+        assertEquals("recovered", after.get(lab.key("restart-proof")));
+      }
+    }
+  }
+
+  @Test
   void validationFailureRollsBackBothProductAndOutbox() throws Exception {
     try (var db = new MySqlLab().start()) {
       var store = new Consistency.Store(db::connect);

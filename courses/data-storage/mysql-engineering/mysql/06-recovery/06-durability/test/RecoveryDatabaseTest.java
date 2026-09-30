@@ -31,10 +31,13 @@ class RecoveryDatabaseTest {
             SQLException last = null;
             boolean ready = false;
             while (System.nanoTime() < deadline) {
-                try (Connection c = MySqlFixture.open()) {
+                try {
+                    MySqlFixture.refreshEndpoint();
+                    try (Connection c = MySqlFixture.open()) {
                     Db.scalar(c, "SELECT 1");
                     ready = true;
                     break;
+                    }
                 } catch (SQLException e) {
                     last = e;
                     Thread.sleep(250);
