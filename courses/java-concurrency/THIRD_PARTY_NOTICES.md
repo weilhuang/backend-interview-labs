@@ -1,0 +1,8 @@
+# 上游来源与许可证
+
+- Gradle包装器与课程构造协议来自JetBrains Academy Java template，commit c23b40acc8e1a0628e036598935ee6139cca0077（MIT）；保留LICENSE-JetBrains-template。https://github.com/jetbrains-academy/java-course-template/tree/c23b40acc8e1a0628e036598935ee6139cca0077
+- 包装器JAR SHA-256为a8451eeda314d0568b5340498b36edf147a8f0d692c5ff58082d477abe9146e4；发行版固定Gradle8.10.2并由wrapper properties验证distributionSha256Sum
+- JUnit BOM5.11.4、Platform1.11.4来自Maven Central。独立验证器校验console JAR SHA-256 b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc；不随仓库分发依赖JAR
+- 固定OpenJDK21 GA jdk-21+35源码commit 890adb6410dab4606a4f26a942aed02fb2f55387。课程提供原始文件链接与独立中文分析，不复制上游完整实现；运行JDK21u与GA源码不是同一补丁版本，动态结果分别标记
+- Java实现、测试与中文教学为本项目原创，不是JetBrains或OpenJDK官方课程。静态格式通过不等于任何具体Academy插件版本已验收
+- 作者代码格式化使用官方Maven com.google.googlejavaformat:google-java-format:1.24.0:all-deps，AOSP四空格规则；工具SHA-256为812f805f58112460edf01bf202a8e61d0fd1f35c0d4fabd54220640776ec57a1。工具仅作者环境使用，不向学员分发二进制，不改变业务合同

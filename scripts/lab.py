@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 INFRA = ROOT / 'infra'
 GROUPS = {'core': ['mysql', 'redis'], 'mysql': ['mysql'], 'redis': ['redis'], 'kafka': ['kafka']}
 PORTS = {'mysql': ('MYSQL_PORT', 3306), 'redis': ('REDIS_PORT', 6379), 'kafka': ('KAFKA_PORT', 19092)}
-IMAGE_KEYS = {'MYSQL_IMAGE', 'REDIS_IMAGE', 'KAFKA_IMAGE', 'JAVA_BUILD_IMAGE'}
+COMPOSE_IMAGE_KEYS = {'MYSQL_IMAGE', 'REDIS_IMAGE', 'KAFKA_IMAGE', 'JAVA_BUILD_IMAGE'}
+# RocketMQ 暂由项目课程的 Testcontainers 使用；独立 Compose profile 尚未交付。
+IMAGE_KEYS = COMPOSE_IMAGE_KEYS | {'ROCKETMQ_IMAGE', 'TESTCONTAINERS_RYUK_IMAGE', 'TESTCONTAINERS_TINY_IMAGE'}
 CONFIG_KEYS = {'LAB_PROJECT_NAME', 'MYSQL_PORT', 'REDIS_PORT', 'KAFKA_PORT', 'MYSQL_DATABASE',
                'MYSQL_USER', 'MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD', 'REDIS_PASSWORD', 'LAB_WAIT_SECONDS'}
 
@@ -74,7 +76,7 @@ def settings(init=False):
 def versions():
     values = read_env(INFRA / 'versions.env')
     if set(values) != IMAGE_KEYS:
-        raise LabError('版本台账必须且只能包含四个受支持的 IMAGE 键')
+        raise LabError('版本台账必须完整包含已登记的 IMAGE 键，不能缺失或加入未知键')
     for key, value in values.items():
         if not re.fullmatch(r'[a-z0-9./-]+:\d+\.\d+\.\d+[a-zA-Z0-9_.-]*(?:@sha256:[a-f0-9]{64})?', value):
             raise LabError(f'{key} 必须锁定完整版本标签，可附多架构 sha256 摘要；禁止 latest/浮动版本')
@@ -104,7 +106,7 @@ def validate():
             raise LabError(f'{name} 缺少健康检查')
         if 'mem_limit' not in service or 'logging' not in service:
             raise LabError(f'{name} 缺少内存或日志边界')
-    if used != IMAGE_KEYS:
+    if used != COMPOSE_IMAGE_KEYS:
         raise LabError('Compose 与版本台账未完整对应')
     return spec
 

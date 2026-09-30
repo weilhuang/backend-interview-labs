@@ -1,0 +1,266 @@
+[
+  {
+    "path": "framework-course/01-boot/01-configuration",
+    "name": "01-configuration",
+    "title": "01 配置绑定与启动校验",
+    "unit": "C04-01",
+    "scenario": "订单服务允许不同环境配置最大购买数量与展示名称。配置错误应在启动时暴露，不能等用户请求时才发现。",
+    "steps": "1. 运行Usage观察真实Spring属性绑定\n2. 实现Limits.requireAllowed，保持数量区间为[1,maxQuantity]\n3. 运行测试验证默认值、外部覆盖、非法配置启动失败\n4. 用断点跟踪绑定器和校验器，而不是手动new替代容器",
+    "contract": "maxQuantity配置范围为1到1000；displayName不能为空。请求数量必须为1到上限，超出抛IllegalArgumentException。启动校验和业务校验都必须存在。",
+    "source": "[Boot绑定入口](https://github.com/spring-projects/spring-boot/blob/v3.5.16/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/context/properties/ConfigurationPropertiesBindingPostProcessor.java)：postProcessBeforeInitialization → bind。另跟踪Binder与ValidationBindHandler。",
+    "explain": "@ConfigurationProperties负责绑定，@Validated触发配置对象校验；业务方法还需校验每次请求。属性来源的覆盖不会自动修复错误数据。字段默认值与外部值通过同一路径进入最终Bean。",
+    "questions": "- 配置绑定与@Value有什么取舍？前者适合一组可校验配置；追问：profile只是文件选择吗？\n- 为什么配置校验不能代替请求校验？两者检查时机和对象不同\n- 线上改配置会立即刷新Bean吗？不能假定普通Boot绑定自动动态刷新，需单独机制与安全回滚",
+    "mutations": [
+      [
+        "quantity>maxQuantity",
+        "quantity>maxQuantity+1"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/01-boot/02-http-contract",
+    "name": "02-http-contract",
+    "title": "02 HTTP校验错误与预置前端",
+    "unit": "C04-02",
+    "scenario": "用户在中文订单页提交SKU、数量、单价与请求编号。网络重试不能重复创建订单；相同编号不同内容必须明确冲突。",
+    "steps": "1. 执行run并打开http://127.0.0.1:18084\n2. 先通过页面和Usage调用成功/非法请求\n3. 实现Store.create中的原子幂等决策、金额溢出检查与ID分配\n4. 运行真实随机端口HTTP测试，检查201/200/400/404/409与Location\n5. 在页面尝试重复点击、相同键改参数、非法数量和刷新列表",
+    "contract": "字段不得空白，数量与单价为正；最大数量100。金额用Math.multiplyExact。新建201、同键同内容200且同ID、同键不同内容409、非法请求400、不存在404。列表按ID升序，offset>=0、limit为1到100，默认前20条；请求失败不得新增记录。教学内存存储仅单进程，重启丢失。",
+    "source": "[MVC入口](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-webmvc/src/main/java/org/springframework/web/servlet/DispatcherServlet.java)：doDispatch。参数解析经RequestResponseBodyMethodProcessor；异常经ExceptionHandlerExceptionResolver。",
+    "explain": "@Valid负责结构约束，Store负责动态数量上限、幂等与溢出。synchronized使同进程的查重和写入成为一个临界区；生产多实例需数据库唯一约束等持久机制。@RestControllerAdvice把预期错误转为稳定响应，不向调用方泄漏堆栈。",
+    "questions": "- POST可以设计成业务幂等吗？可以，但需要明确键作用域/有效期/持久化；追问：服务重启后的保证是什么？\n- 为什么校验注解不放在前端就结束？客户端可绕过，后端仍负责合同\n- 重复请求返回200还是201？由合同定义，本课区别已存在和新建\n- 为什么不用double计算钱？精确单位和溢出合同必须明确",
+    "mutations": [
+      [
+        "return new Creation(old,false);",
+        "return new Creation(old,true);"
+      ],
+      [
+        "r.quantity()>100",
+        "r.quantity()>101"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/01-boot/03-transactions",
+    "name": "03-transactions",
+    "title": "03 JDBC事务与失败原子性",
+    "unit": "C04-03",
+    "scenario": "创建订单同时扣库存。写入订单失败时必须恢复库存；不能把方法返回失败却已扣库存的状态留给用户。",
+    "steps": "1. Usage通过真实H2数据库执行一笔订单\n2. 实现Service.place中的TransactionTemplate边界\n3. 在扣库存后注入异常，验证库存与订单同时回滚\n4. 观察相同请求重试与库存不足\n5. 可选MySQL真实集成由共享镜像驱动，Docker未启动不能记录通过",
+    "contract": "数量必须正数；库存初始10。成功创建同时扣减；任何异常全部回滚。相同requestId/quantity重试不重复扣减；同键不同数量冲突失败。H2仅证明本节Spring/JDBC事务，不替代MySQL的MVCC/锁语义。",
+    "source": "[TransactionTemplate.execute](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-tx/src/main/java/org/springframework/transaction/support/TransactionTemplate.java) → PlatformTransactionManager；[DataSourceTransactionManager](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-jdbc/src/main/java/org/springframework/jdbc/datasource/DataSourceTransactionManager.java)跟踪连接绑定、提交与回滚。",
+    "explain": "事务必须包含读取请求状态、条件扣减和插入订单。数据库连接由Spring绑定到当前事务，JdbcTemplate复用该连接；不是分别new连接。异常必须穿过事务边界才能按规则回滚。重复键竞态的生产处理还需数据库唯一约束和重试设计。",
+    "questions": "- 为什么不能把事务只包在insert上？库存修改会落在事务外\n- TransactionTemplate和@Transactional怎么选？前者边界显式，后者依赖代理；追问自调用\n- 为什么H2通过不能证明MySQL所有行为？实现、方言、锁与隔离不同\n- 库存不足如何防止负库存？条件更新并检查影响行数",
+    "mutations": [
+      [
+        "if(failAfterDebit)throw new IllegalStateException(\"模拟扣库存后写入失败\");",
+        "if(failAfterDebit)return;"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/01-boot/04-test-layers",
+    "name": "04-test-layers",
+    "title": "04 单元切片与真实HTTP分层测试",
+    "unit": "C04-04",
+    "scenario": "报价服务依赖一个价格端口。业务逻辑、控制器映射和真实HTTP各有不同责任，不能用mock通过代替完整联调。",
+    "steps": "1. 先读Unit/Slice/HTTP三层可见测试\n2. 实现Quotes.total的校验、一次取价和精确乘法\n3. 运行测试并指出每层能杀死哪类错误\n4. 改变一个错误映射合同，同时更新对应层的测试，禁止只删断言",
+    "contract": "数量范围1到100；非法数量不能调用价格端口；价格必须为正；使用精确乘法。HTTP非法输入400，下游故障503，正确报价200。所有外部依赖均是本实验显式提供的端口，无第三方访问。",
+    "source": "[DispatcherServlet.doDispatch](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-webmvc/src/main/java/org/springframework/web/servlet/DispatcherServlet.java)与[SpringBootTestContextBootstrapper](https://github.com/spring-projects/spring-boot/blob/v3.5.16/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/context/SpringBootTestContextBootstrapper.java)：比较纯对象、MockMvc和真实端口的边界。",
+    "explain": "纯单元使用Mockito检验调用次数与业务边界；MVC切片检验参数/状态码；真实随机端口检验应用装配与HTTP传输。三层测试可能有重复合同，但诊断粒度不同。mock返回值不能证明远端价格服务真的可用。",
+    "questions": "- 单元与集成测试为什么都需要？速度、隔离性与真实性不同\n- 什么情况下mock让你产生错误信心？真实序列化/事务/网络未执行\n- 切片失败而单元通过先查什么？装配、参数转换、异常映射\n- 测试数据为何要隔离？避免顺序依赖与假阳性",
+    "mutations": [
+      [
+        "quantity>100",
+        "quantity>101"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/01-boot/05-security",
+    "name": "05-security",
+    "title": "05 基础认证授权与CSRF边界",
+    "unit": "C04-05",
+    "scenario": "内部订单接口允许阅读者查订单，管理员才能修改。即使界面隐藏修改按钮，服务端仍必须拒绝越权与无CSRF的浏览器写请求。",
+    "steps": "1. 使用Usage查看本实验角色合同\n2. 实现SecurityFilterChain：公开健康入口、阅读权限、管理员写入、默认拒绝\n3. 保留CSRF保护并运行完整MockMvc安全过滤链测试\n4. 比较未登录401、权限不足403、缺CSRF403与合法写入201",
+    "contract": "GET /public/ping公开；GET /orders需READER或ADMIN；POST /orders需ADMIN和有效CSRF；其他路径默认拒绝。仅模拟用户，不接真实身份平台。不能为了测试通过全局permitAll或禁用CSRF。",
+    "source": "[FilterChainProxy](https://github.com/spring-projects/spring-security/blob/6.5.11/web/src/main/java/org/springframework/security/web/FilterChainProxy.java)与[AuthorizationFilter](https://github.com/spring-projects/spring-security/blob/6.5.11/web/src/main/java/org/springframework/security/web/access/intercept/AuthorizationFilter.java)，固定Security6.5.11。先验证来源路径再记录关键分支。",
+    "explain": "认证先建立主体，授权再匹配HTTP动作与资源。CSRF防护与角色判断解决不同风险；会话/浏览器携带凭据的写请求不能仅靠角色检查。V1只做基础安全，企业OIDC/LDAP/Keycloak在V2。",
+    "questions": "- 401和403区别是什么？未认证与已知请求被拒绝不同\n- CORS是否能阻止所有恶意调用？它是浏览器跨域机制，不能代替后端授权\n- 隐藏按钮为什么不安全？客户端可以绕过页面直接发HTTP\n- 何时讨论CSRF与无状态token的不同？先明确凭据如何自动附带，不盲目关闭",
+    "mutations": [
+      [
+        ".hasRole(\"ADMIN\")",
+        ".hasAnyRole(\"READER\",\"ADMIN\")"
+      ],
+      [
+        ".anyRequest().denyAll()",
+        ".anyRequest().permitAll()"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/01-boot/06-runtime-lifecycle",
+    "name": "06-runtime-lifecycle",
+    "title": "06 生命周期健康与优雅关闭",
+    "unit": "C04-06",
+    "scenario": "服务停机时应停止接单，并在有限预算内处理已有任务。健康状态必须表达真实资源状态，而不是永远返回UP。",
+    "steps": "1. 运行Usage让真实Spring上下文启动并关闭任务池\n2. 实现Gate.stop停止接单、有限等待、必要中断和恢复中断标记\n3. 用latch控制在途任务，不用sleep猜顺序\n4. 检查HealthIndicator与关闭后拒绝提交",
+    "contract": "上下文启动后接单；stop后拒绝新任务；stop等待上限2秒，超时调用shutdownNow；线程中断标记不能被吞。关闭后不留下本实验线程。健康UP/DOWN来自实际running状态。",
+    "source": "[DefaultLifecycleProcessor](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-context/src/main/java/org/springframework/context/support/DefaultLifecycleProcessor.java)：onRefresh/startBeans与onClose/stopBeans；SmartLifecycle的phase与关闭顺序。",
+    "explain": "SmartLifecycle将资源生命周期交给真实Spring容器。先改变接单状态再shutdown，避免关闭期间持续接收任务。优雅等待有预算，超时中断也是协作信号；不响应中断的业务仍需额外保护，不能声称任何任务都能安全强杀。",
+    "questions": "- readiness与liveness为什么不是同一件事？一个能否接流量，一个是否需重启\n- 为什么shutdown不等于任务立刻结束？已提交任务继续执行\n- 中断标记为何要恢复？让上层知道当前线程被要求停止\n- 关闭预算如何分配给多种资源？需要考虑依赖顺序和总预算",
+    "mutations": [
+      [
+        "running=false;current=executor;",
+        "current=executor;"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/01-boot/07-integrated-service",
+    "name": "07-integrated-service",
+    "title": "07 前端HTTP与数据库完整联调",
+    "unit": "C04-07",
+    "scenario": "把内存练习升级为真实SpringBoot/JDBC完整服务，预置界面不改，后端以唯一约束与事务保护请求。明确多实例竞态的结果未知与重试边界。",
+    "steps": "1. 运行预置页面与Usage，观察订单写入真实H2数据库\n2. 实现Store.create的事务、重复检查、GeneratedKeyHolder\n3. 用HTTP测试核对数据库真实状态\n4. 对比02节内存模型和本节持久层，不把H2内存数据库当生产持久部署\n5. 阅读依赖锁与迁移检查清单，解释升级Boot大版本的验证范围",
+    "contract": "保留02节HTTP合同；数据库request_id唯一。并发同键竞争可能返回明确409重试提示，不能假称跨进程锁。成功后事务内的数据一致；输入错误不产生记录。H2是可重建教学数据库，MySQL部署属于共享环境集成验收。",
+    "source": "[Boot数据源自动配置](https://github.com/spring-projects/spring-boot/blob/v3.5.16/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jdbc/DataSourceAutoConfiguration.java)与[JdbcTemplate](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-jdbc/src/main/java/org/springframework/jdbc/core/JdbcTemplate.java)。从HTTP跟到连接获取、SQL执行和事务提交。",
+    "explain": "预置前端只调用相同API，存储实现变化不应破坏契约。数据库唯一约束是多实例的最终防线；先查询再写入仍可能竞态，因此冲突必须可解释并有重试合同。升级依赖必须检查BOM、starter、测试包、Servlet/Validation兼容、配置和完整回归，不能仅改版本号。",
+    "questions": "- 完整服务与CRUD样例差在哪？有失败、重试、生命周期和可验证合同\n- 并发先查后写为何不够？多个事务可同时看见不存在\n- 如何把H2换成MySQL？配置、驱动、迁移与真实集成测试一起更换\n- Boot3升级到4如何评估？先查官方迁移说明与依赖边界，本课不声称已完成Boot4运行验收",
+    "mutations": [
+      [
+        "r.quantity()>100",
+        "r.quantity()>101"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/08-container-di",
+    "name": "08-container-di",
+    "title": "08 最小容器与真实构造注入",
+    "unit": "C05-01",
+    "scenario": "理解Spring之前先明确容器解决什么：依赖构造、共享实例与错误报告。教学容器只支持公开单构造器，不冒充Spring。",
+    "steps": "1. 运行Usage查看真实Spring注入\n2. 实现Tiny.get的构造递归、单例缓存和循环路径清理\n3. 对照真实AnnotationConfigApplicationContext的Bean创建\n4. 用缺失构造器/循环依赖反例解释模型省略了什么",
+    "contract": "Tiny只支持恰好一个公开构造器、无基本类型参数的类；每类型同一实例；循环依赖明确失败；失败不得污染正在构造集合。没有scope、代理、属性注入、生命周期、注解扫描。",
+    "source": "[AbstractBeanFactory.doGetBean](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractBeanFactory.java) → [AbstractAutowireCapableBeanFactory.createBean](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java)。比较真实缓存、依赖解析和教学模型。",
+    "explain": "缓存命中和正在构造是不同状态。先标记构造中、递归解决依赖、成功后缓存，并在finally清理标记。真实Spring的BeanDefinition、scope、工厂Bean、后处理和早期引用远比模型复杂。",
+    "questions": "- IoC与DI是什么关系？控制创建和协作关系，注入是实现方式\n- 单例Bean是否自动线程安全？生命周期共享不等于状态同步\n- 为什么失败后要清理构造标记？否则后续合法请求会被误判\n- 为什么生产代码不直接用这个Tiny？功能与诊断边界故意缩小",
+    "mutations": [
+      [
+        "cache.put(type,result);return result;",
+        "return result;"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/09-bean-lifecycle",
+    "name": "09-bean-lifecycle",
+    "title": "09 Bean定义与实例生命周期",
+    "unit": "C05-02",
+    "scenario": "平台在Bean创建前调整配置，在初始化前后记录资源状态。把修改Bean定义和处理Bean实例混在一起会产生时序问题。",
+    "steps": "1. Usage打印真实Spring执行轨迹\n2. 实现BeanFactoryPostProcessor在实例化前设置label\n3. 实现BeanPostProcessor的初始化前后记录\n4. 关闭上下文，验证销毁调用一次",
+    "contract": "轨迹必须是构造→属性→初始化前→初始化→初始化后→销毁；label为企业订单。后处理器只处理Account，不能对所有对象强转。不要手动调用生命周期方法造假轨迹。",
+    "source": "[AbstractApplicationContext.refresh](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java) → invokeBeanFactoryPostProcessors/registerBeanPostProcessors/finishBeanFactoryInitialization；[initializeBean](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java)。",
+    "explain": "BeanFactoryPostProcessor处理定义，此时目标Account还未创建。BeanPostProcessor围绕初始化处理实例。关闭由Spring触发DisposableBean，不靠测试直接调用destroy。静态@Bean声明后处理器避免过早实例化配置类。",
+    "questions": "- 两种PostProcessor有什么不同？对象和执行阶段不同\n- 为什么初始化前已经完成属性注入？要让初始化逻辑看到最终配置\n- 代理常在哪个阶段加入？初始化后常见，但应以实际框架机制为准\n- prototype关闭时是否和singleton一样自动销毁？不能一概而论",
+    "mutations": [
+      [
+        "a.events.add(\"初始化前\");",
+        "a.events.add(\"错误时序\");"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/10-circular-boundary",
+    "name": "10-circular-boundary",
+    "title": "10 循环依赖的真实支持边界",
+    "unit": "C05-03",
+    "scenario": "两个服务互相依赖导致启动失败。先用真实BeanFactory复现，再区分属性循环的早期引用与构造循环；不把放开配置当万能修复。",
+    "steps": "1. 构造两个RootBeanDefinition，以property reference连接\n2. 按参数显式设置allowCircularReferences\n3. 检查允许/拒绝两种模式\n4. 再运行构造注入循环，即使允许早期引用也失败\n5. 提出拆职责/第三方协调者的重构方案",
+    "contract": "属性循环允许模式可构造并共享同一实例；拒绝模式必须失败。构造循环没有已实例化的对象可暴露，仍失败。这里直接调用BeanFactory，不把其默认值等同Boot应用默认策略。",
+    "source": "[AbstractAutowireCapableBeanFactory.doCreateBean](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java)：earlySingletonExposure、addSingletonFactory、getEarlyBeanReference；[DefaultSingletonBeanRegistry](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-beans/src/main/java/org/springframework/beans/factory/support/DefaultSingletonBeanRegistry.java)。",
+    "explain": "早期引用依赖对象已经实例化，构造阶段互相等待时没有这个条件。真实代理还可能改变早期引用的对象，因此不能背成“三级缓存解决所有循环”。本节不修改生产默认设置。",
+    "questions": "- 构造循环为何不同于setter循环？对象可暴露的时机不同\n- 代理介入为什么更复杂？早期和最终引用的一致性要维护\n- 为什么不建议靠开关修复架构？依赖方向与职责问题仍在\n- @Lazy是什么取舍？延迟某次解析，不是删除真实依赖",
+    "mutations": [
+      [
+        "f.setAllowCircularReferences(allow);",
+        "f.setAllowCircularReferences(true);"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/11-aop-proxy",
+    "name": "11-aop-proxy",
+    "title": "11 真实代理拦截链与自调用",
+    "unit": "C05-04",
+    "scenario": "支付演示服务通过代理统一验证参数并记录调用。内部this调用绕过代理时，为什么看起来同一个方法行为不同？",
+    "steps": "1. 用ProxyFactory分别创建JDK代理和类代理\n2. 实现拦截器的前置校验、proceed、finally记录\n3. 对比外部charge与内部batch调用\n4. 异常传播不能吞掉，解释拆分服务注入代理的修复方法",
+    "contract": "外部charge金额必须正数；拦截轨迹包括进入/退出，异常也退出。方法返回值和原异常保持。batch内部直接调用charge用于展示自调用绕过，不得把该演示当生产支付代码。",
+    "source": "[JdkDynamicAopProxy.invoke](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-aop/src/main/java/org/springframework/aop/framework/JdkDynamicAopProxy.java) → [ReflectiveMethodInvocation.proceed](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-aop/src/main/java/org/springframework/aop/framework/ReflectiveMethodInvocation.java)。类代理对照CglibAopProxy。",
+    "explain": "代理包装的是外部调用入口，target对象内部的this仍是target。拦截器必须调用proceed才能继续到目标，finally让失败也能记录退出。校验时机、异常与返回值都是合同，不只检查是否打印日志。",
+    "questions": "- JDK代理与类代理有什么边界？接口与可覆盖方法的限制不同\n- 为什么self-invocation不重新过代理？接收者是target本身\n- final方法可被类代理覆盖吗？不能按普通可覆盖方法处理\n- AOP为什么不能代替领域校验？调用入口可能绕过代理，关键规则要在合适层保护",
+    "mutations": [
+      [
+        "(int)invocation.getArguments()[0]<1",
+        "(int)invocation.getArguments()[0]<0"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/12-transaction-source",
+    "name": "12-transaction-source",
+    "title": "12 事务代理传播与自调用失效",
+    "unit": "C05-05",
+    "scenario": "订单服务调用审计服务；内部失败即使被catch，也可能把共享事务标记为rollback-only。另一个独立事务可能在外层回滚后保留。",
+    "steps": "1. 实现Inner.required/independent和Outer.catchInner/failAfterAudit上的传播注解\n2. 用真实DataSourceTransactionManager验证REQUIRED与REQUIRES_NEW\n3. 对比withoutProxy内部自调用，定位为何没有事务\n4. 在TransactionInterceptor和事务管理器打断点记录逻辑/物理事务",
+    "contract": "REQUIRED内部失败后外层catch仍在提交时UnexpectedRollback；REQUIRES_NEW审计在外层失败后保留；未过代理的自调用明确不启事务，本节用其作错误反例。所有SQL操作真实执行。",
+    "source": "[TransactionInterceptor.invoke](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-tx/src/main/java/org/springframework/transaction/interceptor/TransactionInterceptor.java) → [TransactionAspectSupport.invokeWithinTransaction](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-tx/src/main/java/org/springframework/transaction/interceptor/TransactionAspectSupport.java) → AbstractPlatformTransactionManager提交/回滚。",
+    "explain": "逻辑事务边界可以共享一个物理事务。REQUIRED的失败把共享事务标为仅回滚，外层捕获异常不会自动清除。REQUIRES_NEW暂停外层并独立提交，需要额外连接容量。自调用绕过代理，注解本身不会执行代码。",
+    "questions": "- UnexpectedRollback为什么晚于原异常？真正提交发生在外层边界\n- REQUIRES_NEW为何可能耗尽连接池？外层连接可能仍占用，同时申请新连接\n- checked异常默认如何回滚？默认规则与显式rollbackFor要分开验证\n- 异步线程会继承当前线程事务吗？不能假定自动传播",
+    "mutations": [
+      [
+        "Propagation.REQUIRES_NEW",
+        "Propagation.REQUIRED"
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/13-mvc-source",
+    "name": "13-mvc-source",
+    "title": "13 MVC参数解析拦截与异常处理",
+    "unit": "C05-06",
+    "scenario": "订单接口从请求头解析教学租户上下文。明确参数解析、拦截器、控制器和异常处理的责任，同时强调真实租户身份必须来源于认证。",
+    "steps": "1. 为Tenant实现HandlerMethodArgumentResolver\n2. 通过WebMvcConfigurer注册解析器和响应轨迹拦截器\n3. 在真实HTTP请求中测试合法/缺失/非法头与路径\n4. 沿DispatcherServlet到参数处理器和异常解析器记录调用顺序",
+    "contract": "X-Lab-Tenant匹配[a-z]{2,12}，缺失/非法400；合法返回租户与订单号；id必须正数。这个头只用于教学解析，生产必须从已认证身份绑定租户，不能信任任意用户头。",
+    "source": "[RequestMappingHandlerAdapter](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/RequestMappingHandlerAdapter.java) → [InvocableHandlerMethod.getMethodArgumentValues](https://github.com/spring-projects/spring-framework/blob/v6.2.19/spring-web/src/main/java/org/springframework/web/method/support/InvocableHandlerMethod.java)；异常链对照ExceptionHandlerExceptionResolver。",
+    "explain": "参数解析器先用supportsParameter判断是否负责，再解析并校验。拦截器与Servlet过滤器不同；解析失败不会执行控制器业务。异常响应应稳定，不泄漏内部栈。教学头不具有授权意义。",
+    "questions": "- Filter、Interceptor、AOP在哪里起作用？不同层与对象不能混为一谈\n- supportsParameter为何必须精准？抢占不属于自己的参数会破坏其他解析\n- 自定义参数是否自动带来安全身份？不会，信任来源要另验证\n- 参数错误为什么不返回500？它属于明确的客户端输入失败",
+    "mutations": [
+      [
+        "\"[a-z]{2,12}\"",
+        "\"[a-zA-Z]{1,30}\""
+      ]
+    ]
+  },
+  {
+    "path": "framework-course/02-source/14-autoconfiguration",
+    "name": "14-autoconfiguration",
+    "title": "14 自动配置条件退让与轻量Starter",
+    "unit": "C05-07",
+    "scenario": "提供一个问候客户端的轻量starter：依赖存在且功能启用时自动装配；用户自己提供Bean时退让，不抢业务配置。",
+    "steps": "1. 阅读真实AutoConfiguration.imports文件\n2. 补上条件注解并实现从配置读取prefix\n3. 检查默认启用、关闭、用户覆盖和缺依赖四种上下文\n4. 读取ConditionEvaluationReport定位为什么某配置生效/未生效",
+    "contract": "默认prefix为你好，greeting.prefix可覆盖；greeting.enabled=false不装配；缺Transport类型不装配；用户自定义Greeting优先。条件不是运行时每次请求重新判断。",
+    "source": "[AutoConfigurationImportSelector](https://github.com/spring-projects/spring-boot/blob/v3.5.16/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationImportSelector.java)读取候选；[OnBeanCondition](https://github.com/spring-projects/spring-boot/blob/v3.5.16/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/condition/OnBeanCondition.java)决定缺Bean条件。",
+    "explain": "候选导入、类路径条件、属性条件和缺Bean条件是不同阶段的筛选。@ConditionalOnMissingBean实现用户配置优先，不能靠Bean名字偶然覆盖。用ApplicationContextRunner隔离每种条件，用条件报告支持解释。",
+    "questions": "- 自动配置为何不是组件扫描同义词？候选元数据和条件机制不同\n- 为什么用户Bean应优先？starter提供默认能力而不是强制实现\n- 修改环境变量会立即重算条件吗？普通上下文不会自动刷新\n- 怎样写可维护starter？小接口、清晰条件、完整组合测试、版本兼容声明",
+    "mutations": [
+      [
+        "@ConditionalOnMissingBean(Greeting.class)",
+        ""
+      ],
+      [
+        "matchIfMissing=true",
+        "matchIfMissing=false"
+      ]
+    ]
+  }
+]

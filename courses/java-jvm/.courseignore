@@ -1,0 +1,10 @@
+/authoring
+/build
+/.gradle
+/.idea
+
+**/build
+.attach_pid*
+**/.attach_pid*
+*.jfr
+*.hprof

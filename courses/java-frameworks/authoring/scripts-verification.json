@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "jdk": "21.0.12.1+1",
+  "actions": [
+    "doctor",
+    "start 02-http-contract",
+    "check",
+    "真实HTTP创建",
+    "stop"
+  ],
+  "frontend_ui": "未执行，Chromium受当前沙箱限制",
+  "mode": "完整JDK21与已有Gradle8.10.2，已解析依赖离线运行"
+}

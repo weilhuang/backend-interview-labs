@@ -1,0 +1,9 @@
+.gradle/
+**/build/
+.idea/
+*.jfr
+*.hprof
+__pycache__/
+**/build
+.attach_pid*
+**/.attach_pid*

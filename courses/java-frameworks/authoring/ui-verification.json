@@ -1,0 +1,9 @@
+{
+  "status": "blocked",
+  "browser": "已安装Chromium，尝试在云端执行Playwright",
+  "completed_ui_checks": 0,
+  "reason": "Chromium创建进程单例Unix socket时返回Operation not permitted；页面尚未打开",
+  "http_page_serving": "02/07真实HTTP测试已验证HTML由服务返回，不能代替UI交互",
+  "test_script": "authoring/verify_frontend.cjs",
+  "security": "未改变系统安全设置或安装新浏览器"
+}

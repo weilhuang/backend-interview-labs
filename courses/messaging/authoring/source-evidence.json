@@ -1,0 +1,196 @@
+[
+  {
+    "课程": "kafka-01-contract",
+    "固定源码": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/BuiltInPartitioner.java",
+    "符号": "partitionForKey",
+    "匹配行": [
+      329
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "kafka-02-producer",
+    "固定源码": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java",
+    "符号": "completeBatch",
+    "匹配行": [
+      299,
+      591,
+      597,
+      603,
+      611,
+      628,
+      649,
+      664,
+      698,
+      725,
+      749
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "kafka-03-inbox",
+    "固定源码": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java",
+    "符号": "commitOffsetsSync",
+    "匹配行": [
+      1101,
+      1144
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "kafka-04-rebalance",
+    "固定源码": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java",
+    "符号": "onJoinPrepare",
+    "匹配行": [
+      154,
+      711,
+      712,
+      714,
+      742,
+      746,
+      750,
+      758
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "kafka-05-transactions",
+    "固定源码": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/TransactionManager.java",
+    "符号": "sendOffsetsToTransaction",
+    "匹配行": [
+      145,
+      146,
+      360,
+      363
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "kafka-06-recovery",
+    "固定源码": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java",
+    "符号": "handleProduceResponse",
+    "匹配行": [
+      584,
+      917
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "rocketmq-01-routing",
+    "固定源码": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/route/RouteActivity.java",
+    "符号": "convertToAddressList",
+    "匹配行": [
+      66,
+      104,
+      187
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "rocketmq-02-retry",
+    "固定源码": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/broker/src/main/java/org/apache/rocketmq/broker/processor/PopMessageProcessor.java",
+    "符号": "processRequest",
+    "匹配行": [
+      220
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "rocketmq-03-order-delay",
+    "固定源码": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/producer/SendMessageActivity.java",
+    "符号": "sendMessage",
+    "匹配行": [
+      66,
+      79
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "rocketmq-04-transactions",
+    "固定源码": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/broker/src/main/java/org/apache/rocketmq/broker/transaction/queue/TransactionalMessageServiceImpl.java",
+    "符号": "check",
+    "匹配行": [
+      109,
+      110,
+      111,
+      112,
+      113,
+      116,
+      119,
+      145,
+      162,
+      177,
+      189,
+      222,
+      226,
+      270,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      288,
+      289,
+      290,
+      295,
+      346,
+      356,
+      357,
+      359,
+      360,
+      361,
+      363,
+      365,
+      445,
+      449,
+      450,
+      465
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "rocketmq-05-storage",
+    "固定源码": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/CommitLog.java",
+    "符号": "asyncPutMessage",
+    "匹配行": [
+      920,
+      1097
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  },
+  {
+    "课程": "rocketmq-06-comparison",
+    "固定源码": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/consumer/AckMessageActivity.java",
+    "符号": "ackMessage",
+    "匹配行": [
+      51,
+      59,
+      61,
+      69,
+      72,
+      73,
+      74,
+      108,
+      136,
+      140,
+      141,
+      144,
+      149,
+      151,
+      155,
+      160,
+      163,
+      164,
+      168,
+      172,
+      173,
+      178,
+      179,
+      195,
+      196,
+      199
+    ],
+    "状态": "HTTP读取与符号检查通过，未运行断点"
+  }
+]

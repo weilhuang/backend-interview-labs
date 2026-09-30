@@ -1,0 +1,57 @@
+import java.time.Duration
+import org.gradle.api.tasks.testing.TestResult
+plugins { id 'base' }
+allprojects { group = 'academy.redis'; version = '1.0.0'; repositories { mavenCentral() } }
+subprojects {
+    apply plugin: 'java-library'
+    sourceSets { main { java.setSrcDirs(['src']) }; test { java.setSrcDirs(['test']) } }
+    java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.11.4')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        if (project.name != 'support' && project.name != 'redis') implementation project(':support')
+    }
+    tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 21 }
+    tasks.withType(Test).configureEach {
+        maxParallelForks = 1
+        systemProperty 'junit.jupiter.execution.parallel.enabled', 'false'
+        systemProperty 'course.root', rootProject.projectDir.absolutePath
+        outputs.upToDateWhen { false }
+        testLogging { events 'failed','skipped'; exceptionFormat 'full' }
+        afterTest { descriptor, result ->
+            if (result.resultType == TestResult.ResultType.FAILURE) println '#educational_plugin FAILED + ' + (result.exception?.message ?: '请查看断言与题目契约')
+        }
+    }
+    tasks.named('test') { useJUnitPlatform(); timeout = Duration.ofMinutes(10) }
+    tasks.register('unitTest', Test) {
+        description = '只运行纯Java契约；不代表Redis或MySQL集成通过'
+        testClassesDirs = sourceSets.test.output.classesDirs; classpath = sourceSets.test.runtimeClasspath
+        useJUnitPlatform { excludeTags 'integration' }; timeout = Duration.ofSeconds(90)
+    }
+    tasks.register('integrationTest', Test) {
+        description = '必须有Docker；运行真实Redis/MySQL实验，缺环境明确失败'
+        group = 'verification'; testClassesDirs = sourceSets.test.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath
+        useJUnitPlatform { includeTags 'integration' }; timeout = Duration.ofMinutes(10)
+    }
+    if (project.projectDir.toPath().startsWith(rootProject.file('redis').toPath()) && project.name != 'redis') {
+        tasks.register('run', JavaExec) {
+            dependsOn 'classes'; classpath = sourceSets.main.runtimeClasspath
+            mainClass = 'labs.' + fileTree('src/labs').matching { include '*Usage.java' }.singleFile.name.replace('.java','')
+            systemProperty 'course.root', rootProject.projectDir.absolutePath
+        }
+    }
+}
+project(':support') {
+    dependencies {
+        api 'redis.clients:jedis:5.2.0'
+        api 'com.mysql:mysql-connector-j:9.2.0'
+        api 'org.testcontainers:testcontainers:1.20.6'
+        api 'org.testcontainers:mysql:1.20.6'
+    }
+}
+tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
+tasks.register('unitTest') { dependsOn subprojects.collect { it.tasks.named('unitTest') } }
+tasks.register('integrationTest') { dependsOn subprojects.collect { it.tasks.named('integrationTest') } }
+tasks.named('check') { dependsOn 'test' }

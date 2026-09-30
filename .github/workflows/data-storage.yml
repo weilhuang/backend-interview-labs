@@ -1,0 +1,83 @@
+name: 数据库与缓存课程真实服务检查
+on:
+  push:
+    paths:
+      - 'courses/data-storage/**'
+      - 'infra/versions.env'
+      - '.github/workflows/data-storage.yml'
+  pull_request:
+    paths:
+      - 'courses/data-storage/**'
+      - 'infra/versions.env'
+      - '.github/workflows/data-storage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mysql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: courses/data-storage/mysql-engineering
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 校验课程与实际工具链
+        run: |
+          java -version
+          javac -version
+          docker version
+          python -m pip install -r authoring/requirements.txt
+          python authoring/validate_course.py
+      - name: 真正MySQL全部契约与故障集成
+        run: ./gradlew --no-daemon test
+      - name: 保留全部可见测试报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c06-mysql-test-reports
+          path: |
+            courses/data-storage/mysql-engineering/mysql/**/build/reports/tests/
+            courses/data-storage/mysql-engineering/mysql/**/build/test-results/
+          retention-days: 7
+
+  redis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: courses/data-storage/redis-engineering
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 校验课程与实际工具链
+        run: |
+          java -version
+          javac -version
+          docker version
+          python -m pip install -r authoring/requirements.txt
+          python authoring/validate_course.py
+      - name: 真正Redis与MySQL全部契约和故障集成
+        run: ./gradlew --no-daemon test
+      - name: 保留全部可见测试报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c07-redis-test-reports
+          path: |
+            courses/data-storage/redis-engineering/redis/**/build/reports/tests/
+            courses/data-storage/redis-engineering/redis/**/build/test-results/
+          retention-days: 7

@@ -57,7 +57,7 @@ class LabTests(unittest.TestCase):
 
     def test_manifest_used_for_all_images(self):
         spec = lab.validate()
-        self.assertEqual({s['image'] for s in spec['services'].values()}, {'${'+k+'}' for k in lab.IMAGE_KEYS})
+        self.assertEqual({s['image'] for s in spec['services'].values()}, {'${'+k+'}' for k in lab.COMPOSE_IMAGE_KEYS})
 
     def test_floating_tag_rejected(self):
         path = lab.INFRA / 'versions.env'

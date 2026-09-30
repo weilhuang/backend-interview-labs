@@ -1,0 +1,7 @@
+/authoring
+/build
+**/build
+/.gradle
+**/.gradle
+/.idea
+*.log

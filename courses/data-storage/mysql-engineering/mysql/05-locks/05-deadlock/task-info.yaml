@@ -1,0 +1,19 @@
+type: edu
+custom_name: C06-05 · 锁等待与死锁重试
+files:
+- name: src/labs/LockLab.java
+  visible: true
+  placeholders:
+  - offset: 212
+    length: 69
+    placeholder_text: '        throw new UnsupportedOperationException("请按题目完成这一阶段");
+
+      '
+- name: src/labs/Usage.java
+  visible: true
+- name: answer.md
+  visible: true
+- name: test/LockContractTest.java
+  visible: true
+- name: test/LockDatabaseTest.java
+  visible: true

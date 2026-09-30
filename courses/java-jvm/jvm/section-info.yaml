@@ -1,0 +1,9 @@
+custom_name: JVM与现代Java · 诊断与迁移
+content:
+- 01-loading
+- 02-lifecycle
+- 03-gc
+- 04-diagnostics
+- 05-migration
+- 06-java21
+- 07-java25

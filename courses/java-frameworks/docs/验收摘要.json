@@ -1,0 +1,31 @@
+{
+  "scope": "C04/C05框架课程，不能代表全部V1完成",
+  "jdk": "完整Temurin 21.0.12.1+1",
+  "gradle": "8.10.2",
+  "spring_boot": "3.5.16",
+  "spring_framework": "6.2.19",
+  "tasks": 14,
+  "placeholders": 20,
+  "reference_tests": {
+    "passed": 61,
+    "failed": 0
+  },
+  "student_stubs_rejected": 14,
+  "wrong_implementations_rejected": 17,
+  "complete_callers_passed": 14,
+  "mysql_integration_compile": "passed，Testcontainers1.20.6",
+  "mysql_container_runtime": "not_run",
+  "source_paths_verified": 22,
+  "startup_health_stop": "passed",
+  "browser_ui": {
+    "status": "blocked",
+    "browser": "已安装Chromium，尝试在云端执行Playwright",
+    "completed_ui_checks": 0,
+    "reason": "Chromium创建进程单例Unix socket时返回Operation not permitted；页面尚未打开",
+    "http_page_serving": "02/07真实HTTP测试已验证HTML由服务返回，不能代替UI交互",
+    "test_script": "authoring/verify_frontend.cjs",
+    "security": "未改变系统安全设置或安装新浏览器"
+  },
+  "academy_native_import": "not_run",
+  "boot4_runtime": "not_run"
+}

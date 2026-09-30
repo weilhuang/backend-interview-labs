@@ -1,0 +1,64 @@
+package labs;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public final class PublicationLab {
+    public record Snapshot(int version, List<String> routes) {
+        public Snapshot {
+            if (version < 0) throw new IllegalArgumentException("版本不能为负");
+            routes = Objects.requireNonNull(routes);
+        }
+    }
+
+    private volatile Snapshot current = new Snapshot(0, List.of());
+    private final AtomicInteger accepted = new AtomicInteger();
+
+    public void publish(Snapshot next) {
+        // 答案开始：发布
+        current = Objects.requireNonNull(next, "配置不能为空");
+        // 答案结束：发布
+    }
+
+    public Snapshot current() {
+        return current;
+    }
+
+    public int accept() {
+        // 答案开始：计数
+        return accepted.incrementAndGet();
+        // 答案结束：计数
+    }
+
+    public int accepted() {
+        return accepted.get();
+    }
+
+    // 教学反例：栅栏刻意让两个读都发生在写之前，即使 value 是 volatile 也会丢更新。
+    public static int forcedLostUpdate() throws Exception {
+        class Box {
+            volatile int value;
+        }
+        Box box = new Box();
+        CyclicBarrier bothRead = new CyclicBarrier(2);
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            Callable<Void> increment =
+                    () -> {
+                        int old = box.value;
+                        bothRead.await(2, TimeUnit.SECONDS);
+                        box.value = old + 1;
+                        return null;
+                    };
+            Future<Void> first = pool.submit(increment), second = pool.submit(increment);
+            first.get(3, TimeUnit.SECONDS);
+            second.get(3, TimeUnit.SECONDS);
+            return box.value;
+        } finally {
+            pool.shutdownNow();
+            if (!pool.awaitTermination(3, TimeUnit.SECONDS))
+                throw new IllegalStateException("线程未退出");
+        }
+    }
+}

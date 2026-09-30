@@ -1,0 +1,64 @@
+name: Java并发与JVM课程质量检查
+on:
+  push:
+    paths:
+      - 'courses/java-concurrency/**'
+      - 'courses/java-jvm/**'
+      - '.github/workflows/java-advanced.yml'
+  pull_request:
+    paths:
+      - 'courses/java-concurrency/**'
+      - 'courses/java-jvm/**'
+      - '.github/workflows/java-advanced.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        course: [java-concurrency, java-jvm]
+    defaults:
+      run:
+        working-directory: courses/${{ matrix.course }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 记录真实JDK与Gradle版本
+        run: |
+          java -version
+          javac -version
+          chmod +x gradlew
+          ./gradlew --version
+      - name: 准备静态验证器
+        run: python -m pip install -r authoring/requirements.txt
+      - name: 全部作者解执行真实Gradle测试
+        run: ./gradlew --no-daemon test --console=plain
+      - name: 取得固定JUnit控制台并核验摘要
+        run: |
+          curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$RUNNER_TEMP/junit-console.jar"
+          echo "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc  $RUNNER_TEMP/junit-console.jar" | sha256sum --check
+      - name: 学员起点、错误变体、替代解和全部调用端回归
+        run: python authoring/verify.py --junit-console "$RUNNER_TEMP/junit-console.jar"
+      - name: 并发课程受限诊断采集
+        if: matrix.course == 'java-concurrency'
+        run: python scripts/diagnose.py --java-home "$JAVA_HOME"
+      - name: 保留每课程的独立验证报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.course }}-jdk21-reports
+          path: |
+            courses/${{ matrix.course }}/build/verification/
+            courses/${{ matrix.course }}/build/diagnostics/
+            courses/${{ matrix.course }}/**/build/reports/tests/
+            courses/${{ matrix.course }}/**/build/test-results/
+          retention-days: 7

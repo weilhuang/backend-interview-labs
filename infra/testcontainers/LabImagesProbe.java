@@ -5,7 +5,7 @@ import java.util.Set;
 /** 只验证版本读取器，不启动 Docker，不等同于 Testcontainers 集成测试。 */
 public final class LabImagesProbe {
     public static void main(String[] args) {
-        for (String key : Set.of("MYSQL_IMAGE", "REDIS_IMAGE", "KAFKA_IMAGE", "JAVA_BUILD_IMAGE")) {
+        for (String key : Set.of("MYSQL_IMAGE", "REDIS_IMAGE", "KAFKA_IMAGE", "JAVA_BUILD_IMAGE", "ROCKETMQ_IMAGE", "TESTCONTAINERS_RYUK_IMAGE", "TESTCONTAINERS_TINY_IMAGE")) {
             String image = LabImages.image(key);
             if (image == null || image.contains(":latest")) {
                 throw new AssertionError("版本读取失败：" + key);

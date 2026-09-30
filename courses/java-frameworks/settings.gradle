@@ -1,0 +1,10 @@
+rootProject.name = 'java-frameworks'
+file('framework-course').eachDir { lesson ->
+    lesson.eachDir { task ->
+        if (new File(task, 'task-info.yaml').isFile()) {
+            String module = task.name
+            include(module)
+            project(":${module}").projectDir = task
+        }
+    }
+}

@@ -1,0 +1,29 @@
+type: marketplace
+title: Java框架工程与源码：Spring Boot与Spring
+language: Chinese
+summary: 完整V1的框架部分，逐步完成真实配置、HTTP、事务、安全、容器、代理、MVC与自动配置；全项目、测试和标准解公开。完成状态以阶段报告为准。
+programming_language: Java
+content:
+- framework-course
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: LICENSE-JetBrains-template
+- name: README.md
+- name: THIRD_PARTY_NOTICES.md
+- name: build.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: settings.gradle
+- name: 中文阶段报告.md
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: scripts/course.sh
+- name: docs/前端使用.md
+- name: docs/源码与版本.md
+- name: docs/课程覆盖与验收边界.md
+- name: docs/验收摘要.json
+- name: docs/云端验收复现.md
+yaml_version: 2

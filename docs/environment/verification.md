@@ -54,6 +54,10 @@
 
 除 Maven 的已核对多架构摘要外，当前其余镜像锁完整标签，标签仍可能被上游重建。同一 daemon 默认 `--pull missing` 会保留已有版本；不同时间/机器可能得到同标签的新层。正式发布前应在可用云端核验各架构与多架构 index digest，并把通过验收的摘要追加到同一个台账，不从搜索摘要臆造 digest。
 
+## RocketMQ 课程版本预登记
+
+为消息队列课程登记 `ROCKETMQ_IMAGE=apache/rocketmq:5.3.2`，来源为[Apache RocketMQ 官方 Docker 快速开始](https://rocketmq.apache.org/docs/quickStart/02quickstartWithDocker/)。它暂由课程 Testcontainers 引用，尚未增加共享 Compose profile，也尚未运行真实 RocketMQ 验收；不得把此前 Kafka 的通过结果外推到 RocketMQ。
+
 ## 版本升级流程
 
 1. 查看上游官方发布说明、支持范围与安全公告，选择具体版本
@@ -73,3 +77,7 @@
 - [Testcontainers 配置](https://java.testcontainers.org/features/configuration/)：辅助镜像与资源清理器不等于业务镜像
 - [Testcontainers 网络](https://java.testcontainers.org/features/networking/)：随机端口与运行时主机地址
 - [Testcontainers Kafka 模块](https://java.testcontainers.org/modules/kafka/)：按官方镜像选择兼容模块
+
+## Testcontainers 辅助镜像
+
+统一登记 Ryuk 0.11.0 与 Alpine 3.17.10，分别用于清理器和短暂的检测辅助容器。Testcontainers1.20.6默认tiny标签为3.17，本仓库按[官方镜像已发布补丁](https://hub.docker.com/layers/library/alpine/3.17.10/images/sha256%3A2cb00e789e7be763614c2ec63140b0ad899a29205e331eabcff9d61b04f1e0c4)固定为3.17.10，避免浮动。此旧版仅用于隔离的临时教学测试，不代表受支持或无漏洞的生产基础镜像；未来安全升级必须重跑集成。Ryuk保持启用。

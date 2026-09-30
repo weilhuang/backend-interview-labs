@@ -1,0 +1,27 @@
+type: edu
+custom_name: Java21稳定特性与并发资源边界
+files:
+- name: solutions/ModernOrders.java.txt
+  visible: true
+- name: src/labs/jvm/ModernOrders.java
+  visible: true
+  placeholders:
+  - offset: 941
+    length: 228
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请按合同完成实现");
+
+      '
+  - offset: 1288
+    length: 172
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请按合同完成实现");
+
+      '
+  - offset: 1848
+    length: 1252
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请按合同完成实现");
+
+      '
+- name: src/labs/jvm/ModernOrdersUsage.java
+  visible: true
+- name: test/ModernOrdersTest.java
+  visible: true

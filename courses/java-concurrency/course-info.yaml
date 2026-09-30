@@ -1,0 +1,30 @@
+type: marketplace
+title: Java后端面试实验室：Java并发与JUC
+language: Chinese
+summary: 八个完整实验覆盖JMM、取消、有界缓冲区、AQS、CAS、线程池、异步期限与Java21虚拟线程；全部测试、调用端、标准解和源码路线公开可见。
+programming_language: Java
+content:
+- juc
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: README.md
+- name: 阶段报告.md
+- name: build.gradle
+- name: settings.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: LICENSE-JetBrains-template
+- name: THIRD_PARTY_NOTICES.md
+- name: docs/证据模板.md
+- name: docs/诊断证据.md
+- name: docs/源码路线图.md
+- name: docs/实际调试记录.md
+- name: scripts/diagnose.py
+- name: scripts/ConcurrencyDiagnostics.java
+- name: scripts/BoundedBlockingComparison.java
+yaml_version: 2

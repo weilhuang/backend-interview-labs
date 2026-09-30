@@ -11,7 +11,7 @@ import java.util.Set;
 /** 供后续课程测试源码集引用的共享读取器，不复制镜像版本，不依赖 Testcontainers 本身。 */
 public final class LabImages {
     private static final Set<String> KEYS = Set.of(
-            "MYSQL_IMAGE", "REDIS_IMAGE", "KAFKA_IMAGE", "JAVA_BUILD_IMAGE");
+            "MYSQL_IMAGE", "REDIS_IMAGE", "KAFKA_IMAGE", "JAVA_BUILD_IMAGE", "ROCKETMQ_IMAGE", "TESTCONTAINERS_RYUK_IMAGE", "TESTCONTAINERS_TINY_IMAGE");
     private static final Properties VALUES = load();
 
     private LabImages() { }

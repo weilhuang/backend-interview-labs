@@ -1,0 +1,18 @@
+type: edu
+custom_name: 06 · 线程池：饱和、拒绝、异常与关闭
+files:
+- name: src/labs/BoundedExecutor.java
+  visible: true
+  placeholders:
+  - offset: 1236
+    length: 117
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 1477
+    length: 395
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+- name: src/labs/BoundedExecutorUsage.java
+  visible: true
+- name: test/BoundedExecutorTest.java
+  visible: true
+- name: solution/Alternative.java.txt
+  visible: true

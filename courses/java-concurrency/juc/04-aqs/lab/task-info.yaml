@@ -1,0 +1,18 @@
+type: edu
+custom_name: 04 · AQS源码：一次性门与共享同步
+files:
+- name: src/labs/OneShotGate.java
+  visible: true
+  placeholders:
+  - offset: 314
+    length: 44
+    placeholder_text: '            throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 474
+    length: 44
+    placeholder_text: '            throw new UnsupportedOperationException("TODO：请实现本段契约");'
+- name: src/labs/OneShotGateUsage.java
+  visible: true
+- name: test/OneShotGateTest.java
+  visible: true
+- name: solution/Alternative.java.txt
+  visible: true

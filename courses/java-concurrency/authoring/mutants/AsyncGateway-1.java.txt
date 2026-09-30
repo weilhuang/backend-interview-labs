@@ -1,0 +1,116 @@
+package labs;
+
+import java.time.Duration;
+import java.util.Objects;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
+
+public final class AsyncGateway {
+    public record Summary(String primary, String secondary) {}
+
+    @FunctionalInterface
+    public interface Ticket {
+        void cancel();
+    }
+
+    @FunctionalInterface
+    public interface Timer {
+        Ticket schedule(Duration delay, Runnable action);
+    }
+
+    public static final class RealTimer implements Timer, AutoCloseable {
+        private final ScheduledExecutorService scheduler =
+                Executors.newSingleThreadScheduledExecutor(
+                        r -> Thread.ofPlatform().daemon().name("实验-期限计时器").unstarted(r));
+
+        public Ticket schedule(Duration delay, Runnable action) {
+            var future = scheduler.schedule(action, nanos(delay), TimeUnit.NANOSECONDS);
+            return () -> future.cancel(false);
+        }
+
+        public void close() {
+            scheduler.shutdownNow();
+        }
+    }
+
+    public static CompletableFuture<Summary> aggregate(
+            CompletableFuture<String> primary,
+            CompletableFuture<String> secondary,
+            Duration budget,
+            Timer timer) {
+        // 答案开始：有界聚合
+        Objects.requireNonNull(primary);
+        Objects.requireNonNull(secondary);
+        Objects.requireNonNull(timer);
+        nanos(budget);
+        var result = new CompletableFuture<Summary>();
+        Ticket alarm =
+                timer.schedule(
+                        budget,
+                        () -> result.completeExceptionally(new TimeoutException("聚合已超过预算")));
+        result.whenComplete((value, error) -> alarm.cancel());
+        primary.whenComplete(
+                (value, error) -> {
+                    if (error != null) result.completeExceptionally(error);
+                });
+        primary.thenCombine(secondary.exceptionally(error -> "次要服务降级"), Summary::new)
+                .whenComplete(
+                        (value, error) -> {
+                            if (error == null) result.complete(value);
+                            else result.completeExceptionally(error);
+                        });
+        return result;
+        // 答案结束：有界聚合
+    }
+
+    private final Executor executor;
+    private final Semaphore permits;
+    private final ThreadLocal<String> request = new ThreadLocal<>();
+
+    public AsyncGateway(Executor executor, int concurrency) {
+        this.executor = Objects.requireNonNull(executor);
+        if (concurrency < 1) throw new IllegalArgumentException("并发上限必须为正");
+        permits = new Semaphore(concurrency);
+    }
+
+    public String currentRequest() {
+        return request.get();
+    }
+
+    public <T> CompletableFuture<T> request(String id, Supplier<T> action) {
+        // 答案开始：隔离和上下文
+        Objects.requireNonNull(id);
+        Objects.requireNonNull(action);
+        var result = new CompletableFuture<T>();
+        if (!permits.tryAcquire()) {
+            result.completeExceptionally(new RejectedExecutionException("下游隔离舱已满"));
+            return result;
+        }
+        try {
+            executor.execute(
+                    () -> {
+                        String previous = request.get();
+                        request.set(id);
+                        try {
+                            result.complete(action.get());
+                        } catch (Throwable error) {
+                            result.completeExceptionally(error);
+                        } finally {
+                                /* 故意泄漏上下文 */
+                            permits.release();
+                        }
+                    });
+        } catch (RuntimeException rejected) {
+            permits.release();
+            result.completeExceptionally(rejected);
+        }
+        return result;
+        // 答案结束：隔离和上下文
+    }
+
+    private static long nanos(Duration budget) {
+        Objects.requireNonNull(budget);
+        if (budget.isNegative()) throw new IllegalArgumentException("预算不能为负");
+        return budget.toNanos();
+    }
+}
