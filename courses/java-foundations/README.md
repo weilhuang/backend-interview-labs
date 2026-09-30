@@ -9,7 +9,7 @@ V1作者验收课程。它补齐C00/C01完整范围，不把先前12题内部试
 | JDK | 统一完整Eclipse Temurin21.0.12.1+1，--release21；不需要其他JDK，不自动下载/安装 |
 | 源码阅读 | OpenJDK21 GA tag jdk-21+35，commit 890adb6410dab4606a4f26a942aed02fb2f55387；动态调试另记实际补丁与src.zip摘要 |
 | Gradle/JUnit | 源码仓库含Wrapper8.10.2；Academy官方ZIP的Wrapper剔除行为见下方路线说明；Jupiter5.11.4、Platform1.11.4；普通测试依赖由Maven Central解析 |
-| IDE/Academy | 目标IDEA2026.1.5；此新课程实际插件预览、Check、重置、导出、干净导入尚未完成，不能借试点结果代替 |
+| IDE/Academy | IDEA2026.1.5＋Academy2026.9-2026.1-1070：官方导出/干净导入与三类题Check/Reset已抽检；其余13题及Preview按钮流程未逐一验收，见阶段报告 |
 | Python | 3.12执行脚本；作者工具需要PyYAML6.0.2 |
 | 前端/Node | 不需要 |
 | Docker/镜像/Testcontainers/外部服务 | 不需要；没有本课私建镜像清单 |
@@ -53,7 +53,7 @@ python authoring/materialize_learner.py build/learner-v1
 python authoring/verify.py --junit-console /你已提供的路径/junit-platform-console-standalone-1.11.4.jar
 ```
 
-脚本不下载JAR，只接受固定摘要。普通学习者目录不是插件导出的Academy ZIP；预览/Check/提示/重置/官方归档/重新导入仍需单独验收。
+脚本不下载JAR，只接受固定摘要。普通学习者目录不是插件导出的Academy ZIP；官方导出/干净导入与C00-01、C00-06、C00-08的Check/提示/重置已另行实测；其他题和Preview按钮流程仍需单独验收。Task面板建议拉宽至约600像素以上再阅读中文长文、代码与ASCII图。
 
 ## 源码仓库中的综合CLI与JMH
 

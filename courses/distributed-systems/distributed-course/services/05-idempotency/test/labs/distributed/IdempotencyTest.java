@@ -59,4 +59,40 @@ class IdempotencyTest {
     assertThrows(IllegalStateException.class, () -> store.complete(request, old, () -> {}));
     assertEquals(1, store.complete(request, current, () -> {}));
   }
+
+  @Test
+  void 登记提交后崩溃保留参数绑定但空占位可重新领取() throws Exception {
+    var db =
+        new Database(
+            "jdbc:h2:mem:" + UUID.randomUUID() + ";MODE=MySQL;DB_CLOSE_DELAY=-1", "sa", "");
+    var store = new IdempotencyStore(db);
+    store.initialize(10);
+    var request = new IdempotencyStore.Request("registered", "book", 2);
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            store.acquire(
+                request,
+                Duration.ofSeconds(10),
+                () -> {
+                  throw new IllegalStateException("登记提交后退出");
+                }));
+    assertEquals(10, db.scalar("SELECT available FROM inventory"));
+    assertEquals(
+        1,
+        db.scalar(
+            "SELECT COUNT(*) FROM operations WHERE state='PENDING' AND owner IS NULL AND"
+                + " generation=0 AND lease_until=0"));
+    assertTrue(store.query(request.key()).isEmpty());
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            store.acquire(
+                new IdempotencyStore.Request(request.key(), "book", 3), Duration.ofSeconds(10)));
+    var restarted = new IdempotencyStore(db);
+    var claim = restarted.acquire(request, Duration.ofSeconds(10));
+    assertEquals(IdempotencyStore.Kind.OWNED, claim.kind());
+    assertEquals(1, claim.generation());
+    assertEquals(8, restarted.complete(request, claim, () -> {}));
+  }
 }

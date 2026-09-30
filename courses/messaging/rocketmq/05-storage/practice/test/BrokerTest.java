@@ -21,18 +21,35 @@ class BrokerTest {
             }
             var files =
                     broker.execInContainer(
-                            "sh", "-c", "find /home/rocketmq/store -maxdepth 2 -type f | head -20");
-            assertEquals(0, files.getExitCode());
-            assertTrue(files.getStdout().contains("commitlog"), "应该观察到真实CommitLog文件");
+                            "sh",
+                            "-c",
+                            "test -d /home/rocketmq/store/commitlog && find"
+                                + " /home/rocketmq/store/commitlog -maxdepth 1 -type f -size +0c"
+                                + " -print");
+            System.err.println("真实CommitLog文件：\n" + files.getStdout() + files.getStderr());
+            assertEquals(0, files.getExitCode(), files.getStderr());
+            var commitLogs =
+                    files.getStdout()
+                            .lines()
+                            .filter(
+                                    path ->
+                                            path.matches(
+                                                    "/home/rocketmq/store/commitlog/[0-9]{20}"))
+                            .toList();
+            assertFalse(commitLogs.isEmpty(), "必须观察到真实非空20位CommitLog数据文件：" + files.getStdout());
             broker.getDockerClient()
                     .restartContainerCmd(broker.getContainerId())
                     .withTimeout(5)
                     .exec();
             broker.awaitReady(Duration.ofMinutes(2));
+            for (String file : commitLogs) {
+                var retained = broker.execInContainer("test", "-s", file);
+                assertEquals(0, retained.getExitCode(), "同容器重启必须保留原CommitLog文件：" + file);
+            }
             broker.admin("topicStatus", "-n", "127.0.0.1:9876", "-t", topic);
             try (var recovered = broker.consumer(group, topic)) {
                 var record = RocketClient.receive(recovered, 1, Duration.ofSeconds(60)).getFirst();
-                assertEquals("disk1", RocketClient.event(record).id());
+                assertEquals(new Event("disk1", "o1", 1, 100), RocketClient.event(record));
                 assertTrue(
                         Lab.missing(
                                         java.util.Set.of("disk1"),

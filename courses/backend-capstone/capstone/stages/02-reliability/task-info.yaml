@@ -1,0 +1,22 @@
+type: edu
+custom_name: 02 MySQL事务、并发库存与缓存边界
+files:
+- name: gradle.lockfile
+  visible: true
+- name: integration-test/labs/capstone/ReliabilityIntegrationTest.java
+  visible: true
+- name: src/labs/capstone/OrderService.java
+  visible: true
+  placeholders:
+  - offset: 493
+    length: 1954
+    placeholder_text: '        result = Exercise.unimplemented();
+
+      '
+  - offset: 2772
+    length: 1366
+    placeholder_text: '        result = Exercise.unimplemented();
+
+      '
+- name: test/labs/capstone/ReliabilityTest.java
+  visible: true

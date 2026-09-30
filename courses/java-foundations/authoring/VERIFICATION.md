@@ -28,12 +28,26 @@ JDI启动自己的64MiB合成JVM，记录HashMap.treeifyBin/resize与TreeNode.tr
 
 状态SANITY_PASS，不是稳定性能评测；部分99.9%误差半宽很大，不能把本结果当生产倍数、P99延迟或复杂度证明。cachedHotKey与轮转查询不同负载，禁止混比。细节见benchmark/短探索记录.md与实验设计.md。
 
+
+## Academy真实界面抽检（2026-09-30）
+
+环境为云端Linux、IDEA2026.1.5（261.27258.48）、Academy2026.9-2026.1-1070、完整Temurin21.0.12.1+1、Gradle8.10.2。本次采用官方本地Gradle与独立缓存/精确版本离线Maven仓，课程源码仍保留mavenCentral；没有修改依赖版本、参考解、测试合同或官方ZIP内容。
+
+官方Create Course Archive导出和Open Course from Disk干净导入已实测；C00/C01共16单元识别正常。GUI抽检C00-01普通编码（2失败→2通过）、C00-06三缺陷调试（3失败→3通过）、C00-08完整CLI项目（4失败→4通过），三题均确认Reset恢复学习者起点。其余13题没有逐题GUI闭环；本新课程Preview Course按钮流程未单独执行，不能把导入等同预览。
+
+- 学员界面可见完整测试文件树、Usage与答案。中文标题/正文、ASCII图、Java代码高亮、展开的H1提示与H2/H3导航、完整长标准答案末尾和逐步解释均已实际查看；推荐Task面板约600像素以上，窄栏会换行
+- C00-08的OrderAnalyzerUsage实际运行输出“客户|总分|笔数”“张三|200|2”，退出码0
+- common三份领域checkpoint、fixtures合成输入、diagnostics、scripts及可选benchmark源文件随官方归档保留；默认17个Gradle模块（16任务+common）导入正常。没有Docker/数据库/消息服务依赖
+- 再次实测官方导出剔除gradlew、gradlew.bat、gradle-wrapper.jar，只保留properties；源码CLI与导入后Check/IDE Run/Gradle工具窗口两条路线仍适用。JDI脚本与JMH在归档导入后的IDE中没有执行，不外推作者CLI结果
+- 导出时未选Check all tasks；全16题GUI循环、IDE交互断点、用户独立掌握、非Linux环境仍未验收
+- 本次仅本地未发布课程；未增加协议或隐私选项。按已安装插件JAR核对的范围，本地未发布课程不进入所检查的解答上传/同步路径，不等于没有统计或网络请求
+
 ## 仍未宣称完成的发布门禁
 
-- 本新课程的Academy预览、Check、提示、重置、官方ZIP导出、干净导入：NOT_RUN，不能借试点或其他课程结果代替
+- 其余13题的逐题GUI闭环、Preview Course按钮流程、用户独立试学仍未完成；上文三类抽检不能外推这些结果
 - 当前已知Academy2026.9官方ZIP剔除gradlew/gradlew.bat/wrapper.jar，只保留properties；题面和README已区分源码CLI与导入后Check/IDE Run/Gradle窗口路线
 - 用户实际独立编码、IDE三缺陷断点与24小时变式回测：NOT_RUN
 - 非Linux脚本兼容、长期/多fork性能评测：NOT_RUN
 - 没有Docker/前端/数据库依赖，不把“不需要”混写成“启动通过”
 
-结果摘要：verification-report.json。完整日志：build/verification、build/final-gradle.log、build/learner-final-gradle.log、build/jmh-sanity.log。大型缓存与生成物不提交。本任务未推送GitHub，未修改已冻结JVM或其他课程源码。
+结果摘要：verification-report.json。完整日志：build/verification、build/final-gradle.log、build/learner-final-gradle.log、build/jmh-sanity.log。大型缓存与生成物不提交。对应GitHub提交与CI结果请以课程阶段报告和仓库进度表为准。

@@ -39,6 +39,7 @@ additional_files:
 - name: authoring/prefetch_gradle_metadata.py
 - name: authoring/dependency-metadata-evidence.json
 - name: authoring/dependency-lock-verification.json
+- name: authoring/mysql-recovery-fix-verification.json
 - name: README.md
 - name: 中文阶段报告.md
 - name: THIRD_PARTY_NOTICES.md

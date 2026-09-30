@@ -1,6 +1,6 @@
 # RocketMQ 共享开发环境
 
-本次交付状态：代码、静态约束、离线回归和宿主 JDK21 探针编译已通过；共享 Compose 的首次拉取、卷权限、gRPC 收发、重启持久化及内存峰值尚待精确提交的云端 CI。消息队列课程自己的 Testcontainers 结果与这里的共享 Compose 是两套隔离验收，不能互相代替。
+本次交付状态：首次共享云端 CI 已通过拉取、UID3000 命名卷写入、HTTP/2 检查和宿主 gRPC 收发；重启验收收到已 ACK 的收发消息而失败。启动屏障、优雅停止及独立持久化主题修复已完成离线回归，完整真实验收待新提交重跑；资源峰值仍未测定。消息队列课程自己的 Testcontainers 结果与这里的共享 Compose 是两套隔离验收，不能互相代替。
 
 ## 启动、检查、停止
 
@@ -26,13 +26,17 @@ NameServer、单个 Broker、独立 CLUSTER Proxy 同容器，共享容器网络
 
 选定服务端版本的 LOCAL Proxy（`mqbroker --enable-proxy`）路由实现不使用请求中的映射端口，可能把宿主 SDK 重定向到未发布的 8081。因此不能把 CLUSTER 三进程简化回 LOCAL。若以后拆成三个容器，需要重新设计容器 DNS/注册地址，不能照抄同容器的回环地址。
 
-监督脚本为各进程建立独立进程组；收到 TERM 时停止官方 shell 包装及 Java 子进程，并等待退出。任一关键进程意外退出，即使退出码为 0，也使容器返回失败，避免只剩一个 Java 进程却显示“可用”。`down` 的 30 秒等待上限之后 Docker 可能强制停止，因此异常终止恢复仍须另验。
+启动顺序有明确屏障：先启动 NameServer/Broker；最多等待 120 秒，重复小内存实际 `clusterList`，单次 RPC 取剩余预算与 15 秒较小值；要求精确 Broker 路由、版本和 active。RPC 失败/空表头不算成功；任一服务提前退出则停止，不启动 Proxy。随后显式创建允许广播的系统消费组 `CID_DefaultHeartBeatSyncerTopic`（`updateSubGroup -d true`），确认成功才启动 Proxy，避免禁用自动创建后出现内部 CODE26。失败保留最近 RPC 输出，不用固定 sleep 或盲重启代替条件。
+
+监督脚本为各进程建立独立进程组；收到 TERM 时停止官方 shell 包装及 Java 子进程，并最多等待整个进程组 25 秒退出，不能只等先退出的 shell 包装、提前结束尚在刷盘的 Java。超时会明确记录强制终止，不能标作优雅关闭。任一关键进程意外退出，即使退出码为 0，也使容器返回失败，避免只剩一个 Java 进程却显示“可用”。`down` 的 30 秒等待上限之后 Docker 可能强制停止，因此异常终止恢复仍须另验。
 
 ## 就绪证据分层
 
 1. Compose 健康检查：Proxy 监听存在；实际运行小内存 `clusterList`，要求 NameServer 返回指定 Broker，Broker 运行统计包含版本且处于 active；异常文本或空表头均失败，不能只看 mqadmin 退出码
 2. `up/check`：重新跑管理 RPC、核对实际 Docker 回环发布绑定、从当前宿主完成 HTTP/2 SETTINGS 和匹配 PING ACK，再读取容器实时状态；TCP connect 或历史 healthy 状态都不够
-3. CI 业务验收：JDK21 + RocketMQ SDK5 从 `.env` 宿主端点建客户端、发送并比对消费内容及 ACK；留存另一条消息后 `down/up`，下一进程只读原消息并 ACK，不重新发送掩盖数据丢失
+3. CI 业务验收：JDK21 + RocketMQ SDK5 从 `.env` 宿主端点建客户端，在 roundtrip 主题/组发送、比对、ACK；在另一个 durable 主题/组预建消费位置并留存一条未消费消息。`down/up` 后只打开原 durable 主题/组，必须读到重启前的精确内容并 ACK，不创建 Producer、不补发；空消息超时或任何未知内容都失败
+
+RocketMQ 至少一次投递允许重复；一次 ACK 的 RPC 成功不能被解释成跨重启精确一次消费保证。独立主题避免把已 ACK roundtrip 的重投误判为持久化内容错误，同时不降低“必须读回重启前 durable 原消息”的要求。ACK 状态强持久化、异常断电恢复及业务幂等属于另外的课程验收。
 
 前两层通过不代表第三层通过。HTTP/2 往返也不是一次 gRPC 业务 RPC。远程 Docker context 的回环端点不在脚本主机，不能自动回退成容器内检测后声称宿主通过；在 daemon 所在的授权云端主机运行本入口。
 
@@ -49,7 +53,7 @@ NameServer、单个 Broker、独立 CLUSTER Proxy 同容器，共享容器网络
 
 堆上限不等于 RSS，仍有 metaspace、线程栈、映射文件和文件缓存。预算在实际 CI 的 OOM/资源结果出来前不能宣称“峰值已验证”；建议 Docker 3–4 GiB 内存、3–5 GiB 初始磁盘余量，避免同时开 Kafka/core/构建容器。镜像中的 mqadmin 默认工具脚本会创建约 1 GiB JVM，所以管理脚本直接调用同发行包工具主类，限制内存并在 15 秒超时后终止工具进程。
 
-数据卷采用本项目 `rocketmq-data:/tmp`，数据明确位于 `/tmp/lab-rocketmq/store`。这里的 `/tmp` 被命名卷持久化，不是关机即丢弃的临时数据；`down` 保留，只有精确确认当前项目的 `reset` 才删除。选择镜像已有的可写目录，是为了保留 UID3000 且不新增 root/chown 初始化服务，不把整个发行目录复制进卷。**新卷实际可写性必须由 CI 验证**；启动会记录 UID/GID 并检查 store 可写，不会自行改权限或删卷。
+数据卷采用本项目 `rocketmq-data:/tmp`，数据明确位于 `/tmp/lab-rocketmq/store`。这里的 `/tmp` 被命名卷持久化，不是关机即丢弃的临时数据；`down` 保留，只有精确确认当前项目的 `reset` 才删除。选择镜像已有的可写目录，是为了保留 UID3000 且不新增 root/chown 初始化服务，不把整个发行目录复制进卷。新卷实际可写性已由首次 Linux amd64 CI 验证：`/tmp` 为 root 的 1777 目录，`lab-rocketmq/store` 由 UID3000 创建。其他架构/环境仍待实测；启动会记录 UID/GID 并检查 store 可写，不会自行改权限或删卷。
 
 commitlog 段设置为 64 MiB，过期保留时间为 24 小时。它们不是磁盘硬配额，多主题/队列或持续发送仍会增长。Docker stdout 日志为 3×10 MiB；官方文件日志按类别缩至 1 MiB 文件与一个归档，JVM GC 日志仍另占空间。用 `doctor` 看占用，不运行任何全局 prune。
 

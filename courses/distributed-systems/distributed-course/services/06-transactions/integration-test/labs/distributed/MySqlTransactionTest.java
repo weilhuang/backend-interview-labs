@@ -31,13 +31,14 @@ class MySqlTransactionTest {
       var committed = new XaTransfer(a, b, temporary.resolve("commit.log"));
       committed.transfer("xa_commit", 30, false, true);
       // 真实重启两个数据库进程，PREPARED分支必须仍可恢复。
-      Images.restartAndAwait(first);
-      Images.restartAndAwait(second);
+      a = Images.restartAndAwait(first);
+      b = Images.restartAndAwait(second);
       // 重建所有XA连接与协调器对象后，按落盘决策完成两个分支。
-      assertEquals(2, new XaTransfer(a, b, temporary.resolve("commit.log")).recover("xa_commit"));
+      var recovered = new XaTransfer(a, b, temporary.resolve("commit.log"));
+      assertEquals(2, recovered.recover("xa_commit"));
       assertEquals(70, a.scalar("SELECT balance FROM xa_account"));
       assertEquals(130, b.scalar("SELECT balance FROM xa_account"));
-      assertEquals(0, committed.recover("xa_commit"));
+      assertEquals(0, recovered.recover("xa_commit"));
     }
   }
 

@@ -1,9 +1,9 @@
 {
-  "report_time_utc": "2026-09-30T14:44:49.342340+00:00",
+  "report_time_utc": "2026-09-30T15:34:50.821215+00:00",
   "jdk": "Eclipse Temurin 21.0.12.1+1",
   "gradle": "8.10.2",
   "javac": "--release21 -Xlint:all,-processing,-serial -Werror",
-  "unit_tests": 38,
+  "unit_tests": 44,
   "unit_failures": 0,
   "unit_skipped": 0,
   "suites": [
@@ -50,7 +50,7 @@
     {
       "module": "05-idempotency",
       "suite": "labs.distributed.IdempotencyTest",
-      "tests": 2,
+      "tests": 3,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -59,6 +59,22 @@
       "module": "05-idempotency",
       "suite": "labs.distributed.RetryTest",
       "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "05-idempotency",
+      "suite": "labs.distributed.TransactionRetryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "06-transactions",
+      "suite": "labs.distributed.EndpointTest",
+      "tests": 1,
       "failures": 0,
       "errors": 0,
       "skipped": 0
@@ -89,13 +105,13 @@
     }
   ],
   "docker_integration": {
-    "cases": 7,
-    "status": "已严格编译，Docker不可用，未执行",
-    "requires": "对应提交的Ubuntu Docker CI"
+    "cases": 9,
+    "status": "本批严格编译通过；上一CI实际暴露死锁和旧端口问题；修复后的Docker执行待新CI",
+    "requires": "本修复提交对应Ubuntu Docker CI"
   },
   "academy_gui": "未执行；源码包不是官方Academy导出",
   "standalone_source_package": {
-    "status": "38项测试通过，7项Docker集成源码编译通过",
+    "status": "前一版38项测试、7项集成源码编译通过；本次修复包重新生成，尚未单独执行，不能沿用前版通过状态",
     "suites": [
       {
         "module": "01-failure-model",
@@ -182,16 +198,16 @@
     "note": "同一源码包独立目录运行，不继承仓库相对infra路径；官方Academy GUI尚未验收"
   },
   "variants": {
-    "total": 24,
+    "total": 25,
     "blank_rejected": 8,
-    "wrong_rejected": 8,
+    "wrong_rejected": 9,
     "alternative_passed": 8,
     "strict_javac": true,
-    "note": "最后只增加C10-01正常响应/负时间断言，已在原工程、独立目录及三个变体定向复验"
+    "note": "本次定向重验C10-05/06共7项，含新增COMMIT未知错误重试负例；其余18项沿用前版未改源码记录"
   },
   "generated_protocol_files_verified": 10,
   "source_files_verified": 16,
-  "java_and_proto_sha256": "8db76ce1085852cfecb9807dd7325e0e460b25003604e3b4c7e2e5df64cb32a9",
+  "java_and_proto_sha256": "cc893ccd666d83ea15aec4100c922b8044633d457b0b43333810fb52e0dc5b60",
   "callers": {
     "default_entrypoints": 8,
     "all_exit_zero": true,
@@ -221,5 +237,10 @@
     "skipped": 0,
     "integration": "全部真实集成源码编译和编译/运行类路径锁解析通过；Docker执行仍待CI",
     "evidence": "authoring/dependency-lock-verification.json"
-  }
+  },
+  "mysql_recovery_ci_fix": {
+    "evidence": "authoring/mysql-recovery-fix-verification.json",
+    "status": "本机44项通过，真实Docker修复待新CI"
+  },
+  "java_and_proto_sha256_algorithm": "按路径排序，顺序拼接相对路径UTF8与文件原始字节后SHA256；support/src与课程src生产Java/proto"
 }

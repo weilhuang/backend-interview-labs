@@ -72,9 +72,9 @@ class AdminTests(unittest.TestCase):
         java.write_text('#!/bin/sh\nprintf "%s\\n" "$MOCK_ADMIN_OUTPUT"\nexit "${MOCK_ADMIN_EXIT:-0}"\n')
         java.chmod(0o700)
 
-    def invoke(self, output, command='clusterList', code=0):
+    def invoke(self, output, command='clusterList', code=0, rpc_timeout='15'):
         env = dict(os.environ, JAVA_HOME=str(self.root), ROCKETMQ_HOME=str(self.root),
-                   MOCK_ADMIN_OUTPUT=output, MOCK_ADMIN_EXIT=str(code))
+                   MOCK_ADMIN_OUTPUT=output, MOCK_ADMIN_EXIT=str(code), LAB_ADMIN_TIMEOUT_SECONDS=rpc_timeout)
         return subprocess.run(['bash', str(lab.INFRA / 'rocketmq' / 'admin.sh'), command],
                               env=env, capture_output=True, text=True, timeout=20)
 
@@ -99,6 +99,10 @@ class AdminTests(unittest.TestCase):
         self.assertEqual(self.invoke('create subscription group to 127.0.0.1:10911 success.', 'updateSubGroup').returncode, 0)
         self.assertNotEqual(self.invoke('', 'updateSubGroup').returncode, 0)
 
+    def test_rpc_timeout_override_remains_bounded(self):
+        for value in ('0', '16', '-1', 'never'):
+            self.assertEqual(self.invoke('', rpc_timeout=value).returncode, 2)
+
     def test_unknown_admin_command_is_rejected(self):
         self.assertEqual(self.invoke('', 'deleteTopic').returncode, 2)
 
@@ -115,17 +119,47 @@ class SupervisorTests(unittest.TestCase):
         source = source.replace('LAB_DATA=/tmp/lab-rocketmq', 'LAB_DATA=' + str(self.root / 'data'))
         self.script = self.root / 'start.sh'
         self.script.write_text(source)
+        (self.root / 'admin.sh').write_text((lab.INFRA / 'rocketmq/admin.sh').read_text())
+        (self.root / 'logs.sh').write_text('#!/bin/sh\necho bounded-test-diagnostics\n')
+        java = self.root / 'bin/java'
+        java.write_text('''#!/bin/sh
+printf called >> "$FAKE_ROOT/rpc.called"
+case "$*" in
+  *updateSubGroup*)
+    if [ "${FAIL_GROUP_INIT:-false}" = true ]; then echo 'system group failed'; exit 1; fi
+    printf "%s\n" "$@" > "$FAKE_ROOT/system-group.args"
+    printf initialized > "$FAKE_ROOT/system-group.ready"
+    echo 'create subscription group to 127.0.0.1:10911 success.'
+    exit 0 ;;
+esac
+if [ "${BLOCK_RPC:-false}" = true ]; then
+  trap 'printf stopped > "$FAKE_ROOT/rpc.stopped"; exit 0' TERM INT
+  while :; do sleep 1; done
+fi
+if [ -f "$FAKE_ROOT/route.ready" ]; then
+  echo 'LabCluster broker-a 0 127.0.0.1:10911 V5_3_2 stats true'
+else
+  echo '#Cluster Name  #Broker Name  #BID  #Addr'
+fi
+''')
+        java.chmod(0o700)
         for command in ('mqnamesrv', 'mqbroker', 'mqproxy'):
             (self.root / 'bin' / command).write_text('''#!/bin/sh
 name=$(basename "$0")
+if [ "$name" = mqproxy ] && { [ ! -f "$FAKE_ROOT/route.ready" ] || [ ! -f "$FAKE_ROOT/system-group.ready" ]; }; then
+  touch "$FAKE_ROOT/premature-proxy"
+  exit 9
+fi
 printf '%s\\n' "$$" > "$FAKE_ROOT/$name.pid"
 trap 'printf stopped > "$FAKE_ROOT/$name.stopped"; exit 0' TERM INT
 if [ "${FAIL_PROCESS:-}" = "$name" ]; then sleep 0.3; exit 7; fi
 while :; do sleep 1; done
 ''')
 
-    def start(self, fail=''):
-        env = dict(os.environ, ROCKETMQ_HOME=str(self.root), FAKE_ROOT=str(self.root), FAIL_PROCESS=fail)
+    def start(self, fail='', registered=True, block_rpc=False, fail_group=False):
+        if registered:
+            (self.root / 'route.ready').touch()
+        env = dict(os.environ, JAVA_HOME=str(self.root), ROCKETMQ_HOME=str(self.root), FAKE_ROOT=str(self.root), FAIL_PROCESS=fail, BLOCK_RPC=str(block_rpc).lower(), FAIL_GROUP_INIT=str(fail_group).lower())
         process = subprocess.Popen(['bash', str(self.script)], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         def cleanup():
             if process.poll() is None:
@@ -137,6 +171,76 @@ while :; do sleep 1; done
                     process.communicate()
         self.addCleanup(cleanup)
         return process
+
+    def await_file(self, name):
+        deadline = self.time.monotonic() + 5
+        while not (self.root / name).exists():
+            if self.time.monotonic() > deadline:
+                self.fail('等待模拟文件超时：' + name)
+            self.time.sleep(.02)
+
+    def test_proxy_waits_for_actual_registered_broker_response(self):
+        process = self.start(registered=False)
+        self.await_file('mqbroker.pid')
+        self.await_file('rpc.called')
+        self.assertFalse((self.root / 'mqproxy.pid').exists())
+        (self.root / 'route.ready').touch()
+        self.await_file('mqproxy.pid')
+        process.terminate()
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 0, out + err)
+        self.assertFalse((self.root / 'premature-proxy').exists())
+        self.assertIn('Broker 注册屏障通过', out)
+        self.assertIn('CID_DefaultHeartBeatSyncerTopic\n-d\ntrue', (self.root / 'system-group.args').read_text())
+
+    def test_missing_registration_times_out_without_starting_proxy(self):
+        self.script.write_text(self.script.read_text().replace('REGISTER_WAIT_SECONDS=120', 'REGISTER_WAIT_SECONDS=2'))
+        process = self.start(registered=False)
+        out, err = process.communicate(timeout=6)
+        self.assertEqual(process.returncode, 1, out + err)
+        self.assertIn('注册屏障未通过', err)
+        self.assertIn('#Cluster Name', err)
+        self.assertFalse((self.root / 'mqproxy.pid').exists())
+        self.assertTrue((self.root / 'mqnamesrv.stopped').exists())
+        self.assertTrue((self.root / 'mqbroker.stopped').exists())
+
+    def test_broker_failure_during_registration_cleans_nameserver(self):
+        process = self.start('mqbroker', registered=False)
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 1, out + err)
+        self.assertIn('可用路由出现前退出', err)
+        self.assertFalse((self.root / 'mqproxy.pid').exists())
+        self.assertTrue((self.root / 'mqnamesrv.stopped').exists())
+
+    def test_term_during_registration_cleans_started_services(self):
+        process = self.start(registered=False)
+        self.await_file('rpc.called')
+        process.terminate()
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 0, out + err)
+        self.assertFalse((self.root / 'mqproxy.pid').exists())
+        self.assertTrue((self.root / 'mqnamesrv.stopped').exists())
+        self.assertTrue((self.root / 'mqbroker.stopped').exists())
+
+    def test_term_during_active_registration_rpc_reaches_tool_process(self):
+        process = self.start(registered=False, block_rpc=True)
+        self.await_file('rpc.called')
+        process.terminate()
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 0, out + err)
+        self.assertTrue((self.root / 'rpc.stopped').exists())
+        self.assertFalse((self.root / 'mqproxy.pid').exists())
+        self.assertTrue((self.root / 'mqnamesrv.stopped').exists())
+        self.assertTrue((self.root / 'mqbroker.stopped').exists())
+
+    def test_system_group_failure_does_not_start_proxy(self):
+        process = self.start(fail_group=True)
+        out, err = process.communicate(timeout=5)
+        self.assertEqual(process.returncode, 1, out + err)
+        self.assertIn('系统消费组初始化失败', err)
+        self.assertFalse((self.root / 'mqproxy.pid').exists())
+        self.assertTrue((self.root / 'mqnamesrv.stopped').exists())
+        self.assertTrue((self.root / 'mqbroker.stopped').exists())
 
     def test_term_reaches_all_three_services(self):
         process = self.start()

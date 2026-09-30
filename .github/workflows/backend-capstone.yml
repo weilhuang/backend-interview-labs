@@ -1,0 +1,99 @@
+name: C14真实订单库存与消息恢复验收
+on:
+  workflow_dispatch:
+  pull_request:
+    paths: ['courses/backend-capstone/**', 'infra/versions.env', '.github/workflows/backend-capstone.yml']
+  push:
+    branches: [main]
+    paths: ['courses/backend-capstone/**', 'infra/versions.env', '.github/workflows/backend-capstone.yml']
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: courses/backend-capstone
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: 工具链与中文字体
+        timeout-minutes: 5
+        run: |
+          java -version
+          docker version
+          docker compose version
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk
+          fc-match sans:lang=zh-cn
+          google-chrome --version
+          node --version
+          npm --version
+          dpkg-query -W fonts-noto-cjk
+          bash ./gradlew --version
+      - name: 元数据与安全脚本
+        timeout-minutes: 3
+        run: |
+          python -m pip install -r authoring/requirements.txt
+          python authoring/validate_course.py
+          python scripts/test-script-safety.py
+          bash -n scripts/course.sh
+      - name: 严格JDK21快测、调用方与完整应用
+        timeout-minutes: 10
+        run: bash ./gradlew --no-daemon --max-workers=1 test usage verificationClasspath :05-defense:installDist --continue --console=plain
+      - name: 正确写法、学生起点与错误变体
+        timeout-minutes: 6
+        run: |
+          mkdir -p build/tools
+          curl -fL --max-time 60 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.12.2/junit-platform-console-standalone-1.12.2.jar -o build/tools/junit-console.jar
+          echo '329bd10288875a74d04c9ca6b7c9889c265ddf87b21a9ea42a7f7392f391472a  build/tools/junit-console.jar' | sha256sum -c -
+          python authoring/verify_variants.py --jdk "$JAVA_HOME" --console build/tools/junit-console.jar
+      - name: 真实MySQL并发、Kafka确认、RPC未知与重启恢复
+        timeout-minutes: 15
+        run: bash ./gradlew --no-daemon --max-workers=1 integrationTest --continue --console=plain -PdockerApiVersion=1.44
+      - name: Compose独立进程与真实HTTP闭环
+        timeout-minutes: 8
+        run: |
+          bash scripts/course.sh start
+          python scripts/check.py
+          python scripts/recovery-check.py
+      - name: 中文前端真实浏览器使用流程
+        timeout-minutes: 4
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: |
+          npm install --prefix build/browser --no-save playwright@1.62.1
+          timeout 190s node scripts/browser-smoke.mjs
+      - name: 保留故障日志并停止本课程服务
+        if: always()
+        timeout-minutes: 2
+        run: |
+          bash scripts/course.sh logs > build/compose.log 2>&1 || true
+          bash scripts/course.sh stop
+      - name: 保存逐层验收证据
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: C14逐层验收与中文页面
+          retention-days: 7
+          path: |
+            courses/backend-capstone/**/build/reports/tests/
+            courses/backend-capstone/**/build/test-results/
+            courses/backend-capstone/build/variants/
+            courses/backend-capstone/build/*.png
+            courses/backend-capstone/build/compose.log
+            courses/backend-capstone/build/process-recovery.json
+            courses/backend-capstone/authoring/*report.json

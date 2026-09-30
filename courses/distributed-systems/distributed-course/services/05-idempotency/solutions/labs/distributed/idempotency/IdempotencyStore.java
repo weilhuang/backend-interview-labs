@@ -68,55 +68,66 @@ public final class IdempotencyStore {
   }
 
   public Claim acquire(Request request, Duration lease) throws SQLException {
+    return acquire(request, lease, () -> {});
+  }
+
+  /** 故障点只用于复现登记提交后、授予租约前进程退出的窗口。 */
+  public Claim acquire(Request request, Duration lease, Runnable afterRegistration)
+      throws SQLException {
     if (lease.isNegative() || lease.toMillis() < 1 || lease.compareTo(Duration.ofMinutes(1)) > 0) {
       throw new IllegalArgumentException("租约必须在1毫秒到1分钟之间");
     }
+    // 独立自动提交登记占位行：重复键的共享锁在连接关闭前释放，避免在同一事务升级为排他锁。
+    // 此时尚未授予租约或扣库存；登记后崩溃留下的空占位行可由下一次调用安全领取。
+    try {
+      database.execute(
+          "INSERT INTO operations VALUES (?, ?, 'PENDING', NULL, 0, 0, NULL)",
+          request.key(),
+          request.fingerprint());
+    } catch (SQLException failure) {
+      if (!Database.duplicate(failure)) throw failure;
+    }
+    afterRegistration.run();
     String owner = UUID.randomUUID().toString();
-    return database.transaction(
-        connection -> {
-          try {
-            Database.update(
-                connection,
-                "INSERT INTO operations VALUES (?, ?, 'PENDING', NULL, 0, 0, NULL)",
-                request.key(),
-                request.fingerprint());
-          } catch (SQLException failure) {
-            if (!Database.duplicate(failure)) throw failure;
-          }
-          try (var statement =
-                  Database.prepare(
-                      connection,
-                      "SELECT * FROM operations WHERE op_key=? FOR UPDATE",
-                      request.key());
-              var rows = statement.executeQuery()) {
-            rows.next();
-            // 练习区开始
-            if (!request.fingerprint().equals(rows.getString("fingerprint"))) {
-              throw new IllegalArgumentException("同一幂等键不能用于不同参数");
-            }
-            if (rows.getString("state").equals("COMPLETED")) {
-              return new Claim(
-                  Kind.REPLAY,
-                  rows.getString("owner"),
-                  rows.getLong("generation"),
-                  rows.getInt("result"));
-            }
-            long time = now(connection);
-            if (rows.getLong("lease_until") > time) {
-              return new Claim(Kind.BUSY, rows.getString("owner"), rows.getLong("generation"), 0);
-            }
-            long generation = rows.getLong("generation") + 1;
-            Database.update(
-                connection,
-                "UPDATE operations SET owner=?, generation=?, lease_until=? WHERE op_key=?",
-                owner,
-                generation,
-                Math.addExact(time, lease.toMillis()),
-                request.key());
-            return new Claim(Kind.OWNED, owner, generation, 0);
-            // 练习区结束
-          }
-        });
+    return TransactionRetry.bounded()
+        .run(
+            database,
+            connection -> {
+              try (var statement =
+                      Database.prepare(
+                          connection,
+                          "SELECT * FROM operations WHERE op_key=? FOR UPDATE",
+                          request.key());
+                  var rows = statement.executeQuery()) {
+                rows.next();
+                // 练习区开始
+                if (!request.fingerprint().equals(rows.getString("fingerprint"))) {
+                  throw new IllegalArgumentException("同一幂等键不能用于不同参数");
+                }
+                if (rows.getString("state").equals("COMPLETED")) {
+                  return new Claim(
+                      Kind.REPLAY,
+                      rows.getString("owner"),
+                      rows.getLong("generation"),
+                      rows.getInt("result"));
+                }
+                long time = now(connection);
+                if (rows.getLong("lease_until") > time) {
+                  return new Claim(
+                      Kind.BUSY, rows.getString("owner"), rows.getLong("generation"), 0);
+                }
+                long generation = rows.getLong("generation") + 1;
+                Database.update(
+                    connection,
+                    "UPDATE operations SET owner=?, generation=?, lease_until=? WHERE op_key=?",
+                    owner,
+                    generation,
+                    Math.addExact(time, lease.toMillis()),
+                    request.key());
+                return new Claim(Kind.OWNED, owner, generation, 0);
+                // 练习区结束
+              }
+            });
   }
 
   /** 本地库存更新和幂等结果同一个事务；不能把任意外部HTTP写操作放入此保证。 */

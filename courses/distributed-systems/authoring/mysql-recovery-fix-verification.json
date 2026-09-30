@@ -1,0 +1,184 @@
+{
+  "time_utc": "2026-09-30T15:34:50.821215+00:00",
+  "trigger_ci": {
+    "head": "5d091ef0c906c0d14d4c8e5b2d307e8ec13d13b9",
+    "run": 36735424906,
+    "job": 109955726570,
+    "failures": [
+      "同键INSERT重复键共享锁升级为FOR UPDATE时发生真实MySQL死锁",
+      "真实MySQL重启后沿用旧随机宿主端口导致Connection refused"
+    ]
+  },
+  "corrections": [
+    "独立自动提交登记原参数；关闭连接释放重复键锁；新事务领取",
+    "登记后故障保留身份，空owner/零代次/零租约占位可立即重新领取",
+    "仅1213+40001且回滚无不确定异常时，重新打开连接并完整重放事务，最多4次",
+    "08006提交响应未知、1205锁等待、重复键、回滚不确定均不自动重试",
+    "每轮fresh inspect真实端口；restartAndAwait返回新Database并显式重建Store/XA恢复器",
+    "保留XA无决策回滚、有持久决策重启恢复70/130、重复恢复0断言"
+  ],
+  "local_verification": {
+    "unit_tests": 44,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "strict_compile": "JDK21 --release21 -Xlint:all,-processing,-serial -Werror",
+    "dependency_classpaths_resolved": 54,
+    "docker_integration_cases_compiled": 9,
+    "docker_execution": "云端没有Docker，本次未执行；不能报告MySQL真实恢复已通过",
+    "variants_rerun": [
+      {
+        "unit": "C10-05",
+        "mode": "典型错误",
+        "compile_exit": 0,
+        "test_exit": 1,
+        "passed": true
+      },
+      {
+        "unit": "C10-05",
+        "mode": "学生起点",
+        "compile_exit": 0,
+        "test_exit": 1,
+        "passed": true
+      },
+      {
+        "unit": "C10-05",
+        "mode": "等价正确",
+        "compile_exit": 0,
+        "test_exit": 0,
+        "passed": true
+      },
+      {
+        "unit": "C10-05",
+        "mode": "错误重试提交未知",
+        "compile_exit": 0,
+        "test_exit": 1,
+        "passed": true
+      },
+      {
+        "unit": "C10-06",
+        "mode": "典型错误",
+        "compile_exit": 0,
+        "test_exit": 1,
+        "passed": true
+      },
+      {
+        "unit": "C10-06",
+        "mode": "学生起点",
+        "compile_exit": 0,
+        "test_exit": 1,
+        "passed": true
+      },
+      {
+        "unit": "C10-06",
+        "mode": "等价正确",
+        "compile_exit": 0,
+        "test_exit": 0,
+        "passed": true
+      }
+    ],
+    "other_variants": "前一版18项不涉及本批源码改动，记录保留"
+  },
+  "suites": [
+    {
+      "module": "01-failure-model",
+      "suite": "labs.distributed.LabTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "02-grpc",
+      "suite": "labs.distributed.GrpcTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "03-dubbo",
+      "suite": "labs.distributed.DiscoveryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "03-dubbo",
+      "suite": "labs.distributed.DubboTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "04-resilience",
+      "suite": "labs.distributed.LabTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "05-idempotency",
+      "suite": "labs.distributed.IdempotencyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "05-idempotency",
+      "suite": "labs.distributed.RetryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "05-idempotency",
+      "suite": "labs.distributed.TransactionRetryTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "06-transactions",
+      "suite": "labs.distributed.EndpointTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "06-transactions",
+      "suite": "labs.distributed.TransactionTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "07-outbox-cache",
+      "suite": "labs.distributed.ProjectionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "08-capacity",
+      "suite": "labs.distributed.CapacityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "official_references": [
+    "https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html",
+    "https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlocks-handling.html"
+  ]
+}

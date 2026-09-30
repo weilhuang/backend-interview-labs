@@ -40,7 +40,7 @@ Saga：STARTED -> RESERVED -> COMPLETED
 3. 编写Saga.step的状态推进。每个参与者成功后、协调日志更新前注入崩溃，重建Saga对象并继续
 4. 在退款后、库存释放前再次注入故障，重试补偿应最终归还资源且不重复退款
 5. 阅读XaTransfer中真实XAConnection与Xid，编码两个prepare、落盘决策、两个commit的严格顺序
-6. Docker中执行两个MySQL资源：仅PREPARED没有日志时恢复回滚；已有COMMIT日志时恢复提交；重复恢复返回0
+6. Docker中执行两个MySQL资源：仅PREPARED没有日志时恢复回滚；已有COMMIT日志后重启两个数据库，fresh inspect取得实际新端口，显式重建Database/XA恢复器，恢复提交后余额70/130且重复恢复返回0
 7. 记录PREPARED期间哪些资源仍可能持锁、人工恢复需要哪些证据。不得为了消除阻塞擅自对未知事务执行相反决策
 
 以下命令用于源码仓库/公开源码包；Academy官方ZIP内用Check/Run或Gradle工具窗口执行同名任务。官方导出可能剔除Wrapper脚本/JAR，不能假设导入目录能直接运行./gradlew。独立服务课需同源shared/versions.env快照，缺失时不能视为发行完成。
@@ -49,7 +49,7 @@ Saga：STARTED -> RESERVED -> COMPLETED
 
 ## 正确性合同与保证边界
 
-XA是单协调者、每笔事务独立日志文件的受控实验。日志文件创建使用CREATE_NEW，禁止覆盖原决策；不能丢失/篡改日志后仍声称安全恢复。MySQL8.4默认支持prepare后detach，恢复账号需要XA_RECOVER_ADMIN。Saga为了简单串行化在一步内持有协调行锁跨参与者调用，故需有界超时并承认锁开销。正常完成表示“库存已预留、积分已扣”，发货确认属于后续业务。
+XA是单协调者、每笔事务独立日志文件的受控实验。日志文件创建使用CREATE_NEW，禁止覆盖原决策；不能丢失/篡改日志后仍声称安全恢复。MySQL8.4默认支持prepare后detach，恢复账号需要XA_RECOVER_ADMIN。Docker重启可能重新绑定随机宿主端口；restartAndAwait返回新的不可变Database，必须用它重建协调器。此为测试夹具主动发现，不承诺普通JDBC连接池会自动发现Docker新端口。Saga为了简单串行化在一步内持有协调行锁跨参与者调用，故需有界超时并承认锁开销。正常完成表示“库存已预留、积分已扣”，发货确认属于后续业务。
 
 ## 固定版本源码阅读
 

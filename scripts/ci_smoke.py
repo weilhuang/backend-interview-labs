@@ -56,13 +56,15 @@ def main(action):
         print('真实 Kafka 建主题、发送及消费校验通过')
     elif action in ('rocketmq-write', 'rocketmq-read'):
         # 固定名称只在当前一次性 CI 项目的独立 Broker 内使用。
-        topic, group = 'lab_ci_smoke', 'lab_ci_smoke_group'
+        roundtrip = ('lab_ci_roundtrip', 'lab_ci_roundtrip_group')
+        durable = ('lab_ci_durable', 'lab_ci_durable_group')
         if action == 'rocketmq-write':
             admin = ['bash', '/opt/lab-rocketmq/admin.sh']
-            execute(config, path, 'rocketmq', admin + ['updateTopic', '-n', '127.0.0.1:9876',
-                    '-b', '127.0.0.1:10911', '-t', topic, '-r', '1', '-w', '1', '-a', '+message.type=NORMAL'])
-            execute(config, path, 'rocketmq', admin + ['updateSubGroup', '-n', '127.0.0.1:9876',
-                    '-b', '127.0.0.1:10911', '-g', group])
+            for topic, group in (roundtrip, durable):
+                execute(config, path, 'rocketmq', admin + ['updateTopic', '-n', '127.0.0.1:9876',
+                        '-b', '127.0.0.1:10911', '-t', topic, '-r', '1', '-w', '1', '-a', '+message.type=NORMAL'])
+                execute(config, path, 'rocketmq', admin + ['updateSubGroup', '-n', '127.0.0.1:9876',
+                        '-b', '127.0.0.1:10911', '-g', group])
         target = lab.ROOT / 'infra' / 'rocketmq' / 'smoke' / 'target'
         if not (target / 'classes' / 'lab' / 'environment' / 'RocketSmoke.class').is_file():
             raise lab.LabError('请先用 JDK21 编译 infra/rocketmq/smoke，见共享环境 CI')
@@ -70,7 +72,7 @@ def main(action):
         result = subprocess.run(['java', '-Xmx256m', '-XX:MaxDirectMemorySize=64m', '-cp',
                     str(target / 'classes') + os.pathsep + str(target / 'dependency' / '*'),
                     'lab.environment.RocketSmoke', mode, '127.0.0.1:' + config['ROCKETMQ_PORT'],
-                    topic, group, marker], text=True, capture_output=True, timeout=150)
+                    *roundtrip, *durable, marker], text=True, capture_output=True, timeout=150)
         if result.returncode or ('ROCKETMQ_SMOKE_OK=' + mode) not in result.stdout.splitlines():
             # 仅项目自生成标记，不含凭据；保留 SDK 真正错误以便诊断。
             print((result.stdout + result.stderr)[-12000:], file=sys.stderr)

@@ -73,7 +73,7 @@ Compose 与未来 Testcontainers 都读取 `infra/versions.env`，避免多个�
 
 | 阶段 | 当前结果 | 证据含义 |
 | --- | --- | --- |
-| Python 无 Docker 回归 | 本轮 84/84 通过（含版本快照回归） | 配置边界、命令组合、错误处理、数据保护、CI 隔离和脱敏逻辑 |
+| Python 无 Docker 回归 | 本轮 91/91 通过（含版本快照回归） | 配置边界、命令组合、错误处理、数据保护、CI 隔离和脱敏逻辑 |
 | 静态环境校验 | 通过 | 固定镜像、回环端口、健康/资源边界，无特权/socket |
 | Bash/Python 语法 | 通过 | 不代表 macOS 或容器运行已验证 |
 | Java 共享版本读取器 | 完整 JDK21.0.12.1+1 实际编译与读取通过 | 仓库根/课程子目录都能读取；未知键/缺失台账会失败，不是容器集成测试 |
@@ -83,7 +83,7 @@ Compose 与未来 Testcontainers 都读取 `infra/versions.env`，避免多个�
 | 真实 MySQL/Redis 读写与持久化 | 通过 | 写入→读取→down/up→再读取均成功 |
 | 真实 Kafka 收发 | 通过 | 建主题→发送→读取并比对内容成功 |
 | JDK21 镜像内 Gradle 构建 | 通过 | 真实容器内 BUILD SUCCESSFUL |
-| RocketMQ 新共享 Compose / SDK5 收发与重启持久化 | 待本次 CI 执行 | JDK21 探针已编译，不能把计划中的命令当成实测 |
+| RocketMQ 新共享 Compose / SDK5 收发与重启持久化 | 首次宿主收发通过，重启断言失败；修复待重跑 | run36735424768；独立 durable 主题与启动屏障修复不能提前记为通过 |
 | Testcontainers 与 Mac 双架构 | 未执行 | 上游架构证据不代替实测 |
 
 本地无 Docker 的复核命令：

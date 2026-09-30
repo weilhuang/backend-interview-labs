@@ -51,6 +51,7 @@ V1 必须完成 Java、Java 框架、分布式、数据库与缓存、消息队�
 - [MySQL 与 Redis：真实数据库验收](courses/data-storage/中文阶段报告.md)
 - [消息队列验证与已知问题](courses/messaging/验证报告.md)
 - [分布式服务与一致性：8 单元](courses/distributed-systems/中文阶段报告.md)
+- [综合项目：订单、库存、消息与恢复五阶段](courses/backend-capstone/中文阶段报告.md)
 - [IDEA/Academy 实际界面验收及覆盖边界](docs/界面验收报告.md)
 - [V1 / V2 发布验收矩阵](docs/curriculum/08-release-plan.md)
 

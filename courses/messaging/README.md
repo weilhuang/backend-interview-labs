@@ -58,7 +58,7 @@ cd courses/messaging
 
 本夹具改为同一临时容器内分别启动NameServer、Broker和CLUSTER Proxy，Proxy使用mqproxy -pm cluster，并配置namesrvAddr、proxyMode=CLUSTER、useEndpointPortFromRequest=true。ClusterTopicRouteService实际沿用请求地址；仍只暴露8081的随机宿主端口，NameServer和Broker管理调用在容器内执行。routing真实测试先断言QueryRoute返回地址等于随机宿主端点，再要求两个消费组成功收到同一条消息。源代码推导、严格编译和无容器单测已通过，此修正仍待新的真实CI及Mac/Linux动态验证，不能仅凭启动或管理命令成功验收。
 
-容器总预算仍为1.5GiB/2CPU：NameServer堆64–128MiB、Broker堆256–512MiB、独立Proxy堆128–256MiB；各自直接内存上界为32/128/64MiB。监督脚本检查三个进程，清理前保留有界Proxy/Broker文件日志及容器状态，包括客户端失败但容器仍在运行的情况。
+容器总预算仍为1.5GiB/2CPU：NameServer堆64–128MiB、Broker堆256–512MiB、独立Proxy堆128–256MiB；各自直接内存上界为32/128/64MiB。监督脚本检查三个进程；先等待NameServer真实clusterList包含已注册Broker，再显式创建Proxy系统广播组，最后才启动CLUSTER Proxy，避免创建系统主题时尚无集群路由。业务自动建组仍禁用。清理前保留有界Proxy/Broker/事务/存储文件日志及容器状态，包括客户端失败但容器仍在运行的情况。
 
 主题按NORMAL、FIFO、DELAY、TRANSACTION显式创建，避免用普通主题发送事务或顺序消息。各组独立随机命名；实验最后关闭容器，临时写层由Testcontainers清理。默认SYNC_FLUSH并不提供多副本容灾，不能从一次重启读到数据宣称任意故障零丢失。
 

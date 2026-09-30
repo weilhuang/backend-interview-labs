@@ -1,0 +1,31 @@
+{
+  "日期UTC": "2026-09-30",
+  "JDK": "Eclipse Temurin 21.0.12.1+1-LTS",
+  "编译": "javac --release 21",
+  "Gradle": "真实官方8.10.2本地发行版；Wrapper下载由CI验证",
+  "快测": {
+    "04-recovery": 5,
+    "05-defense": 7,
+    "03-delivery": 8,
+    "02-reliability": 6,
+    "01-contract": 6
+  },
+  "快测总计": 32,
+  "回环真实gRPC": "通过往返与deadline；不代表MySQL接收端可靠性",
+  "完整应用installDist": "通过",
+  "全部容器测试类严格编译": "通过",
+  "Docker和Compose": "本机未运行，无Docker命令或守护进程",
+  "浏览器": "JS语法通过，真实页面联调等待CI",
+  "macOS": "未实测",
+  "C14官方Academy导入导出": "未实测",
+  "正式module元数据": "Maven Central 46份.module，保留依赖锁重解析并正常不写锁构建通过",
+  "依赖图修正": [
+    "Jackson BOM 2.21.4",
+    "Guava jre变体",
+    "显式apiguardian-api1.1.2测试运行依赖"
+  ],
+  "真实容器场景数": 5,
+  "Compose应用SIGKILL恢复": "脚本与CI已提供，本机未运行",
+  "数据库提交确认网络丢包": "未执行；不能用应用故障钩子替代证明",
+  "脚本安全场景": 11
+}

@@ -8,7 +8,7 @@
 
 | 检查 | 命令 | 结果 |
 | --- | --- | --- |
-| 脚本与安全边界回归 | `JAVA_HOME=/path/to/jdk-21 python3 -m unittest discover -s scripts/tests -v` | **本轮 84/84 通过**（含版本快照回归）；Docker 调用使用模拟对象，管理/监督脚本使用本机假进程 |
+| 脚本与安全边界回归 | `JAVA_HOME=/path/to/jdk-21 python3 -m unittest discover -s scripts/tests -v` | **本轮 91/91 通过**（含版本快照回归）；Docker 调用使用模拟对象，管理/监督脚本使用本机假进程 |
 | 镜像/端口/健康/资源等静态约束 | `./scripts/lab.sh verify` | 通过，不访问 Docker |
 | Bash 入口语法 | `bash -n scripts/lab.sh` | 通过 |
 | Python 编译 | `python3 -m py_compile scripts/lab.py scripts/ci_smoke.py scripts/tests/*.py` | 通过 |
@@ -16,7 +16,7 @@
 | Java 共享版本读取器 | `javac --release 21` 编译 `LabImages.java` 与 `LabImagesProbe.java`，再运行 probe | **通过**：仓库根与课程子目录均读取成功，未知键与缺失台账均按预期失败；云宿主完整 JDK21，不是构建容器 |
 | 实际环境诊断 | `./scripts/lab.sh doctor` | **未通过**：缺 Docker CLI，退出码 2；未安装/启动 daemon |
 
-回归覆盖：不执行 shell 配置、非法/重复配置拒绝、固定镜像与宿主覆盖防护、core/Kafka/RocketMQ 按需选择、目录/符号链接越界拒绝、数据默认保留、精确 reset 确认、失败不删数据、构建 Wrapper/缓存参数、就绪失败、停止容器与缺失容器、缺 Docker/daemon、旧 Compose、旧 Engine 回环暴露风险，以及 CI 专用项目限制、真实读写命令参数、收发值匹配和日志脱敏。新增 RocketMQ 回归还覆盖 HTTP/2 部分帧读取、匹配 PING ACK、TCP/错误帧拒绝、实时端口绑定与检查中进程退出、mqadmin 零退出异常拒绝、三进程 TERM 传播/异常监督、持久化读取步骤不得重新发送。
+回归覆盖：不执行 shell 配置、非法/重复配置拒绝、固定镜像与宿主覆盖防护、core/Kafka/RocketMQ 按需选择、目录/符号链接越界拒绝、数据默认保留、精确 reset 确认、失败不删数据、构建 Wrapper/缓存参数、就绪失败、停止容器与缺失容器、缺 Docker/daemon、旧 Compose、旧 Engine 回环暴露风险，以及 CI 专用项目限制、真实读写命令参数、收发值匹配和日志脱敏。新增 RocketMQ 回归还覆盖 HTTP/2 部分帧读取、匹配 PING ACK、TCP/错误帧拒绝、实时端口绑定与检查中进程退出、mqadmin 零退出异常拒绝、三进程 TERM 传播/异常监督、注册延迟/超时/服务退出、注册 RPC 中 TERM 清理、系统组初始化失败禁止 Proxy 启动、独立持久化主题读取不得重新发送。
 
 `infra/compose.yaml` 使用 JSON 语法（JSON 是 YAML 的子集），因此离线标准库可完整读取对象并检查上述约束。这不替代 Docker Compose 自己的 schema 解析。
 
@@ -64,7 +64,17 @@
 - 1536 MiB/2CPU 总限制，三进程各自 JVM 预算、64 MiB commitlog 段、项目命名卷与 UID/可写诊断见 [详细说明](rocketmq.md)
 - 已准备 CI：共享固定 JDK21 镜像编译探针；宿主 JDK21 + SDK5 从发布端口发送/消费/ACK；留存消息后 down/up，再只读原消息并 ACK；独立一次性项目与脱敏日志沿用原有边界
 
-**尚未执行本轮共享 RocketMQ Compose 的真实 config/up、卷权限、HTTP/2/gRPC、down/up 持久化及实际资源峰值验收。** 制作云容器仍无 Docker CLI；上面“已完成的真实云端 CI”仅对应原 MySQL/Redis/Kafka/JDK 基线。消息队列课程的独立 Testcontainers CI 应由该模块报告记录，不能替代共享 Compose 结果。精确提交的 CI 完成后再补充运行链接、提交、平台和时间。
+### 首次共享 RocketMQ CI：部分通过，重启验收失败
+
+- [运行 36735424768](https://github.com/weilhuang/backend-interview-labs/actions/runs/36735424768)，job `109955726109`；分支提交 `5d091ef0c906c0d14d4c8e5b2d307e8ec13d13b9`，实际 PR 合并预览 `35a3aa6aceafd145f397904cb36c2fcdb21ebffc`
+- 2026-09-30 UTC 15:19:23：宿主发布端点 18081 的 SDK5 gRPC 发送/接收/ACK 成功；随后 down/up，两次 HTTP/2 往返和管理 RPC 均通过
+- UID3000 的新命名卷实际可写：`/tmp` mode1777，`/tmp/lab-rocketmq/store` 归 rocketmq；两次状态记录 `OOMKilled=false`。这不是实际峰值测量或长期负载证明
+- 15:19:48：重启读取首先得到此前已 ACK 的 `...-roundtrip`，严格首条匹配断言失败；不能据此宣称原 durable 消息丢失，也不能宣称重启持久化验收通过
+- 原始 artifact `11107176844` 的 ZIP SHA256：`3aa44eb34a3fe3e48385d39f1d3c005f1bc7cf2e860b91825357d00718fcc3ff`；已读原始组件日志及 job 日志。日志同时记录 Proxy 内部系统组缺失 CODE26
+
+本轮修复：NameServer 真正看见活跃 Broker 注册后才启动 Proxy，并显式建立其广播系统组；停止等待整个进程组，避免只等 shell 退出；roundtrip 与 durable 使用独立主题/组，重启阶段仍必须读到先前 durable 原消息并 ACK，绝不重新发送、容忍未知内容或把 ACK 当作精确一次保证。**修复后的完整共享 CI 尚待重跑，不得标为通过。**
+
+制作云容器本身仍无 Docker CLI。消息队列课程 Testcontainers 的单独结果不替代本共享 Compose 结果。精确新提交 CI 完成后再更新运行链接、平台和阶段状态。
 
 ## 版本升级流程
 

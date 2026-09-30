@@ -24,6 +24,7 @@ class BrokerTest {
             database.initialize();
             Lab.initialize(database);
             String topic = broker.topic("TRANSACTION");
+            String rollbackTopic = broker.topic("TRANSACTION");
             Event event = new Event("tx1", "o1", 1, 100);
             try (var consumer = broker.consumer(broker.group(false), topic)) {
                 try (var original =
@@ -44,7 +45,7 @@ class BrokerTest {
                         RocketClient.PROVIDER
                                 .newProducerBuilder()
                                 .setClientConfiguration(broker.configuration())
-                                .setTopics(topic)
+                                .setTopics(topic, rollbackTopic)
                                 .setTransactionChecker(
                                         message -> {
                                             checked.countDown();
@@ -60,11 +61,36 @@ class BrokerTest {
                     assertFalse(database.apply(event), "下游仍然需要自己的持久幂等");
                     assertEquals(100, database.balance("o1"));
                     consumer.ack(delivered);
-                    var rollback = recovered.beginTransaction();
-                    recovered.send(
-                            RocketClient.message(topic, new Event("tx2", "o2", 1, 100)), rollback);
-                    rollback.rollback();
-                    assertTrue(consumer.receive(1, Duration.ofSeconds(10)).isEmpty(), "回滚消息不能下发");
+                    // 回查提交可能重复投递tx1；回滚用独立主题，不能把tx1重复误判成tx2泄露。
+                    try (var rollbackConsumer =
+                            broker.consumer(broker.group(false), rollbackTopic)) {
+                        Event rolledBack = new Event("tx2", "o2", 1, 100);
+                        var rollback = recovered.beginTransaction();
+                        recovered.send(RocketClient.message(rollbackTopic, rolledBack), rollback);
+                        rollback.rollback();
+                        long deadline = System.nanoTime() + Duration.ofSeconds(15).toNanos();
+                        while (System.nanoTime() < deadline) {
+                            var unexpected = rollbackConsumer.receive(10, Duration.ofSeconds(10));
+                            assertTrue(
+                                    unexpected.isEmpty(),
+                                    "独立回滚主题不能下发任何消息，实际事件="
+                                            + unexpected.stream()
+                                                    .map(RocketClient::event)
+                                                    .toList());
+                        }
+                        // 正向控制：同一消费者必须读到随后提交的事务，排除断连造成的假不可见。
+                        Event control = new Event("tx-control", "o-control", 1, 1);
+                        Lab.commitLocal(database, control);
+                        var committed = recovered.beginTransaction();
+                        recovered.send(RocketClient.message(rollbackTopic, control), committed);
+                        committed.commit();
+                        var visible =
+                                RocketClient.receive(rollbackConsumer, 1, Duration.ofSeconds(30));
+                        for (var message : visible) {
+                            assertEquals(control, RocketClient.event(message), "回滚的tx2始终不可见");
+                            rollbackConsumer.ack(message);
+                        }
+                    }
                 }
             }
         }
@@ -74,21 +100,25 @@ class BrokerTest {
     void 真实MySQL回查不得把其他大小写或尾空格身份认成已提交() throws Exception {
         try (var mysql = new MySQLContainer<>(Images.get("MYSQL_IMAGE"))) {
             mysql.start();
-            Inbox database = new Inbox(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
+            Inbox database =
+                    new Inbox(mysql.getJdbcUrl(), mysql.getUsername(), mysql.getPassword());
             Lab.initialize(database);
             Lab.commitLocal(database, new Event("Case", "o1", 1, 100));
-            assertEquals(TransactionResolution.COMMIT, Lab.check(database,"Case"));
-            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database,"case"));
-            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database,"Case "));
+            assertEquals(TransactionResolution.COMMIT, Lab.check(database, "Case"));
+            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database, "case"));
+            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database, "Case "));
             Lab.commitLocal(database, new Event("case", "o2", 1, 200));
-            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database,"case "));
+            assertEquals(TransactionResolution.UNKNOWN, Lab.check(database, "case "));
             Lab.commitLocal(database, new Event("case ", "o3", 1, 300));
-            for (String id : java.util.List.of("Case","case","case ")) {
-                assertEquals(TransactionResolution.COMMIT, Lab.check(database,id));
+            for (String id : java.util.List.of("Case", "case", "case ")) {
+                assertEquals(TransactionResolution.COMMIT, Lab.check(database, id));
             }
-            try (var c = database.connection(); var st = c.createStatement();
+            try (var c = database.connection();
+                    var st = c.createStatement();
                     var rows = st.executeQuery("SELECT COUNT(*),SUM(cents) FROM local_orders")) {
-                assertTrue(rows.next()); assertEquals(3,rows.getLong(1)); assertEquals(600,rows.getLong(2));
+                assertTrue(rows.next());
+                assertEquals(3, rows.getLong(1));
+                assertEquals(600, rows.getLong(2));
             }
         }
     }

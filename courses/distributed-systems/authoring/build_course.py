@@ -129,14 +129,17 @@ TASKS=[
 ('05-idempotency','05 持久化幂等、租约与重试预算','C10-05',
 '''两个应用实例同时收到相同订单键。一个实例领取后崩溃，另一个稍后接管；旧实例又恢复。正确实现既不能二次扣库存，也不能让旧持有者凭已过期租约提交。''',
 '''- 键作用域包含租户、业务类型与业务ID，参数指纹与键一起检查；同键不同参数应冲突而不是返回旧成功
-- PENDING、COMPLETED与不存在分别代表处理中、已知终态、尚无法确认，不存在不等价“从未执行”
+- PENDING、COMPLETED与不存在分别代表处理中或可领取占位、已知终态、尚无法确认，不存在不等价“从未执行”
+- 登记是独立自动提交：成功后即绑定原参数，即使随后崩溃/业务回滚也不删除。owner为空、generation=0、lease_until=0的占位可立即重新领取，不是永久处理中
 - 租约只是时间许可，代次/owner是拒绝旧执行者的栅栏；以数据库时钟比较租约，避免客户端时钟各说各话
 - 库存更新和COMPLETED结果在同一个本地事务提交；外部支付副作用不在此保证之内，转到Saga/TCC
 - 超时后按原键查询或重放结果，不重新生成键。已完成结果是该操作的原响应，不保证等于现在库存
 - 重试包括尝试次数、总预算、每次剩余时间、可重试错误分类、指数退避和抖动；抖动分散同步重试但不增加容量''',
 '''请求(key, fingerprint)
    |
- INSERT唯一键 + SELECT FOR UPDATE
+ INSERT唯一键（自动提交；关闭连接释放重复键共享锁）
+   | 登记后崩溃：保留原参数，空占位仍可重新领取
+ 新事务 SELECT FOR UPDATE
    +--参数冲突-----------------> 拒绝
    +--COMPLETED----------------> 返回原结果
    +--PENDING且租约未过--------> BUSY
@@ -147,18 +150,21 @@ TASKS=[
                                       |
                                   COMMIT''',
 '''1. 读Request校验与operations表结构，运行SQL合同测试观察OWNED、BUSY、REPLAY三条路径
-2. 实现acquire：唯一键仲裁、锁定记录、参数冲突、数据库时间租约、接管代次递增
+2. 实现acquire：先独立登记，再在新事务锁定记录、检查参数、比较数据库时间租约、递增接管代次；不可把重复INSERT与FOR UPDATE合进同一事务形成共享锁升级
 3. 实现complete：先验证持有者，再在同事务内条件扣库存与保存结果。库存不足保存-1这一稳定业务终态
 4. 注入“库存更新后、结果提交前”故障，确认整个事务回滚且PENDING可在租约到期后接管
 5. 强制实验记录lease_until=0模拟时间已到，旧owner即使恢复也不能提交。真实过期应由数据库时钟决定
 6. 实现RetryBudget.execute，在固定种子随机源与逻辑时钟下验证预算递减、永久错误不重试、非幂等写不重试
-7. 执行MySQL集成：8个并发同键只产生1个OWNED，重建服务对象仍能查询结果；关闭未提交连接观察真实回滚''',
-'''H2仅验证SQL分支合同，不证明MySQL锁/断连语义。真实集成必须通过Docker MySQL。记录不会自动过期删除；生产保留期至少覆盖客户端重试/离线重放窗口，并有清理与审计约定。库存数值为实验整数，租约最大1分钟。业务写操作在本地数据库内，不能直接推广到任意外部副作用。''',
-'''两次短事务分离领取和业务提交，避免跨外部等待一直持有库存锁。第二次事务锁定幂等行并验证owner+generation+lease，接管后旧worker失效。唯一约束是跨实例仲裁点。RetryBudget只捕获TransientFailure，永久错误直接传播；每次睡眠和重试都消耗同一个单调时钟预算。''',
+7. 在登记提交后、授予租约前注入退出，重建Store后相同参数可立即领取，不同参数仍冲突；已绑定身份不可用新参数覆盖
+8. 阅读TransactionRetry与测试：仅MySQL1213/40001且回滚没有不确定异常时，重新打开连接执行完整事务；最多4次，抖动上限依次5/10/20毫秒；COMMIT响应丢失、1205锁等待、永久错误不重试
+9. 执行MySQL集成：屏障同时放行8个同键请求只产生1个OWNED；两行反序更新形成真实死锁，受害者重试完整事务后两行各增加2次；重启数据库后显式接收新Database并重建Store查询结果''',
+'''H2仅验证SQL分支合同，不证明MySQL锁/断连语义。真实集成必须通过Docker MySQL。记录不会自动过期删除；生产保留期至少覆盖客户端重试/离线重放窗口，并有清理与审计约定。库存数值为实验整数，租约最大1分钟。TransactionRetry限制尝试次数与等待；每条SQL仍受JDBC查询/连接超时限制，不将其宣称为能强制取消任意事务的硬总时限。业务写操作在本地数据库内，不能直接推广到任意外部副作用。''',
+'''登记、领取、业务提交是三个独立短事务。登记成功即永久绑定原参数，尚未授予租约或扣库存；随后失败不会删除身份，可按原键恢复。领取事务锁定幂等行，业务事务再次验证owner+generation+lease并原子扣库存。重复INSERT的共享锁先释放，避免在同一事务升级为排他锁；剩余明确已回滚死锁只允许整事务有界重试。唯一约束是跨实例仲裁点。RetryBudget只捕获TransientFailure，永久错误直接传播；每次睡眠和重试都消耗同一个单调时钟预算。''',
 '''- 问：Redis SETNX足够实现业务幂等吗？答：不能独立覆盖锁过期、数据库提交后响应丢失与去重记录持久性；应明确原子提交边界
 - 问：只有租约为什么不够？答：暂停进程恢复可能继续写，必须在真正写入资源处检查栅栏，单纯“我还持锁”声明无效
 - 问：幂等记录过期可直接删吗？答：删除后晚到重试可能再次执行；保留期、客户端最大重试期与业务唯一约束需一起设计
-- 问：为什么同键不同参数要拒绝？答：返回旧结果会隐藏客户端错误，也可能把另一业务操作当成功
+- 问：为什么同键不同参数要拒绝？答：登记即固定业务身份，返回旧结果或失败后覆盖参数都会隐藏客户端错误。登记后未执行仍保留原参数；原参数可重新领取，不能永久PENDING
+- 问：为何捕获重复键后马上FOR UPDATE仍会死锁？答：重复INSERT可持有共享锁，多个事务同时升级为排他锁产生环路；应缩短/分开登记事务，且只对已确认回滚的死锁整事务重试，不能吞异常或重放COMMIT未知请求
 - 问：3层各尝试3次最坏多少？答：可达27次底层尝试；选择一层重试并传播预算，必要时再加共享重试令牌
 - 迁移：把幂等作用域加入租户，补跨租户同key不冲突、同租户参数冲突和过期接管测试'''),
 ('06-transactions','06 XA、TCC与Saga真实恢复','C10-06',
@@ -187,9 +193,9 @@ Saga：STARTED -> RESERVED -> COMPLETED
 3. 编写Saga.step的状态推进。每个参与者成功后、协调日志更新前注入崩溃，重建Saga对象并继续
 4. 在退款后、库存释放前再次注入故障，重试补偿应最终归还资源且不重复退款
 5. 阅读XaTransfer中真实XAConnection与Xid，编码两个prepare、落盘决策、两个commit的严格顺序
-6. Docker中执行两个MySQL资源：仅PREPARED没有日志时恢复回滚；已有COMMIT日志时恢复提交；重复恢复返回0
+6. Docker中执行两个MySQL资源：仅PREPARED没有日志时恢复回滚；已有COMMIT日志后重启两个数据库，fresh inspect取得实际新端口，显式重建Database/XA恢复器，恢复提交后余额70/130且重复恢复返回0
 7. 记录PREPARED期间哪些资源仍可能持锁、人工恢复需要哪些证据。不得为了消除阻塞擅自对未知事务执行相反决策''',
-'''XA是单协调者、每笔事务独立日志文件的受控实验。日志文件创建使用CREATE_NEW，禁止覆盖原决策；不能丢失/篡改日志后仍声称安全恢复。MySQL8.4默认支持prepare后detach，恢复账号需要XA_RECOVER_ADMIN。Saga为了简单串行化在一步内持有协调行锁跨参与者调用，故需有界超时并承认锁开销。正常完成表示“库存已预留、积分已扣”，发货确认属于后续业务。''',
+'''XA是单协调者、每笔事务独立日志文件的受控实验。日志文件创建使用CREATE_NEW，禁止覆盖原决策；不能丢失/篡改日志后仍声称安全恢复。MySQL8.4默认支持prepare后detach，恢复账号需要XA_RECOVER_ADMIN。Docker重启可能重新绑定随机宿主端口；restartAndAwait返回新的不可变Database，必须用它重建协调器。此为测试夹具主动发现，不承诺普通JDBC连接池会自动发现Docker新端口。Saga为了简单串行化在一步内持有协调行锁跨参与者调用，故需有界超时并承认锁开销。正常完成表示“库存已预留、积分已扣”，发货确认属于后续业务。''',
 '''TCC先用唯一分支行建立串行化点，再在同一个事务内改变库存与分支状态；Cancel不存在分支时插入墓碑。Saga每步的远端效果不和协调日志假装原子，通过参与者幂等键恢复“远端成功、日志未写”窗口。XA先让两个分支准备，只有持久化COMMIT以后才提交；恢复按格式ID和全局ID筛选，不触碰别的事务。''',
 '''- 问：2PC为什么会阻塞？答：参与者准备后不能独立知道全局决策，协调日志不可用时可能等待并持有资源
 - 问：TCC的空回滚和悬挂是什么？答：Cancel早于Try到达需留墓碑；随后迟到Try不能重新预留，否则取消后的资源又被占用
@@ -299,6 +305,7 @@ def finish():
    if entry and entry.get('status')=='verified':
     links.extend(f"- [{repo} {entry['tag']}：{f['path'].split('/')[-1]}]({f['url']})" for f in entry['files'])
   if index==1:links += ['- [TCP RFC9293](https://www.rfc-editor.org/rfc/rfc9293.html)','- [HTTP/2 RFC9113](https://www.rfc-editor.org/rfc/rfc9113.html)','- [PACELC原论文](https://www.cs.umd.edu/~abadi/papers/abadi-pacelc.pdf)']
+  if index==5:links += ['- [MySQL8.4语句锁与重复键共享锁](https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html)','- [MySQL8.4整事务死锁重试](https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlocks-handling.html)']
   if index==6:links += ['- [MySQL8.4 XA状态与detach](https://dev.mysql.com/doc/refman/8.4/en/xa-states.html)','- [MySQL8.4 XA限制](https://dev.mysql.com/doc/refman/8.4/en/xa-restrictions.html)']
   source_text='\n'.join(links) or '源码验证正在执行，发布前必须回填固定提交；不得将当前标签入口称为验证通过。'
   write(base/'task.md',f'''# {title}
@@ -370,7 +377,7 @@ def finish():
     entry={'name':str(p.relative_to(R))}
     if p.suffix=='.jar':entry['is_binary']=True
     additional.append(entry)
- for name in ['authoring/build_course.py','authoring/validate_course.py','authoring/verify_variants.py','authoring/materialize_learner.py','authoring/build_distribution.py','authoring/requirements.txt','authoring/manifest.json','authoring/source-verification.json','authoring/verify_sources.py','authoring/regenerate_proto.py','authoring/tools-lock.json','authoring/metadata-report.json','authoring/variants-report.json','authoring/callers-report.json','authoring/maven_read_proxy.py','authoring/prefetch_maven.py','authoring/resolve_cloud_dependencies.py','authoring/prefetch_gradle_metadata.py','authoring/dependency-metadata-evidence.json','authoring/dependency-lock-verification.json']:
+ for name in ['authoring/build_course.py','authoring/validate_course.py','authoring/verify_variants.py','authoring/materialize_learner.py','authoring/build_distribution.py','authoring/requirements.txt','authoring/manifest.json','authoring/source-verification.json','authoring/verify_sources.py','authoring/regenerate_proto.py','authoring/tools-lock.json','authoring/metadata-report.json','authoring/variants-report.json','authoring/callers-report.json','authoring/maven_read_proxy.py','authoring/prefetch_maven.py','authoring/resolve_cloud_dependencies.py','authoring/prefetch_gradle_metadata.py','authoring/dependency-metadata-evidence.json','authoring/dependency-lock-verification.json','authoring/mysql-recovery-fix-verification.json']:
   if (R/name).exists():additional.append({'name':name})
  for name in ['README.md','中文阶段报告.md','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat']:
   if (R/name).exists():additional.append({'name':name})

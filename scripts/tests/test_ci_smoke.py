@@ -84,9 +84,12 @@ class SmokeTests(unittest.TestCase):
 
     def test_rocketmq_write_uses_host_grpc_endpoint_and_separate_topic_group(self):
         execute, run = self.rocketmq_context('rocketmq-write')
-        self.assertEqual(execute.call_count, 2)
+        self.assertEqual(execute.call_count, 4)
         self.assertIn('updateTopic', execute.call_args_list[0].args[3])
         self.assertIn('updateSubGroup', execute.call_args_list[1].args[3])
+        self.assertIn('lab_ci_roundtrip', execute.call_args_list[0].args[3])
+        self.assertIn('lab_ci_durable', execute.call_args_list[2].args[3])
+        self.assertIn('lab_ci_durable_group', execute.call_args_list[3].args[3])
         command = run.call_args.args[0]
         self.assertIn('127.0.0.1:18081', command)
         self.assertEqual(command[-1], self.config['LAB_PROJECT_NAME'])

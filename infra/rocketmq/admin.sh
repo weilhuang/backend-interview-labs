@@ -5,10 +5,15 @@ case "${1:-}" in
   clusterList|updateTopic|updateSubGroup|topicStatus) command=$1 ;;
   *) printf '%s\n' '仅允许 clusterList/updateTopic/updateSubGroup/topicStatus' >&2; exit 2 ;;
 esac
+rpc_timeout=${LAB_ADMIN_TIMEOUT_SECONDS:-15}
+if ! [[ "$rpc_timeout" =~ ^([1-9]|1[0-5])$ ]]; then
+  printf '%s\n' '管理 RPC 超时必须为 1–15 秒' >&2
+  exit 2
+fi
 output=$(mktemp)
 trap 'rm -f "$output"' EXIT
-# 超时在容器内结束 Java，避免宿主命令超时后留下工具 JVM。
-if ! timeout 15s "${JAVA_HOME}/bin/java" -Xms32m -Xmx128m -Xmn32m \
+# 超时在容器内结束 Java；foreground 保持监督脚本进程组，TERM 可同时覆盖工具子进程。
+if ! timeout --foreground --kill-after=1s "${rpc_timeout}s" "${JAVA_HOME}/bin/java" -Xms32m -Xmx128m -Xmn32m \
   -XX:MaxMetaspaceSize=128m -XX:MaxDirectMemorySize=32m \
   "-Drmq.logback.configurationFile=${ROCKETMQ_HOME}/conf/rmq.tools.logback.xml" \
   -cp ".:${ROCKETMQ_HOME}/conf:${ROCKETMQ_HOME}/lib/*" \

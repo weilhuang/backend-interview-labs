@@ -1,6 +1,6 @@
 # 共享实验环境：按需启动，不重复下载整套中间件
 
-> 状态：基础 MySQL/Redis/Kafka 与 JDK21 构建已有 Linux amd64 云端 CI 证据；新增 RocketMQ 按需环境已完成代码与离线回归，真实共享环境 CI 尚待本次提交运行。制作容器本身没有 Docker，不使用个人 Mac。详细证据见 [验证记录](verification.md)，不能把旧组件的通过结果外推到 RocketMQ。
+> 状态：基础 MySQL/Redis/Kafka 与 JDK21 构建已有 Linux amd64 云端 CI 证据；新增 RocketMQ 首次云端 CI 已通过宿主 gRPC 收发与新卷可写检查，重启断言失败；修复后的完整 CI 待重跑。制作容器本身没有 Docker，不使用个人 Mac。详细证据见 [验证记录](verification.md)，不能把旧组件的通过结果外推到 RocketMQ。
 
 课程制作、构建和验收在云端进行，不使用个人 Mac 的磁盘与计算资源。将来在 Mac 学习时可用同一入口，只开当前章节需要的服务。如果磁盘紧张，Java 基础题可以只用 IDEA + JDK 21，不必启动中间件。
 

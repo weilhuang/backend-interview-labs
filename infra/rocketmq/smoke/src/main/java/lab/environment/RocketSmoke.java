@@ -15,38 +15,54 @@ public final class RocketSmoke {
     private RocketSmoke() {}
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 5 || !(args[0].equals("write") || args[0].equals("read"))) {
-            throw new IllegalArgumentException("需要 write/read、端点、主题、消费组、CI 标记");
+        if (args.length != 7 || !(args[0].equals("write") || args[0].equals("read"))) {
+            throw new IllegalArgumentException("需要 write/read、端点、收发主题/组、持久化主题/组、CI 标记");
         }
         if (!"true".equals(System.getenv("CI"))
-                || !args[4].matches("backend-interview-labs-ci-\\d+-\\d+")) {
+                || !args[6].matches("backend-interview-labs-ci-\\d+-\\d+")) {
             throw new IllegalArgumentException("只允许独立 CI 项目进行真实消息读写");
+        }
+        if (args[2].equals(args[4]) || args[3].equals(args[5])) {
+            throw new IllegalArgumentException("收发与持久化必须使用不同主题/消费组，不能混淆至少一次重投递语义");
         }
         if (Runtime.version().feature() != 21) throw new IllegalStateException("验收必须使用完整 JDK21");
         var configuration = ClientConfiguration.newBuilder()
                 .setEndpoints(args[1]).enableSsl(false).setRequestTimeout(Duration.ofSeconds(10)).build();
-        try (var consumer = PROVIDER.newSimpleConsumerBuilder().setClientConfiguration(configuration)
-                .setConsumerGroup(args[3]).setAwaitDuration(Duration.ofSeconds(5))
-                .setSubscriptionExpressions(Map.of(args[2], FilterExpression.SUB_ALL)).build()) {
-            if (args[0].equals("write")) {
+        if (args[0].equals("write")) {
+            try (var roundtrip = consumer(configuration, args[2], args[3]);
+                    var durable = consumer(configuration, args[4], args[5])) {
                 // 在空主题建立初始消费位置，避免新消费组默认从最新位置开始。
-                if (!consumer.receive(1, Duration.ofSeconds(15)).isEmpty()) {
-                    throw new IllegalStateException("新的 CI 主题不应已有消息");
-                }
+                initializeEmpty(roundtrip);
+                initializeEmpty(durable);
                 try (var producer = PROVIDER.newProducerBuilder().setClientConfiguration(configuration)
-                        .setTopics(args[2]).build()) {
+                        .setTopics(args[2], args[4]).build()) {
                     producer.send(PROVIDER.newMessageBuilder().setTopic(args[2])
-                            .setBody((args[4] + "-roundtrip").getBytes(StandardCharsets.UTF_8)).build());
-                    receiveAndAck(consumer, args[4] + "-roundtrip");
-                    // 留一条未消费消息，下一次进程在 down/up 后只读取，绝不重新写入。
-                    producer.send(PROVIDER.newMessageBuilder().setTopic(args[2])
-                            .setBody(args[4].getBytes(StandardCharsets.UTF_8)).build());
+                            .setBody((args[6] + "-roundtrip").getBytes(StandardCharsets.UTF_8)).build());
+                    receiveAndAck(roundtrip, args[6] + "-roundtrip");
+                    // 独立主题只留一条未消费消息。重启读取不得重发，也不要求已 ACK 消息永不重投。
+                    producer.send(PROVIDER.newMessageBuilder().setTopic(args[4])
+                            .setBody(args[6].getBytes(StandardCharsets.UTF_8)).build());
                 }
-            } else {
-                receiveAndAck(consumer, args[4]);
+            }
+        } else {
+            // 不创建 producer、不发送、不初始化空主题，只读同一个持久化主题中的原消息。
+            try (var durable = consumer(configuration, args[4], args[5])) {
+                receiveAndAck(durable, args[6]);
             }
         }
         System.out.println("ROCKETMQ_SMOKE_OK=" + args[0]);
+    }
+
+    private static SimpleConsumer consumer(ClientConfiguration configuration, String topic, String group) throws Exception {
+        return PROVIDER.newSimpleConsumerBuilder().setClientConfiguration(configuration)
+                .setConsumerGroup(group).setAwaitDuration(Duration.ofSeconds(5))
+                .setSubscriptionExpressions(Map.of(topic, FilterExpression.SUB_ALL)).build();
+    }
+
+    private static void initializeEmpty(SimpleConsumer consumer) throws Exception {
+        if (!consumer.receive(1, Duration.ofSeconds(15)).isEmpty()) {
+            throw new IllegalStateException("新的 CI 主题不应已有消息");
+        }
     }
 
     private static void receiveAndAck(SimpleConsumer consumer, String expected) throws Exception {

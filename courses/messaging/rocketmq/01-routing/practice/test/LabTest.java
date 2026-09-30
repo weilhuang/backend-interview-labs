@@ -98,6 +98,16 @@ class LabTest {
         assertTrue(startup.contains("sh mqproxy -pm cluster -pc /tmp/lab-proxy.json"));
         assertTrue(startup.contains("\"proxyMode\":\"CLUSTER\""));
         assertTrue(startup.contains("-Xmx256m"));
+        assertTrue(startup.contains("storePathCommitLog=/home/rocketmq/store/commitlog"));
+        assertTrue(
+                startup.contains("timeout -k 2 \"$remaining\" sh /tmp/lab-admin.sh clusterList"));
+        assertTrue(startup.contains("registration_deadline="));
+        assertTrue(startup.indexOf("ROCKETMQ_BROKER_REGISTERED") < startup.indexOf("sh mqproxy"));
+        assertFalse(startup.contains("@@ADMIN_SCRIPT@@"));
+        assertTrue(startup.contains("-g CID_DefaultHeartBeatSyncerTopic -d true"));
+        assertTrue(
+                startup.indexOf("-g CID_DefaultHeartBeatSyncerTopic")
+                        < startup.indexOf("sh mqproxy"));
         for (String process : java.util.List.of("NAMESRV", "BROKER", "PROXY"))
             assertTrue(startup.contains("check_process " + process));
         String[] files = RocketRuntime.fileLogsCommand();

@@ -335,8 +335,8 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
         result.append("\n--- Docker日志末尾（最多12000字符）---\n").append(logs);
         try {
             if (Boolean.TRUE.equals(freshInfo().getState().getRunning())) {
-                AdminExec files = execCommand(5, 26000, RocketRuntime.fileLogsCommand());
-                result.append("\n--- RocketMQ文件日志（最多26000字符）---\n")
+                AdminExec files = execCommand(5, 40000, RocketRuntime.fileLogsCommand());
+                result.append("\n--- RocketMQ文件日志（最多40000字符）---\n")
                         .append(files.stdout())
                         .append(files.stderr());
             } else {
