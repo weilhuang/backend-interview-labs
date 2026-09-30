@@ -8,6 +8,12 @@ content:
 environment_settings:
   jvm_language_level: JDK_21
 additional_files:
+- name: shared/README.md
+- name: shared/versions.env
+- name: shared/versions.env.sha256
+- name: shared/source-manifest.json
+- name: shared/versions.gradle
+- name: shared/src/labs/environment/VersionLedger.java
 - name: LICENSE-JetBrains-template
 - name: README.md
 - name: THIRD_PARTY_NOTICES.md

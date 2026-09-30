@@ -206,5 +206,20 @@
     ],
     "docker_callers_not_run": true,
     "note": "三个--docker入口仅完成默认帮助模式；真实容器调用由CI集成另验"
+  },
+  "dependency_lock_ci_fix": {
+    "official_metadata_files": 43,
+    "subprojects": 9,
+    "resolved_classpaths_per_project": 6,
+    "resolved_classpaths": 54,
+    "fresh_gradle_cache": true,
+    "offline": true,
+    "write_locks_during_verification": false,
+    "tests": 38,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "integration": "全部真实集成源码编译和编译/运行类路径锁解析通过；Docker执行仍待CI",
+    "evidence": "authoring/dependency-lock-verification.json"
   }
 }

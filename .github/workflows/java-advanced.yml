@@ -13,7 +13,8 @@ on:
       - '.github/workflows/java-advanced.yml'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:

@@ -6,6 +6,7 @@ com.fasterxml.jackson.core:jackson-annotations:2.10.3=compileClasspath,integrati
 com.fasterxml.jackson.core:jackson-annotations:2.13.5=integrationTestRuntimeClasspath,runtimeClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-core:2.13.5=integrationTestRuntimeClasspath,runtimeClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-databind:2.13.5=integrationTestRuntimeClasspath,runtimeClasspath,testRuntimeClasspath
+com.fasterxml.jackson:jackson-bom:2.13.5=integrationTestRuntimeClasspath,runtimeClasspath,testRuntimeClasspath
 com.github.docker-java:docker-java-api:3.4.1=compileClasspath,integrationTestCompileClasspath,integrationTestRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.github.docker-java:docker-java-transport-zerodep:3.4.1=compileClasspath,integrationTestCompileClasspath,integrationTestRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.github.docker-java:docker-java-transport:3.4.1=compileClasspath,integrationTestCompileClasspath,integrationTestRuntimeClasspath,runtimeClasspath,testCompileClasspath,testRuntimeClasspath

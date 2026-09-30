@@ -7,7 +7,8 @@ allprojects {
             maven {
                 url = uri(System.getenv('LAB_MAVEN_REPOSITORY'))
                 allowInsecureProtocol = System.getenv('LAB_MAVEN_REPOSITORY').startsWith('http://127.0.0.1:')
-                metadataSources { mavenPom(); artifact(); ignoreGradleMetadataRedirection() }
+                // 与 Maven Central 一样尊重官方 .module 重定向，不能用 POM-only 图制作锁。
+                metadataSources { gradleMetadata(); mavenPom(); artifact() }
             }
         } else { mavenCentral() }
     }
@@ -32,6 +33,8 @@ subprojects {
         testImplementation platform('org.junit:junit-bom:5.11.4')
         testImplementation 'org.junit.jupiter:junit-jupiter'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        // 官方 JUnit .module 将注解依赖区分为编译期，显式声明保证运行类路径锁一致。
+        testRuntimeOnly 'org.apiguardian:apiguardian-api:1.1.2'
         testRuntimeOnly 'com.h2database:h2:2.3.232'
         if (name != 'support') api project(':support')
     }
@@ -84,6 +87,11 @@ subprojects {
     tasks.register('verificationClasspath') {
         dependsOn testClasses, integrationTestClasses
         doLast {
+            // 无集成源码的模块也解析全部六种类路径，避免 CI 后续新增入口才暴露锁缺失。
+            ['compileClasspath', 'runtimeClasspath', 'testCompileClasspath', 'testRuntimeClasspath',
+             'integrationTestCompileClasspath', 'integrationTestRuntimeClasspath'].each { configuration ->
+                configurations.getByName(configuration).resolve()
+            }
             file("${buildDir}/main-classpath.txt").text = sourceSets.main.runtimeClasspath.asPath
             file("${buildDir}/test-classpath.txt").text = sourceSets.test.runtimeClasspath.asPath
             file("${buildDir}/integration-classpath.txt").text = sourceSets.integrationTest.runtimeClasspath.asPath

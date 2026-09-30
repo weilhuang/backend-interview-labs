@@ -55,3 +55,6 @@ tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') 
 tasks.register('unitTest') { dependsOn subprojects.collect { it.tasks.named('unitTest') } }
 tasks.register('integrationTest') { dependsOn subprojects.collect { it.tasks.named('integrationTest') } }
 tasks.named('check') { dependsOn 'test' }
+
+// 在各模块源目录配置完成后统一接入可独立发行的镜像台账。
+apply from: 'shared/versions.gradle'

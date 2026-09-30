@@ -7,17 +7,19 @@ from pathlib import Path
 import platform
 import re
 import shutil
+import socket
+import time
 import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 INFRA = ROOT / 'infra'
-GROUPS = {'core': ['mysql', 'redis'], 'mysql': ['mysql'], 'redis': ['redis'], 'kafka': ['kafka']}
-PORTS = {'mysql': ('MYSQL_PORT', 3306), 'redis': ('REDIS_PORT', 6379), 'kafka': ('KAFKA_PORT', 19092)}
-COMPOSE_IMAGE_KEYS = {'MYSQL_IMAGE', 'REDIS_IMAGE', 'KAFKA_IMAGE', 'JAVA_BUILD_IMAGE'}
-# RocketMQ 暂由项目课程的 Testcontainers 使用；独立 Compose profile 尚未交付。
-IMAGE_KEYS = COMPOSE_IMAGE_KEYS | {'ROCKETMQ_IMAGE', 'TESTCONTAINERS_RYUK_IMAGE', 'TESTCONTAINERS_TINY_IMAGE'}
-CONFIG_KEYS = {'LAB_PROJECT_NAME', 'MYSQL_PORT', 'REDIS_PORT', 'KAFKA_PORT', 'MYSQL_DATABASE',
+GROUPS = {'core': ['mysql', 'redis'], 'mysql': ['mysql'], 'redis': ['redis'], 'kafka': ['kafka'], 'rocketmq': ['rocketmq']}
+PORTS = {'mysql': ('MYSQL_PORT', 3306), 'redis': ('REDIS_PORT', 6379), 'kafka': ('KAFKA_PORT', 19092), 'rocketmq': ('ROCKETMQ_PORT', 8081)}
+PORT_KEYS = tuple(key for key, _ in PORTS.values())
+COMPOSE_IMAGE_KEYS = {'MYSQL_IMAGE', 'REDIS_IMAGE', 'KAFKA_IMAGE', 'JAVA_BUILD_IMAGE', 'ROCKETMQ_IMAGE'}
+IMAGE_KEYS = COMPOSE_IMAGE_KEYS | {'TESTCONTAINERS_RYUK_IMAGE', 'TESTCONTAINERS_TINY_IMAGE'}
+CONFIG_KEYS = {'LAB_PROJECT_NAME', 'MYSQL_PORT', 'REDIS_PORT', 'KAFKA_PORT', 'ROCKETMQ_PORT', 'MYSQL_DATABASE',
                'MYSQL_USER', 'MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD', 'REDIS_PASSWORD', 'LAB_WAIT_SECONDS'}
 
 class LabError(Exception):
@@ -64,11 +66,11 @@ def settings(init=False):
     for key in ('MYSQL_PASSWORD', 'MYSQL_ROOT_PASSWORD', 'REDIS_PASSWORD'):
         if not re.fullmatch(r'[A-Za-z0-9_!@%+=.,:-]{12,128}', config[key]):
             raise LabError(f'{key} 需为 12–128 位实验密码；仅用字母数字及 _!@%+=.,:-')
-    for key in ('MYSQL_PORT', 'REDIS_PORT', 'KAFKA_PORT'):
+    for key in PORT_KEYS:
         if not config[key].isdigit() or not 1024 <= int(config[key]) <= 65535:
             raise LabError(f'{key} 必须为 1024–65535 之间的端口')
-    if len({config[k] for k in ('MYSQL_PORT', 'REDIS_PORT', 'KAFKA_PORT')}) != 3:
-        raise LabError('三个宿主端口不能重复')
+    if len({int(config[k]) for k in PORT_KEYS}) != len(PORT_KEYS):
+        raise LabError('所有组件的宿主端口不能重复（含 RocketMQ）')
     if not config['LAB_WAIT_SECONDS'].isdigit() or not 30 <= int(config['LAB_WAIT_SECONDS']) <= 900:
         raise LabError('LAB_WAIT_SECONDS 必须为 30–900 秒')
     return config, path if path.exists() else INFRA / '.env.example'
@@ -87,7 +89,7 @@ def validate():
     manifest = versions()
     settings()
     spec = json.loads((INFRA / 'compose.yaml').read_text(encoding='utf-8'))
-    if set(spec['services']) != {'mysql', 'redis', 'kafka', 'java-build'}:
+    if set(spec['services']) != {'mysql', 'redis', 'kafka', 'rocketmq', 'java-build'}:
         raise LabError('Compose 服务集合与入口不一致')
     used = set()
     for name, service in spec['services'].items():
@@ -106,6 +108,8 @@ def validate():
             raise LabError(f'{name} 缺少健康检查')
         if 'mem_limit' not in service or 'logging' not in service:
             raise LabError(f'{name} 缺少内存或日志边界')
+    if spec['services']['rocketmq']['profiles'] != ['rocketmq']:
+        raise LabError('RocketMQ 只能显式按需启动，不能加入 core/tools')
     if used != COMPOSE_IMAGE_KEYS:
         raise LabError('Compose 与版本台账未完整对应')
     return spec
@@ -114,7 +118,7 @@ def selected(groups):
     result = []
     for group in groups or ['core']:
         if group not in GROUPS:
-            raise LabError('可用组件组：core、mysql、redis、kafka；允许组合，例如 up core kafka')
+            raise LabError('可用组件组：core、mysql、redis、kafka、rocketmq；允许组合，例如 up core kafka')
         for service in GROUPS[group]:
             if service not in result:
                 result.append(service)
@@ -167,6 +171,63 @@ def docker_ready(config):
         raise LabError('本仓库最低基线为 Docker Engine 28.0（较旧版本可能让同网段访问回环发布端口）；升级前先核对官方系统要求')
     return info, version
 
+def check_rocketmq_endpoint(config, envpath, container):
+    """检查实时 RPC、真实 Docker 绑定及宿主 Proxy HTTP/2 往返；不冒充业务收发。"""
+    env = docker_env(config)
+    run(compose(config, envpath) + ['exec', '-T', 'rocketmq', 'bash',
+        '/opt/lab-rocketmq/healthcheck.sh'], env, True, timeout=25)
+    bindings = json.loads(run(['docker', 'inspect', '--format',
+        '{{json .NetworkSettings.Ports}}', container], env, True).stdout)
+    expected = {'HostIp': '127.0.0.1', 'HostPort': config['ROCKETMQ_PORT']}
+    if expected not in (bindings.get('8081/tcp') or []):
+        raise LabError('RocketMQ 当前发布端口与 .env 不一致；核对项目并重新 up rocketmq')
+    try:
+        probe_http2('127.0.0.1', int(config['ROCKETMQ_PORT']))
+    except (OSError, ValueError) as exc:
+        raise LabError('RocketMQ 宿主 Proxy HTTP/2 端点未就绪。检查端口/日志；远程 Docker context 的回环地址不在本机，请在 daemon 所在云主机运行入口') from exc
+    state = json.loads(run(['docker', 'inspect', '--format', '{{json .State}}', container], env, True).stdout)
+    if not state.get('Running') or state.get('Health', {}).get('Status') != 'healthy':
+        raise LabError('RocketMQ 在端点检查期间停止或变为不健康')
+    print('RocketMQ 实时管理 RPC 与宿主 Proxy HTTP/2 SETTINGS/PING 往返通过；尚不代表 gRPC 消息收发通过。')
+
+
+def probe_http2(host, port):
+    """无第三方依赖的明文 HTTP/2 握手；必须收到匹配 PING ACK，而非仅 TCP connect。"""
+    deadline = time.monotonic() + 4
+    with socket.create_connection((host, port), timeout=2) as connection:
+        def read_exact(size):
+            chunks = bytearray()
+            while len(chunks) < size:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ValueError('HTTP/2 响应超时')
+                connection.settimeout(remaining)
+                block = connection.recv(size - len(chunks))
+                if not block:
+                    raise ValueError('HTTP/2 连接提前关闭')
+                chunks.extend(block)
+            return bytes(chunks)
+        connection.sendall(b'PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n' + b'\x00\x00\x00\x04\x00\x00\x00\x00\x00')
+        settings_seen = False
+        ping = b'LABREADY'
+        for _ in range(32):
+            header = read_exact(9)
+            length, kind, flags = int.from_bytes(header[:3], 'big'), header[3], header[4]
+            stream = int.from_bytes(header[5:], 'big') & 0x7fffffff
+            if length > 16384 or stream != 0:
+                raise ValueError('HTTP/2 帧格式无效')
+            payload = read_exact(length)
+            if kind == 7:
+                raise ValueError('HTTP/2 服务返回 GOAWAY')
+            if kind == 4 and flags == 0 and length % 6 == 0:
+                settings_seen = True
+                connection.sendall(b'\x00\x00\x00\x04\x01\x00\x00\x00\x00')
+                connection.sendall(b'\x00\x00\x08\x06\x00\x00\x00\x00\x00' + ping)
+            elif kind == 6 and flags == 1 and payload == ping and settings_seen:
+                return
+        raise ValueError('HTTP/2 未返回匹配的 PING ACK')
+
+
 def check_services(config, envpath, services):
     cmd, env = compose(config, envpath), docker_env(config)
     failed = []
@@ -180,9 +241,11 @@ def check_services(config, envpath, services):
             state = json.loads(run(['docker', 'inspect', '--format', '{{json .State}}', container], env, True).stdout)
             health = state.get('Health', {}).get('Status', '无健康检查')
             running = state.get('Running', False)
-            print(f'{service}: 运行={running}，健康={health}')
+            print(f"{service}: 运行={running}，健康={health}，退出码={state.get('ExitCode', '未知')}，OOM={state.get('OOMKilled', '未知')}")
             if not running or health != 'healthy':
                 failed.append(service)
+            elif service == 'rocketmq':
+                check_rocketmq_endpoint(config, envpath, container)
     if failed:
         raise LabError('未就绪：' + '、'.join(sorted(set(failed))) + '。运行 ./scripts/lab.sh logs；首次 MySQL 初始化稍慢，先查日志，不能靠 reset 掩盖故障')
     print('容器内部协议级健康检查通过。宿主/应用连接仍须执行课程集成测试，见 runtime-contract.md。')
@@ -229,7 +292,7 @@ def main(argv=None):
         services = selected(args.args)
     elif action == 'reset':
         if args.args != ['--confirm-reset', config['LAB_PROJECT_NAME']]:
-            raise LabError('重置会永久删除本项目 MySQL/Redis/Kafka 数据及 Gradle/Maven 缓存！备份并确认项目后，显式运行 reset --confirm-reset ' + config['LAB_PROJECT_NAME'])
+            raise LabError('重置会永久删除本项目 MySQL/Redis/Kafka/RocketMQ 数据及 Gradle/Maven 缓存！备份并确认项目后，显式运行 reset --confirm-reset ' + config['LAB_PROJECT_NAME'])
     elif action == 'build':
         if len(args.args) < 2:
             raise LabError('用法：build 仓库内目录 命令 参数；例如 build courses/java-recovery-collections bash ./gradlew --no-daemon test')
@@ -279,6 +342,8 @@ def main(argv=None):
     elif action == 'logs':
         print('以下为本机日志，可能含实验数据；分享前请脱敏。')
         run(cmd + ['logs', '--tail', '100', '--no-color'] + services, env)
+        if 'rocketmq' in services:
+            run(cmd + ['exec', '-T', 'rocketmq', 'bash', '/opt/lab-rocketmq/logs.sh'], env, required=False)
     elif action == 'build':
         work = '/workspace/' + directory.relative_to(ROOT).as_posix()
         print('仅启动一次性完整 JDK 21 构建容器；Gradle/Maven 缓存共享，不启动中间件。')

@@ -1,0 +1,183 @@
+{
+  "生成时间UTC": "2026-09-30T15:02:36Z",
+  "验证目录": "/tmp/独立课程台账验证-ie641r7n",
+  "镜像真源SHA256": "633dd50e7da950a0da9ddb86484e11a63b475a82c89688c3a8f2640c24568a4b",
+  "课程": [
+    {
+      "课程": "data-storage/mysql-engineering",
+      "父仓库不可见": true,
+      "Gradle台账与所有Test辅助镜像检查": "通过",
+      "模块": [
+        {
+          "模块": "mysql/01-model/01-order-contract",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "mysql/02-index/02-plan-evidence",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "mysql/03-query/03-pagination",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "mysql/04-isolation/04-mvcc",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "mysql/05-locks/05-deadlock",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "mysql/06-recovery/06-durability",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "mysql/07-stock/07-inventory",
+          "编译Java文件数": 12,
+          "结果": "通过"
+        }
+      ]
+    },
+    {
+      "课程": "data-storage/redis-engineering",
+      "父仓库不可见": true,
+      "Gradle台账与所有Test辅助镜像检查": "通过",
+      "模块": [
+        {
+          "模块": "redis/01-structures",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "redis/02-expiry",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "redis/03-stampede",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "redis/04-consistency",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "redis/05-replication",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "redis/06-leases",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        },
+        {
+          "模块": "redis/07-resilience",
+          "编译Java文件数": 9,
+          "结果": "通过"
+        }
+      ]
+    },
+    {
+      "课程": "java-frameworks",
+      "父仓库不可见": true,
+      "Gradle台账与所有Test辅助镜像检查": "通过",
+      "模块": [
+        {
+          "模块": "framework-course/01-boot/01-configuration",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/01-boot/02-http-contract",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/01-boot/03-transactions",
+          "编译Java文件数": 5,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/01-boot/04-test-layers",
+          "编译Java文件数": 6,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/01-boot/05-security",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/01-boot/06-runtime-lifecycle",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/01-boot/07-integrated-service",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/08-container-di",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/09-bean-lifecycle",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/10-circular-boundary",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/11-aop-proxy",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/12-transaction-source",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/13-mvc-source",
+          "编译Java文件数": 4,
+          "结果": "通过"
+        },
+        {
+          "模块": "framework-course/02-source/14-autoconfiguration",
+          "编译Java文件数": 5,
+          "结果": "通过"
+        }
+      ]
+    }
+  ],
+  "边界": "无父仓库配置、Gradle配置、真实源码与测试编译；Docker集成本次不运行",
+  "加载器边界测试": {
+    "命令": "JAVA_HOME=<JDK21> python -m unittest discover -s scripts/tests -p test_course_versions.py -v",
+    "通过": 13,
+    "失败": 0
+  },
+  "学员副本": {
+    "三门均生成成功": true,
+    "snapshot及SHA及Gradle和Java读取器保留": true
+  },
+  "编译边界": "使用已下载的官方依赖JAR；JDK21 javac --release 21 -parameters -encoding UTF-8 编译28个模块完整生产源码、可见测试及框架真实MySQL集成测试。未替换业务或fixture。独立副本仅依赖本目录源码和显式离线依赖缓存。",
+  "后续待验收": [
+    "本批修改后的真实Docker集成CI",
+    "Academy官方导出与干净导入"
+  ]
+}

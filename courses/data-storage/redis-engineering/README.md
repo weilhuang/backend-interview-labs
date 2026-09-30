@@ -68,7 +68,7 @@ Testcontainers直接创建并关闭自己的容器，无需先启动Compose。�
 - 这是作者模式课程：源码为参考答案，task-info.yaml中的真实placeholder提供学员起点；不是以注释TODO伪装空白练习
 - 使用Academy的课程创建/打开本地作者课程入口，选择当前含course-info.yaml的目录。按插件当前UI实际操作；预览、Check、Reset、Export、干净导入均需记录，当前未把静态YAML检查当IDE实测
 - 普通IDE方式直接打开当前Gradle根即可阅读/运行标准解。需要空实现练习副本时运行`python3 authoring/materialize_learner.py build/learner`；该副本是普通Gradle工程，不声称是官方可导入归档
-- 导出/移动课程后，把LAB_VERSIONS设置为原共享infra/versions.env绝对路径；不要复制新的镜像常量。实际Redis测试不能只依赖作者机器的缓存
+- 独立导出保留自动生成的shared镜像快照与SHA256，无需父仓库；LAB_SHARED_VERSIONS或LAB_REPO_ROOT可显式覆盖，旧LAB_VERSIONS仍兼容。详见[独立课程镜像台账](shared/README.md)。源码仓库可用Wrapper；Academy官方ZIP若移除Wrapper，请用Check/Run或Gradle工具窗口。真实Redis集成仍需要Docker
 - 运行`python3 authoring/validate_course.py`检查7题元数据、可见文件、实现区和教案；修改Java后用`python3 authoring/sync_metadata.py`同步公开标准解及占位符offset
 
 ## 统一完成标准

@@ -54,13 +54,48 @@ def main(action):
         if got != marker:
             raise lab.LabError('Kafka 收到的消息与发送内容不一致')
         print('真实 Kafka 建主题、发送及消费校验通过')
+    elif action in ('rocketmq-write', 'rocketmq-read'):
+        # 固定名称只在当前一次性 CI 项目的独立 Broker 内使用。
+        topic, group = 'lab_ci_smoke', 'lab_ci_smoke_group'
+        if action == 'rocketmq-write':
+            admin = ['bash', '/opt/lab-rocketmq/admin.sh']
+            execute(config, path, 'rocketmq', admin + ['updateTopic', '-n', '127.0.0.1:9876',
+                    '-b', '127.0.0.1:10911', '-t', topic, '-r', '1', '-w', '1', '-a', '+message.type=NORMAL'])
+            execute(config, path, 'rocketmq', admin + ['updateSubGroup', '-n', '127.0.0.1:9876',
+                    '-b', '127.0.0.1:10911', '-g', group])
+        target = lab.ROOT / 'infra' / 'rocketmq' / 'smoke' / 'target'
+        if not (target / 'classes' / 'lab' / 'environment' / 'RocketSmoke.class').is_file():
+            raise lab.LabError('请先用 JDK21 编译 infra/rocketmq/smoke，见共享环境 CI')
+        mode = action.removeprefix('rocketmq-')
+        result = subprocess.run(['java', '-Xmx256m', '-XX:MaxDirectMemorySize=64m', '-cp',
+                    str(target / 'classes') + os.pathsep + str(target / 'dependency' / '*'),
+                    'lab.environment.RocketSmoke', mode, '127.0.0.1:' + config['ROCKETMQ_PORT'],
+                    topic, group, marker], text=True, capture_output=True, timeout=150)
+        if result.returncode or ('ROCKETMQ_SMOKE_OK=' + mode) not in result.stdout.splitlines():
+            # 仅项目自生成标记，不含凭据；保留 SDK 真正错误以便诊断。
+            print((result.stdout + result.stderr)[-12000:], file=sys.stderr)
+            raise lab.LabError('RocketMQ 宿主 gRPC 收发/持久化验收失败')
+        print('真实宿主 RocketMQ gRPC 收发通过，并已留存重启检查消息' if mode == 'write'
+              else 'down/up 后从宿主 gRPC 读回原消息并确认消费通过')
     elif action == 'logs':
         target = lab.ROOT / 'infra' / 'artifacts'
         target.mkdir(exist_ok=True)
-        for service in ('mysql', 'redis', 'kafka'):
+        for service in ('mysql', 'redis', 'kafka', 'rocketmq'):
             result = subprocess.run(lab.compose(config,path)+['logs','--no-color','--tail','300',service],
                                     env=lab.docker_env(config), capture_output=True, text=True, timeout=60)
             text = result.stdout + result.stderr
+            if service == 'rocketmq':
+                detail = subprocess.run(lab.compose(config, path) + ['exec', '-T', 'rocketmq', 'bash',
+                        '/opt/lab-rocketmq/logs.sh'], env=lab.docker_env(config), capture_output=True, text=True, timeout=30)
+                text += '\n' + detail.stdout + detail.stderr
+                containers = subprocess.run(lab.compose(config, path) + ['ps', '--all', '--quiet', 'rocketmq'],
+                        env=lab.docker_env(config), capture_output=True, text=True, timeout=15)
+                for container in containers.stdout.split():
+                    if not re.fullmatch(r'[0-9a-f]{12,64}', container):
+                        continue
+                    state = subprocess.run(['docker', 'inspect', '--format', '{{json .State}}', container],
+                            env=lab.docker_env(config), capture_output=True, text=True, timeout=15)
+                    text += '\n容器状态（含退出码/OOM，不含环境变量）：\n' + state.stdout + state.stderr
             for key, value in config.items():
                 if 'PASSWORD' in key:
                     text = text.replace(value, '[已脱敏]')
@@ -68,7 +103,7 @@ def main(action):
                 f.write(text + '\n')
         print('组件日志已脱敏归档，不包含 .env 或 docker inspect 环境变量')
     else:
-        raise lab.LabError('可用动作：core-write、core-read、kafka、logs')
+        raise lab.LabError('可用动作：core-write、core-read、kafka、rocketmq-write、rocketmq-read、logs')
 
 
 if __name__ == '__main__':

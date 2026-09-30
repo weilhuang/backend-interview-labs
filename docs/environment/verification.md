@@ -8,14 +8,15 @@
 
 | 检查 | 命令 | 结果 |
 | --- | --- | --- |
-| 脚本与安全边界回归 | `python3 -m unittest discover -s scripts/tests -v` | **42/42 通过**；Docker 调用使用模拟对象 |
+| 脚本与安全边界回归 | `JAVA_HOME=/path/to/jdk-21 python3 -m unittest discover -s scripts/tests -v` | **本轮 84/84 通过**（含版本快照回归）；Docker 调用使用模拟对象，管理/监督脚本使用本机假进程 |
 | 镜像/端口/健康/资源等静态约束 | `./scripts/lab.sh verify` | 通过，不访问 Docker |
 | Bash 入口语法 | `bash -n scripts/lab.sh` | 通过 |
 | Python 编译 | `python3 -m py_compile scripts/lab.py scripts/ci_smoke.py scripts/tests/*.py` | 通过 |
+| 新增 RocketMQ 宿主 SDK5 探针 | 使用完整 JDK21 和已缓存官方 SDK5.0.8 执行 `javac --release 21` | 编译通过；没有 Docker，未执行真实端点连接 |
 | Java 共享版本读取器 | `javac --release 21` 编译 `LabImages.java` 与 `LabImagesProbe.java`，再运行 probe | **通过**：仓库根与课程子目录均读取成功，未知键与缺失台账均按预期失败；云宿主完整 JDK21，不是构建容器 |
 | 实际环境诊断 | `./scripts/lab.sh doctor` | **未通过**：缺 Docker CLI，退出码 2；未安装/启动 daemon |
 
-回归覆盖：不执行 shell 配置、非法/重复配置拒绝、固定镜像与宿主覆盖防护、core/Kafka 按需选择、目录/符号链接越界拒绝、数据默认保留、精确 reset 确认、失败不删数据、构建 Wrapper/缓存参数、就绪失败、停止容器与缺失容器、缺 Docker/daemon、旧 Compose、旧 Engine 回环暴露风险，以及 CI 专用项目限制、真实读写命令参数、收发值匹配和日志脱敏。
+回归覆盖：不执行 shell 配置、非法/重复配置拒绝、固定镜像与宿主覆盖防护、core/Kafka/RocketMQ 按需选择、目录/符号链接越界拒绝、数据默认保留、精确 reset 确认、失败不删数据、构建 Wrapper/缓存参数、就绪失败、停止容器与缺失容器、缺 Docker/daemon、旧 Compose、旧 Engine 回环暴露风险，以及 CI 专用项目限制、真实读写命令参数、收发值匹配和日志脱敏。新增 RocketMQ 回归还覆盖 HTTP/2 部分帧读取、匹配 PING ACK、TCP/错误帧拒绝、实时端口绑定与检查中进程退出、mqadmin 零退出异常拒绝、三进程 TERM 传播/异常监督、持久化读取步骤不得重新发送。
 
 `infra/compose.yaml` 使用 JSON 语法（JSON 是 YAML 的子集），因此离线标准库可完整读取对象并检查上述约束。这不替代 Docker Compose 自己的 schema 解析。
 
@@ -32,7 +33,7 @@
 ## 未执行或未充分覆盖，不能标为通过
 
 - 全部镜像的多架构 registry index digest 锁定：本轮有实际 amd64 拉取和运行，但未独立完成每个 arm64 manifest 审核
-- 宿主应用通过发布端口连接、所有实际课程的 Testcontainers 集成；本轮读写 smoke 使用容器内客户端
+- 新增 RocketMQ 共享 Compose、宿主 SDK5 真实连接及重启持久化待本次 CI；既有 MySQL/Redis/Kafka smoke 使用容器内客户端，不代表所有课程 Testcontainers 集成
 - 故障注入、异常终止后的数据恢复和更完整的卷权限/输出所有权矩阵
 - Mac Intel/Apple Silicon Docker Desktop、Bash3.2 实测和实际资源峰值
 - 前端/业务项目课 UI 验收；当前 Java 基础课无 Web 前端
@@ -54,9 +55,16 @@
 
 除 Maven 的已核对多架构摘要外，当前其余镜像锁完整标签，标签仍可能被上游重建。同一 daemon 默认 `--pull missing` 会保留已有版本；不同时间/机器可能得到同标签的新层。正式发布前应在可用云端核验各架构与多架构 index digest，并把通过验收的摘要追加到同一个台账，不从搜索摘要臆造 digest。
 
-## RocketMQ 课程版本预登记
+## RocketMQ 共享 profile 本轮增量
 
-为消息队列课程登记 `ROCKETMQ_IMAGE=apache/rocketmq:5.3.2`，来源为[Apache RocketMQ 官方 Docker 快速开始](https://rocketmq.apache.org/docs/quickStart/02quickstartWithDocker/)。它暂由课程 Testcontainers 引用，尚未增加共享 Compose profile，也尚未运行真实 RocketMQ 验收；不得把此前 Kafka 的通过结果外推到 RocketMQ。
+`ROCKETMQ_IMAGE` 继续引用唯一台账中的现有官方镜像，来源为[Apache RocketMQ 官方 Docker 快速开始](https://rocketmq.apache.org/docs/quickStart/02quickstartWithDocker/)。本轮加入独立 `rocketmq` profile，不新增镜像、不默认启用重组件。
+
+- NameServer、Broker 与独立 CLUSTER Proxy 同容器；Proxy 同时明确 `namesrvAddr`、`proxyMode=CLUSTER`、`useEndpointPortFromRequest=true`。固定版本 LOCAL Proxy 不保留请求映射端口，不能用于宿主 18081 的本布局
+- 健康定义要求真实 NameServer/Broker 管理 RPC；统一入口进一步核对宿主当前发布绑定、HTTP/2 SETTINGS/PING 往返以及探测后的容器状态
+- 1536 MiB/2CPU 总限制，三进程各自 JVM 预算、64 MiB commitlog 段、项目命名卷与 UID/可写诊断见 [详细说明](rocketmq.md)
+- 已准备 CI：共享固定 JDK21 镜像编译探针；宿主 JDK21 + SDK5 从发布端口发送/消费/ACK；留存消息后 down/up，再只读原消息并 ACK；独立一次性项目与脱敏日志沿用原有边界
+
+**尚未执行本轮共享 RocketMQ Compose 的真实 config/up、卷权限、HTTP/2/gRPC、down/up 持久化及实际资源峰值验收。** 制作云容器仍无 Docker CLI；上面“已完成的真实云端 CI”仅对应原 MySQL/Redis/Kafka/JDK 基线。消息队列课程的独立 Testcontainers CI 应由该模块报告记录，不能替代共享 Compose 结果。精确提交的 CI 完成后再补充运行链接、提交、平台和时间。
 
 ## 版本升级流程
 

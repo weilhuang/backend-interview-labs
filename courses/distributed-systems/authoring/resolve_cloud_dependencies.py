@@ -19,7 +19,7 @@ for turn in range(12):
  run=subprocess.run(command,env=env,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=240)
  log=run.stdout.decode();(R/'build-compile.log').write_text(log)
  if run.returncode==0:print('全模块编译和类路径导出通过',flush=True);break
- paths=set(re.findall(r'file:[^\s]*?/maven-cache/([^\s]+\.(?:pom|jar))',log))
+ paths=set(re.findall(r'file:[^\s]*?/maven-cache/([^\s]+\.(?:pom|jar|module))',log))
  if not paths:
   print(log[-12000:],flush=True);raise SystemExit(run.returncode)
  print('下载缺失官方文件',len(paths),flush=True)

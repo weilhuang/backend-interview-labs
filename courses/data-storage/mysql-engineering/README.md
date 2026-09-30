@@ -11,7 +11,7 @@
 | Gradle | Wrapper8.10.2，发行包SHA256已固定 |
 | 测试 | JUnit Jupiter5.11.4 / Platform1.11.4，Testcontainers1.20.6 |
 | 驱动/连接池 | MySQL Connector/J9.2.0 / HikariCP6.2.1 |
-| 数据库 | 只读取仓库infra/versions.env的MYSQL_IMAGE；精确tag/digest以台账为准，不在课内复制镜像常量 |
+| 数据库 | 从仓库infra/versions.env或其自动生成的shared快照读取MYSQL_IMAGE；精确tag/digest以台账为准 |
 | Docker | 实验需要可用daemon与Compose v2；本制作云端没有daemon，课程真实集成验收等待CI |
 | IDE / Academy | 项目语言级别JDK21；当前课程尚未完成实际插件预览、检查、导出和干净导入，不宣称IDE验收完成 |
 | 前端 | 不需要；SQL/JDBC/CLI与可见JUnit是完整调用链，不要求学员制作界面 |
@@ -20,7 +20,7 @@
 
 ## 从干净环境启动
 
-保留完整仓库，以保证镜像清单只有一份。导出到其他目录时设置LAB_REPO_ROOT指向该仓库；禁止复制一份漂移的镜像清单。命令均在标示的目录运行。
+完整仓库直接使用根镜像台账；独立导入时使用课程内自动生成、带SHA256的shared快照，不需要父仓库。也可用LAB_SHARED_VERSIONS或LAB_REPO_ROOT显式覆盖。详见[独立课程镜像台账](shared/README.md)。下面的命令适用于保留Wrapper的源码仓库；Academy官方ZIP使用Check/Run或Gradle工具窗口。
 
 仓库根：
 

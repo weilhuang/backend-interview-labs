@@ -370,7 +370,7 @@ def finish():
     entry={'name':str(p.relative_to(R))}
     if p.suffix=='.jar':entry['is_binary']=True
     additional.append(entry)
- for name in ['authoring/build_course.py','authoring/validate_course.py','authoring/verify_variants.py','authoring/materialize_learner.py','authoring/build_distribution.py','authoring/requirements.txt','authoring/manifest.json','authoring/source-verification.json','authoring/verify_sources.py','authoring/regenerate_proto.py','authoring/tools-lock.json','authoring/metadata-report.json','authoring/variants-report.json','authoring/callers-report.json','authoring/maven_read_proxy.py','authoring/prefetch_maven.py','authoring/resolve_cloud_dependencies.py']:
+ for name in ['authoring/build_course.py','authoring/validate_course.py','authoring/verify_variants.py','authoring/materialize_learner.py','authoring/build_distribution.py','authoring/requirements.txt','authoring/manifest.json','authoring/source-verification.json','authoring/verify_sources.py','authoring/regenerate_proto.py','authoring/tools-lock.json','authoring/metadata-report.json','authoring/variants-report.json','authoring/callers-report.json','authoring/maven_read_proxy.py','authoring/prefetch_maven.py','authoring/resolve_cloud_dependencies.py','authoring/prefetch_gradle_metadata.py','authoring/dependency-metadata-evidence.json','authoring/dependency-lock-verification.json']:
   if (R/name).exists():additional.append({'name':name})
  for name in ['README.md','中文阶段报告.md','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat']:
   if (R/name).exists():additional.append({'name':name})

@@ -36,6 +36,9 @@ additional_files:
 - name: authoring/maven_read_proxy.py
 - name: authoring/prefetch_maven.py
 - name: authoring/resolve_cloud_dependencies.py
+- name: authoring/prefetch_gradle_metadata.py
+- name: authoring/dependency-metadata-evidence.json
+- name: authoring/dependency-lock-verification.json
 - name: README.md
 - name: 中文阶段报告.md
 - name: THIRD_PARTY_NOTICES.md

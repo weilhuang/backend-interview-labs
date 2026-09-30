@@ -11,7 +11,7 @@
 | 框架 | Spring Boot 3.5.16、Spring Framework 6.2.19，按Boot BOM解析 |
 | 测试 | JUnit Jupiter 5.12.2、Spring Boot Test 3.5.16，全部测试公开 |
 | 数据库 | 无Docker基础阶段使用H2 2.3.232；只证明相应Spring/JDBC合同 |
-| 真实数据库 | 共享MYSQL_IMAGE当前为mysql:8.4.7；测试只读取infra/versions.env，不复制镜像配置常量 |
+| 真实数据库 | 共享MYSQL_IMAGE当前为mysql:8.4.7；测试读取根infra/versions.env或其自动生成且带SHA256的shared快照 |
 | Testcontainers | 统一1.20.6；用独立强制BOM覆盖Boot BOM的默认版本 |
 | 预置前端 | 原生HTML/CSS/JavaScript 0.1.0，由Boot直接提供；无需Node、npm或前端构建 |
 | Docker | 普通学习与H2测试不需要；共享环境最低Engine28.0、Compose2.20，实际daemon验收另记 |
@@ -56,7 +56,8 @@
 真实MySQL集成必须显式启用，并先有Docker访问：
 
 ```bash
-export LAB_SHARED_VERSIONS=/实际仓库路径/infra/versions.env
+# 可选覆盖；完整仓库或自带shared快照的独立课程无需设置
+# export LAB_SHARED_VERSIONS=/实际仓库路径/infra/versions.env
 ./gradlew :03-transactions:integrationTest
 ```
 
@@ -75,3 +76,7 @@ MySQL测试完整可见但独立放在integration-test源集，普通test不会�
 ## 进程管理与修复回归
 
 `python3 scripts/test-process-control.py`只在临时目录启动本测试的受控子进程，检查随机实例token与PID身份、退出状态和幂等停止。脚本采用Linux/macOS共同的ps接口，Linux9项回归已通过；Mac尚未实际运行，不能据此宣称跨平台实测通过。旧版未保存token的服务需在原启动终端结束，新脚本不会冒险认领。C04-06现有6项测试包含超时/中断时取消排队Future，正常退出才报告资源清理完成。
+
+## 独立课程镜像台账
+
+已登记自动生成的shared快照、SHA256和读取器，独立课程无需父仓库。全部Gradle真实集成测试使用台账中的Ryuk与tiny辅助镜像。运行入口、显式覆盖、校验失败和Academy ZIP的Wrapper差异见[独立课程镜像台账](shared/README.md)。

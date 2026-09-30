@@ -48,7 +48,7 @@ class LabTests(unittest.TestCase):
         return subprocess.CompletedProcess(args, 0, out, '')
 
     def test_valid_config(self):
-        self.assertEqual(len(lab.validate()['services']), 4)
+        self.assertEqual(len(lab.validate()['services']), 5)
 
     def test_verify_needs_no_docker_and_creates_no_env(self):
         with patch.object(lab, 'docker_ready', side_effect=AssertionError('不应访问 Docker')):
@@ -122,6 +122,75 @@ class LabTests(unittest.TestCase):
         self.assertEqual(lab.selected([]), ['mysql','redis'])
         self.assertEqual(lab.selected(['kafka']), ['kafka'])
         self.assertEqual(lab.selected(['core','redis','kafka']), ['mysql','redis','kafka'])
+
+    def test_rocketmq_is_explicit_only_with_one_published_endpoint(self):
+        self.assertEqual(lab.selected(['rocketmq']), ['rocketmq'])
+        self.assertEqual(lab.selected(['core', 'rocketmq', 'rocketmq']), ['mysql', 'redis', 'rocketmq'])
+        service = lab.validate()['services']['rocketmq']
+        self.assertEqual(service['profiles'], ['rocketmq'])
+        self.assertEqual(service['ports'], ['127.0.0.1:${ROCKETMQ_PORT}:8081'])
+        self.assertEqual(service['mem_limit'], '1536m')
+        self.assertIn('rocketmq-data:/tmp', service['volumes'])
+        self.assertNotIn('user', service)
+        self.assertTrue(service['init'])
+
+    def test_rocketmq_cannot_be_added_to_core(self):
+        path = lab.INFRA / 'compose.yaml'
+        spec = json.loads(path.read_text())
+        spec['services']['rocketmq']['profiles'].append('core')
+        path.write_text(json.dumps(spec))
+        with self.assertRaises(lab.LabError):
+            lab.validate()
+
+    def test_rocketmq_port_collision_rejected(self):
+        self.write_config(ROCKETMQ_PORT=self.config['KAFKA_PORT'])
+        with self.assertRaises(lab.LabError):
+            lab.settings()
+
+    def test_zero_padded_port_collision_rejected(self):
+        self.write_config(ROCKETMQ_PORT='0' + self.config['KAFKA_PORT'])
+        with self.assertRaises(lab.LabError):
+            lab.settings()
+
+    def test_up_rocketmq_never_starts_other_services(self):
+        with patch.object(lab, 'docker_ready', return_value=({}, '2.20.0')), patch.object(lab, 'run', side_effect=self.fake_run) as run, patch.object(lab, 'check_rocketmq_endpoint') as endpoint:
+            self.invoke('up', 'rocketmq')
+        command = run.call_args_list[0].args[0]
+        self.assertEqual(command[-1], 'rocketmq')
+        self.assertNotIn('mysql', command)
+        self.assertNotIn('kafka', command)
+        endpoint.assert_called_once()
+
+    def test_rocketmq_live_endpoint_failure_is_not_success(self):
+        with patch.object(lab, 'run', side_effect=self.fake_run), patch.object(lab, 'check_rocketmq_endpoint', side_effect=lab.LabError('未就绪')), contextlib.redirect_stdout(io.StringIO()):
+            with self.assertRaises(lab.LabError):
+                lab.check_services(self.config, self.envpath, ['rocketmq'])
+
+    def test_rocketmq_endpoint_requires_binding_protocol_and_fresh_running_state(self):
+        bindings = {'8081/tcp': [{'HostIp': '127.0.0.1', 'HostPort': self.config['ROCKETMQ_PORT']}]}
+        responses = [subprocess.CompletedProcess([], 0, '', ''),
+                     subprocess.CompletedProcess([], 0, json.dumps(bindings), ''),
+                     subprocess.CompletedProcess([], 0, json.dumps({'Running': True, 'Health': {'Status': 'healthy'}}), '')]
+        with patch.object(lab, 'run', side_effect=responses) as run, patch.object(lab, 'probe_http2') as probe, contextlib.redirect_stdout(io.StringIO()):
+            lab.check_rocketmq_endpoint(self.config, self.envpath, 'container')
+        probe.assert_called_once_with('127.0.0.1', int(self.config['ROCKETMQ_PORT']))
+        self.assertIn('/opt/lab-rocketmq/healthcheck.sh', run.call_args_list[0].args[0])
+        self.assertIn('{{json .State}}', run.call_args_list[-1].args[0])
+
+    def test_rocketmq_wrong_binding_does_not_probe_another_service(self):
+        responses = [subprocess.CompletedProcess([], 0, '', ''), subprocess.CompletedProcess([], 0, '{}', '')]
+        with patch.object(lab, 'run', side_effect=responses), patch.object(lab, 'probe_http2') as probe:
+            with self.assertRaises(lab.LabError):
+                lab.check_rocketmq_endpoint(self.config, self.envpath, 'container')
+        probe.assert_not_called()
+
+    def test_rocketmq_stops_during_endpoint_probe(self):
+        bindings = {'8081/tcp': [{'HostIp': '127.0.0.1', 'HostPort': self.config['ROCKETMQ_PORT']}]}
+        responses = [subprocess.CompletedProcess([], 0, '', ''), subprocess.CompletedProcess([], 0, json.dumps(bindings), ''),
+                     subprocess.CompletedProcess([], 0, '{"Running":false}', '')]
+        with patch.object(lab, 'run', side_effect=responses), patch.object(lab, 'probe_http2'):
+            with self.assertRaises(lab.LabError):
+                lab.check_rocketmq_endpoint(self.config, self.envpath, 'container')
 
     def test_unknown_profile_rejected(self):
         with self.assertRaises(lab.LabError):

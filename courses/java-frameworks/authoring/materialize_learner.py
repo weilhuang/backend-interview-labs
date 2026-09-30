@@ -6,7 +6,7 @@ from validate_course import ROOT,student,validate
 p=argparse.ArgumentParser();p.add_argument('destination',type=Path);a=p.parse_args();dest=a.destination.resolve()
 if dest.exists():raise SystemExit('目标已存在，不覆盖已有练习')
 validate();dest.mkdir(parents=True)
-for name in ['README.md','中文阶段报告.md','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat','gradle','docs','scripts','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template']:
+for name in ['README.md','中文阶段报告.md','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat','gradle','docs','scripts','shared','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template']:
  path=ROOT/name
  if path.is_dir():shutil.copytree(path,dest/name)
  else:shutil.copy2(path,dest/name)

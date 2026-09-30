@@ -9,6 +9,6 @@ CLASSPATH="$JUNIT_CONSOLE_JAR:$ROOT/build/deps/*"
 for task in "$ROOT"/mysql/*/*; do
   [[ -f "$task/task-info.yaml" ]] || continue
   out="$ROOT/build/manual/$(basename "$task")"; mkdir -p "$out"
-  "$JAVA_HOME/bin/javac" --release 21 -encoding UTF-8 -cp "$CLASSPATH" -d "$out" "$ROOT"/support/src/labs/*.java "$task"/src/labs/*.java "$task"/test/*ContractTest.java
+  "$JAVA_HOME/bin/javac" --release 21 -encoding UTF-8 -cp "$CLASSPATH" -d "$out" "$ROOT"/support/src/labs/*.java "$ROOT"/shared/src/labs/environment/*.java "$task"/src/labs/*.java "$task"/test/*ContractTest.java
   "$JAVA_HOME/bin/java" -jar "$JUNIT_CONSOLE_JAR" execute --class-path "$out" --scan-class-path --fail-if-no-tests --disable-banner
  done

@@ -18,21 +18,27 @@ on:
   workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
   real-lab:
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: 静态约束与无Docker回归
         run: |
           bash -n scripts/lab.sh
+          for file in infra/rocketmq/*.sh; do bash -n "$file"; done
           python3 -m unittest discover -s scripts/tests -v
           ./scripts/lab.sh verify
       - name: 创建仅本次CI使用的独立项目
@@ -68,6 +74,24 @@ jobs:
           ./scripts/lab.sh up kafka
           ./scripts/lab.sh check kafka
           python3 scripts/ci_smoke.py kafka
+          python3 scripts/ci_smoke.py logs
+          ./scripts/lab.sh down
+      - name: 编译宿主JDK21的RocketMQ真实端点探针
+        run: |
+          java -version
+          ./scripts/lab.sh build infra/rocketmq/smoke mvn --batch-mode --no-transfer-progress compile dependency:copy-dependencies
+      - name: 单独启动RocketMQ并验证宿主gRPC收发
+        run: |
+          ./scripts/lab.sh up rocketmq
+          ./scripts/lab.sh check rocketmq
+          python3 scripts/ci_smoke.py rocketmq-write
+          python3 scripts/ci_smoke.py logs
+          ./scripts/lab.sh down
+      - name: 重启RocketMQ后验证消息与消费组持久化
+        run: |
+          ./scripts/lab.sh up rocketmq
+          ./scripts/lab.sh check rocketmq
+          python3 scripts/ci_smoke.py rocketmq-read
           python3 scripts/ci_smoke.py logs
           ./scripts/lab.sh down
       - name: 使用共享完整JDK21镜像和原GradleWrapper构建

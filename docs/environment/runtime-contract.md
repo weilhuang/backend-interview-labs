@@ -25,7 +25,7 @@
 +-- smoke/                页面 + 接口 + 真实业务读写验证
           |
           +-- 共享 infra/versions.env
-          +-- 共享 MySQL/Redis/Kafka（仅启动所需组）
+          +-- 共享 MySQL/Redis/Kafka/RocketMQ（仅启动所需组）
 ```
 
 优先把预置静态资源打入 Spring Boot 包，前后端同源；其他方式必须同样做到启动后直接可用。具体路由、健康端点和业务字段由真实课程实现确定，不在这里假定所有技术栈共用同一套 API。
@@ -36,7 +36,7 @@
 
 - `infra/compose.yaml` 用 `${MYSQL_IMAGE}` 等变量读取同一个台账
 - 后续课程把 [`infra/testcontainers/LabImages.java`](../../infra/testcontainers/LabImages.java) 加入**测试源码集**，不复制文件内容或硬编码标签
-- `LabImages.image("MYSQL_IMAGE")`、`LabImages.image("REDIS_IMAGE")`、`LabImages.image("KAFKA_IMAGE")` 返回与 Compose 完全相同的引用，交给课程锁定版 Testcontainers 的 `DockerImageName.parse(...)`
+- `LabImages.image("MYSQL_IMAGE")`、`LabImages.image("REDIS_IMAGE")`、`LabImages.image("KAFKA_IMAGE")`、`LabImages.image("ROCKETMQ_IMAGE")` 返回与 Compose 完全相同的引用，交给课程锁定版 Testcontainers 的 `DockerImageName.parse(...)`
 - 读取器从当前课程目录向上查找仓库台账；找不到就失败。脱离仓库单独导出的课程需由发布流程附带同一份台账及来源校验，不能静默使用备用版本
 - 各课固定 Testcontainers BOM/版本，不用动态依赖；首次真正接入时按该版本补充辅助镜像（Ryuk 等）清单与验证，不把业务镜像表误称为零额外下载保证
 - Testcontainers 使用临时容器、独立数据库和随机宿主端口，通过 `getHost()`、`getMappedPort(...)` 获取连接信息；不复用 Compose 的教学数据卷，也不抢占固定实验端口
@@ -48,11 +48,14 @@
 DockerImageName mysqlImage = DockerImageName.parse(LabImages.image("MYSQL_IMAGE"));
 DockerImageName redisImage = DockerImageName.parse(LabImages.image("REDIS_IMAGE"));
 DockerImageName kafkaImage = DockerImageName.parse(LabImages.image("KAFKA_IMAGE"));
+DockerImageName rocketmqImage = DockerImageName.parse(LabImages.image("ROCKETMQ_IMAGE"));
 ```
 
 Testcontainers 的模块、包名和构造函数以该课实际锁定版本为准。Kafka 应选与 `apache/kafka` 兼容的模块，不能把 Confluent 模块的默认镜像替换后就声称兼容。
 
 当前 Java 基础题不依赖 Testcontainers；这里交付的是共享读取器和接入规范，不是不存在的数据库/消息队列课程测试报告。
+
+RocketMQ 共享服务只对外提供 SDK5 gRPC：宿主用 `.env` 中 `ROCKETMQ_PORT`（默认 `127.0.0.1:18081`），同一 Compose 网络用 `rocketmq:8081`。SDK 明确关闭 TLS，仅在隔离教学网络使用。NameServer/Broker 端口不发布，管理命令在容器内执行。主题和消费组须由课程显式创建，不启用自动创建。`up/check` 的管理 RPC 与 HTTP/2 往返是启动就绪证据，真实消息收发和重启持久化由独立 CI smoke 验证，详见 [RocketMQ 开发环境](rocketmq.md)。
 
 ## 4. 发布前必须完成的实机验收
 

@@ -20,7 +20,7 @@ for unit,title,name in UNITS:
 files=[]
 for name in ['README.md','中文阶段报告.md','SOURCES.md','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat']:
     files.append({'name':name})
-for folder in ['gradle','support','authoring']:
+for folder in ['gradle','support','authoring','shared']:
     for path in sorted((ROOT/folder).rglob('*')):
         if path.is_file() and 'build' not in path.parts and '__pycache__' not in path.parts:
             item={'name':str(path.relative_to(ROOT))}

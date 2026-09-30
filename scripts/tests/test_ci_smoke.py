@@ -15,11 +15,11 @@ import ci_smoke
 class SmokeTests(unittest.TestCase):
     def setUp(self):
         self.config = {'LAB_PROJECT_NAME':'backend-interview-labs-ci-123-1', 'MYSQL_PASSWORD':'lab_private_mysql',
-                       'MYSQL_ROOT_PASSWORD':'lab_private_root', 'REDIS_PASSWORD':'lab_private_redis'}
+                       'MYSQL_ROOT_PASSWORD':'lab_private_root', 'REDIS_PASSWORD':'lab_private_redis', 'ROCKETMQ_PORT':'18081'}
         self.context = patch.object(ci_smoke, 'guarded_config', return_value=(self.config, Path('/mock/.env')))
 
     def invoke(self, action):
-        with contextlib.redirect_stdout(io.StringIO()):
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
             ci_smoke.main(action)
 
     def test_non_ci_refused(self):
@@ -69,6 +69,42 @@ class SmokeTests(unittest.TestCase):
         with self.context, patch.object(ci_smoke,'execute',side_effect=['','','wrong']):
             with self.assertRaises(ci_smoke.lab.LabError):
                 self.invoke('kafka')
+
+    def rocketmq_context(self, action, output=None, code=0):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            cls = root / 'infra/rocketmq/smoke/target/classes/lab/environment/RocketSmoke.class'
+            cls.parent.mkdir(parents=True)
+            cls.write_bytes(b'not-a-real-class')
+            if output is None:
+                output = 'ROCKETMQ_SMOKE_OK=' + action.removeprefix('rocketmq-') + '\n'
+            with self.context, patch.object(ci_smoke.lab, 'ROOT', root), patch.object(ci_smoke, 'execute', return_value='') as execute, patch.object(ci_smoke.subprocess, 'run', return_value=subprocess.CompletedProcess([], code, output, '')) as run:
+                self.invoke(action)
+            return execute, run
+
+    def test_rocketmq_write_uses_host_grpc_endpoint_and_separate_topic_group(self):
+        execute, run = self.rocketmq_context('rocketmq-write')
+        self.assertEqual(execute.call_count, 2)
+        self.assertIn('updateTopic', execute.call_args_list[0].args[3])
+        self.assertIn('updateSubGroup', execute.call_args_list[1].args[3])
+        command = run.call_args.args[0]
+        self.assertIn('127.0.0.1:18081', command)
+        self.assertEqual(command[-1], self.config['LAB_PROJECT_NAME'])
+        self.assertEqual(run.call_args.kwargs['timeout'], 150)
+
+    def test_rocketmq_persistence_read_never_recreates_topic_or_sends(self):
+        execute, run = self.rocketmq_context('rocketmq-read')
+        execute.assert_not_called()
+        self.assertIn('read', run.call_args.args[0])
+        self.assertNotIn('write', run.call_args.args[0])
+
+    def test_rocketmq_zero_exit_without_success_marker_is_failure(self):
+        with self.assertRaises(ci_smoke.lab.LabError):
+            self.rocketmq_context('rocketmq-read', output='stream completed')
+
+    def test_rocketmq_nonzero_with_marker_is_still_failure(self):
+        with self.assertRaises(ci_smoke.lab.LabError):
+            self.rocketmq_context('rocketmq-write', code=1)
 
     def test_logs_redact_all_config_passwords(self):
         with tempfile.TemporaryDirectory() as name:
