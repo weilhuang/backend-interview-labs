@@ -1,0 +1,52 @@
+type: edu
+custom_name: 06 XA、TCC与Saga真实恢复
+files:
+- name: gradle.lockfile
+  visible: true
+- name: integration-test/labs/distributed/MySqlTransactionTest.java
+  visible: true
+- name: solutions/labs/distributed/Usage.java
+  visible: true
+- name: solutions/labs/distributed/transactions/PaymentLedger.java
+  visible: true
+- name: solutions/labs/distributed/transactions/Saga.java
+  visible: true
+- name: solutions/labs/distributed/transactions/TccInventory.java
+  visible: true
+- name: solutions/labs/distributed/transactions/XaTransfer.java
+  visible: true
+- name: src/labs/distributed/Usage.java
+  visible: true
+- name: src/labs/distributed/transactions/PaymentLedger.java
+  visible: true
+- name: src/labs/distributed/transactions/Saga.java
+  visible: true
+  placeholders:
+  - offset: 2073
+    length: 1084
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/transactions/TccInventory.java
+  visible: true
+  placeholders:
+  - offset: 2072
+    length: 816
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+  - offset: 3859
+    length: 1134
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/transactions/XaTransfer.java
+  visible: true
+  placeholders:
+  - offset: 3799
+    length: 346
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: test/labs/distributed/TransactionTest.java
+  visible: true

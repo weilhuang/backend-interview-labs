@@ -1,0 +1,39 @@
+type: edu
+custom_name: 03 Dubbo调用链、发现与治理
+files:
+- name: gradle.lockfile
+  visible: true
+- name: resources/META-INF/dubbo/org.apache.dubbo.rpc.Filter
+  visible: true
+- name: solutions/labs/distributed/Usage.java
+  visible: true
+- name: solutions/labs/distributed/dubbo/BudgetFilter.java
+  visible: true
+- name: solutions/labs/distributed/dubbo/Inventory.java
+  visible: true
+- name: solutions/labs/distributed/dubbo/Lab.java
+  visible: true
+- name: src/labs/distributed/Usage.java
+  visible: true
+- name: src/labs/distributed/dubbo/BudgetFilter.java
+  visible: true
+  placeholders:
+  - offset: 350
+    length: 593
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/dubbo/Inventory.java
+  visible: true
+- name: src/labs/distributed/dubbo/Lab.java
+  visible: true
+  placeholders:
+  - offset: 6168
+    length: 544
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: test/labs/distributed/DiscoveryTest.java
+  visible: true
+- name: test/labs/distributed/DubboTest.java
+  visible: true

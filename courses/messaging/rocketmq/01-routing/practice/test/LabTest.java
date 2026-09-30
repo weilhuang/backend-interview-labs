@@ -82,13 +82,29 @@ class LabTest {
         assertFalse(command[2].contains("group name"));
         assertEquals("group name; false", command[6]);
         String startup = RocketRuntime.startupScript();
-        assertTrue(startup.contains("ROCKETMQ_BROKER_EXIT=%s"));
+        assertTrue(startup.contains("ROCKETMQ_%s_EXIT=%s"));
         assertTrue(startup.contains("tail -n 40"));
         assertTrue(startup.contains("-Xmx128m"));
         assertTrue(startup.contains("useEndpointPortFromRequest\":true"));
         assertTrue(startup.contains("timerWheelEnable=true\n"));
         // ProxyConfig独立读取namesrvAddr，不能只在Broker配置里设置。
         assertTrue(startup.contains("\"namesrvAddr\":\"127.0.0.1:9876\""));
+    }
+
+    @Test
+    void 随机映射端口要求独立ClusterProxy且监督全部进程() {
+        String startup = RocketRuntime.startupScript();
+        assertFalse(startup.contains("--enable-proxy"));
+        assertTrue(startup.contains("sh mqproxy -pm cluster -pc /tmp/lab-proxy.json"));
+        assertTrue(startup.contains("\"proxyMode\":\"CLUSTER\""));
+        assertTrue(startup.contains("-Xmx256m"));
+        for (String process : java.util.List.of("NAMESRV", "BROKER", "PROXY"))
+            assertTrue(startup.contains("check_process " + process));
+        String[] files = RocketRuntime.fileLogsCommand();
+        assertEquals("sh", files[0]);
+        assertEquals("-c", files[1]);
+        assertTrue(files[2].contains("rocketmqlogs/proxy.log"));
+        assertTrue(files[2].contains("tail -c 6000"));
     }
 
     @Test

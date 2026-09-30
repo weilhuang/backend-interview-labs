@@ -13,7 +13,7 @@ fs.mkdirSync('build/ui',{recursive:true});
  const page=activePage=await browser.newPage({viewport:{width:1100,height:850}});
  page.setDefaultTimeout(10000);page.setDefaultNavigationTimeout(15000);
  mark('加载中文首页与空态');
- const results=[]; const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const results=[]; const errors=[];page.on('pageerror',e=>{errors.push(e.message);console.error('[页面脚本异常]',e.message);});
  async function status(text){await page.getByRole('status').filter({hasText:text}).waitFor({timeout:10000});}
  async function submit(){await page.locator('#submit').click();}
  await page.goto('http://127.0.0.1:18084');
@@ -38,8 +38,8 @@ fs.mkdirSync('build/ui',{recursive:true});
  await submit();await status('请求超时');assert.equal(await page.locator('#submit').isEnabled(),true);await page.unrouteAll({behavior:'wait'});results.push('五秒超时与结果未知提示');
  mark('旧刷新响应不能覆盖新结果');
  let oldRelease,oldReady,oldRequest;const oldGate=new Promise(r=>oldRelease=r),ready=new Promise(r=>oldReady=r);let first=true;
- await page.route('**/api/orders',async route=>{if(route.request().method()==='GET'&&first){first=false;oldRequest=route.request();const response=await route.fetch();oldReady();await oldGate;await route.fulfill({response});}else await route.continue();});
- await page.locator('#refresh').click();await bounded(ready,'旧GET响应被路由捕获');
+ await page.route('**/api/orders',async route=>{if(route.request().method()==='GET'&&first){console.log('[旧刷新] 捕获GET');first=false;oldRequest=route.request();const response=await route.fetch({timeout:4000});console.log('[旧刷新] 已取得后端快照',response.status());oldReady();await oldGate;await route.fulfill({response});}else await route.continue();});
+ console.log('[旧刷新] 点击前',await page.evaluate(()=>({sequence:loadSequence,handler:String(document.getElementById('refresh').onclick)})));await page.locator('#refresh').click();console.log('[旧刷新] 点击后',await page.evaluate(()=>({sequence:loadSequence,orders:document.getElementById('orders').textContent})));await bounded(ready,'旧GET响应被路由捕获');
  const response=await page.request.post('http://127.0.0.1:18084/api/orders',{data:{requestId:'ui-latest',sku:'LATEST',quantity:1,unitPriceFen:'99'}});assert.equal(response.status(),201);
  await page.locator('#refresh').click();await page.locator('#orders').filter({hasText:'ui-latest'}).waitFor();oldRelease();const delivered=await oldRequest.response();await bounded(delivered.finished(),'旧GET完成');await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(resolve)));await page.unrouteAll({behavior:'wait'});assert.match(await page.locator('#orders').innerText(),/ui-latest/);results.push('旧刷新响应不覆盖新结果');
  mark('移动与桌面排版截图');

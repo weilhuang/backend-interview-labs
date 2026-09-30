@@ -54,7 +54,11 @@ cd courses/messaging
 
 ## RocketMQ 5端点与配置特别说明
 
-5.x gRPC客户端连接Proxy，不直接连接NameServer或Broker。RocketMQ5.3.2的RouteActivity默认把请求端口替换为grpcServerPort，随机映射会因此失效。本夹具显式写入proxy JSON的useEndpointPortFromRequest=true，路由保留客户端实际映射端口；只暴露8081的随机宿主端口。其余NameServer、Broker管理调用在容器内执行。此方案按官方固定源码分支实现，Mac/Linux动态兼容仍待实测。
+5.x gRPC客户端连接Proxy，不直接连接NameServer或Broker。RocketMQ5.3.2的LOCAL模式（mqbroker --enable-proxy）在LocalTopicRouteService中忽略请求端点，返回brokerIP1加固定gRPC端口；即使设置useEndpointPortFromRequest=true，也不能支持本实验的随机宿主端口映射。旧方案只检查RouteActivity而漏看LOCAL后续分支，真实CI已在客户端建立阶段失败。
+
+本夹具改为同一临时容器内分别启动NameServer、Broker和CLUSTER Proxy，Proxy使用mqproxy -pm cluster，并配置namesrvAddr、proxyMode=CLUSTER、useEndpointPortFromRequest=true。ClusterTopicRouteService实际沿用请求地址；仍只暴露8081的随机宿主端口，NameServer和Broker管理调用在容器内执行。routing真实测试先断言QueryRoute返回地址等于随机宿主端点，再要求两个消费组成功收到同一条消息。源代码推导、严格编译和无容器单测已通过，此修正仍待新的真实CI及Mac/Linux动态验证，不能仅凭启动或管理命令成功验收。
+
+容器总预算仍为1.5GiB/2CPU：NameServer堆64–128MiB、Broker堆256–512MiB、独立Proxy堆128–256MiB；各自直接内存上界为32/128/64MiB。监督脚本检查三个进程，清理前保留有界Proxy/Broker文件日志及容器状态，包括客户端失败但容器仍在运行的情况。
 
 主题按NORMAL、FIFO、DELAY、TRANSACTION显式创建，避免用普通主题发送事务或顺序消息。各组独立随机命名；实验最后关闭容器，临时写层由Testcontainers清理。默认SYNC_FLUSH并不提供多副本容灾，不能从一次重启读到数据宣称任意故障零丢失。
 

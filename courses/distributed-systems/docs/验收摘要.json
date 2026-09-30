@@ -1,0 +1,210 @@
+{
+  "report_time_utc": "2026-09-30T14:44:49.342340+00:00",
+  "jdk": "Eclipse Temurin 21.0.12.1+1",
+  "gradle": "8.10.2",
+  "javac": "--release21 -Xlint:all,-processing,-serial -Werror",
+  "unit_tests": 38,
+  "unit_failures": 0,
+  "unit_skipped": 0,
+  "suites": [
+    {
+      "module": "01-failure-model",
+      "suite": "labs.distributed.LabTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "02-grpc",
+      "suite": "labs.distributed.GrpcTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "03-dubbo",
+      "suite": "labs.distributed.DiscoveryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "03-dubbo",
+      "suite": "labs.distributed.DubboTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "04-resilience",
+      "suite": "labs.distributed.LabTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "05-idempotency",
+      "suite": "labs.distributed.IdempotencyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "05-idempotency",
+      "suite": "labs.distributed.RetryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "06-transactions",
+      "suite": "labs.distributed.TransactionTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "07-outbox-cache",
+      "suite": "labs.distributed.ProjectionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "08-capacity",
+      "suite": "labs.distributed.CapacityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "docker_integration": {
+    "cases": 7,
+    "status": "已严格编译，Docker不可用，未执行",
+    "requires": "对应提交的Ubuntu Docker CI"
+  },
+  "academy_gui": "未执行；源码包不是官方Academy导出",
+  "standalone_source_package": {
+    "status": "38项测试通过，7项Docker集成源码编译通过",
+    "suites": [
+      {
+        "module": "01-failure-model",
+        "suite": "labs.distributed.LabTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "02-grpc",
+        "suite": "labs.distributed.GrpcTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "03-dubbo",
+        "suite": "labs.distributed.DiscoveryTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "03-dubbo",
+        "suite": "labs.distributed.DubboTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "04-resilience",
+        "suite": "labs.distributed.LabTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "05-idempotency",
+        "suite": "labs.distributed.IdempotencyTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "05-idempotency",
+        "suite": "labs.distributed.RetryTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "06-transactions",
+        "suite": "labs.distributed.TransactionTest",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "07-outbox-cache",
+        "suite": "labs.distributed.ProjectionTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "module": "08-capacity",
+        "suite": "labs.distributed.CapacityTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "shared_versions_sha256": "633dd50e7da950a0da9ddb86484e11a63b475a82c89688c3a8f2640c24568a4b",
+    "note": "同一源码包独立目录运行，不继承仓库相对infra路径；官方Academy GUI尚未验收"
+  },
+  "variants": {
+    "total": 24,
+    "blank_rejected": 8,
+    "wrong_rejected": 8,
+    "alternative_passed": 8,
+    "strict_javac": true,
+    "note": "最后只增加C10-01正常响应/负时间断言，已在原工程、独立目录及三个变体定向复验"
+  },
+  "generated_protocol_files_verified": 10,
+  "source_files_verified": 16,
+  "java_and_proto_sha256": "8db76ce1085852cfecb9807dd7325e0e460b25003604e3b4c7e2e5df64cb32a9",
+  "callers": {
+    "default_entrypoints": 8,
+    "all_exit_zero": true,
+    "real_network_callers": [
+      "02-grpc",
+      "03-dubbo"
+    ],
+    "docker_help_only": [
+      "06-transactions",
+      "07-outbox-cache",
+      "08-capacity"
+    ],
+    "docker_callers_not_run": true,
+    "note": "三个--docker入口仅完成默认帮助模式；真实容器调用由CI集成另验"
+  }
+}

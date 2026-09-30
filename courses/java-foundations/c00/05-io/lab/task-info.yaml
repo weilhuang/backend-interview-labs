@@ -1,0 +1,17 @@
+type: edu
+custom_name: UTF-8文件、资源关闭与失败链
+files:
+- name: solutions/OrderFiles.java.txt
+  visible: true
+- name: src/labs/foundation/OrderFiles.java
+  visible: true
+  placeholders:
+  - offset: 291
+    length: 792
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：按公开合同完成实现");
+
+      '
+- name: src/labs/foundation/OrderFilesUsage.java
+  visible: true
+- name: test/OrderFilesTest.java
+  visible: true

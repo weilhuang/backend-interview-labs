@@ -1,5 +1,10 @@
 package labs.messaging;
 
+import apache.rocketmq.v2.Code;
+import apache.rocketmq.v2.MessagingServiceGrpc;
+import apache.rocketmq.v2.QueryRouteRequest;
+import apache.rocketmq.v2.Resource;
+
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.ExposedPort;
@@ -10,6 +15,11 @@ import org.apache.rocketmq.client.apis.ClientConfiguration;
 import org.apache.rocketmq.client.apis.consumer.FilterExpression;
 import org.apache.rocketmq.client.apis.consumer.SimpleConsumer;
 import org.apache.rocketmq.client.apis.producer.Producer;
+import org.apache.rocketmq.client.java.misc.ClientId;
+import org.apache.rocketmq.client.java.route.Endpoints;
+import org.apache.rocketmq.client.java.rpc.Signature;
+import org.apache.rocketmq.shaded.io.grpc.ManagedChannelBuilder;
+import org.apache.rocketmq.shaded.io.grpc.stub.MetadataUtils;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
 import org.testcontainers.utility.DockerImageName;
@@ -19,11 +29,14 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /** Broker 与 Proxy 同容器；客户端只连接随机映射的 gRPC 端口。 */
 public final class RocketSupport extends GenericContainer<RocketSupport> {
+    private boolean diagnosticsPrinted;
 
     public RocketSupport() {
         super(DockerImageName.parse(Images.get("ROCKETMQ_IMAGE")));
@@ -107,6 +120,47 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
                 .build();
     }
 
+    /** 直接读取真实QueryRoute响应，避免客户端构建失败掩盖错误的返回地址。 */
+    public Set<String> routeEndpoints(String topic) throws Exception {
+        ClientConfiguration configuration = configuration();
+        Endpoints requested = new Endpoints(configuration.getEndpoints());
+        var channel =
+                ManagedChannelBuilder.forTarget(requested.getGrpcTarget()).usePlaintext().build();
+        try {
+            var response =
+                    MessagingServiceGrpc.newBlockingStub(channel)
+                            .withInterceptors(
+                                    MetadataUtils.newAttachHeadersInterceptor(
+                                            Signature.sign(configuration, new ClientId())))
+                            .withDeadlineAfter(10, TimeUnit.SECONDS)
+                            .queryRoute(
+                                    QueryRouteRequest.newBuilder()
+                                            .setTopic(Resource.newBuilder().setName(topic))
+                                            .setEndpoints(requested.toProtobuf())
+                                            .build());
+            if (response.getStatus().getCode() != Code.OK)
+                throw new IllegalStateException("QueryRoute失败：" + response.getStatus());
+            Set<String> endpoints =
+                    response.getMessageQueuesList().stream()
+                            .flatMap(
+                                    queue ->
+                                            queue
+                                                    .getBroker()
+                                                    .getEndpoints()
+                                                    .getAddressesList()
+                                                    .stream())
+                            .map(address -> address.getHost() + ":" + address.getPort())
+                            .collect(Collectors.toSet());
+            System.err.println(
+                    "RocketMQ QueryRoute：requested=" + endpoint() + ", returned=" + endpoints);
+            return endpoints;
+        } catch (Exception failure) {
+            throw diagnosed("QueryRoute topic=" + topic, failure);
+        } finally {
+            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+        }
+    }
+
     public static String unique(String prefix) {
         return prefix + UUID.randomUUID().toString().replace("-", "");
     }
@@ -179,12 +233,17 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
     private record AdminExec(int exitCode, String stdout, String stderr) {}
 
     private AdminExec execAdmin(String... arguments) throws Exception {
+        return execCommand(15, 20000, RocketRuntime.adminCommand(arguments));
+    }
+
+    private AdminExec execCommand(int seconds, int outputLimit, String... command)
+            throws Exception {
         String id =
                 getDockerClient()
                         .execCreateCmd(getContainerId())
                         .withAttachStdout(true)
                         .withAttachStderr(true)
-                        .withCmd(RocketRuntime.adminCommand(arguments))
+                        .withCmd(command)
                         .exec()
                         .getId();
         StringBuffer stdout = new StringBuffer();
@@ -196,22 +255,30 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
                         String value = new String(frame.getPayload(), StandardCharsets.UTF_8);
                         if (frame.getStreamType()
                                 == com.github.dockerjava.api.model.StreamType.STDERR)
-                            stderr.append(value);
-                        else stdout.append(value);
+                            appendBounded(stderr, value, outputLimit);
+                        else appendBounded(stdout, value, outputLimit);
                     }
                 }) {
             getDockerClient().execStartCmd(id).exec(callback);
-            if (!callback.awaitCompletion(15, TimeUnit.SECONDS))
-                throw new IllegalStateException("单次管理RPC超过15秒，停止重试以免堆积工具JVM");
+            if (!callback.awaitCompletion(seconds, TimeUnit.SECONDS))
+                throw new IllegalStateException("容器命令超过" + seconds + "秒，停止重试以免堆积进程");
         }
         Long exit = getDockerClient().inspectExecCmd(id).exec().getExitCodeLong();
         return new AdminExec(
                 exit == null ? -1 : exit.intValue(), stdout.toString(), stderr.toString());
     }
 
+    private static void appendBounded(StringBuffer target, String value, int maximum) {
+        synchronized (target) {
+            target.append(value);
+            if (target.length() > maximum) target.delete(0, target.length() - maximum);
+        }
+    }
+
     private ContainerExecException diagnosed(String operation, Throwable cause) {
         String diagnostics = diagnostics(operation);
         System.err.println(diagnostics);
+        diagnosticsPrinted = true;
         return new ContainerExecException(diagnostics, cause);
     }
 
@@ -265,36 +332,57 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
             if (unavailable instanceof InterruptedException) Thread.currentThread().interrupt();
             result.append("\n日志读取失败：").append(unavailable);
         }
-        return result.append("\n--- Docker日志末尾（最多12000字符）---\n").append(logs).toString();
+        result.append("\n--- Docker日志末尾（最多12000字符）---\n").append(logs);
+        try {
+            if (Boolean.TRUE.equals(freshInfo().getState().getRunning())) {
+                AdminExec files = execCommand(5, 26000, RocketRuntime.fileLogsCommand());
+                result.append("\n--- RocketMQ文件日志（最多26000字符）---\n")
+                        .append(files.stdout())
+                        .append(files.stderr());
+            } else {
+                result.append("\n容器已退出，无法exec读取文件；检查启动监督脚本输出的文件日志尾部");
+            }
+        } catch (Exception unavailable) {
+            if (unavailable instanceof InterruptedException) Thread.currentThread().interrupt();
+            result.append("\n文件日志读取失败：").append(unavailable);
+        }
+        return result.toString();
     }
 
     @Override
     protected void containerIsStopping(InspectContainerResponse ignoredCachedInfo) {
-        // 包括测试业务步骤意外遇到进程退出，必须在try-with-resources删除容器前重新inspect。
+        // 测试业务异常时容器可能仍在运行；不依赖running=false才留证。
         try {
-            if (!Boolean.TRUE.equals(freshInfo().getState().getRunning()))
-                System.err.println(diagnostics("清理前发现容器已停止"));
+            if (!diagnosticsPrinted) System.err.println(diagnostics("清理前快照"));
         } catch (Exception failure) {
             System.err.println("RocketMQ清理前状态检查失败：" + failure);
         }
     }
 
     public Producer producer(String topic) throws Exception {
-        return RocketClient.PROVIDER
-                .newProducerBuilder()
-                .setClientConfiguration(configuration())
-                .setTopics(topic)
-                .build();
+        try {
+            return RocketClient.PROVIDER
+                    .newProducerBuilder()
+                    .setClientConfiguration(configuration())
+                    .setTopics(topic)
+                    .build();
+        } catch (Exception failure) {
+            throw diagnosed("创建Producer topic=" + topic, failure);
+        }
     }
 
     public SimpleConsumer consumer(String group, String topic) throws Exception {
-        return RocketClient.PROVIDER
-                .newSimpleConsumerBuilder()
-                .setClientConfiguration(configuration())
-                .setConsumerGroup(group)
-                .setAwaitDuration(Duration.ofSeconds(5))
-                .setSubscriptionExpressions(Map.of(topic, FilterExpression.SUB_ALL))
-                .build();
+        try {
+            return RocketClient.PROVIDER
+                    .newSimpleConsumerBuilder()
+                    .setClientConfiguration(configuration())
+                    .setConsumerGroup(group)
+                    .setAwaitDuration(Duration.ofSeconds(5))
+                    .setSubscriptionExpressions(Map.of(topic, FilterExpression.SUB_ALL))
+                    .build();
+        } catch (Exception failure) {
+            throw diagnosed("创建SimpleConsumer group=" + group + ", topic=" + topic, failure);
+        }
     }
 
     public static final class ContainerExecException extends RuntimeException {

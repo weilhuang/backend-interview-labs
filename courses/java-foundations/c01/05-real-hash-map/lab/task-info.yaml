@@ -1,0 +1,17 @@
+type: edu
+custom_name: 真实HashMap扩容、树化与拆分
+files:
+- name: solutions/HashMapRoutes.java.txt
+  visible: true
+- name: src/labs/foundation/HashMapRoutes.java
+  visible: true
+  placeholders:
+  - offset: 338
+    length: 238
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：按公开合同完成实现");
+
+      '
+- name: src/labs/foundation/HashMapRoutesUsage.java
+  visible: true
+- name: test/HashMapRoutesTest.java
+  visible: true

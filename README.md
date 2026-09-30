@@ -11,9 +11,13 @@
 - [版本与官方来源](docs/curriculum/05-versioning-and-sources.md)
 - [Java 编码恢复与集合：首批 12 道练习](courses/java-recovery-collections/README.md)
 
+[查看各课程制作与验证进度](docs/curriculum/09-v1-progress.md)
+
 ## 当前交付状态
 
-完整课程目录已设计，但目录中的未来课程不等于已实现。当前实现是 Java 编码恢复与集合课程的 **author-mode pilot**，不是已验收的 Academy 学习者课程包。
+当前已有 Java 基础与集合、JUC、JVM、Spring/Boot、MySQL、Redis、Kafka/RocketMQ 的作者课程实现，分布式与综合项目正在完善。**V1 仍未整体验收完成**，各模块真实测试与界面验证范围见下方报告。
+
+内部试点已完成官方导出和干净导入，并对第 1 题实测错误答案、正确答案及重置；该结果不能外推为全部课程、全部题目已完成 Academy 验收。
 
 首包包含金额累计、ID 解析、泛型有界栈、稳定去重、不可变键、Top-K、快照、安全删除、动态数组、哈希索引与扩容、LRU、近期 ID 窗口。完整范围不会因为面试时间临近被删减；两周路线只调整练习顺序。
 
@@ -40,6 +44,14 @@ V1 必须完成 Java、Java 框架、分布式、数据库与缓存、消息队�
 
 - [Java 编码恢复与集合：结构、逐题内容和验证证据](courses/java-recovery-collections/阶段报告.md)
 - [共享 Docker 环境：设计、使用示例与实际 CI 结果](docs/environment/phase-report.md)
+- [Java 基础与集合：完整 C00/C01 16 单元](courses/java-foundations/中文阶段报告.md)
+- [JUC 并发：8 单元与正确性验证](courses/java-concurrency/阶段报告.md)
+- [JVM 与现代 Java：7 单元](courses/java-jvm/阶段报告.md)
+- [Spring/Boot 应用与源码：14 阶段](courses/java-frameworks/中文阶段报告.md)
+- [MySQL 与 Redis：真实数据库验收](courses/data-storage/中文阶段报告.md)
+- [消息队列验证与已知问题](courses/messaging/验证报告.md)
+- [分布式服务与一致性：8 单元](courses/distributed-systems/中文阶段报告.md)
+- [IDEA/Academy 实际界面验收及覆盖边界](docs/界面验收报告.md)
 - [V1 / V2 发布验收矩阵](docs/curriculum/08-release-plan.md)
 
 报告中的完成范围与整个 V1 分开；每个较大模块会随代码提交独立报告，供逐步评审。

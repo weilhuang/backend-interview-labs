@@ -1,0 +1,13 @@
+rootProject.name='java-foundations'
+include('common')
+['c00','c01'].each { section ->
+    file(section).eachDir { lesson ->
+        lesson.eachDir { task ->
+            if(new File(task,'task-info.yaml').isFile()) {
+                def name="${section}-${lesson.name}-${task.name}"
+                include(name);project(":${name}").projectDir=task
+            }
+        }
+    }
+}
+if(startParameter.projectProperties.containsKey('withJmh'))include('benchmark')

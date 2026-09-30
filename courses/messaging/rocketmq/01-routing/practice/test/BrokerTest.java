@@ -14,6 +14,10 @@ class BrokerTest {
         try (var broker = new RocketSupport()) {
             broker.start();
             String topic = broker.topic("NORMAL");
+            assertEquals(
+                    java.util.Set.of(broker.endpoint()),
+                    broker.routeEndpoints(topic),
+                    "QueryRoute必须返回客户端可达的随机映射Proxy端点，不能返回容器内127.0.0.1:8081");
             try (var first = broker.consumer(broker.group(false), topic);
                     var second = broker.consumer(broker.group(false), topic);
                     var producer = broker.producer(topic)) {

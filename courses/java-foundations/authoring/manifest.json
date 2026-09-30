@@ -1,0 +1,310 @@
+[
+  {
+    "id": "C00-01",
+    "task": "c00/01-workspace/lab",
+    "class": "Workspace",
+    "source": "src/labs/foundation/Workspace.java",
+    "alternative": "authoring/alternatives/Workspace.java",
+    "mutations": [
+      [
+        "rder.Status.PAID)\n                sum = Math.addExact(sum, order.cents());\n        return sum;\n        // 作答结束\n ",
+        "rder.Status.PAID)\n                sum = sum + order.cents();\n        return sum;\n        // 作答结束\n "
+      ]
+    ],
+    "title": "可重复工作区与首次失败回归",
+    "placeholders": 1
+  },
+  {
+    "id": "C00-02",
+    "task": "c00/02-values/lab",
+    "class": "Money",
+    "source": "src/labs/foundation/Money.java",
+    "alternative": "authoring/alternatives/Money.java",
+    "mutations": [
+      [
+        "zed = raw.setScale(2, RoundingMode.HALF_EVEN);\n        normalized.unscaledValue().lo",
+        "zed = raw.setScale(2, RoundingMode.HALF_UP);\n        normalized.unscaledValue().lo"
+      ],
+      [
+        "Null(decimal, \"金额文本不能为空\"));\n        if (raw.signum() < 0) throw new IllegalArgumentException(\"金额",
+        "Null(decimal, \"金额文本不能为空\"));\n        if (false) throw new IllegalArgumentException(\"金额"
+      ]
+    ],
+    "title": "金额舍入、值相等与对象身份",
+    "placeholders": 1
+  },
+  {
+    "id": "C00-03",
+    "task": "c00/03-parsing/lab",
+    "class": "OrderParser",
+    "source": "src/labs/foundation/OrderParser.java",
+    "alternative": "authoring/alternatives/OrderParser.java",
+    "mutations": [
+      [
+        "       String[] parts = text.split(\"[|]\", -1);\n        if (parts.length != 4) throw ",
+        "       String[] parts = text.split(\"[|]\");\n        if (parts.length != 4) throw "
+      ],
+      [
+        "e(lines.get(i), i + 1);\n            if (!seen.add(order.id())) throw new ParseFailure(i + 1, \"id\", \"重",
+        "e(lines.get(i), i + 1);\n            if (false) throw new ParseFailure(i + 1, \"id\", \"重"
+      ]
+    ],
+    "title": "从订单行到领域模型与定位错误",
+    "placeholders": 2
+  },
+  {
+    "id": "C00-04",
+    "task": "c00/04-generics/lab",
+    "class": "Repositories",
+    "source": "src/labs/foundation/Repositories.java",
+    "alternative": "authoring/alternatives/Repositories.java",
+    "mutations": [
+      [
+        "r.Status.PAID)\n                .collect(\n                        Collectors.toMap(\n                                Order::customer, Order::cents, Math::addExact, TreeMap::new));\n        // 作答结束\n    }\n",
+        "r.Status.PAID)\n                .collect(Collectors.toMap(Order::customer, Order::cents, Long::sum, TreeMap::new));\n        // 作答结束\n    }\n"
+      ],
+      [
+        " new IllegalStateException(\"仓库最多4096项\");\n            data.putAll(staged);\n            // 作答结束\n        }\n\n        ",
+        " new IllegalStateException(\"仓库最多4096项\"); /* 故意遗漏提交 */\n            // 作答结束\n        }\n\n        "
+      ]
+    ],
+    "title": "泛型仓库、PECS与函数式转换",
+    "placeholders": 2
+  },
+  {
+    "id": "C00-05",
+    "task": "c00/05-io/lab",
+    "class": "OrderFiles",
+    "source": "src/labs/foundation/OrderFiles.java",
+    "alternative": "authoring/alternatives/OrderFiles.java",
+    "mutations": [
+      [
+        "     for (var entry : totals.entrySet())\n                writer.write(entry.getKey() + \"|\" + entry.getValue() + \"\\n\");\n        }\n        // 作答结束\n    }\n\n ",
+        "     for (var entry : totals.entrySet()) writer.write(entry.getKey() + \"|0\\n\");\n        }\n        // 作答结束\n    }\n\n "
+      ]
+    ],
+    "title": "UTF-8文件、资源关闭与失败链",
+    "placeholders": 1
+  },
+  {
+    "id": "C00-06",
+    "task": "c00/06-debug/lab",
+    "class": "DebugRepairs",
+    "source": "src/labs/foundation/DebugRepairs.java",
+    "alternative": "authoring/alternatives/DebugRepairs.java",
+    "mutations": [
+      [
+        "turn List.copyOf(values.subList(from, to));\n        // 作答结束\n    }\n\n    public st",
+        "turn List.copyOf(values.subList(from, to - 1));\n        // 作答结束\n    }\n\n    public st"
+      ],
+      [
+        "alues) {\n        // 作答开始\n        return values.stream().map(List::copyOf).toList();\n        // 作答结束\n    }\n\n    public sta",
+        "alues) {\n        // 作答开始\n        return List.copyOf(values);\n        // 作答结束\n    }\n\n    public sta"
+      ],
+      [
+        "Exception {\n        // 作答开始\n        try (resource) {\n            return operation.call();\n        }\n        // 作答结束\n    }\n}\n",
+        "Exception {\n        // 作答开始\n        try {\n            return operation.call();\n        } finally {\n            resource.close();\n        }\n        // 作答结束\n    }\n}\n"
+      ]
+    ],
+    "title": "三个独立缺陷的最小回归与调试",
+    "placeholders": 3
+  },
+  {
+    "id": "C00-07",
+    "task": "c00/07-algorithms/lab",
+    "class": "Algorithms",
+    "source": "src/labs/foundation/Algorithms.java",
+    "alternative": "authoring/alternatives/Algorithms.java",
+    "mutations": [
+      [
+        "(left < right) {\n            long sum = (long) a[left] + a[right];\n            if (sum",
+        "(left < right) {\n            long sum = a[left] + a[right];\n            if (sum"
+      ],
+      [
+        "left) / 2;\n            if (sorted[mid] < key) left = mid + 1;\n            else r",
+        "left) / 2;\n            if (sorted[mid] <= key) left = mid + 1;\n            else r"
+      ],
+      [
+        "s.fill(dp, amount + 1);\n        dp[0] = 0;\n        for (int value = 1; value <= a",
+        "s.fill(dp, amount + 1);\n        dp[0] = 1;\n        for (int value = 1; value <= a"
+      ]
+    ],
+    "title": "七类编码模式与不变量",
+    "placeholders": 4
+  },
+  {
+    "id": "C00-08",
+    "task": "c00/08-capstone/lab",
+    "class": "OrderAnalyzer",
+    "source": "src/labs/foundation/OrderAnalyzer.java",
+    "alternative": "authoring/alternatives/OrderAnalyzer.java",
+    "mutations": [
+      [
+        "s.get(i), i + 1);\n            unique.putIfAbsent(order.id(), order);\n        }\n        ",
+        "s.get(i), i + 1);\n            unique.put(order.id(), order);\n        }\n        "
+      ],
+      [
+        ".merge(order.customer(), order.cents(), Math::addExact);\n                count.merge(order.cus",
+        ".merge(order.customer(), order.cents(), Long::sum);\n                count.merge(order.cus"
+      ]
+    ],
+    "title": "可交付的订单分析CLI",
+    "placeholders": 1
+  },
+  {
+    "id": "C01-01",
+    "task": "c01/01-views/lab",
+    "class": "CollectionViews",
+    "source": "src/labs/foundation/CollectionViews.java",
+    "alternative": "authoring/alternatives/CollectionViews.java",
+    "mutations": [
+      [
+        "  // 作答开始\n        Set<String> ids = new LinkedHashSet<>();\n        for (Order order : ",
+        "  // 作答开始\n        Set<String> ids = new HashSet<>();\n        for (Order order : "
+      ],
+      [
+        "    return Collections.unmodifiableList(new ArrayList<>(input.subList(from, to)));\n        // 作答结束\n    }\n\n    public st",
+        "    return Collections.unmodifiableList(input.subList(from, to));\n        // 作答结束\n    }\n\n    public st"
+      ]
+    ],
+    "title": "集合选择、视图与不可变边界",
+    "placeholders": 2
+  },
+  {
+    "id": "C01-02",
+    "task": "c01/02-array-list/lab",
+    "class": "MiniArrayList",
+    "source": "src/labs/foundation/MiniArrayList.java",
+    "alternative": "authoring/alternatives/MiniArrayList.java",
+    "mutations": [
+      [
+        "E old = get(index);\n        int moved = size - index - 1;\n        if (moved > 0) System.arraycop",
+        "E old = get(index);\n        int moved = 0;\n        if (moved > 0) System.arraycop"
+      ],
+      [
+        "x + 1, elements, index, moved);\n        elements[--size] = null;\n        return old;\n        // 作答结束\n  ",
+        "x + 1, elements, index, moved);\n        --size;\n        return old;\n        // 作答结束\n  "
+      ]
+    ],
+    "title": "泛型动态数组与过期引用",
+    "placeholders": 2
+  },
+  {
+    "id": "C01-03",
+    "task": "c01/03-linked/lab",
+    "class": "LinkedAlgorithms",
+    "source": "src/labs/foundation/LinkedAlgorithms.java",
+    "alternative": "authoring/alternatives/LinkedAlgorithms.java",
+    "mutations": [
+      [
+        "t = null;\n        else first.previous = null;\n        removed.next = null;\n        s",
+        "t = null;\n        else first.previous = removed;\n        removed.next = null;\n        s"
+      ],
+      [
+        "(!queue.isEmpty() && queue.peekFirst() <= i - k) queue.removeFirst();\n           ",
+        "(!queue.isEmpty() && queue.peekFirst() < i - k) queue.removeFirst();\n           "
+      ]
+    ],
+    "title": "双向链表、BFS与单调队列",
+    "placeholders": 2
+  },
+  {
+    "id": "C01-04",
+    "task": "c01/04-hash-map/lab",
+    "class": "MiniHashMap",
+    "source": "src/labs/foundation/MiniHashMap.java",
+    "alternative": "authoring/alternatives/MiniHashMap.java",
+    "mutations": [
+      [
+        "l) {\n            V old = existing.value;\n            existing.value = value;\n            return old;\n        }\n     ",
+        "l) {\n            V old = existing.value; /* 故意不替换旧值 */\n            return old;\n        }\n     "
+      ],
+      [
+        ";\n                int index = e.hash & (next.length - 1);\n                e.next = n",
+        ";\n                int index = e.hash & (table.length - 1);\n                e.next = n"
+      ],
+      [
+        "         e.next = null;\n                size--;\n                return e.value;\n      ",
+        "         e.next = null;\n                return e.value;\n      "
+      ]
+    ],
+    "title": "哈希键契约与拉链扩容模型",
+    "placeholders": 2
+  },
+  {
+    "id": "C01-05",
+    "task": "c01/05-real-hash-map/lab",
+    "class": "HashMapRoutes",
+    "source": "src/labs/foundation/HashMapRoutes.java",
+    "alternative": "authoring/alternatives/HashMapRoutes.java",
+    "mutations": [
+      [
+        "new HashMap<>(16);\n        for (int i = 0; i < count; i++) map.put(new Key(i, (i ",
+        "new HashMap<>(16);\n        for (int i = 1; i < count; i++) map.put(new Key(i, (i "
+      ]
+    ],
+    "title": "真实HashMap扩容、树化与拆分",
+    "placeholders": 1
+  },
+  {
+    "id": "C01-06",
+    "task": "c01/06-ordered/lab",
+    "class": "OrderedQueries",
+    "source": "src/labs/foundation/OrderedQueries.java",
+    "alternative": "authoring/alternatives/OrderedQueries.java",
+    "mutations": [
+      [
+        "   .thenComparing(Order::id, Comparator.reverseOrder());\n        PriorityQueue<Order> h",
+        "   .thenComparing(Order::id, Comparator.naturalOrder());\n        PriorityQueue<Order> h"
+      ],
+      [
+        "       return heap.stream().sorted(worst.reversed()).toList();\n        // 作答结束\n    }\n\n    p",
+        "       return heap.stream().sorted(worst).toList();\n        // 作答结束\n    }\n\n    p"
+      ]
+    ],
+    "title": "TreeMap范围、堆TopK与访问顺序LRU",
+    "placeholders": 1
+  },
+  {
+    "id": "C01-07",
+    "task": "c01/07-iterators/lab",
+    "class": "ConcurrentViews",
+    "source": "src/labs/foundation/ConcurrentViews.java",
+    "alternative": "authoring/alternatives/ConcurrentViews.java",
+    "mutations": [
+      [
+        "       // 作答开始\n        counters.compute(\n                Objects.requireNonNull(key),\n                (ignored, old) -> old == null ? 1L : Math.addExact(old, 1L));\n        // 作答结束\n    }\n\n    public sta",
+        "       // 作答开始\n        counters.compute(Objects.requireNonNull(key), (ignored, old) -> 1L);\n        // 作答结束\n    }\n\n    public sta"
+      ],
+      [
+        "nNull(it.next()) < 0) {\n                it.remove();\n                removed++;\n            ",
+        "nNull(it.next()) < 0) {\n                removed++;\n            "
+      ]
+    ],
+    "title": "安全迭代、快照与并发复合操作",
+    "placeholders": 2
+  },
+  {
+    "id": "C01-08",
+    "task": "c01/08-query-project/lab",
+    "class": "IndexedOrders",
+    "source": "src/labs/foundation/IndexedOrders.java",
+    "alternative": "authoring/alternatives/IndexedOrders.java",
+    "mutations": [
+      [
+        "                .filter(o -> o.cents() >= minimum)\n                        .sorte",
+        "                .filter(o -> o.cents() > minimum)\n                        .sorte"
+      ],
+      [
+        " if (cache.size() > capacity) cache.pollFirstEntry();\n        return result;\n      ",
+        " if (cache.size() > capacity) cache.pollLastEntry();\n        return result;\n      "
+      ],
+      [
+        "        for (Order o : entry.getValue())\n                if (o.status() == Order.Status.PAID) total = Math.addExact(total, o.cents()",
+        "        for (Order o : entry.getValue()) if (true) total = Math.addExact(total, o.cents()"
+      ]
+    ],
+    "title": "索引查询、缓存与TopK综合项目",
+    "placeholders": 2
+  }
+]

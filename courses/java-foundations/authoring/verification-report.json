@@ -1,0 +1,735 @@
+{
+  "static": {
+    "tasks": 16,
+    "placeholders": 29,
+    "status": "PASS"
+  },
+  "environment": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+  "compiler": [
+    "${JAVA_HOME}/bin/javac",
+    "--release",
+    "21"
+  ],
+  "release_api_verified": true,
+  "gradle": {
+    "version": "8.10.2",
+    "author": {
+      "modules": 16,
+      "tests": 52,
+      "failures": 0,
+      "errors": 0
+    },
+    "learner": {
+      "modules": 16,
+      "tests": 52,
+      "failures": 47,
+      "errors": 0
+    },
+    "dependency_route": "仅验收使用官方工件本地仓与临时init脚本；正式build仍mavenCentral"
+  },
+  "IDEA_Academy": "NOT_RUN",
+  "cases": [
+    {
+      "task": "C00-01",
+      "case": "reference",
+      "found": 2,
+      "successful": 2,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "已付款总分=150\n测试运行JDK=21.0.12.1+1-LTS\n"
+    },
+    {
+      "task": "C00-01",
+      "case": "student",
+      "found": 2,
+      "successful": 0,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-01",
+      "case": "alternative",
+      "found": 2,
+      "successful": 2,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-01",
+      "case": "mutant-0",
+      "found": 2,
+      "successful": 1,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-02",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "银行家舍入=1.02\n订单金额=12.50\n"
+    },
+    {
+      "task": "C00-02",
+      "case": "student",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-02",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-02",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-02",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-03",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "[Order[id=A, customer=张三, cents=120, status=PAID]]\n预期错误=第2行，字段cents：必须是long范围内整数\n"
+    },
+    {
+      "task": "C00-03",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-03",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-03",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-03",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-04",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "查找=Optional[Order[id=A, customer=甲, cents=200, status=PAID]]\n汇总={甲=200}\n"
+    },
+    {
+      "task": "C00-04",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-04",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-04",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-04",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-05",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "报告：\n张三|200\n"
+    },
+    {
+      "task": "C00-05",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-05",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-05",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-06",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "半开区间=[B]\n资源关闭\n资源执行=完成\n"
+    },
+    {
+      "task": "C00-06",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-06",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-06",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-06",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-06",
+      "case": "mutant-2",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-07",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "两类字符最长窗口=3\n下界=1\n最少硬币=2\n"
+    },
+    {
+      "task": "C00-07",
+      "case": "student",
+      "found": 4,
+      "successful": 1,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-07",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-07",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-07",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 2,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-07",
+      "case": "mutant-2",
+      "found": 4,
+      "successful": 2,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-08",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "客户|总分|笔数\n张三|200|2\n"
+    },
+    {
+      "task": "C00-08",
+      "case": "student",
+      "found": 4,
+      "successful": 0,
+      "failed": 4,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-08",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C00-08",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C00-08",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-01",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "稳定去重=[A]\n排队分发=[A, A]\n"
+    },
+    {
+      "task": "C01-01",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-01",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-01",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-01",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-02",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "删除=订单A\n剩余=[订单B]，容量=2\n"
+    },
+    {
+      "task": "C01-02",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-02",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-02",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-02",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-03",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "出队=A\n窗口最大=[3, 3, 5]\n"
+    },
+    {
+      "task": "C01-03",
+      "case": "student",
+      "found": 4,
+      "successful": 0,
+      "failed": 4,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-03",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-03",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 2,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-03",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-04",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "替换旧值=1\n空键=3，数量=2\n"
+    },
+    {
+      "task": "C01-04",
+      "case": "student",
+      "found": 4,
+      "successful": 0,
+      "failed": 4,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-04",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-04",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-04",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-04",
+      "case": "mutant-2",
+      "found": 4,
+      "successful": 2,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-05",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "碰撞插入后可查询=true\n扩容后条目=60，原键仍可查=true\n"
+    },
+    {
+      "task": "C01-05",
+      "case": "student",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-05",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-05",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-06",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "最高金额=[Order[id=B, customer=乙, cents=300, status=PAID]]\n范围=[Order[id=A, customer=甲, cents=100, status=PAID]]\n"
+    },
+    {
+      "task": "C01-06",
+      "case": "student",
+      "found": 4,
+      "successful": 1,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-06",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-06",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 2,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-06",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 1,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-07",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "原子累计={A=2}\n删除=2，剩余=[2]\n"
+    },
+    {
+      "task": "C01-07",
+      "case": "student",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-07",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-07",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-07",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-08",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "查询=[Order[id=A, customer=甲, cents=120, status=PAID]]\nTop客户=[CustomerTotal[customer=乙, cents=200]]\n缓存命中=1\n"
+    },
+    {
+      "task": "C01-08",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-08",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C01-08",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-08",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C01-08",
+      "case": "mutant-2",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    }
+  ],
+  "status": "PASS",
+  "reference_source_snapshot_checked": {
+    "status": "PASS",
+    "comparisons": 96
+  },
+  "format": "PASS：GoogleJavaFormat1.24.0 AOSP四空格，最后dry-run退出0",
+  "academy_export_boundary": "NOT_RUN：本新课程官方ZIP待验收；插件剔除Wrapper行为已在每题区分路线",
+  "debug_learner_start": "三种真实错误实现，另含三份单缺陷checkpoint，均编译后失败",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "hashmap_debug": {
+    "status": "OBSERVED",
+    "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "utc": "2026-09-30T14:28:08Z",
+    "reading_reference": "OpenJDK21 GA 890adb6410dab4606a4f26a942aed02fb2f55387",
+    "boundary": "动态执行是当前补丁JDK，不冒充GA二进制",
+    "runtime": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+    "methods": [
+      "treeifyBin",
+      "resize",
+      "treeify",
+      "getTreeNode",
+      "find",
+      "split",
+      "untreeify"
+    ],
+    "runtime_src_zip_sha256": "2fb0fb7eef6330656944cdd42a3ba36ea819deab00acf958468feb002bdf11e2"
+  },
+  "JMH": {
+    "status": "SANITY_PASS",
+    "version": "1.37",
+    "cases": 6,
+    "forks": 1,
+    "warmup": "2 x 500ms",
+    "measurement": "3 x 500ms",
+    "threads": 1,
+    "boundary": "短探索性完整链路校验，绝非稳定性能评测或生产倍数结论",
+    "json_sha256": "f95195ff4f195e7949052c6bfe17ca08b22c1efdec080d74868c3f4f7cb52c29"
+  }
+}

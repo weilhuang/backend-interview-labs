@@ -1,0 +1,17 @@
+{
+  "platform": "Linux x86_64",
+  "tools": [
+    {
+      "filename": "protoc-4.29.0",
+      "url": "https://repo.maven.apache.org/maven2/com/google/protobuf/protoc/4.29.0/protoc-4.29.0-linux-x86_64.exe",
+      "sha256": "880ae950dd88a89dc70b24ef0fea3707f5f4ae9c4ba1f0aa94e5bd72045734b7",
+      "bytes": 9623664
+    },
+    {
+      "filename": "protoc-gen-grpc-java",
+      "url": "https://repo.maven.apache.org/maven2/io/grpc/protoc-gen-grpc-java/1.71.0/protoc-gen-grpc-java-1.71.0-linux-x86_64.exe",
+      "sha256": "50cf1f126c07a7b775808211087b537cc0482f79e9207e7a14110e5e3536c12f",
+      "bytes": 2523968
+    }
+  ]
+}
