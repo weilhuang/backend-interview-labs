@@ -4,12 +4,14 @@ files:
 - name: src/labs/SafeRemoval.java
   visible: true
   placeholders:
-  - offset: 157
+  - offset: 198
     length: 372
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
 - name: test/SafeRemovalTest.java
-  visible: false
+  visible: true
 - name: test/SafeRemovalExamplesTest.java
+  visible: true
+- name: src/labs/SafeRemovalUsage.java
   visible: true

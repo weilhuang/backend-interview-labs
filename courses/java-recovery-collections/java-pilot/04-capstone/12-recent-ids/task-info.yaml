@@ -4,17 +4,19 @@ files:
 - name: src/labs/RecentIds.java
   visible: true
   placeholders:
-  - offset: 401
+  - offset: 442
     length: 303
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
-  - offset: 747
+  - offset: 788
     length: 35
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
 - name: test/RecentIdsTest.java
-  visible: false
+  visible: true
 - name: test/RecentIdsExamplesTest.java
+  visible: true
+- name: src/labs/RecentIdsUsage.java
   visible: true

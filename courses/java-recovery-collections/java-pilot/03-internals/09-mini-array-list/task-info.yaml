@@ -4,17 +4,19 @@ files:
 - name: src/labs/IntVector.java
   visible: true
   placeholders:
-  - offset: 251
+  - offset: 292
     length: 150
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
-  - offset: 512
+  - offset: 553
     length: 173
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
 - name: test/IntVectorTest.java
-  visible: false
+  visible: true
 - name: test/IntVectorExamplesTest.java
+  visible: true
+- name: src/labs/IntVectorUsage.java
   visible: true

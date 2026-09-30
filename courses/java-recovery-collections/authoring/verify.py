@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Run real JUnit5: references pass, every untouched learner task and mutant fails.
+"""运行真正的JUnit5：参考解及替代正确解通过，未完成实现和错误变体失败。
 
-Uses supplied JUnit console jar; does not download dependencies. Temp copies never
-modify the author solution. A standalone JUnit test is not an Academy UI check.
+使用指定的JUnit控制台JAR，不下载依赖。临时副本不修改作者答案。
+独立JUnit测试不等于Academy界面验收。
 """
 from pathlib import Path
 import argparse, hashlib, json, re, shutil, subprocess, sys
@@ -10,8 +10,8 @@ from validate_course import ROOT, read_yaml, student_source, validate
 
 p=argparse.ArgumentParser()
 p.add_argument('--junit-console',type=Path,required=True)
-p.add_argument('--java-module-compiler',action='store_true',help='Use installed jdk.compiler via java when javac launcher is absent')
-p.add_argument('--source-target-only',action='store_true',help='Explicit limited fallback when the runtime lacks ct.sym; does NOT verify JDK17 API compatibility')
+p.add_argument('--java-module-compiler',action='store_true',help='缺少javac启动器时，使用已有jdk.compiler模块')
+p.add_argument('--source-target-only',action='store_true',help='缺少ct.sym时显式降级为source/target21；不代表--release21验证')
 args=p.parse_args()
 jar=args.junit_console.resolve()
 expected='b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc'
@@ -22,8 +22,8 @@ if work.exists():shutil.rmtree(work)
 work.mkdir(parents=True)
 manifest=json.loads((ROOT/'authoring/manifest.json').read_text())
 compiler=['java','com.sun.tools.javac.Main'] if args.java_module_compiler else ['javac']
-flags=['-source','17','-target','17'] if args.source_target_only else ['--release','17']
-report={'metadata':'passed','compiler':compiler,'compiler_flags':flags,'jdk17_api_verified':not args.source_target_only,'junit_console_sha256':expected,'gradle':'not run by this script','idea_academy':'not run','tasks':[]}
+flags=['-source','21','-target','21'] if args.source_target_only else ['--release','21']
+report={'metadata':'passed','compiler':compiler,'compiler_flags':flags,'jdk21_release_verified':not args.source_target_only,'junit_console_sha256':expected,'gradle':'not run by this script','idea_academy':'not run','tasks':[]}
 
 def run_case(name, entries, expected_pass):
     directory=work/name
@@ -55,9 +55,16 @@ def run_case(name, entries, expected_pass):
 all_entries=[]
 for item in manifest:
     task=ROOT/item['task']
-    for key in ['source','test','examples']:
+    for key in ['source','usage','test','examples']:
         all_entries.append((item['task']+'/'+item[key],(task/item[key]).read_text()))
 report['reference']=run_case('reference',all_entries,True)
+report['caller_usage']=[]
+for item in manifest:
+    result=subprocess.run(['java','-cp',str(work/'reference/classes'),'labs.'+item['class']+'Usage'],capture_output=True,text=True,timeout=10)
+    assert result.returncode==0,(item['class'],result.stderr)
+    assert result.stdout==item['usage_expected_output'],(item['class'],result.stdout)
+    report['caller_usage'].append({'class':item['class']+'Usage','status':'passed','stdout':result.stdout})
+
 for item in manifest:
     task=ROOT/item['task']; config=read_yaml(task/'task-info.yaml')
     source=(task/item['source']).read_text(); tests=(task/item['test']).read_text(); examples=(task/item['examples']).read_text()
@@ -70,7 +77,7 @@ for item in manifest:
         record['mutants'].append(run_case('mutant-'+item['class']+'-'+str(index),[(item['source'],mutated),(item['test'],tests),(item['examples'],examples)],False))
     record['alternative_correct'] = run_case('alternative-'+item['class'], [(item['source'], (ROOT/item['alternative']).read_text()), (item['test'], tests), (item['examples'], examples)], True)
     report['tasks'].append(record)
-# Deliberately nonterminating implementation must produce an actual timeout failure.
+# 故意构造死循环，必须被实际报告为超时失败。
 hash_task=next(item for item in manifest if item['class']=='HashIndex')
 loop_source=(ROOT/hash_task['task']/hash_task['source']).read_text().replace('return hash ^ (hash >>> 16);', 'while (true) { Thread.onSpinWait(); }')
 probe_test="""import labs.HashIndex;

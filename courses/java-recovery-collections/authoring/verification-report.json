@@ -6,11 +6,11 @@
   ],
   "compiler_flags": [
     "-source",
-    "17",
+    "21",
     "-target",
-    "17"
+    "21"
   ],
-  "jdk17_api_verified": false,
+  "jdk21_release_verified": false,
   "junit_console_sha256": "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc",
   "gradle": "not run by this script",
   "idea_academy": "not run",
@@ -261,6 +261,68 @@
     "successful": 65,
     "failed": 0
   },
+  "caller_usage": [
+    {
+      "class": "PaidTotalsUsage",
+      "status": "passed",
+      "stdout": "已付款总额（分）=200\n"
+    },
+    {
+      "class": "IdParserUsage",
+      "status": "passed",
+      "stdout": "解析后的 ID=[3, 1, 2]\n"
+    },
+    {
+      "class": "BoundedStackUsage",
+      "status": "passed",
+      "stdout": "查看栈顶=Optional[b]\n弹出栈顶=Optional[b]\n剩余数量=1\n"
+    },
+    {
+      "class": "StableDedupUsage",
+      "status": "passed",
+      "stdout": "去重结果=[z, a, null]\n原始列表=[z, a, null, a, z]\n"
+    },
+    {
+      "class": "TenantKeyUsage",
+      "status": "passed",
+      "stdout": "查到用户=用户甲\n条目数量=1\n"
+    },
+    {
+      "class": "TopWordsUsage",
+      "status": "passed",
+      "stdout": "词=a，次数=2\n词=b，次数=2\n"
+    },
+    {
+      "class": "SnapshotsUsage",
+      "status": "passed",
+      "stdout": "原列表=[]\n结构快照=[a, b]\n"
+    },
+    {
+      "class": "SafeRemovalUsage",
+      "status": "passed",
+      "stdout": "删除数量=3\n剩余元素=[0, 3]\n"
+    },
+    {
+      "class": "IntVectorUsage",
+      "status": "passed",
+      "stdout": "删除值=2\n首项=1\n有效元素=4\n容量=8\n"
+    },
+    {
+      "class": "HashIndexUsage",
+      "status": "passed",
+      "stdout": "扰动后=65537\n桶索引=1\n"
+    },
+    {
+      "class": "LruCacheUsage",
+      "status": "passed",
+      "stdout": "从最旧到最新=[a, c]\n读取已淘汰键=Optional.empty\n"
+    },
+    {
+      "class": "RecentIdsUsage",
+      "status": "passed",
+      "stdout": "接受结果=[true, true, false, true, true]\n最终窗口=[c, a]\n"
+    }
+  ],
   "timeout_probe": {
     "found": 1,
     "successful": 0,
@@ -272,12 +334,23 @@
   "mutants_rejected": 12,
   "checked_date_utc": "2026-09-30",
   "runtime": "OpenJDK 21.0.12.1+1-1-deb13u1-Debian",
-  "runtime_launcher": "java",
-  "compiler_note": "Installed jdk.compiler module; no javac launcher or ct.sym. Language/source and classfile target17 only. No JDK17 API compatibility validation.",
+  "compiler_note": "现有jdk.compiler模块；精简运行时缺javac启动器与ct.sym。本轮明确使用source21/target21，不将其当作--release21或真实Gradle验证。",
+  "content_visibility": {
+    "all_24_test_files_visible": true,
+    "standard_answers_in_all_12_task_descriptions": true,
+    "readme_in_additional_files": true,
+    "answer_unlock_or_collapse_required": false
+  },
   "learner_copy": {
-    "source_files": 12,
+    "implementation_files": 12,
+    "caller_files": 12,
     "todo_placeholders": 20,
-    "reference_solution_directories_copied": false,
+    "public_standard_answers": 12,
+    "all_tests_visible": true,
     "academy_course_root_or_archive": false
+  },
+  "chinese_comment_audit": {
+    "self_authored_java_comments": "passed",
+    "upstream_wrapper_and_license": "保留上游原文"
   }
 }

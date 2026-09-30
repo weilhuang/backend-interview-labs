@@ -6,7 +6,7 @@ fail-fast 只是尽力检测错误，不是并发安全保证。LinkedList 迭�
 
 ## 源码定位
 
-https://github.com/openjdk/jdk/blob/jdk-17%2B35/src/java.base/share/classes/java/util/ArrayList.java
+https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/java/util/ArrayList.java
 
 ## 关键反例
 

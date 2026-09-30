@@ -6,7 +6,7 @@ n 个 token、m 个不同词：预期 O(n+m log m) 时间，O(m) 空间。大 m 
 
 ## 源码定位
 
-https://github.com/openjdk/jdk/blob/jdk-17%2B35/src/java.base/share/classes/java/util/Comparator.java
+https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/java/util/Comparator.java
 
 ## 关键反例
 

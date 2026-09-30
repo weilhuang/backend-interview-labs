@@ -1,74 +1,132 @@
-# Java 编码恢复与集合原理 · Academy 作者课程 0.1.0
+# Java编码恢复与集合原理：内部教学模板试点
 
-本包是完整 Java 后端面试课程体系的第一批 **12 个实际可执行任务**，不是把完整范围压缩成两周。覆盖 C00 编码恢复与 C01 集合的一部分；规划中的 16 个教学单元、JUC/JVM、Spring、数据库、缓存、MQ、分布式、云与可观测性和 Go 不因本包完成而视为完成。课程规划见仓库 docs；本目录才是 Academy course root。
+## 第一步：确认依赖和版本
 
-## 先选择打开方式
+- 必需完整 JDK21：`java -version` 和 `javac -version` 均应为21。IDE项目SDK与Gradle JVM也选21
+- Gradle Wrapper8.10.2：仓库自带启动器，不需要另装Gradle。编译明确使用 `--release 21`
+- JUnit Jupiter5.11.4 / Platform1.11.4：由Gradle从Maven Central解析
+- Python3.11以上及PyYAML6.0.3：仅作者元数据、学员副本生成和质量回归脚本需要；普通Java学习不依赖Python
+- IntelliJ IDEA2026.1.5与兼容其构建版本的JetBrains Academy插件：仅Academy界面学习/导出需要。具体插件版本仍须实机确认
+- 固定源码：OpenJDK21 GA，tag `jdk-21+35`，commit `890adb6410dab4606a4f26a942aed02fb2f55387`。运行时更新补丁与GA源码不完全相同时须分别记录
 
-### A. Academy 作者模式与正式学员预览
+```sh
+java -version
+javac -version
+./gradlew --version
+./gradlew test
+./gradlew :java-pilot-01-recovery-01-money-total:run
+```
 
-1. 使用 IntelliJ IDEA 2026.1.5 与兼容该 IDE 构建的 JetBrains Academy 插件（具体插件版本必须在实际环境验收记录中确认）。
-2. 打开此目录，以作者身份打开课程。作者 src 保存参考实现，所以直接在这里跑测试应为绿色。
-3. 使用 Course Creator 的 Create Course Preview 创建学员预览。占位区应显示 TODO，并由学员填写。实机菜单名称和导出步骤以所装插件为准。
-4. **正式交付 Academy 学员包前**，必须在该精确 IDE/插件版本中完成：创建预览、逐题检查、错误代码触发失败、正确代码触发通过、导出 course archive、在干净位置重新导入。当前静态 YAML 校验和普通 Gradle 成功不能替代这一步。
+这是 **12题内部试点**，用于验证后续课程模板与教学体验，不能称为V1。V1必须完整做好并验收Java、Java框架、分布式、数据库、消息队列五块；V2包含云原生、可观测性和企业级IAM/LDAP/Keycloak；Go待排期。课程规划见仓库 `docs/curriculum`。
 
-本目录是作者源码课程，不是已验收的 Academy 学员归档。不得把普通 zip 重命名为课程归档。全部参考实现只在作者答案占位区或被排除的 authoring 目录；教师解题解析在仓库 instructor/java-pilot，位于 course root 之外。生成归档后还要检查答案是否泄漏。
+本试点只用JDK和JUnit，不启动MySQL/Redis/Kafka。后续数据库与中间件课程统一使用仓库 `infra/versions.env` 和 `scripts/lab.sh`，不在每题复制一套版本常量或环境。开发和验证在云端进行，不依赖个人Mac。
 
-### B. 不等待插件的普通 Gradle 学员副本
+## 第二步：选择学习工程
 
-云端或其他开发环境都可运行，不依赖个人 Mac：
+### Academy课程预览
+
+1. 打开本目录作为作者课程。作者src保存标准实现，所以这里直接测试应通过
+2. 在兼容插件中创建学员预览。实现区被替换为TODO，完整调用端与所有测试保持可见
+3. 每题题面直接包含完整标准答案、中文解析、ASCII示意图、面试递进问题。答案无解锁门槛，不依赖隐藏教师目录，也不假设折叠渲染可用
+4. 正式交付前仍必须验证精确IDE/插件组合、检查按钮、学员预览、导出、全新位置重新导入。静态YAML或普通Gradle通过不能替代这些步骤
+
+本目录是作者源码课程，不是已验收的Academy学员归档。普通zip不能冒充插件生成的课程归档。导出检查要确认公开答案和测试完整保留，同时TODO实现区未被意外填成标准实现；答案公开是明确的教学要求，不是需要消除的泄漏。
+
+### 普通Gradle学员副本
 
 ```sh
 python -m pip install -r authoring/requirements.txt
 python authoring/materialize_learner.py /absolute/path/to/new-java-pilot-learner
 cd /absolute/path/to/new-java-pilot-learner
-./gradlew test
+./gradlew :java-pilot-01-recovery-01-money-total:test
+./gradlew :java-pilot-01-recovery-01-money-total:run
 ```
 
-目标必须是不存在且位于作者课程目录之外的路径。副本只有 TODO 实现、题面和测试；它是 **普通 Gradle 工程**，没有 course-info.yaml，也不是 Academy importer 的输入。未完成时 test 失败是预期行为。Gradle 可能首次下载固定版本的 distribution 和 Maven Central 依赖。
+目标必须不存在且位于作者课程目录之外。副本的实现区为TODO，题面保留公开答案，调用端和全部测试可见。它没有course-info.yaml，是普通Gradle工程，不是Academy导入归档。未完成实现时测试和调用端失败属于预期行为。
 
-## 版本与编译边界
+## 完整工程结构
 
-- Java 语言与 API 基线：17；Gradle JavaCompile 使用 `--release 17`
-- 推荐完整 JDK：17 或21；Gradle/Test 实际运行在哪个 JDK 取决于 Gradle JVM / JAVA_HOME。本包没有静默下载或强制17 toolchain
-- Gradle wrapper：8.10.2；distribution SHA-256 固定。launcher JAR 来自官方课程模板，出处见 THIRD_PARTY_NOTICES.md
-- JUnit Jupiter：5.11.4；Platform：1.11.4
-- OpenJDK 阅读基线：jdk-17+35，commit dfacda488bfbe2e11e8d607a6d08527710286982
-- 现代 JDK21 专题将单独使用21基线；虚拟线程等内容没有塞进17课程里伪装兼容
+下面列出整个试点的顶层关系；每题题面另外列出该题的全部文件。所有模块都在同一个Gradle工程里，不能只复制某个Java文件后误以为拥有完整工程。
 
-为何先用17：对齐官方 Academy Java 模板的 JDK_17 环境，降低作者格式与基础 API 的变量；这不否定后续21实验，也不把本题 IntVector 当成 JDK ArrayList 完整实现。
+```text
+java-recovery-collections/
++-- README.md                     学习入口与环境说明
++-- course-info.yaml              Academy课程配置
++-- build.gradle                  JDK21、JUnit、测试与真实调用端任务
++-- settings.gradle               12个独立任务模块
++-- gradle.properties             版本与构建参数
++-- gradlew / gradlew.bat          自带构建启动器
++-- gradle/wrapper/                固定分发地址、校验和、启动器JAR
++-- THIRD_PARTY_NOTICES.md         上游出处
++-- LICENSE-JetBrains-template    保留原始许可证
++-- .courseignore                 仅排除作者检查工具与构建产物
++-- .gitignore / .gitattributes    构建忽略项与固定换行
++-- java-pilot/
+|   +-- section-info.yaml
+|   +-- 01-recovery/              编码恢复
+|   |   +-- 01-money-total/       PaidTotals
+|   |   +-- 02-parse-ids/         IdParser
+|   |   +-- 03-bounded-stack/     BoundedStack
+|   +-- 02-collections/           集合契约
+|   |   +-- 04-stable-dedup/      StableDedup
+|   |   +-- 05-map-key/           TenantKey
+|   |   +-- 06-top-words/         TopWords
+|   |   +-- 07-snapshot/          Snapshots
+|   |   +-- 08-safe-removal/      SafeRemoval
+|   +-- 03-internals/             源码伴读
+|   |   +-- 09-mini-array-list/   IntVector
+|   |   +-- 10-hash-index/        HashIndex
+|   +-- 04-capstone/              综合实验
+|       +-- 11-lru-cache/         LruCache
+|       +-- 12-recent-ids/        RecentIds
++-- authoring/                    作者质量工具，不是学员答案入口
+    +-- manifest.json            源文件/调用端/正反变体清单
+    +-- alternatives/            另一套正确实现，用于检查测试不过度限制风格
+    +-- validate_course.py       元数据、公开测试、答案、UTF-16占位检查
+    +-- verify.py                正反实现与实际调用端验证
+    +-- materialize_learner.py    生成普通Gradle练习副本
+    +-- requirements.txt         Python检查依赖
+    +-- VERIFICATION.md          验证事实与未完成门槛
+    +-- verification-report.json 机器可读结果
+```
 
-## 学习顺序与验收
+每个章节都有lesson-info.yaml；每题都有task.md、task-info.yaml、实现类、完整Usage类、完整契约Test类与ExamplesTest类。题面中的标准答案由该实现类生成，元数据检查会确保两者一致。
 
-| 章节 | 任务 | 预计实作 |
-|---|---|---:|
-| 编码恢复 | 金额累计、ID解析、泛型有界栈 | 115分钟 |
-| 集合契约 | 稳定去重、不可变Key、Top-K、快照、Iterator删除 | 220分钟 |
-| 源码伴读 | 动态数组、HashMap索引与扩容 | 120分钟 |
-| 综合实验 | LRU、近期ID去重窗口 | 125分钟 |
+## 学习流程
 
-共约9小时40分实作估计，另留复盘、源码与二次无提示重写时间。不是必须一天做完，也不是整个面试准备的总工时。
+每题遵循“读调用端与契约 → 自己实现 → 测试 → 运行真实调用端 → 改进 → 看源码机制 → 对照答案 → 面试口述”。完整测试53项加公开样例12项全部可读；不要删改契约测试来掩盖错误，可在ExamplesTest中继续增加自己的用例。
 
-每题有三阶提示、隐藏契约测试、可见 ExamplesTest、精确源码定位、实验输入及口述证据。建议：先独立写15–20分钟，按需展开一阶提示；运行单题；补边界；两分钟讲清不变量、复杂度与失败行为；隔日不看答案重写。
+- 编码恢复3题：约115分钟
+- 集合契约5题：约220分钟
+- 源码伴读2题：约120分钟
+- 综合实验2题：约125分钟
 
-## 作者测试与维护
+约9小时40分只是这12题的实作估计，源码研究、复盘及无提示重写另计，不能推导整个V1只需这些时间。两周是准备优先级约束，不是缩减完整质量或范围的许可。
+
+## 作者质量回归
 
 ```sh
 ./gradlew test
-./gradlew :java-pilot-01-recovery-01-money-total:test
 python authoring/validate_course.py
 python authoring/verify.py --junit-console /path/to/junit-platform-console-standalone-1.11.4.jar
 ```
 
-verify.py 要求完整 JDK 的 javac，默认 `--release 17`。仅当精简环境没有 javac 启动器、但已有 jdk.compiler 模块时可显式加 `--java-module-compiler`；缺少 ct.sym 时另加 `--source-target-only` 会降为语言/字节码17验证，**不验证17 API兼容**。报告会记录此限制。
+验证器默认使用完整JDK21的javac和--release21。在精简环境中可显式指定--java-module-compiler；只有缺少ct.sym时才额外用--source-target-only，并明确它只是source/target21验证，不等于完整--release21验证。报告记录实际选项，不能把配置存在当作执行成功。
 
-独立验证器运行同一套真正 JUnit5 测试：参考解通过；12个未修改学员实现全部拒绝；12个已知错误变体全部拒绝；每题另一个正确实现也应通过。它不修改作者代码，不等价于真实 Academy 检查器或 Gradle 集成测试。变体只是有限回归集，不是完整 mutation testing 分数。
+验证器要求参考解通过、12个替代正确解通过、12个未完成实现失败、12个错误变体失败，并执行12个真实调用端核对输出。另有一个故意死循环的超时检查。这是有限回归集，不是完整变异测试分数，也不形式化证明复杂度或并发安全。
 
-编辑答案代码后必须重新计算 task-info.yaml 的 UTF-16 offset/length；格式化 Java 文件也可能使偏移失效。不要只手工移动源码而忘记占位区。validate_course.py 验证层级、文件、边界、重复键与构建配置引用，但没有调用 JetBrains 的实际 YAML importer。
+编辑源文件或格式化代码会改变UTF-16占位偏移，必须同步元数据与题面标准答案。不得留下“源码已改、答案与占位区还是旧版本”的状态。
 
-## 运行超时与调试
+## 超时与调试
 
-每个 JUnit 测试以独立测试线程执行，3秒超时；Gradle 单任务另设60秒上限，防止错误循环拖住检查。独立验证脚本对子进程也设60秒上限，并实际验证一个死循环变体被报告为超时失败。依赖下载/首次构建耗时与题目执行超时分别处理。Gradle 调试连接时关闭 JUnit 超时，但默认60秒 Gradle 任务上限仍在。长时间断点调试使用 `./gradlew :java-pilot-01-recovery-01-money-total:test --debug-jvm -PdebugLab`，显式关闭任务上限；正常学习/CI不要设置该选项。若 IDE 直接运行 JUnit 调试，可设置 junit.jupiter.execution.timeout.mode=disabled_on_debug，或在调试后恢复测试超时。必要时使用 IDE Stop / Ctrl-C 结束运行。
+每项JUnit测试3秒，Gradle单任务60秒；独立验证子进程也有60秒上限。依赖下载与首次构建时间和单题执行超时分别处理。长断点调试使用：
 
-## 状态
+```sh
+./gradlew :java-pilot-01-recovery-01-money-total:test --debug-jvm -PdebugLab
+```
 
-详见 authoring/VERIFICATION.md。未通过精确版本的 IDEA 学员预览及导出/重新导入前，发布状态始终是 author-mode pilot，不能标记正式学员包完成。
+-PdebugLab显式关闭Gradle任务时限，调试连接时JUnit时限也关闭；普通学习和CI不要设置它。IDE直接运行JUnit调试可设置junit.jupiter.execution.timeout.mode=disabled_on_debug。必要时使用停止按钮或Ctrl-C。
+
+## 当前状态
+
+见authoring/VERIFICATION.md。本包始终标记为内部教学模板试点，既不代表完整V1完成，也不代表Academy学员归档已经验收。

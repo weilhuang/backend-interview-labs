@@ -1,5 +1,5 @@
 rootProject.name = 'java-recovery-collections'
-// Match Academy task directories only. Never recursively import generated previews.
+// 只识别课程任务目录，不递归导入生成的预览或验证产物。
 file('java-pilot').eachDir { lesson ->
     lesson.eachDir { task ->
         if (new File(task, 'task-info.yaml').isFile()) {

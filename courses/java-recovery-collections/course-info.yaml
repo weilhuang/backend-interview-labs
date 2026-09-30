@@ -1,13 +1,14 @@
 type: marketplace
 title: Java 后端面试实验室：编码恢复与集合
 language: Chinese
-summary: 通过十二个可检查的编码实验恢复 Java 手感，理解集合契约，结合 OpenJDK17 固定版本源码和面试表达。此为完整课程体系的首个试运行模块。
+summary: Java后端完整V1中的内部教学模板试点，仅含十二题。使用JDK21，在IDE内编写、调用和验证集合代码；所有测试与标准答案公开，配中文原理图和面试追问。完整V1尚须覆盖并验收Java、Java框架、分布式、数据库、消息队列五块。
 programming_language: Java
 content:
 - java-pilot
 environment_settings:
-  jvm_language_level: JDK_17
+  jvm_language_level: JDK_21
 additional_files:
+- name: README.md
 - name: build.gradle
 - name: settings.gradle
 - name: gradle.properties

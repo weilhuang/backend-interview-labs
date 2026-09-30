@@ -1,4 +1,4 @@
-name: Java Academy pilot checks
+name: Java课程内部试点检查
 on:
   push:
     paths:
@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: ['17', '21']
+        java: ['21']
     defaults:
       run:
         working-directory: courses/java-recovery-collections
@@ -29,24 +29,24 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Record actual tool versions
+      - name: 记录实际工具版本
         run: |
           java -version
           javac -version
           ./gradlew --version
-      - name: Install metadata checker
+      - name: 安装元数据检查依赖
         run: python -m pip install -r authoring/requirements.txt
-      - name: Check author metadata
+      - name: 检查作者课程元数据
         run: python authoring/validate_course.py
-      - name: Run real Gradle JUnit tests with release 17
+      - name: 使用release21运行真实Gradle测试
         run: ./gradlew --no-daemon test
-      - name: Fetch pinned JUnit console for negative/alternate checks
+      - name: 取得固定版本JUnit控制台用于正反实现回归
         run: |
           curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$RUNNER_TEMP/junit-console.jar"
           echo "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc  $RUNNER_TEMP/junit-console.jar" | sha256sum --check
-      - name: Check all learner stubs, mutants and alternate correct solutions
+      - name: 检查未完成实现、错误变体、替代正确解与完整调用端
         run: python authoring/verify.py --junit-console "$RUNNER_TEMP/junit-console.jar"
-      - name: Retain reports
+      - name: 保留验证报告
         if: always()
         uses: actions/upload-artifact@v4
         with:

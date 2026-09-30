@@ -2,11 +2,11 @@
 
 参考实现位于作者模式任务的 src，占位区由 Academy 预览/导出时替换。请先练习再看。
 
-证明 n 次追加总搬运 1+2+4+…<2n，因此均摊 O(1)，单次扩容 O(n)。本题故意 2 倍；OpenJDK17 ArrayList 的首个默认容量及约 1.5 倍增长策略不同，不能将教学实现当作 JDK 源码。
+证明 n 次追加总搬运 1+2+4+…<2n，因此均摊 O(1)，单次扩容 O(n)。本题故意 2 倍；OpenJDK21 ArrayList 的首个默认容量及约 1.5 倍增长策略不同，不能将教学实现当作 JDK 源码。
 
 ## 源码定位
 
-https://github.com/openjdk/jdk/blob/jdk-17%2B35/src/java.base/share/classes/java/util/ArrayList.java
+https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/java/util/ArrayList.java
 
 ## 关键反例
 

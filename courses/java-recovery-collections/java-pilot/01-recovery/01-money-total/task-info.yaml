@@ -4,12 +4,14 @@ files:
 - name: src/labs/PaidTotals.java
   visible: true
   placeholders:
-  - offset: 280
+  - offset: 321
     length: 430
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
 - name: test/PaidTotalsTest.java
-  visible: false
+  visible: true
 - name: test/PaidTotalsExamplesTest.java
+  visible: true
+- name: src/labs/PaidTotalsUsage.java
   visible: true

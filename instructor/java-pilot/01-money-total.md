@@ -6,7 +6,7 @@
 
 ## 源码定位
 
-https://github.com/openjdk/jdk/blob/jdk-17%2B35/src/java.base/share/classes/java/lang/Math.java
+https://github.com/openjdk/jdk/blob/jdk-21%2B35/src/java.base/share/classes/java/lang/Math.java
 
 ## 关键反例
 

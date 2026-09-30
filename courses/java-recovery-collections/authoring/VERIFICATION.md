@@ -1,34 +1,37 @@
-# Pilot verification record
+# 内部教学模板试点验证记录
 
-Checked 2026-09-30 in the dot cloud filesystem. This record is intentionally separated from future CI and Academy UI evidence.
+日期：2026-09-30。本轮已经统一JDK21，12题只是完整V1的内部教学模板试点，不能代表V1完成。早期17源级结果不计入这次21基线验收。
 
-## Actually executed and passed
+## 本轮实际执行并通过
 
-- 12 author tasks, 4 lessons, 20 UTF-16 answer placeholder spans: YAML hierarchy, referenced files, duplicate-key detection, visibility conventions, placeholder ranges and allowed fields, pinned wrapper checksum
-- Real OpenJDK javac compiler module: Java source17 / bytecode17, UTF-8, JUnit Platform Console 1.11.4
-- 65/65 JUnit tests passed against reference implementations (53 hidden contract tests plus 12 visible examples)
-- Every one of 12 untouched student implementations compiled and failed tests as expected; all TODO regions were materialized from metadata
-- Every one of 12 deliberately incorrect variants compiled and was rejected by the tests
-- 12 independently varied correct implementations passed those same tests (including alternative dedup, snapshot, comparator, eviction and array-shift approaches)
-- Deliberate nonterminating HashIndex implementation: real JUnit TimeoutException after 250ms; process exited with one failed test rather than hanging
-- Plain learner copy materialized outside author root: 12 Java implementation files, 20 TODO bodies, no authoring/instructor directories, no course-info.yaml. This is a plain Gradle exercise copy, not an Academy archive
-- Python scripts compile; Gradle wrapper binary SHA-256 matches the pinned official template artifact
+- 12题、4章、20个UTF-16占位区：层级、重复YAML键、所有文件引用、可见性、占位范围和固定Wrapper校验和通过
+- 课程YAML为JDK_21，Gradle为--release21，版本配置为21，CI必需矩阵为21
+- 现有OpenJDK21编译器模块以-source21、-target21、UTF-8编译；JUnit Platform控制台1.11.4真正执行
+- 65/65测试通过：53项完整契约测试与12项使用样例，24份测试文件全部在课程中可见
+- 12份完整main调用端实际运行，逐个核对中文输出，与题面预期一致
+- 12个尚未填写的学员实现全部能编译，且都被测试拒绝
+- 12个已知错误变体全部能编译，且都被测试拒绝
+- 每题一份不同写法的正确实现，共12份，全部通过同样测试
+- 故意不终止的HashIndex实现被JUnit报告为250ms超时失败，进程正常退出，没有无限等待
+- 普通学员副本生成：12份TODO实现、12份完整调用端、20处TODO、全部可见测试、12份公开标准答案完整保留、README保留；副本48份Java文件整体编译通过
+- 题面完整标准答案与实现源码逐字核对；完整调用端与题面代码逐字核对；Markdown围栏配对、三阶提示、标准答案区均存在
+- 自编教学Java注释中文检查通过。第三方Wrapper和许可证保留原始语言与版权文本
 
-Machine-readable counts and compiler flags: verification-report.json. Reproduction: see ../README.md. Full ephemeral compile/test logs reside under build/verification after the script runs; they are not part of the learner course or repository deliverable.
+机器可读结果见verification-report.json。复现命令见课程根README。完整临时日志位于运行后生成的build/verification，不作为学员课程文件提交。
 
-## Limits and not-yet-run gates
+## 必须明确的验证边界
 
-- Cloud runtime: OpenJDK 21.0.12.1+1-1-deb13u1-Debian. It has the jdk.compiler module but lacks the javac launcher and ct.sym. `--release 17` fails in this stripped runtime. Therefore checks explicitly used `-source 17 -target 17`; they do **not** establish JDK17 API compatibility
-- Real Gradle wrapper build/test was not run during this record. CI is configured to run real Gradle and `--release 17` on full Temurin17 and21, but a configured workflow is not proof of a successful CI run
-- IntelliJ IDEA 2026.1.5 / matching Academy plugin import, Check button, course preview, archive export, clean re-import and answer-leak audit have not been run
-- No claim of release-ready Academy learner archive. Source tree and ordinary zip are not interchangeable with a validated plugin-generated archive
-- Behavior tests do not formally prove big-O complexity, constant-time operations, security, or concurrency safety. Current tasks are single-threaded; manual source/rubric review covers these distinctions
-- Negative variants are a finite regression suite, not a comprehensive mutation-score measurement
+当前运行时为OpenJDK21.0.12.1+1-1-deb13u1-Debian。它包含jdk.compiler模块，但缺少javac启动器和ct.sym；实际尝试--release21得到“release version 21 not supported”。因此上面的21验证明确使用source/target21，不能冒充完整--release21检查。
 
-## Before calling this a learner release
+本记录没有执行真实Gradle Wrapper测试，也没有执行IntelliJ IDEA2026.1.5及对应Academy插件的导入、检查按钮、预览、导出和重新导入。CI已配置为完整Temurin21加真实Gradle和--release21，但“配置好”不是“已经跑过”。新的CI提交结果应另行记录。
 
-1. On a full JDK, run wrapper tests and verifier without source-target fallback; retain exact vendor/patch, Gradle output and CI commit
-2. In the exact target IDE/plugin pair, confirm all12 tasks appear in order and all20 answer placeholders appear correctly
-3. In learner preview, verify an empty solution fails, an intentional wrong solution fails, a corrected solution passes, and visible example tests can be edited/run
-4. Export using Academy, inspect learner contents for unintended author/answer files, and re-import the actual archive into a fresh location
-5. Record plugin version and screenshots for the above; only then label the learner archive validated
+行为测试不形式化证明复杂度、并发安全或生产可用性。有限错误变体只验证已知回归风险，不是全面的变异测试分数。当前集合任务明确为单线程练习。
+
+## 正式验收前还要做
+
+1. 在完整JDK21中执行真实Wrapper和不带降级参数的验证脚本，记录供应商、补丁版本、Gradle输出与提交编号
+2. 在精确IDE/插件组合中确认12题顺序、20处占位区、完整调用端与全部测试可见
+3. 确认三阶提示、ASCII图、公开完整答案、原理讲解和面试追问可读；公开答案不应被导出规则删除
+4. 检查空实现失败、错误实现失败、正确实现成功，并能运行每题的完整调用端
+5. 使用插件导出实际课程归档，在新位置重新导入，确认实现起点仍为TODO，而题面标准答案仍公开可读
+6. 为完整V1的Java、Java框架、分布式、数据库、消息队列五块分别完成课程与验收；不得用本试点替代整体完成门槛

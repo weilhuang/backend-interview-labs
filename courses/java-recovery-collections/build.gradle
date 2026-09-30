@@ -20,7 +20,7 @@ subprojects {
     }
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
-        options.release = 17
+        options.release = 21
     }
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
@@ -28,10 +28,10 @@ subprojects {
         systemProperty 'junit.jupiter.execution.timeout.mode', 'disabled_on_debug'
         outputs.upToDateWhen { false }
         testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
-        // Protocol used by the official JetBrains Academy Java template.
+        // 遵循官方 Academy Java 模板的检查失败输出协议。
         afterTest { descriptor, result ->
             if (result.resultType == TestResult.ResultType.FAILURE) {
-                String message = result.exception?.message ?: 'Wrong answer'
+                String message = result.exception?.message ?: '答案不符合要求'
                 def lines = message.split('\n', -1)
                 println "#educational_plugin FAILED + ${lines[0]}"
                 lines.drop(1).each { println "#educational_plugin${it}" }
@@ -39,8 +39,14 @@ subprojects {
             }
         }
     }
-    // Template-compatible no-op: these tasks are checked through JUnit, not main().
-    tasks.register('run') { group = 'application' }
+    // 每题提供真正可运行的调用端，便于在测试之外理解API的使用方式。
+    tasks.register('run', JavaExec) {
+        group = 'application'
+        description = '运行本题完整调用示例'
+        dependsOn tasks.named('classes')
+        classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'labs.' + fileTree('src/labs').matching { include '*Usage.java' }.singleFile.name.replace('.java', '')
+    }
 }
 tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
 tasks.named('check') { dependsOn tasks.named('test') }

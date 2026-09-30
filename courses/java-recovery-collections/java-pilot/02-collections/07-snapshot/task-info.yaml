@@ -4,12 +4,14 @@ files:
 - name: src/labs/Snapshots.java
   visible: true
   placeholders:
-  - offset: 163
+  - offset: 204
     length: 159
-    placeholder_text: '        throw new UnsupportedOperationException("TODO: implement this method");
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
 
       '
 - name: test/SnapshotsTest.java
-  visible: false
+  visible: true
 - name: test/SnapshotsExamplesTest.java
+  visible: true
+- name: src/labs/SnapshotsUsage.java
   visible: true
