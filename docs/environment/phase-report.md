@@ -1,12 +1,12 @@
 # 阶段报告：共享 Docker 实验环境基础
 
-日期：2026-09-30。范围：共享基础环境、命令入口、版本同源、CI 验收准备；不包含尚未实现的后端项目课程或前端页面。
+日期：2026-09-30。范围：共享基础环境、命令入口、版本同源、CI 基础验收；不包含尚未实现的后端项目课程或前端页面。
 
 ## 一、这一阶段完成了什么
 
 交付了最小可用的环境基础代码：MySQL + Redis 默认组合、可选单节点 Kafka、一次性完整 JDK21 构建容器，以及统一版本读取。目标是让不同课程共用同一组镜像，并让低磁盘/低性能学习设备只启动眼前需要的组件。
 
-当前可确认的是**代码与离线测试完成**。当前云端没有 Docker CLI/daemon，因此真实拉取与运行结果仍待云端 CI 验收，不能把配置交付等同于完整运行成功。
+当前已完成**代码、离线测试及 Linux amd64 云端 CI 基础验收**。制作环境本身无 Docker，但独立 GitHub Actions runner 已运行真实 MySQL/Redis/Kafka 与 JDK21 构建；Mac/arm64、宿主应用及 Testcontainers 项目集成仍需后续验收。
 
 ## 二、结构与职责
 
@@ -71,12 +71,12 @@ Compose 与未来 Testcontainers 都读取 `infra/versions.env`，避免多个�
 | 静态环境校验 | 通过 | 固定镜像、回环端口、健康/资源边界，无特权/socket |
 | Bash/Python 语法 | 通过 | 不代表 macOS 或容器运行已验证 |
 | Java 共享版本读取器 | 完整 JDK21.0.12.1+1 实际编译与读取通过 | 仓库根/课程子目录都能读取；未知键/缺失台账会失败，不是容器集成测试 |
-| CI YAML 解析 | 通过 | workflow 文件可解析，尚未触发实际 run |
+| 云端 CI | 通过 | run 36708893556；实际 Engine28.0.4/Compose2.38.2、Linux x86_64 |
 | 当前云 Docker doctor | 失败，缺 CLI | 明确阻塞；未擅自安装 daemon |
-| Compose 真实解析/拉取/启动 | 未执行 | 等待可用云端 CI |
-| 真实 MySQL/Redis 读写与持久化 | 未执行 | CI 已准备写入→读取→down/up→再读取 |
-| 真实 Kafka 收发 | 未执行 | CI 已准备建主题→发送→读取并比对内容 |
-| JDK21 镜像内 Gradle 构建 | 未执行 | CI 已准备，不能借用宿主测试结果声称容器成功 |
+| Compose 真实解析/拉取/启动 | 通过 | 精确提交的云端 CI |
+| 真实 MySQL/Redis 读写与持久化 | 通过 | 写入→读取→down/up→再读取均成功 |
+| 真实 Kafka 收发 | 通过 | 建主题→发送→读取并比对内容成功 |
+| JDK21 镜像内 Gradle 构建 | 通过 | 真实容器内 BUILD SUCCESSFUL |
 | Testcontainers 与 Mac 双架构 | 未执行 | 上游架构证据不代替实测 |
 
 本地无 Docker 的复核命令：
@@ -99,7 +99,7 @@ python3 -m py_compile scripts/lab.py scripts/ci_smoke.py scripts/tests/*.py
 5. 记录实际 Engine/Compose/镜像/CPU 架构；失败需要修复后重跑，拉取失败不能算代码通过
 6. CI 无论成功失败均保留脱敏日志；只清理由本次运行号限定的一次性项目，不删除学习者已有卷
 
-真实 CI 完成后，在 [验证记录](verification.md) 补提交 SHA、run URL、每一步结果。当前尚无运行链接。
+[本次真实 CI 运行](https://github.com/weilhuang/backend-interview-labs/actions/runs/36708893556) 对应提交 `a57a95b67a0d29cd280a54d3f761c340b9cad0d4`；精确平台、时间和仍未覆盖项目见[验证记录](verification.md)。
 
 ## 六、建议重点 Review
 

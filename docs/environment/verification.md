@@ -19,23 +19,25 @@
 
 `infra/compose.yaml` 使用 JSON 语法（JSON 是 YAML 的子集），因此离线标准库可完整读取对象并检查上述约束。这不替代 Docker Compose 自己的 schema 解析。
 
-## 已准备但尚未运行的云端 CI
+## 已完成的真实云端 CI
 
-[共享环境 workflow](../../.github/workflows/lab-environment.yml) 在独立 Ubuntu 24.04 GitHub runner 上依次执行 core 读写、停止/重启持久化、Kafka 收发、完整 JDK21/首包 Gradle 构建；最后仅清理 `backend-interview-labs-ci-运行号-重试号` 的临时卷，并上传脱敏日志。
+- 提交：`a57a95b67a0d29cd280a54d3f761c340b9cad0d4`（PR 合并预览提交 `e0ff210f4977ef93aaadef74dccd59172368bc2c`，并未实际合并 main）
+- [实际运行记录](https://github.com/weilhuang/backend-interview-labs/actions/runs/36708893556)，job `109865674586`，全部步骤成功，父任务已读取日志核对
+- 实测平台：Ubuntu 24.04.5 / Linux x86_64；Docker Engine 28.0.4、Compose 2.38.2；2 CPU / 7.8 GiB
+- 2026-09-30 UTC：11:30:41 MySQL/Redis 真实读写通过；11:30:49 停止/重启后持久化通过；11:31:18 Kafka 建主题、发送、消费内容比对通过；11:32:03 完整 JDK21 镜像内 Gradle `BUILD SUCCESSFUL`
+- Compose 解析、镜像拉取、健康检查、独立 CI 项目清理、脱敏日志上传均已执行成功
 
-`scripts/ci_smoke.py` 只接受 `CI=true` 且精确格式的独立项目，防止误写学习者已有数据库。这个 workflow 已做 YAML 解析检查，**还没有实际 GitHub run / job URL，不能宣称 CI 已通过**。部署授权与推送由仓库主任务统一处理；一旦真实运行，需在此补充提交 SHA、run URL、各阶段结果和平台。
+云端制作容器本身仍无 Docker CLI；上面的结果来自独立 GitHub Actions runner，不能把两者混同。`scripts/ci_smoke.py` 只接受 `CI=true` 且精确格式的临时项目，避免误写学习者数据库。
 
-## 未执行，不能标为通过
+## 未执行或未充分覆盖，不能标为通过
 
-- Docker Compose 真实 `config`、镜像拉取和 registry manifest digest 校验
-- MySQL/Redis/Kafka 的真实启动、卷权限、健康检查、宿主连接、持久化读写和消息收发
-- `up/down/up` 数据保留，异常退出后的恢复，临时项目 reset 范围的真实验收
-- JDK21 构建镜像中的首包 Gradle 任务与输出文件所有权
-- Testcontainers 运行；`LabImages.java` 已用云宿主 JDK21 编译并验证读取，但尚未接入真实容器项目课
-- Mac Intel/Apple Silicon 的 Docker Desktop 与 Bash3.2 实测，实际内存/磁盘峰值
+- 全部镜像的多架构 registry index digest 锁定：本轮有实际 amd64 拉取和运行，但未独立完成每个 arm64 manifest 审核
+- 宿主应用通过发布端口连接、所有实际课程的 Testcontainers 集成；本轮读写 smoke 使用容器内客户端
+- 故障注入、异常终止后的数据恢复和更完整的卷权限/输出所有权矩阵
+- Mac Intel/Apple Silicon Docker Desktop、Bash3.2 实测和实际资源峰值
 - 前端/业务项目课 UI 验收；当前 Java 基础课无 Web 前端
 
-待获准可用 Docker 环境后，按 [运行契约的验收清单](runtime-contract.md#4-发布前必须完成的实机验收) 逐项补证据，不为通过测试静默安装 daemon、挂 socket、改权限或清理卷。
+按[运行契约](runtime-contract.md#4-发布前必须完成的实机验收)继续补齐，不把当前基础 smoke 视为所有课程集成成功。
 
 ## 镜像固定基线与官方证据
 
@@ -43,10 +45,10 @@
 
 | 键 | 已核对的官方发布内容 | 架构证据与限制 |
 | --- | --- | --- |
-| `MYSQL_IMAGE` | [Docker Official MySQL 8.4 标签列表](https://hub.docker.com/_/mysql/tags?name=8.4) 中存在选定完整补丁标签 | 上游标签页列出 amd64、arm64/v8；本次未执行 registry manifest/pull |
-| `REDIS_IMAGE` | [Docker Official Redis 镜像层页面](https://hub.docker.com/layers/library/redis/7.4.7-alpine3.21/) 显示选定完整补丁与 Alpine 标签 | 官方页面标为 multi-platform；本次没有验证该具体标签在本机的 amd64/arm64 拉取，按待验收处理 |
+| `MYSQL_IMAGE` | [Docker Official MySQL 8.4 标签列表](https://hub.docker.com/_/mysql/tags?name=8.4) 中存在选定完整补丁标签 | 上游标签页列出 amd64、arm64/v8；已在 CI 实际 amd64 拉取运行；arm64 与完整 registry index 审核待验收 |
+| `REDIS_IMAGE` | [Docker Official Redis 镜像层页面](https://hub.docker.com/layers/library/redis/7.4.7-alpine3.21/) 显示选定完整补丁与 Alpine 标签 | 官方页面标为 multi-platform；已在 CI 验证 amd64 拉取运行；arm64 实测仍待验收 |
 | `KAFKA_IMAGE` | [Apache Kafka 3.9 Docker 指南](https://kafka.apache.org/39/getting-started/docker/) 明确给出选定官方 JVM 镜像 | [该标签 arm64 镜像页面](https://hub.docker.com/layers/apache/kafka/3.9.1/images/sha256-39bc3b30084ad6ab33ad2c9a525f15c942bf097b18cb2a1825afa6df3411f8b5) 有 ARM 证据；双架构实际运行待验证 |
-| `JAVA_BUILD_IMAGE` | [官方 Maven amd64 页面](https://hub.docker.com/layers/library/maven/3.9.11-eclipse-temurin-21/images/sha256-463a1849665463254b2dd56e3a5b316f1596bc93d0571065c06ea05bb48ab8f4) 与 [arm64 页面](https://hub.docker.com/layers/library/maven/3.9.11-eclipse-temurin-21/images/sha256-d1d89ba5f782ba5dd52272e7da5aed592abb192dff6435523b852ffab3ee8484) | 两页显示同一多架构 index digest，已写入台账；不是把某一个 CPU 的单架构 manifest 当作共用摘要。尚未实际拉取 |
+| `JAVA_BUILD_IMAGE` | [官方 Maven amd64 页面](https://hub.docker.com/layers/library/maven/3.9.11-eclipse-temurin-21/images/sha256-463a1849665463254b2dd56e3a5b316f1596bc93d0571065c06ea05bb48ab8f4) 与 [arm64 页面](https://hub.docker.com/layers/library/maven/3.9.11-eclipse-temurin-21/images/sha256-d1d89ba5f782ba5dd52272e7da5aed592abb192dff6435523b852ffab3ee8484) | 两页显示同一多架构 index digest，已写入台账；不是把某一个 CPU 的单架构 manifest 当作共用摘要。已在 CI 实际 amd64 拉取并完成 JDK21/Gradle 构建 |
 
 这是官方已发布的**教学复现基线**，不是“当前最新”“无漏洞”或“所有补丁仍在维护”的保证。Kafka 3.9 文档本身标为旧版。镜像里基础 OS/JDK 的安全更新与业务主版本支持期必须分别核查；不得拿教学环境直接部署生产。没有使用 `latest`、`8.4`、`7-alpine` 等浮动标签。
 

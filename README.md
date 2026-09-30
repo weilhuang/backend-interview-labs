@@ -35,3 +35,11 @@
 ## 分版范围
 
 V1 必须完成 Java、Java 框架、分布式、数据库与缓存、消息队列，包含必要前端及 Docker 支撑环境。当前 12 题只是内部试点，不代表 V1 完成。V2 为云原生、可观测和 IAM/LDAP/Keycloak 等企业身份工程；Go 单列待排期。
+
+## 阶段报告
+
+- [Java 编码恢复与集合：结构、逐题内容和验证证据](courses/java-recovery-collections/阶段报告.md)
+- [共享 Docker 环境：设计、使用示例与实际 CI 结果](docs/environment/phase-report.md)
+- [V1 / V2 发布验收矩阵](docs/curriculum/08-release-plan.md)
+
+报告中的完成范围与整个 V1 分开；每个较大模块会随代码提交独立报告，供逐步评审。
