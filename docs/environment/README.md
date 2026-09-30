@@ -1,6 +1,6 @@
 # 共享实验环境：按需启动，不重复下载整套中间件
 
-> 状态：基础 MySQL/Redis/Kafka 与 JDK21 构建已有 Linux amd64 云端 CI 证据；新增 RocketMQ 首次云端 CI 已通过宿主 gRPC 收发与新卷可写检查，重启断言失败；修复后的完整 CI 待重跑。制作容器本身没有 Docker，不使用个人 Mac。详细证据见 [验证记录](verification.md)，不能把旧组件的通过结果外推到 RocketMQ。
+> 状态：[完整共享环境 CI 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 已在 Linux amd64 实际通过 MySQL/Redis 读写与重启持久化、Kafka 收发、RocketMQ 宿主 gRPC 收发与 down/up 原消息读取，以及共享 JDK21 构建。制作容器本身没有 Docker，不使用个人 Mac；Mac/arm64 与资源峰值仍未实测。详细时间、提交及历史失败见 [验证记录](verification.md)。
 
 课程制作、构建和验收在云端进行，不使用个人 Mac 的磁盘与计算资源。将来在 Mac 学习时可用同一入口，只开当前章节需要的服务。如果磁盘紧张，Java 基础题可以只用 IDEA + JDK 21，不必启动中间件。
 
@@ -11,7 +11,7 @@
 | Python | 3.9+，仅标准库 | 3.12.14，脚本与测试通过 |
 | Bash | 3.2+，只作入口 | 5.2.37，语法检查通过；Mac 自带 3.2 待验证 |
 | Docker | Linux 容器，Engine 28.0+ | 制作容器未安装；基础 CI 实测 Engine 28.0.4 |
-| Compose | 插件 v2.20.0+，不支持 v1 | 基础 CI 实测 2.38.2；新增 RocketMQ 待重跑 |
+| Compose | 插件 v2.20.0+，不支持 v1 | 完整共享 CI 实测 2.38.2，含 RocketMQ |
 | macOS/Docker Desktop | 使用 [Docker 官方当前支持的 macOS 与芯片版本](https://docs.docker.com/desktop/setup/install/mac-install/) | 未占用个人 Mac；Intel/Apple Silicon 均待实测 |
 | Java | 完整 JDK **21**，构建镜像由台账锁定 | 云宿主完整 JDK21 验证读取器/新探针编译；基础 CI 已验证共享构建容器 |
 | Gradle/Maven | Gradle 用各课已锁定 Wrapper；Maven 用共享镜像 | 首包使用 Gradle Wrapper；此环境入口未代替课程测试 |

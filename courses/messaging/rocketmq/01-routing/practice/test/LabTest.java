@@ -123,4 +123,42 @@ class LabTest {
         assertTrue(RocketRuntime.tail("old".repeat(100) + "ROOT_CAUSE", 20).endsWith("ROOT_CAUSE"));
         assertTrue(RocketRuntime.tail("old".repeat(100) + "ROOT_CAUSE", 20).length() < 50);
     }
+
+    @Test
+    void 就绪必须收到真实协议及正确映射路由() {
+        var empty = java.util.Set.<String>of();
+        var correct = java.util.Set.of("localhost:32771");
+        assertFalse(
+                RocketRuntime.protocolReady(apache.rocketmq.v2.Code.OK, empty, "localhost:32771"));
+        assertFalse(
+                RocketRuntime.protocolReady(
+                        apache.rocketmq.v2.Code.TOPIC_NOT_FOUND, empty, "localhost:32771"));
+        assertTrue(
+                RocketRuntime.protocolReady(
+                        apache.rocketmq.v2.Code.OK, correct, "localhost:32771"));
+        assertThrows(
+                IllegalStateException.class,
+                () ->
+                        RocketRuntime.protocolReady(
+                                apache.rocketmq.v2.Code.OK,
+                                java.util.Set.of("127.0.0.1:8081"),
+                                "localhost:32771"));
+        assertThrows(
+                IllegalStateException.class,
+                () ->
+                        RocketRuntime.protocolReady(
+                                apache.rocketmq.v2.Code.UNAUTHORIZED, empty, "localhost:32771"));
+        assertTrue(
+                RocketRuntime.transientReadinessFailure(
+                        org.apache.rocketmq.shaded.io.grpc.Status.Code.UNAVAILABLE));
+        assertTrue(
+                RocketRuntime.transientReadinessFailure(
+                        org.apache.rocketmq.shaded.io.grpc.Status.Code.DEADLINE_EXCEEDED));
+        assertFalse(
+                RocketRuntime.transientReadinessFailure(
+                        org.apache.rocketmq.shaded.io.grpc.Status.Code.UNAUTHENTICATED));
+        assertFalse(
+                RocketRuntime.transientReadinessFailure(
+                        org.apache.rocketmq.shaded.io.grpc.Status.Code.INVALID_ARGUMENT));
+    }
 }

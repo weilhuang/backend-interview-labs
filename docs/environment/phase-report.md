@@ -6,7 +6,7 @@
 
 交付了最小可用的环境基础代码：MySQL + Redis 默认组合、可选单节点 Kafka、可选 RocketMQ 三进程开发容器、一次性完整 JDK21 构建容器，以及统一版本读取。目标是让不同课程共用同一组镜像，并让低磁盘/低性能学习设备只启动眼前需要的组件。
 
-当前已完成**代码、离线测试及 Linux amd64 云端 CI 基础验收**。制作环境本身无 Docker，但独立 GitHub Actions runner 已运行真实 MySQL/Redis/Kafka 与 JDK21 构建；新增 RocketMQ Compose、Mac/arm64 的本次真实验收仍待执行；不能将基础组件既有 CI 结果当作新增服务已通过。
+当前已完成**代码、91 项离线回归及 Linux amd64 云端 CI 共享环境验收**。[运行 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 已实际覆盖 MySQL/Redis 读写与重启持久化、Kafka 收发、RocketMQ 宿主 SDK5 gRPC 收发与原消息重启读取，以及共享 JDK21 构建。制作容器本身仍无 Docker；Mac/arm64、故障注入和实际资源峰值未实测。
 
 ## 二、结构与职责
 
@@ -77,14 +77,14 @@ Compose 与未来 Testcontainers 都读取 `infra/versions.env`，避免多个�
 | 静态环境校验 | 通过 | 固定镜像、回环端口、健康/资源边界，无特权/socket |
 | Bash/Python 语法 | 通过 | 不代表 macOS 或容器运行已验证 |
 | Java 共享版本读取器 | 完整 JDK21.0.12.1+1 实际编译与读取通过 | 仓库根/课程子目录都能读取；未知键/缺失台账会失败，不是容器集成测试 |
-| 云端 CI | 通过 | run 36708893556；实际 Engine28.0.4/Compose2.38.2、Linux x86_64 |
+| 云端 CI | 通过 | run 36738093788 / job109964985567；实际 Engine28.0.4/Compose2.38.2、Linux x86_64 |
 | 当前云 Docker doctor | 失败，缺 CLI | 明确阻塞；未擅自安装 daemon |
 | Compose 真实解析/拉取/启动 | 通过 | 精确提交的云端 CI |
 | 真实 MySQL/Redis 读写与持久化 | 通过 | 写入→读取→down/up→再读取均成功 |
 | 真实 Kafka 收发 | 通过 | 建主题→发送→读取并比对内容成功 |
-| JDK21 镜像内 Gradle 构建 | 通过 | 真实容器内 BUILD SUCCESSFUL |
-| RocketMQ 新共享 Compose / SDK5 收发与重启持久化 | 首次宿主收发通过，重启断言失败；修复待重跑 | run36735424768；独立 durable 主题与启动屏障修复不能提前记为通过 |
-| Testcontainers 与 Mac 双架构 | 未执行 | 上游架构证据不代替实测 |
+| JDK21 镜像内 Gradle 构建 | 通过 | javac21.0.9 / Maven3.9.11；12 个报告共 65 项测试，0 失败/跳过 |
+| RocketMQ 共享 Compose / SDK5 收发与重启持久化 | 修复后完整通过 | 15:40:20 宿主收发；15:41:20 down/up 原 durable 消息读取与 ACK；无补发 |
+| 各课程 Testcontainers 与 Mac 双架构 | 不在此共享 CI 证明范围内 | 课程测试另见各模块报告；Mac Intel/Apple Silicon 均未实测 |
 
 本地无 Docker 的复核命令：
 
@@ -108,7 +108,7 @@ python3 -m py_compile scripts/lab.py scripts/ci_smoke.py scripts/tests/*.py
 6. 记录实际 Engine/Compose/镜像/CPU 架构；失败需要修复后重跑，拉取失败不能算代码通过
 7. CI 无论成功失败均保留脱敏日志；只清理由本次运行号限定的一次性项目，不删除学习者已有卷
 
-[本次真实 CI 运行](https://github.com/weilhuang/backend-interview-labs/actions/runs/36708893556) 对应提交 `a57a95b67a0d29cd280a54d3f761c340b9cad0d4`；精确平台、时间和仍未覆盖项目见[验证记录](verification.md)。
+[本次完整共享 CI](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 对应分支提交 `70af2cd8b6bca72c9ae8bff4753dc84ca91c6360`（PR 合并预览 `3bcf69d3c69fbdd11ba387d54ecdf77c89874162`）。原始 artifact `11107863219` 已核对 ZIP 摘要及组件日志/12 个测试报告；首次 RocketMQ 重启断言失败的历史、修复与本轮精确时间均见[验证记录](verification.md)。
 
 ## 六、建议重点 Review
 

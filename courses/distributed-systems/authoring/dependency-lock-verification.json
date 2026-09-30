@@ -18,7 +18,7 @@
     "failures": 0,
     "errors": 0,
     "skipped": 0,
-    "integration": "全部真实集成源码编译和编译/运行类路径锁解析通过；Docker执行仍待CI"
+    "integration": "本机阶段仅编译；后续成功GitHub CI实际运行9项Docker集成，0失败/错误/跳过"
   },
   "command": "JAVA_HOME=<JDK21> GRADLE_USER_HOME=<新建空目录> LAB_MAVEN_REPOSITORY=file://<官方原始POM、.module和JAR缓存> gradle --offline --no-daemon --max-workers=1 test verificationClasspath --continue --console=plain",
   "locks": {
@@ -103,5 +103,51 @@
       "errors": 0,
       "skipped": 0
     }
-  ]
+  ],
+  "current_status": "PASSED_IN_REAL_DOCKER_CI",
+  "ci_verification": {
+    "run_id": 36738093982,
+    "job_id": 109964986131,
+    "run_url": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093982",
+    "head_sha": "70af2cd8b6bca72c9ae8bff4753dc84ca91c6360",
+    "checked_out_merge_sha": "3bcf69d3c69fbdd11ba387d54ecdf77c89874162",
+    "conclusion": "success",
+    "unit": {
+      "suites": 12,
+      "tests": 44,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "suites": 4,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "variants": {
+      "total": 25,
+      "blank_rejected": 8,
+      "wrong_rejected": 9,
+      "alternative_passed": 8,
+      "all_compiled": true,
+      "all_expected_outcomes": true
+    },
+    "platform": {
+      "os": "Ubuntu 24.04.5 LTS",
+      "runner_image": "ubuntu-24.04",
+      "runner_image_version": "20260927.320.1",
+      "architecture": "x86_64",
+      "cpu_count": 2,
+      "memory": "7.756GiB",
+      "jdk_runtime": "Eclipse Temurin 21.0.12.1+1-LTS",
+      "gradle": "8.10.2",
+      "docker_engine": "28.0.4",
+      "docker_api_server": "1.48",
+      "docker_api_test_override": "1.44",
+      "docker_compose": "2.38.2",
+      "testcontainers": "1.20.6"
+    }
+  }
 }

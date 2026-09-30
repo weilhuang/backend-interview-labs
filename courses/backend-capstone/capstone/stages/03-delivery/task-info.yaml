@@ -18,6 +18,8 @@ files:
     placeholder_text: '        Exercise.unimplemented();
 
       '
+- name: test/labs/capstone/BrokerConfigTest.java
+  visible: true
 - name: test/labs/capstone/DeliveryTest.java
   visible: true
 - name: test/labs/capstone/WireTest.java

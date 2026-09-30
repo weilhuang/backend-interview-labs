@@ -1,6 +1,6 @@
 # RocketMQ 共享开发环境
 
-本次交付状态：首次共享云端 CI 已通过拉取、UID3000 命名卷写入、HTTP/2 检查和宿主 gRPC 收发；重启验收收到已 ACK 的收发消息而失败。启动屏障、优雅停止及独立持久化主题修复已完成离线回归，完整真实验收待新提交重跑；资源峰值仍未测定。消息队列课程自己的 Testcontainers 结果与这里的共享 Compose 是两套隔离验收，不能互相代替。
+本次交付状态：[完整共享云端 CI 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 已通过拉取、UID3000 命名卷写入、实际 Broker 注册屏障、广播系统组初始化、HTTP/2 检查、宿主 gRPC 收发及 down/up 原 durable 消息读取与 ACK。首次重启断言失败和对应修复保留在[验证记录](verification.md)；Mac/arm64、异常断电与资源峰值仍未实测。消息队列课程自己的 Testcontainers 结果与这里的共享 Compose 是两套隔离验收，不能互相代替。
 
 ## 启动、检查、停止
 
@@ -51,7 +51,7 @@ RocketMQ 至少一次投递允许重复；一次 ACK 的 RPC 成功不能被解�
 | Proxy | 128/256 MiB | 64 MiB |
 | 短时 mqadmin | 32/128 MiB | 32 MiB |
 
-堆上限不等于 RSS，仍有 metaspace、线程栈、映射文件和文件缓存。预算在实际 CI 的 OOM/资源结果出来前不能宣称“峰值已验证”；建议 Docker 3–4 GiB 内存、3–5 GiB 初始磁盘余量，避免同时开 Kafka/core/构建容器。镜像中的 mqadmin 默认工具脚本会创建约 1 GiB JVM，所以管理脚本直接调用同发行包工具主类，限制内存并在 15 秒超时后终止工具进程。
+堆上限不等于 RSS，仍有 metaspace、线程栈、映射文件和文件缓存。本次 Linux amd64 CI 两轮均 `OOMKilled=false`，仍不能宣称“峰值已验证”；建议 Docker 3–4 GiB 内存、3–5 GiB 初始磁盘余量，避免同时开 Kafka/core/构建容器。镜像中的 mqadmin 默认工具脚本会创建约 1 GiB JVM，所以管理脚本直接调用同发行包工具主类，限制内存并在 15 秒超时后终止工具进程。
 
 数据卷采用本项目 `rocketmq-data:/tmp`，数据明确位于 `/tmp/lab-rocketmq/store`。这里的 `/tmp` 被命名卷持久化，不是关机即丢弃的临时数据；`down` 保留，只有精确确认当前项目的 `reset` 才删除。选择镜像已有的可写目录，是为了保留 UID3000 且不新增 root/chown 初始化服务，不把整个发行目录复制进卷。新卷实际可写性已由首次 Linux amd64 CI 验证：`/tmp` 为 root 的 1777 目录，`lab-rocketmq/store` 由 UID3000 创建。其他架构/环境仍待实测；启动会记录 UID/GID 并检查 store 可写，不会自行改权限或删卷。
 

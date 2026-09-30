@@ -2,7 +2,7 @@
 
 记录日期：2026-09-30。只列已经发生的检查，准备好的命令不是运行证据。
 
-## 已实际执行
+## 制作容器内已实际执行
 
 环境：云端 Linux x86_64，Python 3.12.14，Bash 5.2.37；随后使用已准备好的完整 Temurin JDK 21.0.12.1+1 做读取器验证。
 
@@ -12,7 +12,7 @@
 | 镜像/端口/健康/资源等静态约束 | `./scripts/lab.sh verify` | 通过，不访问 Docker |
 | Bash 入口语法 | `bash -n scripts/lab.sh` | 通过 |
 | Python 编译 | `python3 -m py_compile scripts/lab.py scripts/ci_smoke.py scripts/tests/*.py` | 通过 |
-| 新增 RocketMQ 宿主 SDK5 探针 | 使用完整 JDK21 和已缓存官方 SDK5.0.8 执行 `javac --release 21` | 编译通过；没有 Docker，未执行真实端点连接 |
+| 新增 RocketMQ 宿主 SDK5 探针 | 使用完整 JDK21 和已缓存官方 SDK5.0.8 执行 `javac --release 21` | 制作容器内编译通过；后续独立 CI 的真实端点连接及重启持久化也已通过，见下文 |
 | Java 共享版本读取器 | `javac --release 21` 编译 `LabImages.java` 与 `LabImagesProbe.java`，再运行 probe | **通过**：仓库根与课程子目录均读取成功，未知键与缺失台账均按预期失败；云宿主完整 JDK21，不是构建容器 |
 | 实际环境诊断 | `./scripts/lab.sh doctor` | **未通过**：缺 Docker CLI，退出码 2；未安装/启动 daemon |
 
@@ -20,20 +20,46 @@
 
 `infra/compose.yaml` 使用 JSON 语法（JSON 是 YAML 的子集），因此离线标准库可完整读取对象并检查上述约束。这不替代 Docker Compose 自己的 schema 解析。
 
-## 已完成的真实云端 CI
+## 早期基础组件的真实云端 CI
 
 - 提交：`a57a95b67a0d29cd280a54d3f761c340b9cad0d4`（PR 合并预览提交 `e0ff210f4977ef93aaadef74dccd59172368bc2c`，并未实际合并 main）
-- [实际运行记录](https://github.com/weilhuang/backend-interview-labs/actions/runs/36708893556)，job `109865674586`，全部步骤成功，父任务已读取日志核对
+- [实际运行记录](https://github.com/weilhuang/backend-interview-labs/actions/runs/36708893556)，job `109865674586`，全部步骤成功，已读取原始日志核对
 - 实测平台：Ubuntu 24.04.5 / Linux x86_64；Docker Engine 28.0.4、Compose 2.38.2；2 CPU / 7.8 GiB
 - 2026-09-30 UTC：11:30:41 MySQL/Redis 真实读写通过；11:30:49 停止/重启后持久化通过；11:31:18 Kafka 建主题、发送、消费内容比对通过；11:32:03 完整 JDK21 镜像内 Gradle `BUILD SUCCESSFUL`
 - Compose 解析、镜像拉取、健康检查、独立 CI 项目清理、脱敏日志上传均已执行成功
 
 云端制作容器本身仍无 Docker CLI；上面的结果来自独立 GitHub Actions runner，不能把两者混同。`scripts/ci_smoke.py` 只接受 `CI=true` 且精确格式的临时项目，避免误写学习者数据库。
 
+## 本轮完整共享环境真实云端 CI：通过
+
+- [运行 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788)，job `109964985567`；全部阶段实际执行并成功，没有跳过 RocketMQ、持久化或 JDK 构建步骤
+- 分支提交：`70af2cd8b6bca72c9ae8bff4753dc84ca91c6360`；实际检出的 PR 合并预览：`3bcf69d3c69fbdd11ba387d54ecdf77c89874162`，这是 CI 测试提交，不表示合并到 main
+- 平台：Ubuntu 24.04.5 / Linux x86_64，Docker Engine 28.0.4、Compose 2.38.2，runner 2 CPU / 7.8 GiB
+- 宿主 SDK 客户端使用 Temurin JDK21；固定共享构建镜像内 `javac 21.0.9`、Maven 3.9.11，两者均为完整 JDK21，具体补丁版本如实分开记录
+
+2026-09-30 UTC 原始日志中的实际完成时间：
+
+| 时间 | 验收阶段 | 结果 |
+| --- | --- | --- |
+| 15:37:19 | 无 Docker 回归与静态配置 | 91 项回归通过；固定镜像、回环端口及安全边界通过 |
+| 15:37:48 | MySQL / Redis 真实读写 | 同一 CI 标记写入及读回一致 |
+| 15:37:57 | core 的 down/up 持久化 | 两种存储都读回原标记 |
+| 15:38:27 | Kafka | 真实建主题、发送、消费并比对内容通过 |
+| 15:38:56 | SDK5 宿主探针构建 | 使用共享固定 JDK21 镜像编译成功 |
+| 15:40:20 | RocketMQ 宿主端点 | 127.0.0.1:18081 上真实 SDK5 gRPC 发送、接收、ACK 通过；独立 durable 主题留存原消息 |
+| 15:41:20 | RocketMQ down/up 持久化 | 新客户端从原 durable 主题/组读回重启前消息并 ACK；该阶段不创建 Producer 或补发 |
+| 15:41:38 | Java 共享台账读取器 | 镜像内编译及读取/未知键拒绝 probe 通过 |
+| 15:42:13 | 共享 JDK21 镜像内 Gradle Wrapper | `BUILD SUCCESSFUL`；原始报告共 12 个模块、65 项测试，0 失败、0 跳过 |
+| 15:42:16 | 清理与证据 | 当前一次性项目清理、脱敏日志和测试报告上传成功 |
+
+已下载并核对 [artifact 11107863219](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788/artifacts/11107863219)，共 121147 bytes，ZIP SHA256 为 `ce34359f99d7b3ca0f365f2e2361daf59b13f6ebd5f5c9a0b6d24d381c14b29c`。其中包含四类组件日志及上述 12 个 Gradle HTML 汇总报告。
+
+RocketMQ 两次启动的原始日志均记录 Broker 注册屏障与广播系统组初始化通过，UID3000 成功写入项目命名卷；两次状态为 healthy、`OOMKilled=false`。管理 RPC、当前宿主映射端口与 HTTP/2 往返也都实际检查过。无 OOM 不等于测得内存峰值，也不保证长期大负载或异常断电下的状态恢复。
+
 ## 未执行或未充分覆盖，不能标为通过
 
 - 全部镜像的多架构 registry index digest 锁定：本轮有实际 amd64 拉取和运行，但未独立完成每个 arm64 manifest 审核
-- 新增 RocketMQ 共享 Compose、宿主 SDK5 真实连接及重启持久化待本次 CI；既有 MySQL/Redis/Kafka smoke 使用容器内客户端，不代表所有课程 Testcontainers 集成
+- MySQL/Redis/Kafka smoke 使用容器内客户端；RocketMQ 已覆盖宿主发布端点。共享环境通过不代表所有课程 Testcontainers 集成都已验收
 - 故障注入、异常终止后的数据恢复和更完整的卷权限/输出所有权矩阵
 - Mac Intel/Apple Silicon Docker Desktop、Bash3.2 实测和实际资源峰值
 - 前端/业务项目课 UI 验收；当前 Java 基础课无 Web 前端
@@ -62,7 +88,7 @@
 - NameServer、Broker 与独立 CLUSTER Proxy 同容器；Proxy 同时明确 `namesrvAddr`、`proxyMode=CLUSTER`、`useEndpointPortFromRequest=true`。固定版本 LOCAL Proxy 不保留请求映射端口，不能用于宿主 18081 的本布局
 - 健康定义要求真实 NameServer/Broker 管理 RPC；统一入口进一步核对宿主当前发布绑定、HTTP/2 SETTINGS/PING 往返以及探测后的容器状态
 - 1536 MiB/2CPU 总限制，三进程各自 JVM 预算、64 MiB commitlog 段、项目命名卷与 UID/可写诊断见 [详细说明](rocketmq.md)
-- 已准备 CI：共享固定 JDK21 镜像编译探针；宿主 JDK21 + SDK5 从发布端口发送/消费/ACK；留存消息后 down/up，再只读原消息并 ACK；独立一次性项目与脱敏日志沿用原有边界
+- 已执行 CI：共享固定 JDK21 镜像编译探针；宿主 JDK21 + SDK5 从发布端口发送/消费/ACK；留存消息后 down/up，再只读原消息并 ACK；独立一次性项目与脱敏日志沿用原有边界
 
 ### 首次共享 RocketMQ CI：部分通过，重启验收失败
 
@@ -72,9 +98,9 @@
 - 15:19:48：重启读取首先得到此前已 ACK 的 `...-roundtrip`，严格首条匹配断言失败；不能据此宣称原 durable 消息丢失，也不能宣称重启持久化验收通过
 - 原始 artifact `11107176844` 的 ZIP SHA256：`3aa44eb34a3fe3e48385d39f1d3c005f1bc7cf2e860b91825357d00718fcc3ff`；已读原始组件日志及 job 日志。日志同时记录 Proxy 内部系统组缺失 CODE26
 
-本轮修复：NameServer 真正看见活跃 Broker 注册后才启动 Proxy，并显式建立其广播系统组；停止等待整个进程组，避免只等 shell 退出；roundtrip 与 durable 使用独立主题/组，重启阶段仍必须读到先前 durable 原消息并 ACK，绝不重新发送、容忍未知内容或把 ACK 当作精确一次保证。**修复后的完整共享 CI 尚待重跑，不得标为通过。**
+本轮修复：NameServer 真正看见活跃 Broker 注册后才启动 Proxy，并显式建立其广播系统组；停止等待整个进程组，避免只等 shell 退出；roundtrip 与 durable 使用独立主题/组，重启阶段仍必须读到先前 durable 原消息并 ACK，绝不重新发送、容忍未知内容或把 ACK 当作精确一次保证。**上述修复已由[完整共享 CI 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 实际通过，精确提交及各阶段证据见上文。**
 
-制作云容器本身仍无 Docker CLI。消息队列课程 Testcontainers 的单独结果不替代本共享 Compose 结果。精确新提交 CI 完成后再更新运行链接、平台和阶段状态。
+制作云容器本身仍无 Docker CLI。消息队列课程 Testcontainers 的单独结果不替代本共享 Compose 结果。本次通过只覆盖上面列出的真实阶段，仍保留 macOS、arm64、实际峰值与故障注入等未测边界。
 
 ## 版本升级流程
 

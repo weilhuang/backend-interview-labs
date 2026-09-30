@@ -4,6 +4,8 @@
 
 异步链路包含三种不同事实：订单数据库已经提交；Kafka已确认消息；接收端inbox和配送读模型已经提交。任何一条网络应答都可能丢失。Kafka生产者幂等只处理生产者会话内的重试，重新创建生产者再次发布同一业务事件仍可重复。
 
+先区分“客户端配置不合法”与“broker暂时不可用”：KafkaAdminClient构造时要求default.api.timeout.ms不小于request.timeout.ms。创建主题与位点检查统一使用总API预算5秒、单请求2秒；健康检查总预算1秒、单请求0.5秒，外层等待和关闭也有界。BrokerConfigTest在没有Docker的环境直接构造真实Admin，既复现旧配置异常，也验证两种正式配置；不能等到拉起容器才发现这个合同。
+
 本节实现publishOne与consumeOne，要求先完成业务效果再推进确认。生产者收到Kafka确认后才更新outbox.published。消费者等待gRPC成功后，提交该分区record.offset()+1。接收端先写inbox唯一事件号，再更新读模型，二者同事务。相同事件号不同载荷拒绝；版本2的取消到达后，版本1的预留不得回退读模型。
 
 Checked回调是为了对“效果/确认顺序”做可控单元测试，真实调用方仍是KafkaProducer、KafkaConsumer和生成的gRPC stub。真实传输、MySQL唯一键、超时后重放由integrationTest单独证明。完成后保留一张故障窗口表，不能把单元替身的通过写成真实MQ证明。
@@ -41,7 +43,7 @@ Checked回调是为了对“效果/确认顺序”做可控单元测试，真实
 
 ## 核心源码与断点证据
 
-在[Kafka3.9.1 KafkaConsumer.commitSync](https://github.com/apache/kafka/blob/3.9.1/clients/src/main/java/org/apache/kafka/clients/consumer/KafkaConsumer.java)与[gRPC1.71.0 ClientCalls.blockingUnaryCall](https://github.com/grpc/grpc-java/blob/v1.71.0/stub/src/main/java/io/grpc/stub/ClientCalls.java)定位确认与异常边界。阅读[gRPC deadline说明](https://grpc.io/docs/guides/deadlines/)。断点分别放在DeliveryStore.commit、RPC返回和consumer.commitSync，故意让前一位置完成而后一位置失败，记录数据库行数与消费组位点。此实验是一个broker，不覆盖副本选主。
+在[Kafka3.9.1 KafkaConsumer.commitSync](https://github.com/apache/kafka/blob/3.9.1/clients/src/main/java/org/apache/kafka/clients/consumer/KafkaConsumer.java)与[gRPC1.71.0 ClientCalls.blockingUnaryCall](https://github.com/grpc/grpc-java/blob/v1.71.0/stub/src/main/java/io/grpc/stub/ClientCalls.java)定位确认与异常边界；再检查[KafkaAdminClient.calcDefaultApiTimeoutMs](https://github.com/apache/kafka/blob/3.9.1/clients/src/main/java/org/apache/kafka/clients/admin/KafkaAdminClient.java)的预算校验。阅读[gRPC deadline说明](https://grpc.io/docs/guides/deadlines/)。断点分别放在DeliveryStore.commit、RPC返回和consumer.commitSync，故意让前一位置完成而后一位置失败，记录数据库行数与消费组位点。此实验是一个broker，不覆盖副本选主。
 
 ## 面试递进
 

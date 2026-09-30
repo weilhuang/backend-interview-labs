@@ -1,14 +1,14 @@
 [
   {
     "unit": "C10-01",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-01",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -22,14 +22,14 @@
   },
   {
     "unit": "C10-02",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-02",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -43,14 +43,14 @@
   },
   {
     "unit": "C10-03",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-03",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -64,14 +64,14 @@
   },
   {
     "unit": "C10-04",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-04",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -85,14 +85,14 @@
   },
   {
     "unit": "C10-05",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-05",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -113,14 +113,14 @@
   },
   {
     "unit": "C10-06",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-06",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -134,14 +134,14 @@
   },
   {
     "unit": "C10-07",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-07",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
@@ -155,14 +155,14 @@
   },
   {
     "unit": "C10-08",
-    "mode": "典型错误",
+    "mode": "学生起点",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true
   },
   {
     "unit": "C10-08",
-    "mode": "学生起点",
+    "mode": "典型错误",
     "compile_exit": 0,
     "test_exit": 1,
     "passed": true

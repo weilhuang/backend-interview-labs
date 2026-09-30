@@ -118,30 +118,33 @@ class DeliveryIntegrationTest {
             assertThrows(
                     io.grpc.StatusRuntimeException.class,
                     () -> env.flow.consume("batch-boundary", Duration.ofSeconds(12), Fault.NONE));
-            try (var admin =
+            var admin =
                     org.apache.kafka.clients.admin.Admin.create(
-                            Map.of("bootstrap.servers", env.kafka.getBootstrapServers()))) {
+                            Broker.admin(env.kafka.getBootstrapServers()));
+            try {
                 var offsets =
                         admin.listConsumerGroupOffsets("batch-boundary")
                                 .partitionsToOffsetAndMetadata()
-                                .get(5, TimeUnit.SECONDS);
+                                .get(6, TimeUnit.SECONDS);
                 assertEquals(
                         firstOffset + 1,
                         offsets.get(new org.apache.kafka.common.TopicPartition(Broker.TOPIC, 0))
                                 .offset());
+            } finally {
+                admin.close(Duration.ofSeconds(1));
             }
             assertEquals(
                     0,
                     env.db.scalar(
                             "SELECT COUNT(*) FROM inbox WHERE event_id IN"
-                                + " ('batch-b:1','batch-c:1')"));
+                                    + " ('batch-b:1','batch-c:1')"));
             env.rpc.failBeforeEvent.set(null);
             env.flow.consume("batch-boundary", Duration.ofSeconds(12), Fault.NONE);
             assertEquals(
                     2,
                     env.db.scalar(
                             "SELECT COUNT(*) FROM inbox WHERE event_id IN"
-                                + " ('batch-b:1','batch-c:1')"));
+                                    + " ('batch-b:1','batch-c:1')"));
             assertTrue(
                     Audit.inspect(env.db.inventory(), env.db.orders(), env.db.deliveries())
                             .isEmpty());

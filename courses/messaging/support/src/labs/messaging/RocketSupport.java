@@ -3,6 +3,7 @@ package labs.messaging;
 import apache.rocketmq.v2.Code;
 import apache.rocketmq.v2.MessagingServiceGrpc;
 import apache.rocketmq.v2.QueryRouteRequest;
+import apache.rocketmq.v2.QueryRouteResponse;
 import apache.rocketmq.v2.Resource;
 
 import com.github.dockerjava.api.async.ResultCallback;
@@ -19,13 +20,12 @@ import org.apache.rocketmq.client.java.misc.ClientId;
 import org.apache.rocketmq.client.java.route.Endpoints;
 import org.apache.rocketmq.client.java.rpc.Signature;
 import org.apache.rocketmq.shaded.io.grpc.ManagedChannelBuilder;
+import org.apache.rocketmq.shaded.io.grpc.StatusRuntimeException;
 import org.apache.rocketmq.shaded.io.grpc.stub.MetadataUtils;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.AbstractWaitStrategy;
 import org.testcontainers.utility.DockerImageName;
 
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
@@ -74,42 +74,93 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
         return Integer.parseInt(bindings[0].getHostPortSpec());
     }
 
-    /** 同时用于初始启动和原容器重启；每轮读取当前状态、端口以及真实NameServer/Broker响应。 */
+    /** 只有真实gRPC路由及当前映射地址都正确，才算初始启动或重启就绪。 */
     public void awaitReady(Duration timeout) {
         long deadline = System.nanoTime() + timeout.toNanos();
-        String last = "尚未连接Proxy";
+        String readyTopic = unique("readiness");
+        boolean topicCreated = false;
+        String last = "尚未收到Proxy协议响应";
+        Throwable lastFailure = null;
         try {
             while (System.nanoTime() < deadline) {
-                var info = freshInfo();
-                if (!Boolean.TRUE.equals(info.getState().getRunning()))
+                if (!Boolean.TRUE.equals(freshInfo().getState().getRunning()))
                     throw new IllegalStateException("就绪前容器已停止");
-                boolean listening;
-                try (Socket socket = new Socket()) {
-                    socket.connect(new InetSocketAddress(getHost(), currentGrpcPort(info)), 500);
-                    listening = true;
-                } catch (java.io.IOException refused) {
-                    listening = false;
-                    last = refused.toString();
-                }
-                if (listening) {
-                    var result = execAdmin("clusterList", "-n", "127.0.0.1:9876");
+                if (!topicCreated) {
+                    var result = readinessAdmin(deadline, "clusterList", "-n", "127.0.0.1:9876");
                     last = result.stdout() + result.stderr();
                     if (RocketAdminResult.succeeded(
                             "clusterList", result.exitCode(), result.stdout(), result.stderr())) {
-                        if (Boolean.TRUE.equals(freshInfo().getState().getRunning())) return;
-                        throw new IllegalStateException("管理RPC成功后容器立即停止");
+                        var created =
+                                readinessAdmin(
+                                        deadline,
+                                        "updateTopic",
+                                        "-n",
+                                        "127.0.0.1:9876",
+                                        "-b",
+                                        "127.0.0.1:10911",
+                                        "-t",
+                                        readyTopic,
+                                        "-r",
+                                        "1",
+                                        "-w",
+                                        "1",
+                                        "-a",
+                                        "+message.type=NORMAL");
+                        if (!RocketAdminResult.succeeded(
+                                "updateTopic",
+                                created.exitCode(),
+                                created.stdout(),
+                                created.stderr()))
+                            throw new IllegalStateException(
+                                    "创建隔离就绪主题失败：" + created.stdout() + created.stderr());
+                        topicCreated = true;
                     }
                 }
-                Thread.sleep(250);
+                if (topicCreated && System.nanoTime() < deadline) {
+                    try {
+                        var response =
+                                queryRouteOnce(
+                                        readyTopic,
+                                        Math.min(
+                                                TimeUnit.SECONDS.toNanos(2),
+                                                deadline - System.nanoTime()));
+                        Set<String> returned = routeAddresses(response);
+                        lastFailure = null;
+                        last = response.getStatus() + ", returned=" + returned;
+                        if (RocketRuntime.protocolReady(
+                                response.getStatus().getCode(), returned, endpoint())) {
+                            if (!Boolean.TRUE.equals(freshInfo().getState().getRunning()))
+                                throw new IllegalStateException("协议就绪后容器立即停止");
+                            System.err.println("RocketMQ协议就绪：" + last);
+                            return;
+                        }
+                    } catch (StatusRuntimeException transientFailure) {
+                        if (!RocketRuntime.transientReadinessFailure(
+                                transientFailure.getStatus().getCode())) throw transientFailure;
+                        lastFailure = transientFailure;
+                        last = transientFailure.toString();
+                    }
+                }
+                long remaining = deadline - System.nanoTime();
+                if (remaining > 0)
+                    TimeUnit.NANOSECONDS.sleep(
+                            Math.min(remaining, TimeUnit.MILLISECONDS.toNanos(250)));
             }
             throw new IllegalStateException(
-                    "等待真实Proxy及Broker就绪超时：" + RocketRuntime.tail(last, 2000));
+                    "等待真实Proxy协议就绪超时：" + RocketRuntime.tail(last, 2000), lastFailure);
         } catch (InterruptedException interrupted) {
             Thread.currentThread().interrupt();
             throw diagnosed("等待就绪被中断", interrupted);
         } catch (Exception failure) {
             throw diagnosed("启动/重启未就绪", failure);
         }
+    }
+
+    private AdminExec readinessAdmin(long deadline, String... arguments) throws Exception {
+        long remaining = deadline - System.nanoTime();
+        if (remaining <= 0) throw new IllegalStateException("就绪预算已耗尽");
+        int seconds = (int) Math.min(15, Math.max(1, (remaining + 999_999_999L) / 1_000_000_000L));
+        return execCommand(seconds, 20000, RocketRuntime.adminCommand(arguments));
     }
 
     public ClientConfiguration configuration() {
@@ -120,45 +171,47 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
                 .build();
     }
 
-    /** 直接读取真实QueryRoute响应，避免客户端构建失败掩盖错误的返回地址。 */
+    /** 业务主题单次真实查询；失败不重试，保留清理前诊断。 */
     public Set<String> routeEndpoints(String topic) throws Exception {
-        ClientConfiguration configuration = configuration();
-        Endpoints requested = new Endpoints(configuration.getEndpoints());
-        var channel =
-                ManagedChannelBuilder.forTarget(requested.getGrpcTarget()).usePlaintext().build();
         try {
-            var response =
-                    MessagingServiceGrpc.newBlockingStub(channel)
-                            .withInterceptors(
-                                    MetadataUtils.newAttachHeadersInterceptor(
-                                            Signature.sign(configuration, new ClientId())))
-                            .withDeadlineAfter(10, TimeUnit.SECONDS)
-                            .queryRoute(
-                                    QueryRouteRequest.newBuilder()
-                                            .setTopic(Resource.newBuilder().setName(topic))
-                                            .setEndpoints(requested.toProtobuf())
-                                            .build());
+            var response = queryRouteOnce(topic, TimeUnit.SECONDS.toNanos(10));
             if (response.getStatus().getCode() != Code.OK)
                 throw new IllegalStateException("QueryRoute失败：" + response.getStatus());
-            Set<String> endpoints =
-                    response.getMessageQueuesList().stream()
-                            .flatMap(
-                                    queue ->
-                                            queue
-                                                    .getBroker()
-                                                    .getEndpoints()
-                                                    .getAddressesList()
-                                                    .stream())
-                            .map(address -> address.getHost() + ":" + address.getPort())
-                            .collect(Collectors.toSet());
+            Set<String> endpoints = routeAddresses(response);
             System.err.println(
                     "RocketMQ QueryRoute：requested=" + endpoint() + ", returned=" + endpoints);
             return endpoints;
         } catch (Exception failure) {
             throw diagnosed("QueryRoute topic=" + topic, failure);
-        } finally {
-            channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
         }
+    }
+
+    private QueryRouteResponse queryRouteOnce(String topic, long timeoutNanos) throws Exception {
+        ClientConfiguration configuration = configuration();
+        Endpoints requested = new Endpoints(configuration.getEndpoints());
+        var channel =
+                ManagedChannelBuilder.forTarget(requested.getGrpcTarget()).usePlaintext().build();
+        try {
+            return MessagingServiceGrpc.newBlockingStub(channel)
+                    .withInterceptors(
+                            MetadataUtils.newAttachHeadersInterceptor(
+                                    Signature.sign(configuration, new ClientId())))
+                    .withDeadlineAfter(Math.max(1, timeoutNanos), TimeUnit.NANOSECONDS)
+                    .queryRoute(
+                            QueryRouteRequest.newBuilder()
+                                    .setTopic(Resource.newBuilder().setName(topic))
+                                    .setEndpoints(requested.toProtobuf())
+                                    .build());
+        } finally {
+            channel.shutdownNow().awaitTermination(1, TimeUnit.SECONDS);
+        }
+    }
+
+    private static Set<String> routeAddresses(QueryRouteResponse response) {
+        return response.getMessageQueuesList().stream()
+                .flatMap(queue -> queue.getBroker().getEndpoints().getAddressesList().stream())
+                .map(address -> address.getHost() + ":" + address.getPort())
+                .collect(Collectors.toSet());
     }
 
     public static String unique(String prefix) {

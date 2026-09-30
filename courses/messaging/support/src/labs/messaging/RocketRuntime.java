@@ -1,11 +1,32 @@
 package labs.messaging;
 
+import apache.rocketmq.v2.Code;
+
+import org.apache.rocketmq.shaded.io.grpc.Status;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 /** 固定5.3.2发行包的启动入口与资源预算；不改写镜像中的官方脚本。 */
 public final class RocketRuntime {
     private RocketRuntime() {}
+
+    /** 只有启动期可等待这些传输暂态，业务操作与认证错误不重试。 */
+    public static boolean transientReadinessFailure(Status.Code code) {
+        return code == Status.Code.UNAVAILABLE || code == Status.Code.DEADLINE_EXCEEDED;
+    }
+
+    /** 新探针主题传播可等待；内部固定端口和认证失败必须明确失败。 */
+    public static boolean protocolReady(Code code, Set<String> returned, String requested) {
+        if (code == Code.TOPIC_NOT_FOUND) return false;
+        if (code != Code.OK) throw new IllegalStateException("就绪协议拒绝：" + code);
+        if (returned.isEmpty()) return false;
+        if (!returned.equals(Set.of(requested)))
+            throw new IllegalStateException(
+                    "Proxy返回不可达路由：requested=" + requested + ", returned=" + returned);
+        return true;
+    }
 
     public static String startupScript() {
         return """

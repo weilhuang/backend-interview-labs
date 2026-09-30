@@ -6,11 +6,11 @@
   "快测": {
     "04-recovery": 5,
     "05-defense": 7,
-    "03-delivery": 8,
+    "03-delivery": 11,
     "02-reliability": 6,
     "01-contract": 6
   },
-  "快测总计": 32,
+  "快测总计": 35,
   "回环真实gRPC": "通过往返与deadline；不代表MySQL接收端可靠性",
   "完整应用installDist": "通过",
   "全部容器测试类严格编译": "通过",
@@ -27,5 +27,18 @@
   "真实容器场景数": 5,
   "Compose应用SIGKILL恢复": "脚本与CI已提供，本机未运行",
   "数据库提交确认网络丢包": "未执行；不能用应用故障钩子替代证明",
-  "脚本安全场景": 11
+  "脚本安全场景": 11,
+  "首次CI": {
+    "运行": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093924",
+    "提交前缀": "70af2cd8",
+    "快测及变体": "通过",
+    "真实容器": "五方法共同在Admin构造预算配置失败，业务断言尚未到达",
+    "Compose及浏览器": "此前失败，未执行到"
+  },
+  "Admin配置修复": {
+    "应用和位点检查": "request.timeout.ms=2000 / default.api.timeout.ms=5000 / 外层等待6000ms / 关闭1000ms",
+    "健康": "request.timeout.ms=500 / default.api.timeout.ms=1000 / 外层等待1500ms / 关闭500ms",
+    "真实客户端无Docker回归": 3,
+    "修复后的真实容器CI": "待运行"
+  }
 }
