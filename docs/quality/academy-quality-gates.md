@@ -123,9 +123,9 @@ JUnit JAR 校验固定 SHA-256；不下载或执行未知程序。每题先证�
 
 在已绿的 `e66c2fddf2ce172b140e9a577e43c9828f9307a1` 输入上，另完成37个独立声明编码区的真实JDK21编译/JUnit审计：frameworks 9区、distributed 21区、capstone 7区。**36区使用完整模块合同测试；Admission.execute的1区只使用既有选定JUnit方法** `CapacityTest#入口无等待拒绝与异常许可归还`。其原完整变体套件出现额外RPC诊断错误，仍保留为 `UNCLASSIFIED_FAILURE`，不能改称完整套件通过。另有两个屏障断言不作为严格拒绝依据；对应编码区由直接本区TODO失败证明。
 
-这37区是原76区之外的补充证据，合计113个独立编码区；不是113道题，不是全156区，也不是通用变异覆盖率。原80个待逐区验证中仍有43区未由这两批证明。只记录最终有效结果，不把预检、重复运行、参考测试或两次XA语义控制再加为编码区。
+这37区是原76区之外的补充证据，合计113个独立编码区；不是113道题，不是全156区，也不是通用变异覆盖率。完成这两批时还有43区未证明；随后下述4区取得独立真实TODO拒绝证据，余39区仍未由这些检查证明。只记录最终有效结果，不把预检、重复运行、参考测试或两次XA语义控制再加为编码区。
 
-其中分布式4个真实服务区（DS-17/19/21/22）仍待运行：只靠合同层不能判定XA持久化提交、Outbox发布标记以及Redis缓存填充/失效。新增 `distributed_integration_audit.py` 只为这4区建立最小真实集成拒绝门禁，并可附加两个独立XA提交缺失控制：
+分布式4个真实服务区（DS-17/19/21/22）已在 `84781e8` 的[运行36776413515](https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515) 独立被真实TODO拒绝，两个参考模块也通过。但首个XA提交缺失控制的 `MultipleFailuresError` 序列化格式未被守卫接受，第二个控制未运行，所以整个8次调用门禁仍FAIL。修订后的归因器/消息夹具仍需新提交CI，当前新运行 `NOT_RUN`。只靠合同层不能判定XA持久化提交、Outbox发布标记以及Redis缓存填充/失效；`distributed_integration_audit.py` 的复现命令仍为：
 
 ```sh
 python scripts/quality/distributed_integration_audit.py \

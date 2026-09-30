@@ -13,8 +13,14 @@
   },
   "gate_self_tests": {
     "status": "PASS",
-    "tests": 50,
-    "log": "build/quality/gate-self-tests-final.log"
+    "tests": 97,
+    "scope": "Current post-fourth-run narrow attribution fix; Python only, not new Docker runtime",
+    "log_sha256": "689e6549f857c7c4ad0bdb5a2dd88b3cb05e03cb93c2700e5df5a1fb4cafc919",
+    "previous_historical_run": {
+      "status": "PASS",
+      "tests": 50,
+      "log": "build/quality/gate-self-tests-final.log"
+    }
   },
   "independent_placeholders": {
     "status": "PASS",
@@ -802,14 +808,14 @@
   },
   "github_ci": {
     "new_quality_gate_commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
-    "new_quality_gate_execution": "THIRD_RUN_COMPLETED_SUCCESS; NEW_REGION_GATE_NOT_RUN",
+    "new_quality_gate_execution": "FOURTH_RUN_COMPLETED_FAILURE; NEXT_FIX_RUNTIME_NOT_RUN",
     "published_baseline": "1fb27d8885bf1eb62b112d2e15f5478becf697fa; 9 green workflows, not evidence for unpublished changes",
     "first_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
     "mysql_gate": "PASS at e66c2fd; integration24 tests/phase, failures14/0/14",
     "redis_gate": "PASS; real integration 19 tests per phase, failures 13/0/13, no skips",
-    "latest_completed_commit": "e66c2fddf2ce172b140e9a577e43c9828f9307a1",
-    "latest_completed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36766340612",
-    "messaging_gate": "PASS: author 52 tests; three phases 35 tests with failures 13/0/13 and zero skips",
+    "latest_completed_commit": "84781e8cf393606d4445313335071ed9d95aaffa",
+    "latest_completed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515",
+    "messaging_gate": "FAIL at84781e8: author52 tests,51pass/1fail/0skip; RocketMQ brokerStatus exceeded15s before restart; subsequent roundtrip NOT_RUN",
     "second_run": {
       "actual_jobs_passed": 11,
       "actual_jobs_failed": 1,
@@ -827,13 +833,28 @@
       "evidence_scope": "Existing full workflows and roundtrips only; new region gate not run",
       "timing_is_billing_receipt": false,
       "evidence_summary_sha256": "e4d7eece9fb82650e2e3dcdf9f18169d1e04f0a89206f766ea3bf6281649fa60"
+    },
+    "fourth_run": {
+      "conclusion": "failure",
+      "head_sha": "84781e8cf393606d4445313335071ed9d95aaffa",
+      "actual_jobs_passed": 10,
+      "actual_jobs_failed": 2,
+      "total_jobs_passed": 12,
+      "total_jobs_failed": 3,
+      "failed_actual_suites": [
+        "distributed",
+        "messaging"
+      ],
+      "aggregate_gate": "FAIL",
+      "timing_is_billing_receipt": false,
+      "next_fix_runtime": "NOT_RUN"
     }
   },
   "native_idea": "NOT_RUN by these scripts; separate GUI report defines actual tested scope",
   "remaining": [
-    "Real execution of four distributed regions and two XA semantic controls on exact next CI commit",
-    "All selected workflows on the next commit",
-    "43 individual regions not yet proven by the original76 plus additional37 batches",
+    "New exact-commit full CI: both XA semantic controls accepted by narrowly corrected attribution, all8 distributed audit runs complete",
+    "RocketMQ explicit-NameServer fix and original restart/recovery test plus subsequent course roundtrip in real CI",
+    "39 individual regions outside prior76 plus additional37 plus four independently rejected real TODO regions",
     "Full-task native Academy acceptance and C02 new official export; pilot missing-document release decision",
     "Native macOS runtime of author quality tools"
   ],
@@ -1116,7 +1137,7 @@
     "native_macos_runtime": "NOT_RUN"
   },
   "distributed_real_region_gate": {
-    "status": "NOT_RUN",
+    "status": "FAIL",
     "regions": [
       "DS-17",
       "DS-19",
@@ -1136,14 +1157,77 @@
     "job_timeout_minutes": 60,
     "acceptance": "--execute and PASS at status/docker_integration/runtime.status, execution_requested=true, all expected rows PASS and all8 runs completed",
     "preparation_only": "NOT_RUN with exit2; not runtime success",
-    "next_required": "Real GitHub execution for exact new commit",
+    "next_required": "New exact-commit CI with narrow serialization fix: all2 references,4TODO mutations and2 semantic controls; current next run NOT_RUN",
     "native_idea": "NOT_RUN",
-    "native_macos_runtime": "NOT_RUN"
+    "native_macos_runtime": "NOT_RUN",
+    "head_sha": "84781e8cf393606d4445313335071ed9d95aaffa",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515",
+    "reference_runs_passed": 2,
+    "mutation_runs_passed": [
+      "DS-17",
+      "DS-19",
+      "DS-21",
+      "DS-22"
+    ],
+    "completed_runs": 6,
+    "runtime_seconds": 293.81,
+    "semantic_control_results": {
+      "DS-17-omit-ra-commit": {
+        "runtime": "EXECUTED",
+        "gate_status": "FAIL_ATTRIBUTION",
+        "observed": "Exact outgoing-branch assertion expected0 but saw1 prepared branch",
+        "serialization": "MultipleFailuresError with app// stack frames and repeated same assertion under Suppressed and Caused by"
+      },
+      "DS-17-omit-rb-commit": {
+        "runtime": "NOT_RUN",
+        "gate_status": "NOT_RUN"
+      }
+    },
+    "evidence_sha256": {
+      "distributed-region-audit.json": "995e34c8fdfef6fb7f70b07fd99746afbdc7f034fa5b27df59c1bd426611ac4f",
+      "omit-ra-MySqlTransactionTest.xml": "3dd6fbdaf7b6a548ce2b7c3ad0ea0923f3157e98c4a61360469a677203da942f"
+    },
+    "post_failure_local_validation": {
+      "quality_python_selftests": 97,
+      "retained_real_xml_rechecked": 7,
+      "new_container_execution": "NOT_RUN"
+    }
   },
   "author_quality_runtime_platforms": {
     "linux_ci": "Python3.12",
     "macos_author_scripts": "Python>=3.13 with waitid/WNOWAIT; capability checked before fixture writes/Java execution",
     "macos_runtime_validation": "NOT_RUN",
     "student_idea_gradle_python_requirement": "UNCHANGED; author tools are not in ordinary student entrypoints"
+  },
+  "messaging_admin_timeout": {
+    "status": "FAIL_AT_84781e8",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515",
+    "author_tests": 52,
+    "passed": 51,
+    "failed": 1,
+    "skipped": 0,
+    "failure_location": "rocketmq/05-storage BrokerTest line20, brokerStatus before restart",
+    "whole_exec_timeout_seconds": 15,
+    "restart_recovery_executed": false,
+    "subsequent_course_roundtrip": "NOT_RUN",
+    "source_risk": "RocketMQ5.3.2 may perform NameServer address discovery if explicit configuration is absent",
+    "observed_root_cause": "UNCONFIRMED; no internal process stack captured",
+    "planned_fix": "brokerStatus explicit -n127.0.0.1:9876; reject real admin invocation without valid -n; preserve15s fatal non-retry timeout and add bounded execID/stdout/stderr diagnostics",
+    "next_fix_runtime": "NOT_RUN",
+    "failure_xml_sha256": "f6b8515f28736b77959b4a67ee00680355b357e933eb873336d0b51a425cb9dc",
+    "next_expected_author_tests": {
+      "total": 54,
+      "pure_contract": 37,
+      "real_service": 17,
+      "runtime": "NOT_RUN"
+    }
+  },
+  "independent_region_accounting": {
+    "prior_core": 76,
+    "additional_contract": 37,
+    "new_real_todo_regions": 4,
+    "remaining_of_156": 39,
+    "semantic_controls_add_regions": false,
+    "complete_integration_gate": "FAIL; region counts do not override overall gate"
   }
 }

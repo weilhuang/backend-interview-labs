@@ -314,7 +314,9 @@ public final class RocketSupport extends GenericContainer<RocketSupport> {
                 }) {
             getDockerClient().execStartCmd(id).exec(callback);
             if (!callback.awaitCompletion(seconds, TimeUnit.SECONDS))
-                throw new IllegalStateException("容器命令超过" + seconds + "秒，停止重试以免堆积进程");
+                throw new IllegalStateException(
+                        RocketRuntime.execTimeoutDetails(
+                                seconds, id, stdout.toString(), stderr.toString()));
         }
         Long exit = getDockerClient().inspectExecCmd(id).exec().getExitCodeLong();
         return new AdminExec(

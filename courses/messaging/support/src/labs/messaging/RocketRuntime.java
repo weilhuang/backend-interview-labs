@@ -156,6 +156,17 @@ done
   }
 
   public static String[] adminCommand(String... arguments) {
+    // brokerStatus即使有-b也会启动MQClient；缺-n会先走外部HTTP NameServer发现。
+    // 零参数仅生成startupScript中的模板；真实管理调用必须显式给出NameServer。
+    if (arguments.length > 0) {
+      int nameserver = Arrays.asList(arguments).indexOf("-n");
+      if (nameserver < 1
+          || nameserver + 1 >= arguments.length
+          || arguments[nameserver + 1].isBlank()
+          || arguments[nameserver + 1].startsWith("-")) {
+        throw new IllegalArgumentException("实验管理命令必须显式指定-n NameServer，禁止隐式外部发现");
+      }
+    }
     // tools.sh硬编码-Xms1g/-Xmx1g且不读取JAVA_OPT_EXT，不能在同一小容器里再启动1GiB工具JVM。
     String script =
         """
@@ -168,6 +179,19 @@ done
     ArrayList<String> command = new ArrayList<>(Arrays.asList("sh", "-c", script, "lab-mqadmin"));
     command.addAll(Arrays.asList(arguments));
     return command.toArray(String[]::new);
+  }
+
+  /** exec超时时保留已收到的工具输出；部分成功文本不能把超时改判成通过。 */
+  public static String execTimeoutDetails(
+      int seconds, String execId, String stdout, String stderr) {
+    return "容器命令超过"
+        + seconds
+        + "秒，停止重试以免堆积进程；exec="
+        + execId
+        + "\n--- 已收到stdout尾部（最多2000字符）---\n"
+        + tail(stdout, 2000)
+        + "\n--- 已收到stderr尾部（最多2000字符）---\n"
+        + tail(stderr, 2000);
   }
 
   public static String tail(String value, int maximum) {

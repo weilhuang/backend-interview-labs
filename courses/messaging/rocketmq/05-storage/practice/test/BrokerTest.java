@@ -17,7 +17,7 @@ class BrokerTest {
           var producer = broker.producer(topic)) {
         producer.send(RocketClient.message(topic, new Event("disk1", "o1", 1, 100)));
       }
-      String status = broker.admin("brokerStatus", "-b", "127.0.0.1:10911");
+      String status = broker.admin("brokerStatus", "-n", "127.0.0.1:9876", "-b", "127.0.0.1:10911");
       long maxOffset = RocketAdminResult.commitLogMaxOffset(status);
       System.err.println("发送确认后的CommitLog已写物理上界（不含预分配容量）：" + maxOffset);
       var files =

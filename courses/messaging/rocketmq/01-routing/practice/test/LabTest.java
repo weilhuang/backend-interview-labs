@@ -73,7 +73,9 @@ class LabTest {
 
     @Test
     void 管理工具使用独立小堆且参数不拼入shell() {
-        String[] command = RocketRuntime.adminCommand("updateSubGroup", "-g", "group name; false");
+        String[] command =
+                RocketRuntime.adminCommand(
+                        "updateSubGroup", "-g", "group name; false", "-n", "127.0.0.1:9876");
         assertEquals("sh", command[0]);
         assertEquals("-c", command[1]);
         assertTrue(command[2].contains("-Xmx128m"));

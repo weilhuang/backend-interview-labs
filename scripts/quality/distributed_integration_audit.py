@@ -141,17 +141,28 @@ def validate_xml(directory, case, changed, exit_code):
                 require(c.get('name') == case['rejecting_test'], 'failure in unrelated test is not region rejection')
                 kind = failure.get('type', '')
                 if case['mutation_kind'] == 'OMIT_COMMIT':
-                    frame = (r'at labs\.distributed\.MySqlTransactionTest\.lambda\$[^\s(]+'
-                             r'\(MySqlTransactionTest\.java:' + str(case['assertion_line']) + r'\)')
+                    frame = (r'at (?:app//)?labs\.distributed\.MySqlTransactionTest\.lambda\$'
+                             + re.escape(case['rejecting_test'].removesuffix('()')) + r'\$\d+'
+                             + r'\(MySqlTransactionTest\.java:' + str(case['assertion_line']) + r'\)')
+                    trace = failure.text or ''
+                    assertion = ('org.opentest4j.AssertionFailedError: ' + case['assertion_message']
+                                 + ' ==> expected: <0> but was: <1>')
                     require(kind == 'org.opentest4j.MultipleFailuresError'
-                            and 'Multiple Failures (1 failure)' in evidence
-                            and ('org.opentest4j.AssertionFailedError: ' + case['assertion_message']
-                                 + ' ==> expected: <0> but was: <1>') in evidence
-                            and re.search(frame, evidence) and 'UnsupportedOperationException' not in evidence,
+                            and results[0]['failures'] == 1
+                            and trace.splitlines()[:1] == ['org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)']
+                            and assertion in trace and re.search(frame, trace)
+                            and 'UnsupportedOperationException' not in evidence,
                             'commit control must fail its exact no-prepared-branch assertion, not setup or recovery')
-                    nested = re.findall(r'(?:Caused by:|Suppressed:) ([\w.$]+)', evidence)
-                    require(nested == ['org.opentest4j.AssertionFailedError'],
+                    chains = list(re.finditer(r'(?m)^[ \t]*(Suppressed|Caused by):[ \t]*([^\n]+)', trace))
+                    # Gradle may repeat the ONE assertAll failure as its cause.
+                    # Each representation needs its own exact branch and frame;
+                    # an unrelated assertion or cleanup exception cannot borrow it.
+                    require([node[1] for node in chains] in (['Suppressed'], ['Suppressed', 'Caused by']),
                             'commit control includes unexpected nested or cleanup exception')
+                    for index, node in enumerate(chains):
+                        end = chains[index + 1].start() if index + 1 < len(chains) else len(trace)
+                        require(node[2].strip() == assertion and re.search(frame, trace[node.end():end]),
+                                'commit control nested assertion has the wrong branch or source frame')
                     attributed.append({'test': c.get('name'), 'type': kind,
                                        'assertion_line': case['assertion_line']})
                     continue

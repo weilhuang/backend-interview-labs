@@ -70,4 +70,42 @@ class LabTest {
           IllegalArgumentException.class, () -> RocketAdminResult.commitLogMaxOffset(invalid));
     }
   }
+
+  @Test
+  void 直连broker的管理命令仍须显式指定NameServer() {
+    String[] command =
+        RocketRuntime.adminCommand("brokerStatus", "-n", "127.0.0.1:9876", "-b", "127.0.0.1:10911");
+    assertArrayEquals(
+        new String[] {"brokerStatus", "-n", "127.0.0.1:9876", "-b", "127.0.0.1:10911"},
+        java.util.Arrays.copyOfRange(command, 4, command.length));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> RocketRuntime.adminCommand("brokerStatus", "-b", "127.0.0.1:10911"));
+    assertThrows(
+        IllegalArgumentException.class, () -> RocketRuntime.adminCommand("brokerStatus", "-n"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> RocketRuntime.adminCommand("brokerStatus", "-n", " "));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> RocketRuntime.adminCommand("brokerStatus", "-n", "-b", "127.0.0.1:10911"));
+    assertDoesNotThrow(RocketRuntime::startupScript);
+  }
+
+  @Test
+  void 管理超时保留有界工具输出而不是只剩宿主等待异常() {
+    String detail =
+        RocketRuntime.execTimeoutDetails(
+            15,
+            "exec-123",
+            "x".repeat(10000) + "commitLogMaxOffset: 1889\n",
+            "y".repeat(10000) + "discovery-or-shutdown-marker\n");
+    assertTrue(detail.contains("超过15秒"));
+    assertTrue(detail.contains("停止重试"));
+    assertTrue(detail.contains("exec=exec-123"));
+    assertTrue(detail.contains("commitLogMaxOffset: 1889"));
+    assertTrue(detail.contains("discovery-or-shutdown-marker"));
+    assertTrue(detail.length() < 4300);
+    assertFalse(RocketAdminResult.succeeded("brokerStatus", 124, "commitLogMaxOffset: 1889\n", ""));
+  }
 }

@@ -336,7 +336,8 @@ class DistributedIntegrationAuditTests(unittest.TestCase):
         failure.text = ('org.opentest4j.MultipleFailuresError: Multiple Failures (1 failure)\n'
                         + 'Suppressed: org.opentest4j.AssertionFailedError: ' + case['assertion_message']
                         + ' ==> expected: <0> but was: <1>\n'
-                        + 'at labs.distributed.MySqlTransactionTest.lambda$normal$0(MySqlTransactionTest.java:'
+                        + 'at labs.distributed.MySqlTransactionTest.lambda$' + case['rejecting_test'].removesuffix('()')
+                        + '$0(MySqlTransactionTest.java:'
                         + str(case['assertion_line']) + ')')
         return root
 
@@ -349,6 +350,69 @@ class DistributedIntegrationAuditTests(unittest.TestCase):
             self.write(root, case)
             with self.assertRaisesRegex(GateError, 'nested or cleanup'):
                 self.check(case=case)
+
+    def real_commit_xml(self):
+        # Sanitized run 36776413515 evidence: only logs/properties/host/timing
+        # metadata removed. Exact failure attributes and stack are retained.
+        fixture = Path(__file__).parent / 'fixtures/distributed-xa-omit-ra-gradle.xml'
+        return ET.parse(fixture).getroot()
+
+    def test_real_gradle_commit_failure_with_app_loader_and_repeated_cause(self):
+        case = audit.commit_controls(self.model, self.cases)[0]
+        self.assertEqual(52, case['assertion_line'], 'review the recorded XML if the assertion moves')
+        self.write(self.real_commit_xml(), case)
+        result = self.check(case=case)
+        self.assertEqual(1, result['counts']['failures'])
+        self.assertEqual([{'test': case['rejecting_test'], 'type': 'org.opentest4j.MultipleFailuresError',
+                           'assertion_line': 52}], result['attributed'])
+
+    def test_real_commit_trace_rejects_wrong_branch_frame_or_nested_runtime(self):
+        case = audit.commit_controls(self.model, self.cases)[0]
+        for corruption in ('cause branch', 'cause line', 'cause owner', 'cause method',
+                           'suppressed line', 'extra sql', 'extra assertion', 'extra todo',
+                           'two failures', 'duplicate failure tag'):
+            root = self.real_commit_xml()
+            failure = root.find('.//failure')
+            before, cause = failure.text.split('\nCaused by: ', 1)
+            if corruption == 'cause branch':
+                cause = cause.replace('转出分支未完成', '转入分支未完成')
+            elif corruption == 'cause line':
+                cause = cause.replace('MySqlTransactionTest.java:52', 'MySqlTransactionTest.java:53')
+            elif corruption == 'cause owner':
+                cause = cause.replace('labs.distributed.MySqlTransactionTest.lambda$', 'labs.distributed.OtherTest.lambda$')
+            elif corruption == 'cause method':
+                cause = cause.replace('lambda$两个MySQL资源准备后无决策回滚有决策提交$', 'lambda$unrelated$')
+            elif corruption == 'suppressed line':
+                before = before.replace('MySqlTransactionTest.java:52', 'MySqlTransactionTest.java:53')
+            elif corruption == 'extra sql':
+                cause += '\nCaused by: java.sql.SQLException: cleanup failed'
+            elif corruption == 'extra assertion':
+                cause += '\nSuppressed: org.opentest4j.AssertionFailedError: unrelated'
+            elif corruption == 'extra todo':
+                cause += '\nSuppressed: java.lang.UnsupportedOperationException: TODO'
+            elif corruption == 'two failures':
+                before = before.replace('Multiple Failures (1 failure)', 'Multiple Failures (2 failures)')
+            else:
+                target = next(c for c in root.findall('testcase') if c.find('failure') is not None)
+                target.append(copy.deepcopy(failure))
+                root.set('failures', '2')
+            failure.text = before + '\nCaused by: ' + cause
+            self.write(root, case)
+            with self.subTest(corruption=corruption), self.assertRaises(GateError):
+                self.check(case=case)
+
+    def test_real_commit_failure_cannot_be_assigned_to_opposite_branch_or_other_test(self):
+        outbound, inbound = audit.commit_controls(self.model, self.cases)
+        self.write(self.real_commit_xml(), inbound)
+        with self.assertRaises(GateError):
+            self.check(case=inbound)
+        for attribute, value in [('name', 'unrelated()'), ('classname', 'labs.distributed.OtherTest')]:
+            root = self.real_commit_xml()
+            target = next(c for c in root.findall('testcase') if c.find('failure') is not None)
+            target.set(attribute, value)
+            self.write(root, outbound)
+            with self.subTest(attribute=attribute), self.assertRaises(GateError):
+                self.check(case=outbound)
 
     def test_normal_xa_assertions_precede_application_recovery(self):
         path = audit.REPO / audit.COURSE / audit.BASE / '06-transactions/integration-test/labs/distributed/MySqlTransactionTest.java'
