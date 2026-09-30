@@ -9,7 +9,7 @@ a=p.parse_args(); dest=a.destination.resolve()
 if dest.exists():raise SystemExit('目标目录必须不存在；不会覆盖已有文件')
 if dest.is_relative_to(ROOT):raise SystemExit('请选择作者课程根之外的目标目录')
 validate();dest.mkdir(parents=True)
-for name in ['README.md','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat','gradle','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template']:
+for name in ['README.md','阶段报告.md','build.gradle','settings.gradle','gradle.properties','gradlew','gradlew.bat','gradle','THIRD_PARTY_NOTICES.md','LICENSE-JetBrains-template']:
     source=ROOT/name
     if source.is_dir():shutil.copytree(source,dest/name)
     else:shutil.copy2(source,dest/name)

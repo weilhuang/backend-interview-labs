@@ -9,6 +9,7 @@ environment_settings:
   jvm_language_level: JDK_21
 additional_files:
 - name: README.md
+- name: 阶段报告.md
 - name: build.gradle
 - name: settings.gradle
 - name: gradle.properties

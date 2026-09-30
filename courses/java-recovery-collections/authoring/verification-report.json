@@ -1,19 +1,45 @@
 {
   "metadata": "passed",
   "compiler": [
-    "java",
-    "com.sun.tools.javac.Main"
+    "javac"
   ],
   "compiler_flags": [
-    "-source",
-    "21",
-    "-target",
+    "--release",
     "21"
   ],
-  "jdk21_release_verified": false,
+  "jdk21_release_verified": true,
   "junit_console_sha256": "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc",
-  "gradle": "not run by this script",
-  "idea_academy": "not run",
+  "gradle": {
+    "status": "passed_in_github_actions",
+    "head_sha": "7ac4413f8d1bf591dc4f6a64b85e7b95c293b473",
+    "run_id": 36708242272,
+    "job_id": 109863541871,
+    "url": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36708242272",
+    "verified_workflow_status": "completed",
+    "verified_workflow_conclusion": "success",
+    "jdk": "21",
+    "compiler_release": 21,
+    "local_environment_attempt": {
+      "status": "blocked_before_build",
+      "error": "java.net.SocketException: Network is unreachable",
+      "stage": "官方Gradle8.10.2分发包下载；构建与测试尚未执行",
+      "retry_scope": "默认网络、环境代理和允许的升级尝试均失败，未修改构建源"
+    },
+    "local_run_smoke": {
+      "status": "passed",
+      "distribution": "Gradle 8.10.2 官方ZIP，SHA-256匹配Wrapper配置",
+      "jdk": "Temurin21.0.12.1+1",
+      "mode": "offline",
+      "run_tasks": 12,
+      "build_result": "BUILD SUCCESSFUL",
+      "actionable_tasks": 24
+    },
+    "local_offline_test": {
+      "status": "blocked_dependency_cache",
+      "detail": "未缓存JUnit BOM5.11.4；不影响已通过的严格独立验证与真实CI"
+    }
+  },
+  "idea_academy": "未由本验证器执行，独立IDE检查仍待记录",
   "tasks": [
     {
       "task": "java-pilot/01-recovery/01-money-total",
@@ -333,8 +359,8 @@
   "untouched_learner_tasks_rejected": 12,
   "mutants_rejected": 12,
   "checked_date_utc": "2026-09-30",
-  "runtime": "OpenJDK 21.0.12.1+1-1-deb13u1-Debian",
-  "compiler_note": "现有jdk.compiler模块；精简运行时缺javac启动器与ct.sym。本轮明确使用source21/target21，不将其当作--release21或真实Gradle验证。",
+  "runtime": "Eclipse Temurin 21.0.12.1+1-LTS",
+  "compiler_note": "已使用完整JDK21的javac与--release21严格编译；不是source/target降级结果。",
   "content_visibility": {
     "all_24_test_files_visible": true,
     "standard_answers_in_all_12_task_descriptions": true,
@@ -347,6 +373,7 @@
     "todo_placeholders": 20,
     "public_standard_answers": 12,
     "all_tests_visible": true,
+    "java_files_compiled_with_release21": 48,
     "academy_course_root_or_archive": false
   },
   "chinese_comment_audit": {

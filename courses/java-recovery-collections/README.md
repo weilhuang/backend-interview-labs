@@ -127,6 +127,10 @@ python authoring/verify.py --junit-console /path/to/junit-platform-console-stand
 
 -PdebugLab显式关闭Gradle任务时限，调试连接时JUnit时限也关闭；普通学习和CI不要设置它。IDE直接运行JUnit调试可设置junit.jupiter.execution.timeout.mode=disabled_on_debug。必要时使用停止按钮或Ctrl-C。
 
+## 阶段评审
+
+本次详细内容、代表题目、源码讲解、面试问答、测试结果和重点Review提示见[阶段报告](阶段报告.md)。
+
 ## 当前状态
 
 见authoring/VERIFICATION.md。本包始终标记为内部教学模板试点，既不代表完整V1完成，也不代表Academy学员归档已经验收。
