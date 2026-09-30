@@ -1,11 +1,14 @@
 package labs.distributed;
 
+import static labs.distributed.grpc.RpcFailureObserver.call;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import labs.distributed.capacity.*;
 import labs.distributed.grpc.Lab;
+import labs.distributed.grpc.RpcFailureObserver;
 import labs.distributed.grpc.protocol.*;
 import labs.distributed.support.Database;
 import org.junit.jupiter.api.Test;
@@ -25,21 +28,31 @@ class CapacityTest {
   @Test
   void 入口无等待拒绝与异常许可归还() throws Exception {
     var admission = new Admission(1);
-    CountDownLatch entered = new CountDownLatch(1);
+    CountDownLatch enteredOrFinished = new CountDownLatch(1);
+    AtomicBoolean entered = new AtomicBoolean();
     CountDownLatch release = new CountDownLatch(1);
     try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
       var work =
           pool.submit(
-              () ->
-                  admission.execute(
+              () -> {
+                try {
+                  return admission.execute(
                       () -> {
-                        entered.countDown();
+                        entered.set(true);
+                        enteredOrFinished.countDown();
                         if (!release.await(3, TimeUnit.SECONDS))
                           throw new IllegalStateException("屏障超时");
                         return 1;
-                      }));
+                      });
+                } finally {
+                  enteredOrFinished.countDown();
+                }
+              });
       try {
-        assertTrue(entered.await(3, TimeUnit.SECONDS));
+        assertTrue(enteredOrFinished.await(3, TimeUnit.SECONDS));
+        // 工作线程提前失败时立即传播其真实cause，不能误报为进入屏障超时。
+        if (!entered.get()) work.get(3, TimeUnit.SECONDS);
+        assertTrue(entered.get());
         assertThrows(RejectedExecutionException.class, () -> admission.execute(() -> 2));
       } finally {
         release.countDown();
@@ -65,11 +78,24 @@ class CapacityTest {
             "jdbc:h2:mem:" + UUID.randomUUID() + ";MODE=MySQL;DB_CLOSE_DELAY=-1", "sa", "");
     var backend = new DatabaseInventory(db, 2);
     backend.initialize(5);
-    try (var endpoint = new Lab.Endpoint(new Lab.Service(backend))) {
+    var failures = new RpcFailureObserver();
+    try (var endpoint = new Lab.Endpoint(new Lab.Service(backend), failures)) {
       var request =
           ReserveRequest.newBuilder().setKey("order1").setSku("book").setQuantity(2).build();
-      assertEquals(3, Lab.client(endpoint.channel, "first", 3000).reserve(request).getAvailable());
-      assertEquals(3, Lab.client(endpoint.channel, "retry", 3000).reserve(request).getAvailable());
+      assertEquals(
+          3,
+          call(() ->
+                  Lab.client(endpoint.channel, "first", 3000)
+                      .withInterceptors(failures)
+                      .reserve(request))
+              .getAvailable());
+      assertEquals(
+          3,
+          call(() ->
+                  Lab.client(endpoint.channel, "retry", 3000)
+                      .withInterceptors(failures)
+                      .reserve(request))
+              .getAvailable());
       assertEquals(3, db.scalar("SELECT available FROM inventory"));
       assertEquals(0, backend.admission.active());
     }
@@ -84,13 +110,20 @@ class CapacityTest {
     backend.initialize(6);
     var provider =
         new labs.distributed.dubbo.Lab.Provider("sql-fixture", new DubboDatabaseInventory(backend));
+    var failures = new RpcFailureObserver();
     try (var server = new labs.distributed.dubbo.Lab.Server(provider, "N/A");
         var client = new labs.distributed.dubbo.Lab.Client(server.address(), false);
-        var grpc = new Lab.Endpoint(new Lab.Service(backend))) {
+        var grpc = new Lab.Endpoint(new Lab.Service(backend), failures)) {
       assertEquals(4, client.reserve("shared-order", "book", 2, "dubbo", 3000));
       var request =
           ReserveRequest.newBuilder().setKey("shared-order").setSku("book").setQuantity(2).build();
-      assertEquals(4, Lab.client(grpc.channel, "grpc", 3000).reserve(request).getAvailable());
+      assertEquals(
+          4,
+          call(() ->
+                  Lab.client(grpc.channel, "grpc", 3000)
+                      .withInterceptors(failures)
+                      .reserve(request))
+              .getAvailable());
       assertEquals(4, db.scalar("SELECT available FROM inventory"));
     }
   }

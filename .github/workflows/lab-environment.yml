@@ -1,33 +1,18 @@
 name: 共享实验环境真实验收
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'infra/**'
-      - 'scripts/**'
-      - 'docs/environment/**'
-      - 'courses/java-recovery-collections/**'
-      - '.github/workflows/lab-environment.yml'
-  pull_request:
-    paths:
-      - 'infra/**'
-      - 'scripts/**'
-      - 'docs/environment/**'
-      - 'courses/java-recovery-collections/**'
-      - '.github/workflows/lab-environment.yml'
-  workflow_dispatch:
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
-  cancel-in-progress: false
+  workflow_call:
 permissions:
   contents: read
+
 jobs:
   real-lab:
+    name: real-lab-environment
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -99,7 +84,7 @@ jobs:
           ./scripts/lab.sh build . javac -version
           ./scripts/lab.sh build . mvn -version
           ./scripts/lab.sh build . sh -ec 'out=$(mktemp -d); javac --release 21 -d "$out" infra/testcontainers/LabImages.java infra/testcontainers/LabImagesProbe.java; java -cp "$out" lab.support.LabImagesProbe'
-          ./scripts/lab.sh build courses/java-recovery-collections bash ./gradlew --no-daemon test
+          ./scripts/lab.sh build courses/java-recovery-collections bash ./gradlew --no-daemon --no-build-cache test
       - name: 收集最后状态的脱敏日志
         if: always()
         run: python3 scripts/ci_smoke.py logs
@@ -116,5 +101,5 @@ jobs:
           path: |
             infra/artifacts/*.log
             courses/java-recovery-collections/java-pilot/**/build/reports/tests/
-          if-no-files-found: warn
           retention-days: 7
+          if-no-files-found: error

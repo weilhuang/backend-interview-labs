@@ -1,0 +1,592 @@
+[
+  {
+    "label": "layout-320",
+    "viewport": 320,
+    "document": 320,
+    "body": 320,
+    "containers": [
+      {
+        "element": "MAIN",
+        "left": 0,
+        "right": 320,
+        "width": 320
+      },
+      {
+        "element": "ASIDE",
+        "left": 14,
+        "right": 306,
+        "width": 292
+      },
+      {
+        "element": "stack",
+        "left": 14,
+        "right": 306,
+        "width": 292
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 306,
+        "width": 292
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 190.859375,
+        "width": 159.859375
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 161,
+        "width": 130
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 161.015625,
+        "width": 130.015625
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 177.015625,
+        "width": 146.015625
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 306,
+        "width": 292
+      },
+      {
+        "element": "orders",
+        "left": 31,
+        "right": 289,
+        "width": 258
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 306,
+        "width": 292
+      },
+      {
+        "element": "deliveries",
+        "left": 31,
+        "right": 289,
+        "width": 258
+      },
+      {
+        "element": "wide",
+        "left": 14,
+        "right": 306,
+        "width": 292
+      },
+      {
+        "element": "notice",
+        "left": 31,
+        "right": 289,
+        "width": 258
+      },
+      {
+        "element": "audit",
+        "left": 31,
+        "right": 289,
+        "width": 258
+      },
+      {
+        "element": "history",
+        "left": 31,
+        "right": 289,
+        "width": 258
+      }
+    ],
+    "tables": [
+      {
+        "id": "orders",
+        "width": 258,
+        "scrollWidth": 837,
+        "overflow": "auto"
+      },
+      {
+        "id": "deliveries",
+        "width": 258,
+        "scrollWidth": 1226,
+        "overflow": "auto"
+      }
+    ]
+  },
+  {
+    "label": "layout-390",
+    "viewport": 390,
+    "document": 390,
+    "body": 390,
+    "containers": [
+      {
+        "element": "MAIN",
+        "left": 0,
+        "right": 390,
+        "width": 390
+      },
+      {
+        "element": "ASIDE",
+        "left": 14,
+        "right": 376,
+        "width": 362
+      },
+      {
+        "element": "stack",
+        "left": 14,
+        "right": 376,
+        "width": 362
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 376,
+        "width": 362
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 190.859375,
+        "width": 159.859375
+      },
+      {
+        "element": "metric",
+        "left": 202.859375,
+        "right": 332.859375,
+        "width": 130
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 161.015625,
+        "width": 130.015625
+      },
+      {
+        "element": "metric",
+        "left": 173.015625,
+        "right": 319.03125,
+        "width": 146.015625
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 376,
+        "width": 362
+      },
+      {
+        "element": "orders",
+        "left": 31,
+        "right": 359,
+        "width": 328
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 376,
+        "width": 362
+      },
+      {
+        "element": "deliveries",
+        "left": 31,
+        "right": 359,
+        "width": 328
+      },
+      {
+        "element": "wide",
+        "left": 14,
+        "right": 376,
+        "width": 362
+      },
+      {
+        "element": "notice",
+        "left": 31,
+        "right": 359,
+        "width": 328
+      },
+      {
+        "element": "audit",
+        "left": 31,
+        "right": 359,
+        "width": 328
+      },
+      {
+        "element": "history",
+        "left": 31,
+        "right": 359,
+        "width": 328
+      }
+    ],
+    "tables": [
+      {
+        "id": "orders",
+        "width": 328,
+        "scrollWidth": 837,
+        "overflow": "auto"
+      },
+      {
+        "id": "deliveries",
+        "width": 328,
+        "scrollWidth": 1226,
+        "overflow": "auto"
+      }
+    ]
+  },
+  {
+    "label": "layout-800",
+    "viewport": 800,
+    "document": 800,
+    "body": 800,
+    "containers": [
+      {
+        "element": "MAIN",
+        "left": 0,
+        "right": 800,
+        "width": 800
+      },
+      {
+        "element": "ASIDE",
+        "left": 14,
+        "right": 786,
+        "width": 772
+      },
+      {
+        "element": "stack",
+        "left": 14,
+        "right": 786,
+        "width": 772
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 786,
+        "width": 772
+      },
+      {
+        "element": "metric",
+        "left": 31,
+        "right": 190.859375,
+        "width": 159.859375
+      },
+      {
+        "element": "metric",
+        "left": 202.859375,
+        "right": 332.859375,
+        "width": 130
+      },
+      {
+        "element": "metric",
+        "left": 344.859375,
+        "right": 474.875,
+        "width": 130.015625
+      },
+      {
+        "element": "metric",
+        "left": 486.875,
+        "right": 632.890625,
+        "width": 146.015625
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 786,
+        "width": 772
+      },
+      {
+        "element": "orders",
+        "left": 31,
+        "right": 769,
+        "width": 738
+      },
+      {
+        "element": "SECTION",
+        "left": 14,
+        "right": 786,
+        "width": 772
+      },
+      {
+        "element": "deliveries",
+        "left": 31,
+        "right": 769,
+        "width": 738
+      },
+      {
+        "element": "wide",
+        "left": 14,
+        "right": 786,
+        "width": 772
+      },
+      {
+        "element": "notice",
+        "left": 31,
+        "right": 769,
+        "width": 738
+      },
+      {
+        "element": "audit",
+        "left": 31,
+        "right": 769,
+        "width": 738
+      },
+      {
+        "element": "history",
+        "left": 31,
+        "right": 769,
+        "width": 738
+      }
+    ],
+    "tables": [
+      {
+        "id": "orders",
+        "width": 738,
+        "scrollWidth": 837,
+        "overflow": "auto"
+      },
+      {
+        "id": "deliveries",
+        "width": 738,
+        "scrollWidth": 1226,
+        "overflow": "auto"
+      }
+    ]
+  },
+  {
+    "label": "layout-801",
+    "viewport": 801,
+    "document": 801,
+    "body": 801,
+    "containers": [
+      {
+        "element": "MAIN",
+        "left": 0,
+        "right": 801,
+        "width": 801
+      },
+      {
+        "element": "ASIDE",
+        "left": 24,
+        "right": 364,
+        "width": 340
+      },
+      {
+        "element": "stack",
+        "left": 384,
+        "right": 777,
+        "width": 393
+      },
+      {
+        "element": "SECTION",
+        "left": 384,
+        "right": 777,
+        "width": 393
+      },
+      {
+        "element": "metric",
+        "left": 405,
+        "right": 564.859375,
+        "width": 159.859375
+      },
+      {
+        "element": "metric",
+        "left": 576.859375,
+        "right": 706.859375,
+        "width": 130
+      },
+      {
+        "element": "metric",
+        "left": 405,
+        "right": 535.015625,
+        "width": 130.015625
+      },
+      {
+        "element": "metric",
+        "left": 547.015625,
+        "right": 693.03125,
+        "width": 146.015625
+      },
+      {
+        "element": "SECTION",
+        "left": 384,
+        "right": 777,
+        "width": 393
+      },
+      {
+        "element": "orders",
+        "left": 405,
+        "right": 756,
+        "width": 351
+      },
+      {
+        "element": "SECTION",
+        "left": 384,
+        "right": 777,
+        "width": 393
+      },
+      {
+        "element": "deliveries",
+        "left": 405,
+        "right": 756,
+        "width": 351
+      },
+      {
+        "element": "wide",
+        "left": 24,
+        "right": 777,
+        "width": 753
+      },
+      {
+        "element": "notice",
+        "left": 45,
+        "right": 756,
+        "width": 711
+      },
+      {
+        "element": "audit",
+        "left": 45,
+        "right": 756,
+        "width": 711
+      },
+      {
+        "element": "history",
+        "left": 45,
+        "right": 756,
+        "width": 711
+      }
+    ],
+    "tables": [
+      {
+        "id": "orders",
+        "width": 351,
+        "scrollWidth": 837,
+        "overflow": "auto"
+      },
+      {
+        "id": "deliveries",
+        "width": 351,
+        "scrollWidth": 1226,
+        "overflow": "auto"
+      }
+    ]
+  },
+  {
+    "label": "layout-1440",
+    "viewport": 1440,
+    "document": 1440,
+    "body": 1440,
+    "containers": [
+      {
+        "element": "MAIN",
+        "left": 76,
+        "right": 1364,
+        "width": 1288
+      },
+      {
+        "element": "ASIDE",
+        "left": 100,
+        "right": 440,
+        "width": 340
+      },
+      {
+        "element": "stack",
+        "left": 460,
+        "right": 1340,
+        "width": 880
+      },
+      {
+        "element": "SECTION",
+        "left": 460,
+        "right": 1340,
+        "width": 880
+      },
+      {
+        "element": "metric",
+        "left": 481,
+        "right": 640.859375,
+        "width": 159.859375
+      },
+      {
+        "element": "metric",
+        "left": 652.859375,
+        "right": 782.859375,
+        "width": 130
+      },
+      {
+        "element": "metric",
+        "left": 794.859375,
+        "right": 924.875,
+        "width": 130.015625
+      },
+      {
+        "element": "metric",
+        "left": 936.875,
+        "right": 1082.890625,
+        "width": 146.015625
+      },
+      {
+        "element": "SECTION",
+        "left": 460,
+        "right": 1340,
+        "width": 880
+      },
+      {
+        "element": "orders",
+        "left": 481,
+        "right": 1319,
+        "width": 838
+      },
+      {
+        "element": "SECTION",
+        "left": 460,
+        "right": 1340,
+        "width": 880
+      },
+      {
+        "element": "deliveries",
+        "left": 481,
+        "right": 1319,
+        "width": 838
+      },
+      {
+        "element": "wide",
+        "left": 100,
+        "right": 1340,
+        "width": 1240
+      },
+      {
+        "element": "notice",
+        "left": 121,
+        "right": 1319,
+        "width": 1198
+      },
+      {
+        "element": "audit",
+        "left": 121,
+        "right": 1319,
+        "width": 1198
+      },
+      {
+        "element": "history",
+        "left": 121,
+        "right": 1319,
+        "width": 1198
+      }
+    ],
+    "tables": [
+      {
+        "id": "orders",
+        "width": 838,
+        "scrollWidth": 838,
+        "overflow": "auto"
+      },
+      {
+        "id": "deliveries",
+        "width": 838,
+        "scrollWidth": 1226,
+        "overflow": "auto"
+      }
+    ]
+  }
+]

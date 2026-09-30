@@ -51,6 +51,13 @@ additional_files:
 - name: docs/前端使用.md
 - name: docs/故障演练.md
 - name: docs/源码与版本.md
+- name: docs/界面证据/README.md
+- name: docs/界面证据/ci-36746760606-1440px.png
+  is_binary: true
+- name: docs/界面证据/ci-36746760606-390px.png
+  is_binary: true
+- name: docs/界面证据/ci-36746760606-browser-layout.json
+- name: docs/界面证据/ci-36746760606-process-recovery.json
 - name: docs/答辩与盲测标准解.md
 - name: gradle/wrapper/gradle-wrapper.jar
   is_binary: true

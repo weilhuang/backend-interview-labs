@@ -48,7 +48,7 @@ for key, lesson in lessons.items():
 
 {lesson['scene']}
 
-本节范围：先运行完整作者实现，再在 Academy 预览的占位区独立编码，最后对照公开标准解。预计 60–100 分钟；先修不足请回到首页给出的课程。容器测试目前是可执行待云端 Docker 实证，不代表已经运行成功。
+本节范围：先运行完整作者实现，再在 Academy 预览的占位区独立编码，最后对照公开标准解。预计 60–100 分钟；先修不足请回到首页给出的课程。本节真实容器与正反解的已验证提交、环境和证据见课程根目录的验证报告；CLI/CI通过不代替Academy界面与归档验收。
 
 ## 概念、机制与图解
 
@@ -134,6 +134,6 @@ if (ROOT/'shared/versions.env').is_file(): additional += ['shared/versions.env',
 additional += [str(p.relative_to(ROOT)) for p in sorted((ROOT/'support').rglob('*.java'))]
 additional += [str(p.relative_to(ROOT)) for p in sorted((ROOT/'authoring').iterdir()) if p.suffix in {'.py','.json','.txt'}]
 additional = list(dict.fromkeys(additional))
-yaml_file(ROOT/'course-info.yaml',{'type':'marketplace','title':'后端面试实验室：Kafka 与 RocketMQ','language':'Chinese','summary':'两门消息队列课程十二个实验单元，包含完整源码、调用端、全部测试、每节标准答案、真实容器故障验证与面试追问；容器动态和Academy导入尚待实测，不代表完整V1发布。','programming_language':'Java','content':sections,'environment_settings':{'jvm_language_level':'JDK_21'},'additional_files':[{'name':p,**({'is_binary':True} if p.endswith('.jar') else {})} for p in additional],'yaml_version':2})
+yaml_file(ROOT/'course-info.yaml',{'type':'marketplace','title':'后端面试实验室：Kafka 与 RocketMQ','language':'Chinese','summary':'两门消息队列课程十二个实验单元，包含完整源码、调用端、全部测试、每节标准答案、真实容器故障验证与面试追问；Linux真实容器与正反解门禁已通过，Academy界面与归档仍待独立验收，不代表完整V1发布。','programming_language':'Java','content':sections,'environment_settings':{'jvm_language_level':'JDK_21'},'additional_files':[{'name':p,**({'is_binary':True} if p.endswith('.jar') else {})} for p in additional],'yaml_version':2})
 (ROOT/'authoring/manifest.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n')
 print('已生成中文课稿与UTF-16占位：',len(manifest),'节')

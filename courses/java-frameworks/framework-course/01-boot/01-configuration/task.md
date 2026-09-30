@@ -13,7 +13,9 @@
 3. 运行测试验证默认值、外部覆盖、非法配置启动失败
 4. 用断点跟踪绑定器和校验器，而不是手动new替代容器
 
-运行本节检查：`./gradlew :01-configuration:test`。运行完整调用方：`./gradlew :01-configuration:usage`。服务型示例另可执行 `./gradlew :01-configuration:run`，停止使用 Ctrl+C。
+**Academy导入模式**：用本题Check检查；打开Usage.java的main运行按钮，或在Gradle工具窗口执行本模块test、usage、run。归档缺少Wrapper时不要在导入目录运行./gradlew。
+
+**源码仓库/普通Gradle副本CLI模式**：运行本节检查：`./gradlew :01-configuration:test`。运行完整调用方：`./gradlew :01-configuration:usage`。服务型示例另可执行 `./gradlew :01-configuration:run`，停止使用 Ctrl+C。
 
 ## 正确性合同
 

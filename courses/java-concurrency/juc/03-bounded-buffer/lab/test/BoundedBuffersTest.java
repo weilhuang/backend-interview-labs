@@ -82,23 +82,27 @@ class BoundedBuffersTest {
         for (var factory : factories) {
             var b = factory.apply(2);
             var start = new CountDownLatch(1);
-            try (var pool = Executors.newFixedThreadPool(3)) {
+            var pool = Executors.newFixedThreadPool(3);
+            var completed = new ExecutorCompletionService<Set<Integer>>(pool);
+            var futures = new ArrayList<Future<Set<Integer>>>();
+            Throwable primary = null;
+            try {
                 var first =
-                        pool.submit(
+                        completed.submit(
                                 () -> {
                                     start.await();
                                     for (int i = 0; i < 40; i++) b.put(i);
                                     return null;
                                 });
                 var second =
-                        pool.submit(
+                        completed.submit(
                                 () -> {
                                     start.await();
                                     for (int i = 40; i < 80; i++) b.put(i);
                                     return null;
                                 });
                 var consumer =
-                        pool.submit(
+                        completed.submit(
                                 () -> {
                                     start.await();
                                     var seen = new HashSet<Integer>();
@@ -107,18 +111,57 @@ class BoundedBuffersTest {
                                         assertTrue(seen.add(x.get()), "不能重复消费");
                                     return seen;
                                 });
+                futures.addAll(List.of(first, second, consumer));
+                start.countDown();
+                int finishedProducers = 0;
+                for (int i = 0; i < futures.size(); i++) {
+                    var done = completed.poll(3, TimeUnit.SECONDS);
+                    assertNotNull(done, "并发任务未按期限完成，请检查等待条件与通知");
+                    // 按完成顺序传播错误：消费者的TODO不能被等待生产者的超时遮住。
+                    var values = done.get();
+                    if (done == consumer) {
+                        assertEquals(80, values.size());
+                    } else if (++finishedProducers == 2) {
+                        b.close();
+                    }
+                }
+            } catch (Exception | Error failure) {
+                primary = failure;
+                throw failure;
+            } finally {
+                Throwable cleanup = null;
                 try {
-                    start.countDown();
-                    first.get(3, TimeUnit.SECONDS);
-                    second.get(3, TimeUnit.SECONDS);
                     b.close();
-                    assertEquals(80, consumer.get(3, TimeUnit.SECONDS).size());
-                } finally {
-                    b.close();
+                } catch (Exception | Error failure) {
+                    cleanup = failure;
+                }
+                try {
+                    for (var future : futures) future.cancel(true);
+                } catch (Exception | Error failure) {
+                    cleanup = combine(cleanup, failure);
+                }
+                try {
                     pool.shutdownNow();
+                    assertTrue(pool.awaitTermination(2, TimeUnit.SECONDS), "并发测试线程未正常结束");
+                } catch (InterruptedException failure) {
+                    Thread.currentThread().interrupt();
+                    cleanup = combine(cleanup, failure);
+                } catch (Exception | Error failure) {
+                    cleanup = combine(cleanup, failure);
+                }
+                if (cleanup != null) {
+                    if (primary != null) primary.addSuppressed(cleanup);
+                    else if (cleanup instanceof Exception failure) throw failure;
+                    else throw (Error) cleanup;
                 }
             }
         }
+    }
+
+    private static Throwable combine(Throwable first, Throwable next) {
+        if (first == null) return next;
+        first.addSuppressed(next);
+        return first;
     }
 
     @Test

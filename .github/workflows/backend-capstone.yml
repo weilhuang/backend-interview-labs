@@ -1,29 +1,33 @@
 name: C14真实订单库存与消息恢复验收
 on:
-  workflow_dispatch:
-  pull_request:
-    paths: ['courses/backend-capstone/**', 'infra/versions.env', '.github/workflows/backend-capstone.yml']
-  push:
-    branches: [main]
-    paths: ['courses/backend-capstone/**', 'infra/versions.env', '.github/workflows/backend-capstone.yml']
+  workflow_call:
 permissions:
   contents: read
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
+
 jobs:
   verify:
+    name: real-backend-capstone
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 50
     defaults:
       run:
         working-directory: courses/backend-capstone
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-backend-capstone-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-backend-capstone-${{ github.job }}-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -53,7 +57,7 @@ jobs:
           bash -n scripts/course.sh
       - name: 严格JDK21快测、调用方与完整应用
         timeout-minutes: 10
-        run: bash ./gradlew --no-daemon --max-workers=1 test usage verificationClasspath :05-defense:installDist --continue --console=plain
+        run: bash ./gradlew --no-daemon --no-build-cache --max-workers=1 test usage verificationClasspath :05-defense:installDist --continue --console=plain
       - name: 正确写法、学生起点与错误变体
         timeout-minutes: 6
         run: |
@@ -63,7 +67,7 @@ jobs:
           python authoring/verify_variants.py --jdk "$JAVA_HOME" --console build/tools/junit-console.jar
       - name: 真实MySQL并发、Kafka确认、RPC未知与重启恢复
         timeout-minutes: 15
-        run: bash ./gradlew --no-daemon --max-workers=1 integrationTest --continue --console=plain -PdockerApiVersion=1.44
+        run: bash ./gradlew --no-daemon --no-build-cache --max-workers=1 integrationTest --continue --console=plain -PdockerApiVersion=1.44
       - name: Compose独立进程与真实HTTP闭环
         timeout-minutes: 8
         run: |
@@ -83,13 +87,31 @@ jobs:
         run: |
           bash scripts/course.sh logs > build/compose.log 2>&1 || true
           bash scripts/course.sh stop
+      - name: Academy源码夹具三阶段判题（contract）
+        timeout-minutes: 35
+        working-directory: ${{ github.workspace }}
+        env:
+          ACADEMY_COURSE: backend-capstone
+          ACADEMY_KEY: backend-capstone
+        run: |
+          python -m pip install -r scripts/quality/requirements.txt
+          python scripts/quality/academy_gate.py roundtrip \
+            --course "$ACADEMY_COURSE" --suite contract \
+            --java-home "$JAVA_HOME" --timeout 600 \
+            --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
+            --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
       - name: 保存逐层验收证据
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: C14逐层验收与中文页面
+          name: C14逐层验收与中文页面-${{ github.run_id }}-${{ github.run_attempt }}
           retention-days: 7
+          if-no-files-found: error
           path: |
+            build/quality/backend-capstone-roundtrip.json
+            build/quality/backend-capstone-roundtrip/**/source-manifest.json
+            build/quality/backend-capstone-roundtrip/**/*.log
+            build/quality/backend-capstone-roundtrip/**/build/test-results/
             courses/backend-capstone/**/build/reports/tests/
             courses/backend-capstone/**/build/test-results/
             courses/backend-capstone/build/variants/

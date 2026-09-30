@@ -162,10 +162,18 @@ public final class Lab {
     public final ManagedChannel channel;
 
     public Endpoint(BindableService service) throws java.io.IOException {
+      this(service, new ServerInterceptor[0]);
+    }
+
+    /** 额外拦截器包在练习拦截器外侧，供同JVM测试保留原始服务端异常。 */
+    public Endpoint(BindableService service, ServerInterceptor... observers)
+        throws java.io.IOException {
       server =
           NettyServerBuilder.forAddress(new InetSocketAddress("127.0.0.1", 0))
               .maxInboundMessageSize(1024 * 1024)
-              .addService(ServerInterceptors.intercept(service, new TraceInterceptor()))
+              .addService(
+                  ServerInterceptors.intercept(
+                      ServerInterceptors.intercept(service, new TraceInterceptor()), observers))
               .build()
               .start();
       channel =

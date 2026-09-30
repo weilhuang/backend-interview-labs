@@ -13,7 +13,9 @@
 3. 检查默认启用、关闭、用户覆盖和缺依赖四种上下文
 4. 读取ConditionEvaluationReport定位为什么某配置生效/未生效
 
-运行本节检查：`./gradlew :14-autoconfiguration:test`。运行完整调用方：`./gradlew :14-autoconfiguration:usage`。服务型示例另可执行 `./gradlew :14-autoconfiguration:run`，停止使用 Ctrl+C。
+**Academy导入模式**：用本题Check检查；打开Usage.java的main运行按钮，或在Gradle工具窗口执行本模块test、usage、run。归档缺少Wrapper时不要在导入目录运行./gradlew。
+
+**源码仓库/普通Gradle副本CLI模式**：运行本节检查：`./gradlew :14-autoconfiguration:test`。运行完整调用方：`./gradlew :14-autoconfiguration:usage`。服务型示例另可执行 `./gradlew :14-autoconfiguration:run`，停止使用 Ctrl+C。
 
 ## 正确性合同
 

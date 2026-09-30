@@ -1,36 +1,33 @@
 name: 数据库与缓存课程真实服务检查
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'courses/data-storage/**'
-      - 'infra/versions.env'
-      - '.github/workflows/data-storage.yml'
-  pull_request:
-    paths:
-      - 'courses/data-storage/**'
-      - 'infra/versions.env'
-      - '.github/workflows/data-storage.yml'
-  workflow_dispatch:
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
-  cancel-in-progress: false
+  workflow_call:
 permissions:
   contents: read
+
 jobs:
   mysql:
+    name: real-mysql
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: courses/data-storage/mysql-engineering
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-data-storage-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-data-storage-${{ github.job }}-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -42,29 +39,59 @@ jobs:
           python -m pip install -r authoring/requirements.txt
           python authoring/validate_course.py
       - name: 真正MySQL全部契约与故障集成
-        run: ./gradlew --no-daemon test
+        run: ./gradlew --no-daemon --no-build-cache test
+      - name: Academy源码夹具三阶段判题（integration）
+        timeout-minutes: 35
+        working-directory: ${{ github.workspace }}
+        env:
+          ACADEMY_COURSE: data-storage/mysql-engineering
+          ACADEMY_KEY: mysql
+        run: |
+          python -m pip install -r scripts/quality/requirements.txt
+          python scripts/quality/academy_gate.py roundtrip \
+            --course "$ACADEMY_COURSE" --suite integration \
+            --java-home "$JAVA_HOME" --timeout 600 \
+            --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
+            --work-dir "build/quality/$ACADEMY_KEY-roundtrip" \
+            --gradle-arg=-PdockerApiVersion=1.44
       - name: 保留全部可见测试报告
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: c06-mysql-test-reports
+          name: c06-mysql-test-reports-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/quality/mysql-roundtrip.json
+            build/quality/mysql-roundtrip/**/source-manifest.json
+            build/quality/mysql-roundtrip/**/*.log
+            build/quality/mysql-roundtrip/**/build/test-results/
             courses/data-storage/mysql-engineering/mysql/**/build/reports/tests/
             courses/data-storage/mysql-engineering/mysql/**/build/test-results/
           retention-days: 7
+          if-no-files-found: error
 
   redis:
+    name: real-redis
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: courses/data-storage/redis-engineering
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-data-storage-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-data-storage-${{ github.job }}-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -76,13 +103,32 @@ jobs:
           python -m pip install -r authoring/requirements.txt
           python authoring/validate_course.py
       - name: 真正Redis与MySQL全部契约和故障集成
-        run: ./gradlew --no-daemon test
+        run: ./gradlew --no-daemon --no-build-cache test
+      - name: Academy源码夹具三阶段判题（integration）
+        timeout-minutes: 35
+        working-directory: ${{ github.workspace }}
+        env:
+          ACADEMY_COURSE: data-storage/redis-engineering
+          ACADEMY_KEY: redis
+        run: |
+          python -m pip install -r scripts/quality/requirements.txt
+          python scripts/quality/academy_gate.py roundtrip \
+            --course "$ACADEMY_COURSE" --suite integration \
+            --java-home "$JAVA_HOME" --timeout 600 \
+            --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
+            --work-dir "build/quality/$ACADEMY_KEY-roundtrip" \
+            --gradle-arg=-PdockerApiVersion=1.44
       - name: 保留全部可见测试报告
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: c07-redis-test-reports
+          name: c07-redis-test-reports-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/quality/redis-roundtrip.json
+            build/quality/redis-roundtrip/**/source-manifest.json
+            build/quality/redis-roundtrip/**/*.log
+            build/quality/redis-roundtrip/**/build/test-results/
             courses/data-storage/redis-engineering/redis/**/build/reports/tests/
             courses/data-storage/redis-engineering/redis/**/build/test-results/
           retention-days: 7
+          if-no-files-found: error

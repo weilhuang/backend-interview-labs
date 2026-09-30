@@ -1,6 +1,13 @@
 # JVM与现代Java实验课程 · V1作者验收版
 
-状态：作者CLI与真实Gradle验收已完成（30测试、7替代解、19错误变异），详见[阶段报告](阶段报告.md)。尚未通过本课程专属Academy预览、Check、重置、插件导出与干净导入，不称为可用发行归档。不是JetBrains官方课程。七个C03单元完整覆盖，不用两周路线删减内容。
+## 先选择运行路线
+
+**Academy官方归档导入模式**：用本题Check检查作答，打开对应Usage.java的main运行按钮，或用IDE的Gradle工具窗口执行test/run。Academy2026.9官方导出实际会剔除gradlew、gradlew.bat与gradle-wrapper.jar，仅保留properties；不要在缺少Wrapper的导入目录照抄终端./gradlew命令。项目SDK与Gradle JVM均用完整JDK21。
+
+**源码仓库或普通Gradle学员副本模式**：以下./gradlew命令针对含Wrapper的课程根，Windows用gradlew.bat。完整CLI与诊断教程保留；首次依赖解析失败应区分环境问题与作答失败。
+
+
+状态：作者CLI与真实Gradle验收已完成（30测试、7替代解、19错误变异），详见[阶段报告](阶段报告.md)。已完成本课官方导出/干净导入和C03-01代表题Check/Reset/Usage；其余6题与Preview按钮流程未逐项验收，不称全部发行门禁通过。不是JetBrains官方课程。七个C03单元完整覆盖，不用两周路线删减内容。
 
 ## 版本、依赖与边界
 
@@ -11,7 +18,7 @@
 | 显式旧版对照 | 同一JDK21以--release8、--release17编译；不代表在实际8/17 VM运行 |
 | 新版资料附录 | 25示例仅作显式版本对照；已有完整JDK25时自选运行，无环境就NOT_RUN；V1学习与毕业只要求JDK21，不要求另装或下载JDK |
 | Gradle/JUnit | Wrapper8.10.2；Jupiter5.11.4，Platform1.11.4；依赖来自Maven Central |
-| IDE/Academy | 目标IntelliJ IDEA2026.1.5；实际build与插件组合、导入/Check/提示/重置/导出未在本课验收 |
+| IDE/Academy | IDEA2026.1.5＋Academy2026.9-2026.1-1070；已官方导出/干净导入并抽检C03-01，其他6题和Preview按钮流程未覆盖 |
 | Python | Python3.12执行轻量CLI；作者验证另需PyYAML6.0.2与指定JUnit独立JAR |
 | 前端/Node | 不需要 |
 | Docker/Compose/镜像/Testcontainers | 不需要；本课没有外部服务或重复镜像台账 |
@@ -69,3 +76,7 @@ python authoring/verify.py --junit-console /你提供的路径/junit-platform-co
 - T：单目标加载器、有界保留、版本开关模型均有意缩小，不能称生产框架
 
 环境不足写INVALID_ENV/BLOCKED；没运行写NOT_RUN。标准解通过、错误解失败、替代解通过与IDE验收是四件不同的事。
+
+## Academy界面抽检
+
+本课已在云端IDEA2026.1.5（261.27258.48）、Academy2026.9-2026.1-1070、完整Temurin21.0.12.1+1和官方本地Gradle8.10.2中完成官方导出/干净导入，识别7单元。C03-01类加载多fixture代表题：起点2失败/2通过，参考解4通过；Reset恢复0/7及TODO。LoaderLabUsage真实输出两倍6、常量7且初始化事件为空、主动初始化[父类, 子类]，退出码0。 中文标题/正文、ASCII、展开提示、完整公开测试与fixture树、长标准答案和解释均实际查看。Task栏建议约600像素以上，窄栏会折行。完整边界见阶段报告；JDK25附录和诊断脚本未在本次GUI中运行。

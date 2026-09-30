@@ -13,7 +13,9 @@
 3. 对比withoutProxy内部自调用，定位为何没有事务
 4. 在TransactionInterceptor和事务管理器打断点记录逻辑/物理事务
 
-运行本节检查：`./gradlew :12-transaction-source:test`。运行完整调用方：`./gradlew :12-transaction-source:usage`。服务型示例另可执行 `./gradlew :12-transaction-source:run`，停止使用 Ctrl+C。
+**Academy导入模式**：用本题Check检查；打开Usage.java的main运行按钮，或在Gradle工具窗口执行本模块test、usage、run。归档缺少Wrapper时不要在导入目录运行./gradlew。
+
+**源码仓库/普通Gradle副本CLI模式**：运行本节检查：`./gradlew :12-transaction-source:test`。运行完整调用方：`./gradlew :12-transaction-source:usage`。服务型示例另可执行 `./gradlew :12-transaction-source:run`，停止使用 Ctrl+C。
 
 ## 正确性合同
 

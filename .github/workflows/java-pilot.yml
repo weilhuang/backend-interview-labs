@@ -1,23 +1,14 @@
 name: Java课程内部试点检查
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'courses/java-recovery-collections/**'
-      - '.github/workflows/java-pilot.yml'
-  pull_request:
-    paths:
-      - 'courses/java-recovery-collections/**'
-      - '.github/workflows/java-pilot.yml'
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
-  cancel-in-progress: false
+  workflow_call:
 permissions:
   contents: read
+
 jobs:
   check:
+    name: real-java-pilot
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -27,10 +18,20 @@ jobs:
         working-directory: courses/java-recovery-collections
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-java-pilot-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-java-pilot-${{ github.job }}-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -44,19 +45,37 @@ jobs:
       - name: 检查作者课程元数据
         run: python authoring/validate_course.py
       - name: 使用release21运行真实Gradle测试
-        run: ./gradlew --no-daemon test
+        run: ./gradlew --no-daemon --no-build-cache test
       - name: 取得固定版本JUnit控制台用于正反实现回归
         run: |
           curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$RUNNER_TEMP/junit-console.jar"
           echo "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc  $RUNNER_TEMP/junit-console.jar" | sha256sum --check
       - name: 检查未完成实现、错误变体、替代正确解与完整调用端
         run: python authoring/verify.py --junit-console "$RUNNER_TEMP/junit-console.jar"
+      - name: Academy源码夹具三阶段判题（contract）
+        timeout-minutes: 35
+        working-directory: ${{ github.workspace }}
+        env:
+          ACADEMY_COURSE: java-recovery-collections
+          ACADEMY_KEY: java-recovery-collections
+        run: |
+          python -m pip install -r scripts/quality/requirements.txt
+          python scripts/quality/academy_gate.py roundtrip \
+            --course "$ACADEMY_COURSE" --suite contract \
+            --java-home "$JAVA_HOME" --timeout 600 \
+            --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
+            --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
       - name: 保留验证报告
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: java-pilot-reports-jdk${{ matrix.java }}
+          name: java-pilot-reports-jdk${{ matrix.java }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/quality/java-recovery-collections-roundtrip.json
+            build/quality/java-recovery-collections-roundtrip/**/source-manifest.json
+            build/quality/java-recovery-collections-roundtrip/**/*.log
+            build/quality/java-recovery-collections-roundtrip/**/build/test-results/
             courses/java-recovery-collections/build/verification/
             courses/java-recovery-collections/java-pilot/**/build/reports/tests/
           retention-days: 7
+          if-no-files-found: error

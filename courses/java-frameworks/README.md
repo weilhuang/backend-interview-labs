@@ -40,7 +40,11 @@
 
 ## 开始练习
 
-在本课程根目录打开工程，先确认java和javac均来自JDK21。
+先确认项目SDK与Gradle JVM均为完整JDK21。
+
+**Academy官方归档导入模式**：使用题目面板的Check检查作答，打开本题Usage.java的main运行按钮执行调用方，或在Gradle工具窗口运行对应模块的test、usage、run任务。Academy2026.9的前序课程实际导出会移除gradlew、gradlew.bat与gradle-wrapper.jar，仅保留Wrapper配置；不要在缺少Wrapper的导入目录直接执行下列终端命令。
+
+**源码仓库或普通Gradle学员副本模式**：以下完整CLI教程适用于保留Wrapper的课程根；Windows使用gradlew.bat。
 
 ```bash
 ./gradlew :01-configuration:test

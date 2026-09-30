@@ -1,24 +1,14 @@
 name: Java基础与集合课程质量检查
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'courses/java-foundations/**'
-      - '.github/workflows/java-foundations.yml'
-  pull_request:
-    paths:
-      - 'courses/java-foundations/**'
-      - '.github/workflows/java-foundations.yml'
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
-  cancel-in-progress: false
+  workflow_call:
 permissions:
   contents: read
+
 jobs:
   check:
+    name: real-java-foundations
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -28,10 +18,20 @@ jobs:
         working-directory: courses/${{ matrix.course }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-java-foundations-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-java-foundations-${{ github.job }}-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -44,7 +44,7 @@ jobs:
       - name: 准备静态验证器
         run: python -m pip install -r authoring/requirements.txt
       - name: 全部作者解执行真实Gradle测试
-        run: ./gradlew --no-daemon test --console=plain
+        run: ./gradlew --no-daemon --no-build-cache test --console=plain
       - name: 取得固定JUnit控制台并核验摘要
         run: |
           curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$RUNNER_TEMP/junit-console.jar"
@@ -53,14 +53,32 @@ jobs:
         run: python authoring/verify.py --junit-console "$RUNNER_TEMP/junit-console.jar"
       - name: 真实HashMap源码断点与拆分观察
         run: python scripts/trace_hashmap.py
+      - name: Academy源码夹具三阶段判题（contract）
+        timeout-minutes: 35
+        working-directory: ${{ github.workspace }}
+        env:
+          ACADEMY_COURSE: java-foundations
+          ACADEMY_KEY: java-foundations
+        run: |
+          python -m pip install -r scripts/quality/requirements.txt
+          python scripts/quality/academy_gate.py roundtrip \
+            --course "$ACADEMY_COURSE" --suite contract \
+            --java-home "$JAVA_HOME" --timeout 600 \
+            --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
+            --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
       - name: 保留每课程的独立验证报告
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.course }}-jdk21-reports
+          name: ${{ matrix.course }}-jdk21-reports-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/quality/java-foundations-roundtrip.json
+            build/quality/java-foundations-roundtrip/**/source-manifest.json
+            build/quality/java-foundations-roundtrip/**/*.log
+            build/quality/java-foundations-roundtrip/**/build/test-results/
             courses/${{ matrix.course }}/build/verification/
             courses/${{ matrix.course }}/build/hashmap-trace/
             courses/${{ matrix.course }}/**/build/reports/tests/
             courses/${{ matrix.course }}/**/build/test-results/
           retention-days: 7
+          if-no-files-found: error

@@ -1,6 +1,10 @@
 # Kafka 与 RocketMQ 消息可靠性实验室
 
-本目录提供 C08 与 C09 两门课程的完整作者工程。不是两周速成删减版，也不是完整 V1 发布结论。完整 V1 范围见仓库 docs/curriculum/08-release-plan.md；本包的 Docker/IDE 待验证状态见[验证报告](验证报告.md)。
+本目录提供 C08 与 C09 两门课程的完整作者工程。不是两周速成删减版，也不是完整 V1 发布结论。完整 V1 范围见仓库 docs/curriculum/08-release-plan.md；本包的 Docker 实证与IDE待验证状态见[验证报告](验证报告.md)。
+
+## 当前验证状态
+
+[run36746760650](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650)对应head `1fb27d8885bf1eb62b112d2e15f5478becf697fa`，完整消息workflow已通过：27项快测、17项真实broker/MySQL测试，0失败/0错误/0跳过；12节作者解、空解与错误变体拒绝及恢复回归也通过。RocketMQ存储重启已完成原已写CommitLog段和完整原事件恢复断言。证据及适用边界见[验证报告](验证报告.md)；IDE/Academy官方导出和干净导入仍是独立门禁，不据此宣称完整V1发布。
 
 ## 版本、环境与开课自检
 
@@ -56,7 +60,7 @@ cd courses/messaging
 
 5.x gRPC客户端连接Proxy，不直接连接NameServer或Broker。RocketMQ5.3.2的LOCAL模式（mqbroker --enable-proxy）在LocalTopicRouteService中忽略请求端点，返回brokerIP1加固定gRPC端口；即使设置useEndpointPortFromRequest=true，也不能支持本实验的随机宿主端口映射。旧方案只检查RouteActivity而漏看LOCAL后续分支，真实CI已在客户端建立阶段失败。
 
-本夹具改为同一临时容器内分别启动NameServer、Broker和CLUSTER Proxy，Proxy使用mqproxy -pm cluster，并配置namesrvAddr、proxyMode=CLUSTER、useEndpointPortFromRequest=true。ClusterTopicRouteService实际沿用请求地址；仍只暴露8081的随机宿主端口，NameServer和Broker管理调用在容器内执行。routing真实测试先断言QueryRoute返回地址等于随机宿主端点，再要求两个消费组成功收到同一条消息。Linux CI已有真实QueryRoute与双消费组收发通过记录；完整套件与最新就绪门禁仍按验证报告逐项回归，macOS未实测，不能仅凭启动或管理命令成功验收。
+本夹具改为同一临时容器内分别启动NameServer、Broker和CLUSTER Proxy，Proxy使用mqproxy -pm cluster，并配置namesrvAddr、proxyMode=CLUSTER、useEndpointPortFromRequest=true。ClusterTopicRouteService实际沿用请求地址；仍只暴露8081的随机宿主端口，NameServer和Broker管理调用在容器内执行。routing真实测试先断言QueryRoute返回地址等于随机宿主端点，再要求两个消费组成功收到同一条消息。Linux CI已通过真实QueryRoute、双消费组收发以及完整套件与重启就绪门禁；证据固定于顶部提交。macOS未实测，不能从该Linux结果泛化为跨平台验收。
 
 容器总预算仍为1.5GiB/2CPU：NameServer堆64–128MiB、Broker堆256–512MiB、独立Proxy堆128–256MiB；各自直接内存上界为32/128/64MiB。监督脚本检查三个进程；先等待NameServer真实clusterList包含已注册Broker，再显式创建Proxy系统广播组，最后才启动CLUSTER Proxy，避免创建系统主题时尚无集群路由。业务自动建组仍禁用。清理前保留有界Proxy/Broker/事务/存储文件日志及容器状态，包括客户端失败但容器仍在运行的情况。
 

@@ -1,7 +1,7 @@
 type: marketplace
 title: 后端面试实验室：Kafka 与 RocketMQ
 language: Chinese
-summary: 两门消息队列课程十二个实验单元，包含完整源码、调用端、全部测试、每节标准答案、真实容器故障验证与面试追问；容器动态和Academy导入尚待实测，不代表完整V1发布。
+summary: 两门消息队列课程十二个实验单元，包含完整源码、调用端、全部测试、每节标准答案、真实容器故障验证与面试追问；Linux真实容器与正反解门禁已通过，Academy界面与归档仍待独立验收，不代表完整V1发布。
 programming_language: Java
 content:
 - kafka

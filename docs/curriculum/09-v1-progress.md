@@ -10,33 +10,40 @@
 |---|---|---|---|
 | C00/C01 Java 基础与集合 | 16 单元，52 公开测试，16 调用端，16 替代解，33 错误变体 | 云端真实 JDK21/Gradle；HashMap JDI 分支；JMH 短探索 | CI 已通过；官方导出与干净导入，三类题 Check/Reset 抽检通过；其余逐题界面与独立试学未验 |
 | C02 JUC | 8 单元 | JDK21/Gradle 与 CI；38 测试、8 替代解、20 变体；官方导出、两次干净导入与首题 Check/Reset 抽检通过 | 其余逐题 GUI 与独立试学 |
-| C03 JVM/现代 Java | 7 单元 | JDK21/Gradle 与 CI；30 测试、7 替代解、19 变体 | Academy 发行验收、独立试学 |
+| C03 JVM/现代 Java | 7 单元 | JDK21/Gradle 与 CI；30 测试、7 替代解、19 变体；官方导出、两次干净导入与首题 Check/Reset 抽检通过 | 其余逐题 GUI 与独立试学 |
 | C04/C05 Spring/Boot | 14 阶段，预置中文页面 | 真实构建、MySQL 集成、14 调用端、32 负例 | 11 项真实浏览器断言与桌面/窄屏截图已通过；Academy 发行验收待做 |
 | C06 MySQL | 7 单元 | 40 测试，其中 23 项真实服务测试，CI 通过 | 独立包同源台账已验证；Academy 发行验收待做 |
 | C07 Redis | 7 单元 | 36 测试，其中 19 项真实服务测试，CI 通过 | 独立包同源台账已验证；Academy 发行验收待做 |
-| C08 Kafka | 6 单元 | 6 套真实 Broker/数据库测试，包括三副本故障路径，已有 CI 通过记录 | 与 RocketMQ 修复后的整体回归；Academy 验收 |
-| C09 RocketMQ | 6 单元 | 纯逻辑、编译、静态合同验证；实际启动及管理 RPC 已前进至成功 | 真实 QueryRoute、双组收发与其余套件已过；存储测试误把预分配空段视为必须保留，正按真实已写段修正并重验 |
+| C08 Kafka | 6 单元 | 真实 Broker/数据库、三副本故障路径；与 RocketMQ 合计 44 项测试全过，其中 17 项真实服务测试 | Academy 发行验收与独立试学 |
+| C09 RocketMQ | 6 单元 | QueryRoute、双组收发、重试/顺序/事务与已写段恢复全部通过；MQ 合计 44 项，零失败/错误/跳过 | Academy 发行验收与独立试学 |
 | C10 分布式 | 8 单元，真实 gRPC/Dubbo/注册发现 | 44 项本机/RPC、9 项真实服务测试全过；25 变体；8 CLI | 同键死锁、重启端口与XA恢复已在真实CI复验通过；Academy、macOS与独立试学待验 |
-| C14 综合项目 | 5 阶段已制作，完整订单/库存/outbox/inbox/缓存/RPC 与中文前端 | 35 快测、5 调用端、5 组正反解、11 脚本边界；独立代码审查已补关键回归 | 真实容器与 Compose 独立进程恢复已通过；浏览器业务流程已走过，390px 窄屏溢出仍待修复复验；Academy待验 |
+| C14 综合项目 | 5 阶段已制作，完整订单/库存/outbox/inbox/缓存/RPC 与中文前端 | 35 快测＋5 真实服务测试；5 调用端、5 组正反解、11 脚本边界；Compose 独立进程恢复与 320/390/800/801/1440px 浏览器检查全过 | Academy 发行验收、macOS 与独立试学 |
 
 内部 12 题试点不计入上述完整课程数量。试点官方导出和两次干净导入、第 1 题错误/正确/重置已实测；不能外推到其他题和其他课程，详见 [界面验收报告](../界面验收报告.md)。
 
+C02 本轮改进了公开并发测试的异常传播，使学习者 TODO 失败能直接暴露而非被次生超时掩盖。已交付的官方 ZIP 保持原样；其 GUI 抽检记录仍只代表原包，新源码发行包需另行导出和比对，详见 [质量增强阶段报告](../quality/中文阶段报告.md)。
+
 ## 当前可复核证据
 
-- [MySQL/Redis 全部真实服务 CI](https://github.com/weilhuang/backend-interview-labs/actions/runs/36729402341)
-- [Kafka 通过、RocketMQ 尚失败的历史运行](https://github.com/weilhuang/backend-interview-labs/actions/runs/36726367053)：需查看各套结果，不能把整个红色运行称为全绿
-- [RocketMQ 最新完整套件：41 项中存储 1 项失败](https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583)
-- [框架后端、MySQL、调用端、负例与真实中文浏览器全部通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36735424856)
-- [完整 Java 基础课程 CI 与 JDI 通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36733937766)
-- [C10 全部真实服务与正反解通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093982)
-- [C14 后端与独立进程通过、窄屏排版仍失败](https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557113)
-- [共享环境全部真实读写、Rocket持久化与JDK21构建通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788)
+下面九条运行均对应提交 `1fb27d8885bf1eb62b112d2e15f5478becf697fa`，结论为成功。历史失败保留为排错记录，不表示修复后的版本仍失败。
 
-同一 PR 后续提交可能重跑所有课程，已有通过仅对应记录中的版本；修复后的最新版本仍需回归。运行中、取消、未执行与失败分别记录，不视为成功。
+- [MySQL/Redis 全部真实服务 CI](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760864)
+- [Kafka/RocketMQ 完整 44 项与课程正反解通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650)
+- [框架后端、MySQL、调用端、负例与真实中文浏览器通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760801)
+- [完整 Java 基础课程与 JDI 通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760767)
+- [JUC/JVM 构建、正反解及诊断通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760776)
+- [内部试点通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760613)
+- [C10 全部真实服务与正反解通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760872)
+- [C14 全部测试、独立进程恢复及五种视口通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760606)
+- [共享环境真实读写、Rocket 持久化与 JDK21 构建通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760630)
+
+已有通过仅对应记录中的版本。新质量门禁和 CI 调度改动必须在新提交上验证，不能沿用旧提交的全绿结论；运行中、取消、未执行与失败分别记录，不视为成功。私人仓库的 Actions 计费与 ChatGPT 套餐不同，当前没有读取账户剩余额度；上述运行确实执行并通过，不能将先前测试失败归因于额度不足。
 
 ## 发布前重点
 
-1. 完成 RocketMQ 最新协议门禁与完整套件回归，以及 C14 容器/进程恢复/前端联调
+测试层次见 [Academy 质量门禁说明](../quality/academy-quality-gates.md)，本轮实测与缺口见 [中文阶段报告](../quality/中文阶段报告.md)，执行策略见 [CI 使用指南](../ci.md)。新门禁的本地验证与 GitHub 运行结果分别记录，不互相代替。
+
+1. 补齐跨课程学习者生命周期、归档完整性与独立占位区测试，并验证新的 CI 调度不会漏验或产生假绿
 2. 各课程独立归档统一镜像台账和辅助镜像，提供可复建环境
 3. 按课程结构逐项做 Academy 官方导出、干净导入、Check、Reset 与可见性检查
 4. 交付源码、官方归档、版本/已知问题和中文操作文档，邀请实际试学反馈

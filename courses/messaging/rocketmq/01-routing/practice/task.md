@@ -4,7 +4,7 @@
 
 订单服务异步通知仓储和审计，两组都需要完整事件流。先修C04/C06，不要求先学Kafka。本课选择RocketMQ5.3.2的Proxy+Java gRPC SDK5.0.8，避免把Remoting旧API与新协议混讲。
 
-本节范围：先运行完整作者实现，再在 Academy 预览的占位区独立编码，最后对照公开标准解。预计 60–100 分钟；先修不足请回到首页给出的课程。容器测试目前是可执行待云端 Docker 实证，不代表已经运行成功。
+本节范围：先运行完整作者实现，再在 Academy 预览的占位区独立编码，最后对照公开标准解。预计 60–100 分钟；先修不足请回到首页给出的课程。本节真实容器与正反解的已验证提交、环境和证据见课程根目录的验证报告；CLI/CI通过不代替Academy界面与归档验收。
 
 ## 概念、机制与图解
 
@@ -54,7 +54,7 @@ src/labs/messaging/Usage.java 是可见命令行调用端；无参数打印准�
 
 ## 标准答案与逐步解析
 
-使用5.x ClientServiceProvider构建producer，回收close资源。Fixture明确创建主题类型与消费组，管理命令在容器内运行；客户端仅访问映射后的gRPC端点。RocketMQ5.3.2默认useEndpointPortFromRequest=false会把路由端口替换为8081，夹具显式true保留请求端口。此设计按源码验证，Mac/Linux动态验证尚未执行。 官方mqadmin捕获异常后可能退出零，因此夹具通过RocketAdminResult检查实际命令成功输出与异常堆栈，不用退出码冒充协议就绪。
+使用5.x ClientServiceProvider构建producer，回收close资源。Fixture明确创建主题类型与消费组，管理命令在容器内运行；客户端仅访问映射后的gRPC端点。RocketMQ5.3.2的LOCAL路由不保留请求端点；夹具使用CLUSTER Proxy并显式useEndpointPortFromRequest=true，才能保留随机宿主端口。Linux CI已通过真实QueryRoute和双消费组收发，固定提交与证据见根验证报告；Mac尚未实测。 官方mqadmin捕获异常后可能退出零，因此夹具通过RocketAdminResult检查实际命令成功输出与异常堆栈，不用退出码冒充协议就绪。
 
 下方为与工程同源的完整实现及调用方，不隐藏答案。先自己完成再读；已读答案后需换条件盲做才能判断掌握程度。
 

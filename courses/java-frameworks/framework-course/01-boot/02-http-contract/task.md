@@ -14,7 +14,9 @@
 4. 运行真实随机端口HTTP测试，检查201/200/400/404/409与Location
 5. 在页面尝试重复点击、相同键改参数、非法数量和刷新列表
 
-运行本节检查：`./gradlew :02-http-contract:test`。运行完整调用方：`./gradlew :02-http-contract:usage`。服务型示例另可执行 `./gradlew :02-http-contract:run`，停止使用 Ctrl+C。
+**Academy导入模式**：用本题Check检查；打开Usage.java的main运行按钮，或在Gradle工具窗口执行本模块test、usage、run。归档缺少Wrapper时不要在导入目录运行./gradlew。
+
+**源码仓库/普通Gradle副本CLI模式**：运行本节检查：`./gradlew :02-http-contract:test`。运行完整调用方：`./gradlew :02-http-contract:usage`。服务型示例另可执行 `./gradlew :02-http-contract:run`，停止使用 Ctrl+C。
 
 ## 正确性合同
 

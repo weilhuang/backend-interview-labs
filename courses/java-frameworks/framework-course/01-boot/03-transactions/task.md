@@ -14,7 +14,9 @@
 4. 观察相同请求重试与库存不足
 5. 可选MySQL真实集成由共享镜像驱动，Docker未启动不能记录通过
 
-运行本节检查：`./gradlew :03-transactions:test`。运行完整调用方：`./gradlew :03-transactions:usage`。服务型示例另可执行 `./gradlew :03-transactions:run`，停止使用 Ctrl+C。
+**Academy导入模式**：用本题Check检查；打开Usage.java的main运行按钮，或在Gradle工具窗口执行本模块test、usage、run。归档缺少Wrapper时不要在导入目录运行./gradlew。
+
+**源码仓库/普通Gradle副本CLI模式**：运行本节检查：`./gradlew :03-transactions:test`。运行完整调用方：`./gradlew :03-transactions:usage`。服务型示例另可执行 `./gradlew :03-transactions:run`，停止使用 Ctrl+C。
 
 ## 正确性合同
 

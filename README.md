@@ -15,9 +15,9 @@
 
 ## 当前交付状态
 
-当前已有 Java 基础与集合、JUC、JVM、Spring/Boot、MySQL、Redis、Kafka/RocketMQ 的作者课程实现，分布式与综合项目正在完善。**V1 仍未整体验收完成**，各模块真实测试与界面验证范围见下方报告。
+当前已有 Java 基础与集合、JUC、JVM、Spring/Boot、MySQL、Redis、Kafka/RocketMQ、分布式与综合项目的作者课程实现。提交 `1fb27d8` 对应的九条 CI 均已通过。**V1 仍未整体验收完成**，各模块真实测试与界面验证范围见下方报告。
 
-内部试点已完成官方导出和干净导入，并对第 1 题实测错误答案、正确答案及重置；该结果不能外推为全部课程、全部题目已完成 Academy 验收。
+Java 基础与集合、JUC、JVM 已取得官方导出和干净导入归档，并完成代表题错误答案、正确答案及重置验收；内部试点也完成首题抽检。其余课程正在逐门做发行验收，这些结果不能外推为全部课程、全部题目已完成 Academy 验收。
 
 首包包含金额累计、ID 解析、泛型有界栈、稳定去重、不可变键、Top-K、快照、安全删除、动态数组、哈希索引与扩容、LRU、近期 ID 窗口。完整范围不会因为面试时间临近被删减；两周路线只调整练习顺序。
 
@@ -30,6 +30,10 @@
 普通源码 ZIP 不等于 Academy 导出的课程归档。发布学习者包前需实际验证：预览、错误和正确答案检查、提示、重置、导出、干净导入及答案泄漏检查。
 
 ## 验证
+
+- [分层 CI：触发范围、完整验收与资源使用](docs/ci.md)
+- [Academy 质量门禁：学习者副本、逐空位测试与归档边界](docs/quality/academy-quality-gates.md)
+- [质量增强阶段报告：实际覆盖、问题修复与待验项](docs/quality/中文阶段报告.md)
 
 - [当前验证记录](courses/java-recovery-collections/authoring/VERIFICATION.md)
 - [CI 配置](.github/workflows/java-pilot.yml)：完整 JDK 21、Gradle、元数据及有限错误变体验证

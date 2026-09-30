@@ -243,7 +243,7 @@
       "用Usage指定课堂Proxy与预建NORMAL主题发送，按文档检查容器内topic状态",
       "阅读Proxy的RouteActivity分支，解释为什么端口映射不是只写一个-p参数就足够"
     ],
-    "answer": "使用5.x ClientServiceProvider构建producer，回收close资源。Fixture明确创建主题类型与消费组，管理命令在容器内运行；客户端仅访问映射后的gRPC端点。RocketMQ5.3.2默认useEndpointPortFromRequest=false会把路由端口替换为8081，夹具显式true保留请求端口。此设计按源码验证，Mac/Linux动态验证尚未执行。 官方mqadmin捕获异常后可能退出零，因此夹具通过RocketAdminResult检查实际命令成功输出与异常堆栈，不用退出码冒充协议就绪。",
+    "answer": "使用5.x ClientServiceProvider构建producer，回收close资源。Fixture明确创建主题类型与消费组，管理命令在容器内运行；客户端仅访问映射后的gRPC端点。RocketMQ5.3.2的LOCAL路由不保留请求端点；夹具使用CLUSTER Proxy并显式useEndpointPortFromRequest=true，才能保留随机宿主端口。Linux CI已通过真实QueryRoute和双消费组收发，固定提交与证据见根验证报告；Mac尚未实测。 官方mqadmin捕获异常后可能退出零，因此夹具通过RocketAdminResult检查实际命令成功输出与异常堆栈，不用退出码冒充协议就绪。",
     "questions": [
       [
         "key与messageId有什么区别？",

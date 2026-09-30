@@ -1,18 +1,12 @@
 name: Java框架真实构建与前端验收
 on:
-  push:
-    branches: [main]
-    paths: ['courses/java-frameworks/**', 'infra/versions.env', '.github/workflows/java-frameworks.yml']
-  pull_request:
-    paths: ['courses/java-frameworks/**', 'infra/versions.env', '.github/workflows/java-frameworks.yml']
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # 已开始的真实集成需留下完整结果；新提交排队，避免反复取消导致从未跑完。
-  cancel-in-progress: false
+  workflow_call:
 permissions:
   contents: read
+
 jobs:
   verify:
+    name: real-java-frameworks-backend
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     defaults:
@@ -23,10 +17,22 @@ jobs:
       GRADLE_USER_HOME: ${{ github.workspace }}/courses/java-frameworks/build/gradle-home
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+            courses/java-frameworks/build/gradle-home/caches/modules-2
+            courses/java-frameworks/build/gradle-home/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-java-frameworks-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-java-frameworks-${{ github.job }}-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -40,10 +46,10 @@ jobs:
           javac -version
           python -m pip install -r authoring/requirements.txt
           python authoring/validate_course.py
-          ./gradlew --no-daemon test verificationClasspath --console=plain
+          ./gradlew --no-daemon --no-build-cache test verificationClasspath --console=plain
       - name: 真正MySQL事务集成
         timeout-minutes: 5
-        run: ./gradlew --no-daemon :03-transactions:integrationTest --console=plain
+        run: ./gradlew --no-daemon --no-build-cache :03-transactions:integrationTest --console=plain
       - name: 所有可见调用方验证
         timeout-minutes: 5
         run: python authoring/verify_callers.py --jdk "$JAVA_HOME"
@@ -53,12 +59,29 @@ jobs:
           curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.12.2/junit-platform-console-standalone-1.12.2.jar -o "$RUNNER_TEMP/framework-junit.jar"
           echo "329bd10288875a74d04c9ca6b7c9889c265ddf87b21a9ea42a7f7392f391472a  $RUNNER_TEMP/framework-junit.jar" | sha256sum --check
           python authoring/verify_negative_cases.py --console "$RUNNER_TEMP/framework-junit.jar" --jdk "$JAVA_HOME"
+      - name: Academy源码夹具三阶段判题（contract）
+        timeout-minutes: 35
+        working-directory: ${{ github.workspace }}
+        env:
+          ACADEMY_COURSE: java-frameworks
+          ACADEMY_KEY: java-frameworks
+        run: |
+          python -m pip install -r scripts/quality/requirements.txt
+          python scripts/quality/academy_gate.py roundtrip \
+            --course "$ACADEMY_COURSE" --suite contract \
+            --java-home "$JAVA_HOME" --timeout 600 \
+            --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
+            --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
       - name: 保存后端测试证据
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: framework-backend-jdk21-evidence
+          name: framework-backend-jdk21-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/quality/java-frameworks-roundtrip.json
+            build/quality/java-frameworks-roundtrip/**/source-manifest.json
+            build/quality/java-frameworks-roundtrip/**/*.log
+            build/quality/java-frameworks-roundtrip/**/build/test-results/
             courses/java-frameworks/framework-course/**/build/reports/tests/
             courses/java-frameworks/framework-course/**/build/test-results/
             courses/java-frameworks/build/ui/
@@ -68,8 +91,10 @@ jobs:
             courses/java-frameworks/authoring/*report.json
             courses/java-frameworks/authoring/ui-verification.json
           retention-days: 7
+          if-no-files-found: error
 
   ui:
+    name: real-java-frameworks-ui
     runs-on: ubuntu-24.04
     timeout-minutes: 12
     defaults:
@@ -79,10 +104,22 @@ jobs:
       LAB_SHARED_VERSIONS: ${{ github.workspace }}/infra/versions.env
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: 缓存依赖下载（不缓存测试结果或构建输出）
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches/modules-2
+            ~/.gradle/wrapper
+            courses/java-frameworks/build/gradle-home/caches/modules-2
+            courses/java-frameworks/build/gradle-home/wrapper
+          key: ${{ runner.os }}-jdk21-deps-v1-java-frameworks-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-jdk21-deps-v1-java-frameworks-${{ github.job }}-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -121,9 +158,10 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: framework-ui-evidence
+          name: framework-ui-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             courses/java-frameworks/build/ui/
             courses/java-frameworks/build/server/
             courses/java-frameworks/authoring/ui-verification.json
           retention-days: 7
+          if-no-files-found: error
