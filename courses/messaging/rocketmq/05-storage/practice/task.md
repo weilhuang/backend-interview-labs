@@ -8,7 +8,7 @@
 
 ## 概念、机制与图解
 
-CommitLog保存消息实体；ConsumeQueue保存面向逻辑队列的索引，索引与实体不是两份独立完整副本。同步/异步刷盘与主从复制分别约束不同故障窗口。单broker的SYNC_FLUSH实验只能观察同磁盘重启，不提供跨节点容灾。
+CommitLog保存消息实体；ConsumeQueue保存面向逻辑队列的索引，索引与实体不是两份独立完整副本。同步/异步刷盘与主从复制分别约束不同故障窗口。单broker的SYNC_FLUSH实验只能观察同磁盘重启，不提供跨节点容灾。 CommitLog段按固定容量预分配，文件长度非零并不证明该段已含消息；恢复扫描可删除已写上界之后的未使用段。
 
 ```text
 发送 -> CommitLog追加 -> SYNC_FLUSH确认
@@ -32,15 +32,15 @@ CommitLog保存消息实体；ConsumeQueue保存面向逻辑队列的索引，�
 1. 运行模型单测，明确标注它只解释确认边界，不是真刷盘实现
 2. 运行BrokerTest，向真实broker发送消息并等待确认
 3. 实现Lab.missing：按已获得发送确认的业务ID核对恢复记录，重复投递不能抵消另一条消息缺失，并按ID稳定排序报告
-4. 直接检查配置的commitlog目录中非空20位数据文件；restart同一容器后原文件和完整已确认事件都必须存在
-5. 重新等待映射端口与topicStatus真实就绪，再重建消费者断言原事件可读
+4. send确认后读取官方brokerStatus的commitLogMaxOffset，再直接列出commitlog目录非空20位文件；只将起始位点小于该上界的已写段固定为重启保留对象，不把预分配下一段当作已写消息
+5. restart同一容器，以真实QueryRoute与当前随机端点等待就绪；逐一断言先前已写段仍非空，再检查topicStatus并重建消费者，核验disk1完整事件及缺失集后ack
 6. 独立对照ASYNC_FLUSH配置并记录能观察和不能证明的结论；不能把一次数据仍在当作断电零丢失
 
 默认命令只跑无容器用例；带 -PwithDocker 才会启动真实服务。无 Docker 时后者必须失败，不使用 disabledWithoutDocker 自动跳过来制造全绿。第一次依赖下载失败属于环境问题，先检查 Maven Central 与 Wrapper 下载；API 或断言失败再按中文提示检查代码。
 
 ## 本节输入与预期结果
 
-确认disk1后观察到真实commitlog文件；重启同一容器并重建消费者后仍读到disk1；同步刷盘且仅1副本的模型报告单机磁盘风险。
+确认disk1后取得真实物理写入上界并观察到至少一个非空20位已写CommitLog段；重启同一容器后这些原已写段仍存在，重建消费者仍读到disk1的完整事件并确认缺失集为空；同步刷盘且仅1副本的模型报告单机磁盘风险。未使用预分配段是否保留不构成消息持久性保证。
 
 ## 完整调用示例
 
@@ -50,13 +50,13 @@ src/labs/messaging/Usage.java 是可见命令行调用端；无参数打印准�
 
 固定源码：[rocketmq rocketmq-all-5.3.2：store/src/main/java/org/apache/rocketmq/store/CommitLog.java](https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/CommitLog.java)
 
-固定提交：2baaf044ea9b12a73a89433242b7b7c56a1b89c2。目标符号：asyncPutMessage。从追加到handleDiskFlush与复制确认路径逐项画等待条件；再查看DefaultMessageStore分发与ConsumeQueue索引更新，区分同步刷盘配置和复制配置。
+固定提交：2baaf044ea9b12a73a89433242b7b7c56a1b89c2。目标符号：asyncPutMessage。从追加到handleDiskFlush与复制确认路径逐项画等待条件；再查看DefaultMessageStore分发与ConsumeQueue索引更新，区分同步刷盘配置和复制配置。 再沿MappedFileQueue.tryCreateMappedFile与AllocateMappedFileService查看当前/下一段预分配，沿DefaultMessageStore.getRuntimeInfo→getMaxPhyOffset→MappedFileQueue.getMaxOffset核对物理写入上界，沿CommitLog.recoverNormally→MappedFileQueue.truncateDirtyFiles解释为什么未写入预分配段可在恢复中删除。
 
 按入口→关键状态→条件分支→可观察结果阅读；记录一次正常路径和一次失败路径。断点可对官方 sources JAR 附源码调试；本次没有伪造断点截图。support/ 与 Lab 中的自写模型不是上游源码替身。不要从一个模型断言生产系统所有故障都被覆盖。
 
 ## 标准答案与逐步解析
 
-测试先等待send返回；直接检查夹具显式配置的/home/rocketmq/store/commitlog目录，必须存在非空的20位数字CommitLog数据文件，不再枚举整个store后用head截断。随后restart同容器，要求这些原数据文件仍存在，并核验完整事件正文与ID。restart保留容器文件系统，这与stop并创建新容器不是同一故障；课程结束close会清理实验写层。SYNC_FLUSH说明刷盘等待路径，不承诺单盘损坏仍可用。risk方法是显式标注的纯教学模型，时间空间O(1)，不伪装成RocketMQ存储源码。 missing把恢复记录的业务ID放入Set，再检查每个已确认ID，重复记录不会抵消另一个ID缺失；真实重启测试使用这个核验器。
+测试先等待send返回，再读取brokerStatus中唯一的commitLogMaxOffset数据行。这个值来自DefaultMessageStore.getMaxPhyOffset，最终是最后已挂载段的起始位点加getReadPosition，不是磁盘文件容量。直接检查夹具显式配置的/home/rocketmq/store/commitlog目录，非空20位文件名表示段起始位点；只将起始位点严格小于发送确认后物理上界的段列为必须保留的原已写段。AllocateMappedFileService会预分配下一段，恢复时truncateDirtyFiles可以删除上界之后尚未使用的段；要求所有预分配文件都保留会误报。随后restart同容器，原已写段仍须非空，并通过重建消费者核验disk1完整事件正文、ID和缺失集。这两层断言都保留，不能只用目录或brokerStatus存在代替消息恢复。restart保留容器文件系统，这与stop并创建新容器不是同一故障；课程结束close会清理实验写层。SYNC_FLUSH说明刷盘等待路径，不承诺单盘损坏仍可用。risk是显式标注的纯教学模型，时间空间O(1)，不伪装成RocketMQ存储源码。missing把恢复记录的业务ID放入Set，再检查每个已确认ID，重复记录不会抵消另一个ID缺失。
 
 下方为与工程同源的完整实现及调用方，不隐藏答案。先自己完成再读；已读答案后需换条件盲做才能判断掌握程度。
 

@@ -15,7 +15,7 @@
   "完整应用installDist": "通过",
   "全部容器测试类严格编译": "通过",
   "Docker和Compose": "本机未运行，无Docker命令或守护进程",
-  "浏览器": "JS语法通过，真实页面联调等待CI",
+  "浏览器": "CI36740557113真实业务流程通过，390px页面溢出失败；修复及增强多视口门禁待新提交CI",
   "macOS": "未实测",
   "C14官方Academy导入导出": "未实测",
   "正式module元数据": "Maven Central 46份.module，保留依赖锁重解析并正常不写锁构建通过",
@@ -25,7 +25,7 @@
     "显式apiguardian-api1.1.2测试运行依赖"
   ],
   "真实容器场景数": 5,
-  "Compose应用SIGKILL恢复": "脚本与CI已提供，本机未运行",
+  "Compose应用SIGKILL恢复": "CI36740557113通过；本机无Docker，未执行",
   "数据库提交确认网络丢包": "未执行；不能用应用故障钩子替代证明",
   "脚本安全场景": 11,
   "首次CI": {
@@ -39,6 +39,34 @@
     "应用和位点检查": "request.timeout.ms=2000 / default.api.timeout.ms=5000 / 外层等待6000ms / 关闭1000ms",
     "健康": "request.timeout.ms=500 / default.api.timeout.ms=1000 / 外层等待1500ms / 关闭500ms",
     "真实客户端无Docker回归": 3,
-    "修复后的真实容器CI": "待运行"
+    "修复后的真实容器CI": "CI36740557113五方法全部通过、零跳过"
+  },
+  "第二轮CI": {
+    "运行": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557113",
+    "任务": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557113/job/109973519324",
+    "PR源提交": "bddc80e88b8843d12f2d391c2249e89340c72c6e",
+    "实际合并checkout": "8d0a60bb46a7506716d2adb284a82ccd3bd63cb0",
+    "artifact": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557113/artifacts/11110835323",
+    "JUnit测试总计": 40,
+    "快测": 35,
+    "真实容器": 5,
+    "失败": 0,
+    "跳过": 0,
+    "Compose与HTTP恢复": "通过",
+    "真实浏览器业务流程": "404查询、提交、原号重试、409冲突、取消、Kafka/gRPC重放与投影通过",
+    "失败门禁": "390像素手机页面横向溢出；artifact失败截图宽672像素",
+    "整体结论": "失败，不能因后端通过标记整体成功"
+  },
+  "手机布局修复": {
+    "根因": "手机1fr自动最小尺寸与嵌套grid item最小尺寸使nowrap表格撑宽祖先",
+    "处理": "minmax(0,1fr)、min-width:0、局部表格滚动、键盘焦点与长文本换行；未隐藏整页溢出",
+    "浏览器回归": "真实64字符请求号与320/390/800/801/1440px布局、最后列可达检查；页面宽度仍严格不超过视口",
+    "Chromium沙箱": true,
+    "本地语法与元数据": "通过",
+    "本地脚本安全场景": 11,
+    "本地JDK21构建": "35快测、五个Usage、全部容器测试类编译和installDist通过；保留官方.module与锁图",
+    "本地动态浏览器": "未执行成功：socket权限限制，执行升级仍失败；未关闭沙箱",
+    "新提交CI": "待发布并运行",
+    "本地正反解": "五阶段参考解和另一正确写法通过；五个学习起点及五个错解可编译并被测试拒绝。一次01-contract错解JVM在35秒预算内未退出；原预算重试全部通过，未放宽超时。"
   }
 }

@@ -62,7 +62,7 @@ cd courses/messaging
 
 夹具不会把宿主TCP连接成功当作Proxy就绪：每次启动/重启建立独立NORMAL探针主题，在同一启动预算内实际QueryRoute，直到协议成功、非空队列及当前随机端点全部匹配。只对启动暂态与探针主题传播有界等待，错误路由与认证失败立即退出；业务测试不因此增加重试。
 
-主题按NORMAL、FIFO、DELAY、TRANSACTION显式创建，避免用普通主题发送事务或顺序消息。各组独立随机命名；实验最后关闭容器，临时写层由Testcontainers清理。默认SYNC_FLUSH并不提供多副本容灾，不能从一次重启读到数据宣称任意故障零丢失。
+主题按NORMAL、FIFO、DELAY、TRANSACTION显式创建，避免用普通主题发送事务或顺序消息。各组独立随机命名；实验最后关闭容器，临时写层由Testcontainers清理。默认SYNC_FLUSH并不提供多副本容灾，不能从一次重启读到数据宣称任意故障零丢失。 存储实验在send确认后读取真实commitLogMaxOffset，只固定起始位点小于该上界的原已写CommitLog段并检查重启后完整事件；下一段可能已预分配为非空文件，却在恢复时合法删除，不能把文件容量当成已写消息。
 
 ## 使用与答案
 

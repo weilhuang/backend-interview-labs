@@ -104,9 +104,9 @@ def finish():
    additional.append({'name':p.name})
  for folder in ['gradle','scripts','docs','shared']:
   for p in sorted((ROOT/folder).rglob('*')):
-   if p.is_file():
+   if p.is_file() and '__pycache__' not in p.parts and p.suffix != '.pyc':
     item={'name':str(p.relative_to(ROOT))}
-    if p.suffix=='.jar':item['is_binary']=True
+    if p.suffix.lower() in {'.jar','.png','.jpg','.jpeg','.gif','.webp','.ico'}:item['is_binary']=True
     additional.append(item)
  write('course-info.yaml',yaml.safe_dump({'type':'marketplace','title':'Java框架工程与源码：Spring Boot与Spring','language':'Chinese','summary':'完整V1的框架部分，逐步完成真实配置、HTTP、事务、安全、容器、代理、MVC与自动配置；全项目、测试和标准解公开。完成状态以阶段报告为准。','programming_language':'Java','content':['framework-course'],'environment_settings':{'jvm_language_level':'JDK_21'},'additional_files':additional,'yaml_version':2},allow_unicode=True,sort_keys=False))
  write('authoring/manifest.json',json.dumps(TASKS,ensure_ascii=False,indent=2))

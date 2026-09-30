@@ -44,4 +44,7 @@ assert 'Images.get("ROCKETMQ_IMAGE")' in (ROOT/'support/src/labs/messaging/Rocke
 assert all('disabledWithoutDocker' not in p.read_text() for p in ROOT.glob('*/**/test/*.java'))
 for item in course['additional_files']:
     assert (ROOT/item['name']).is_file(), item
+support_sources = {str(p.relative_to(ROOT)) for p in (ROOT/'support/src').rglob('*.java')}
+additional_paths = {item['name'] for item in course['additional_files']}
+assert support_sources <= additional_paths, 'Academy清单遗漏公共Java依赖：' + ', '.join(sorted(support_sources - additional_paths))
 print('静态检查通过：', len(manifest), '节、全部源码测试可见、UTF-16占位与标准解同步')

@@ -22,6 +22,8 @@ Docker Desktop 是 Mac 的可选学习环境，不是课程制作前提。安装
 
 镜像唯一来源是 [`infra/versions.env`](../../infra/versions.env)，登记 MySQL、Redis、Kafka、RocketMQ、完整 JDK 构建及 Testcontainers 辅助镜像。RocketMQ Compose 与课程 Testcontainers 读取同一 `ROCKETMQ_IMAGE`，没有增加另一种业务镜像；K8s、Istio、ELK、SkyWalking 属于后续范围。
 
+已在官方 Registry 核验台账 7/7 镜像均有 amd64/arm64 manifest，包含固定 Maven 多架构 digest；[完整来源与摘要](镜像架构支持.md)。这是发布元数据证据，Mac Intel/Apple Silicon 仍未实测，无需为两种芯片增加另一套镜像版本。
+
 ## 2. 一条命令启动并等待健康
 
 在仓库根目录运行；首次成功连接 Docker 后会创建 `infra/.env`，内容来自实验样例，权限为仅当前用户读写。镜像只在缺失时拉取。
@@ -59,6 +61,8 @@ Docker Desktop 是 Mac 的可选学习环境，不是课程制作前提。安装
 `up` 不是后台“发起即成功”：它使用 Compose `--wait`，再检查选中容器是否运行且 `healthy`；健康失败返回非零。MySQL 执行普通实验用户的 `SELECT 1`，Redis 通过密码执行 `PING`，Kafka 查询 broker 协议 API。RocketMQ 要求 NameServer 返回当前 Broker、Broker 运行统计显示活跃，并检查宿主发布端口的 HTTP/2 SETTINGS/PING 往返；这仍不等于 gRPC 业务收发，必须另跑 SDK 集成验收。其他组件检查仅证明内部就绪。
 
 命令中的 `core` 表示 MySQL + Redis；`kafka` 只开 Kafka，`rocketmq` 只开 RocketMQ。先启动的组件不会因下一次 `up` 自动停止，切换重型章节前先 `down`。命令不受宿主 `COMPOSE_PROFILES=*` 或镜像同名环境变量覆盖，避免误开全套或重复拉取另一个标签。
+
+`doctor` 分开显示脚本主机和 Docker daemon 架构，并展示 `DOCKER_DEFAULT_PLATFORM`。用户显式覆盖若与 daemon 不匹配，会警告仿真性能/资源或无法运行的风险；脚本保留该覆盖，不修改用户设置，也不强制 `platform`。doctor 成功不等于 Mac 业务或资源峰值验收通过。
 
 ## 3. 完整 JDK 21 构建容器
 

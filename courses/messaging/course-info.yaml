@@ -32,6 +32,7 @@ additional_files:
 - name: support/src/labs/messaging/KafkaSupport.java
 - name: support/src/labs/messaging/RocketAdminResult.java
 - name: support/src/labs/messaging/RocketClient.java
+- name: support/src/labs/messaging/RocketRuntime.java
 - name: support/src/labs/messaging/RocketSupport.java
 - name: authoring/check_sources.py
 - name: authoring/download_compile_dependencies.py

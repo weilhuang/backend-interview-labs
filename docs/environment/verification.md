@@ -8,7 +8,7 @@
 
 | 检查 | 命令 | 结果 |
 | --- | --- | --- |
-| 脚本与安全边界回归 | `JAVA_HOME=/path/to/jdk-21 python3 -m unittest discover -s scripts/tests -v` | **本轮 91/91 通过**（含版本快照回归）；Docker 调用使用模拟对象，管理/监督脚本使用本机假进程 |
+| 脚本与安全边界回归 | `JAVA_HOME=/path/to/jdk-21 python3 -m unittest discover -s scripts/tests -v` | 架构增量前 **91/91 通过**（含版本快照回归）；增量后 **99/99 通过**见下一节。Docker 调用使用模拟对象，管理/监督脚本使用本机假进程 |
 | 镜像/端口/健康/资源等静态约束 | `./scripts/lab.sh verify` | 通过，不访问 Docker |
 | Bash 入口语法 | `bash -n scripts/lab.sh` | 通过 |
 | Python 编译 | `python3 -m py_compile scripts/lab.py scripts/ci_smoke.py scripts/tests/*.py` | 通过 |
@@ -19,6 +19,19 @@
 回归覆盖：不执行 shell 配置、非法/重复配置拒绝、固定镜像与宿主覆盖防护、core/Kafka/RocketMQ 按需选择、目录/符号链接越界拒绝、数据默认保留、精确 reset 确认、失败不删数据、构建 Wrapper/缓存参数、就绪失败、停止容器与缺失容器、缺 Docker/daemon、旧 Compose、旧 Engine 回环暴露风险，以及 CI 专用项目限制、真实读写命令参数、收发值匹配和日志脱敏。新增 RocketMQ 回归还覆盖 HTTP/2 部分帧读取、匹配 PING ACK、TCP/错误帧拒绝、实时端口绑定与检查中进程退出、mqadmin 零退出异常拒绝、三进程 TERM 传播/异常监督、注册延迟/超时/服务退出、注册 RPC 中 TERM 清理、系统组初始化失败禁止 Proxy 启动、独立持久化主题读取不得重新发送。
 
 `infra/compose.yaml` 使用 JSON 语法（JSON 是 YAML 的子集），因此离线标准库可完整读取对象并检查上述约束。这不替代 Docker Compose 自己的 schema 解析。
+
+## 镜像架构与 doctor 增量核验
+
+2026-09-30 15:59–16:01 UTC 完成全部 7 个固定镜像的官方 Hub API/Registry 元数据审核，均包含 Linux amd64 与 arm64；固定 Maven digest 也直接查得多架构 index。[逐项来源与摘要](镜像架构支持.md)。没有下载镜像层，也没有新增 Mac 或 arm64 实机结果。
+
+doctor 现在区分脚本主机与 Docker daemon 架构、归一化两类常见架构别名，并明确显示 `DOCKER_DEFAULT_PLATFORM`。显式覆盖不匹配时只提示仿真性能/资源及运行风险，保留环境变量；未知平台不宣称匹配。不会改动系统设置、镜像台账、Compose 平台或 CI。
+
+2026-09-30 16:07 UTC 本地制作容器复验：
+
+- 使用已准备好的完整 Temurin JDK21 设置 `JAVA_HOME` 后，`python3 -m unittest discover -s scripts/tests -v`：**99/99 通过**，包含新增 8 项架构/override 回归；Docker 交互仍为模拟，不是实机验收
+- `./scripts/lab.sh verify`、`bash -n scripts/lab.sh`、`python3 -m py_compile scripts/lab.py scripts/tests/test_lab.py`：通过
+- 首次未设置 `JAVA_HOME` 的全量运行因缺可用 `javac` 在台账 Java 测试初始化失败；未跳过该测试，改用已有完整 JDK21 后全量通过
+- 文档检查：7 个镜像条目、21 个唯一 index/子 manifest SHA256、README 与本页入口链接均存在
 
 ## 早期基础组件的真实云端 CI
 
@@ -58,7 +71,7 @@ RocketMQ 两次启动的原始日志均记录 Broker 注册屏障与广播系统
 
 ## 未执行或未充分覆盖，不能标为通过
 
-- 全部镜像的多架构 registry index digest 锁定：本轮有实际 amd64 拉取和运行，但未独立完成每个 arm64 manifest 审核
+- 全部镜像的多架构 registry index digest 锁定：仅 Maven 已在台账固定 index；其余六项仍锁完整标签。2026-09-30 15:59–16:01 UTC 已完成 7/7 官方 Registry amd64/arm64 元数据审核，见[镜像架构支持](镜像架构支持.md)，未据此宣称 arm64 实际运行通过
 - MySQL/Redis/Kafka smoke 使用容器内客户端；RocketMQ 已覆盖宿主发布端点。共享环境通过不代表所有课程 Testcontainers 集成都已验收
 - 故障注入、异常终止后的数据恢复和更完整的卷权限/输出所有权矩阵
 - Mac Intel/Apple Silicon Docker Desktop、Bash3.2 实测和实际资源峰值
@@ -72,14 +85,16 @@ RocketMQ 两次启动的原始日志均记录 Broker 注册屏障与广播系统
 
 | 键 | 已核对的官方发布内容 | 架构证据与限制 |
 | --- | --- | --- |
-| `MYSQL_IMAGE` | [Docker Official MySQL 8.4 标签列表](https://hub.docker.com/_/mysql/tags?name=8.4) 中存在选定完整补丁标签 | 上游标签页列出 amd64、arm64/v8；已在 CI 实际 amd64 拉取运行；arm64 与完整 registry index 审核待验收 |
-| `REDIS_IMAGE` | [Docker Official Redis 镜像层页面](https://hub.docker.com/layers/library/redis/7.4.7-alpine3.21/) 显示选定完整补丁与 Alpine 标签 | 官方页面标为 multi-platform；已在 CI 验证 amd64 拉取运行；arm64 实测仍待验收 |
-| `KAFKA_IMAGE` | [Apache Kafka 3.9 Docker 指南](https://kafka.apache.org/39/getting-started/docker/) 明确给出选定官方 JVM 镜像 | [该标签 arm64 镜像页面](https://hub.docker.com/layers/apache/kafka/3.9.1/images/sha256-39bc3b30084ad6ab33ad2c9a525f15c942bf097b18cb2a1825afa6df3411f8b5) 有 ARM 证据；双架构实际运行待验证 |
+| `MYSQL_IMAGE` | [Docker Official MySQL 8.4 标签列表](https://hub.docker.com/_/mysql/tags?name=8.4) 中存在选定完整补丁标签 | 官方 Registry 已确认 amd64、arm64/v8 与 index digest；CI 已实际 amd64 拉取运行，arm64 实测仍待验收 |
+| `REDIS_IMAGE` | [Docker Official Redis 镜像层页面](https://hub.docker.com/layers/library/redis/7.4.7-alpine3.21/) 显示选定完整补丁与 Alpine 标签 | 官方 Registry 已确认 amd64、arm64/v8；CI 已验证 amd64 拉取运行，arm64 实测仍待验收 |
+| `KAFKA_IMAGE` | [Apache Kafka 3.9 Docker 指南](https://kafka.apache.org/39/getting-started/docker/) 明确给出选定官方 JVM 镜像 | 官方 Registry 已确认 amd64、arm64；[该标签 arm64 镜像页面](https://hub.docker.com/layers/apache/kafka/3.9.1/images/sha256-39bc3b30084ad6ab33ad2c9a525f15c942bf097b18cb2a1825afa6df3411f8b5) 提供独立页面证据；amd64 CI 已通过，arm64 实测待验证 |
 | `JAVA_BUILD_IMAGE` | [官方 Maven amd64 页面](https://hub.docker.com/layers/library/maven/3.9.11-eclipse-temurin-21/images/sha256-463a1849665463254b2dd56e3a5b316f1596bc93d0571065c06ea05bb48ab8f4) 与 [arm64 页面](https://hub.docker.com/layers/library/maven/3.9.11-eclipse-temurin-21/images/sha256-d1d89ba5f782ba5dd52272e7da5aed592abb192dff6435523b852ffab3ee8484) | 两页显示同一多架构 index digest，已写入台账；不是把某一个 CPU 的单架构 manifest 当作共用摘要。已在 CI 实际 amd64 拉取并完成 JDK21/Gradle 构建 |
 
 这是官方已发布的**教学复现基线**，不是“当前最新”“无漏洞”或“所有补丁仍在维护”的保证。Kafka 3.9 文档本身标为旧版。镜像里基础 OS/JDK 的安全更新与业务主版本支持期必须分别核查；不得拿教学环境直接部署生产。没有使用 `latest`、`8.4`、`7-alpine` 等浮动标签。
 
-除 Maven 的已核对多架构摘要外，当前其余镜像锁完整标签，标签仍可能被上游重建。同一 daemon 默认 `--pull missing` 会保留已有版本；不同时间/机器可能得到同标签的新层。正式发布前应在可用云端核验各架构与多架构 index digest，并把通过验收的摘要追加到同一个台账，不从搜索摘要臆造 digest。
+2026-09-30 15:59–16:01 UTC 对台账全部 7 个镜像完成官方 Hub API 与 Registry 的交叉审核，包含 RocketMQ、Ryuk、Alpine；完整 index 与 amd64/arm64 子 digest、来源及 Mac 未测边界见[镜像架构支持](镜像架构支持.md)。本次仅下载 JSON 元数据，未拉取镜像层或运行容器。
+
+除 Maven 的已核对多架构摘要外，当前其余镜像锁完整标签，标签仍可能被上游重建。同一 daemon 默认 `--pull missing` 会保留已有版本；不同时间/机器可能得到同标签的新层。正式发布前应复核上述 digest，完成实际验收后把通过验收的摘要追加到同一个台账，不从搜索摘要臆造 digest，也不把此次查询快照冒充原 CI 已运行的精确镜像身份。
 
 ## RocketMQ 共享 profile 本轮增量
 

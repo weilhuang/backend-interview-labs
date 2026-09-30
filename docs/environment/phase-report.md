@@ -6,7 +6,7 @@
 
 交付了最小可用的环境基础代码：MySQL + Redis 默认组合、可选单节点 Kafka、可选 RocketMQ 三进程开发容器、一次性完整 JDK21 构建容器，以及统一版本读取。目标是让不同课程共用同一组镜像，并让低磁盘/低性能学习设备只启动眼前需要的组件。
 
-当前已完成**代码、91 项离线回归及 Linux amd64 云端 CI 共享环境验收**。[运行 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 已实际覆盖 MySQL/Redis 读写与重启持久化、Kafka 收发、RocketMQ 宿主 SDK5 gRPC 收发与原消息重启读取，以及共享 JDK21 构建。制作容器本身仍无 Docker；Mac/arm64、故障注入和实际资源峰值未实测。
+当前已完成**代码及 Linux amd64 云端 CI 共享环境验收**；该次CI含91项离线回归，随后架构检查增补后本地99/99通过（新增8项尚以新CI复核）。[运行 36738093788](https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093788) 已实际覆盖 MySQL/Redis 读写与重启持久化、Kafka 收发、RocketMQ 宿主 SDK5 gRPC 收发与原消息重启读取，以及共享 JDK21 构建。制作容器本身仍无 Docker；Mac/arm64、故障注入和实际资源峰值未实测。
 
 ## 二、结构与职责
 
@@ -73,7 +73,7 @@ Compose 与未来 Testcontainers 都读取 `infra/versions.env`，避免多个�
 
 | 阶段 | 当前结果 | 证据含义 |
 | --- | --- | --- |
-| Python 无 Docker 回归 | 本轮 91/91 通过（含版本快照回归） | 配置边界、命令组合、错误处理、数据保护、CI 隔离和脱敏逻辑 |
+| Python 无 Docker 回归 | 历史CI 91/91；架构增补后本地99/99（含版本快照回归） | 配置边界、命令组合、错误处理、数据保护、CI 隔离和脱敏逻辑 |
 | 静态环境校验 | 通过 | 固定镜像、回环端口、健康/资源边界，无特权/socket |
 | Bash/Python 语法 | 通过 | 不代表 macOS 或容器运行已验证 |
 | Java 共享版本读取器 | 完整 JDK21.0.12.1+1 实际编译与读取通过 | 仓库根/课程子目录都能读取；未知键/缺失台账会失败，不是容器集成测试 |

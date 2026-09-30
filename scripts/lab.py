@@ -154,6 +154,34 @@ def numeric_version(text):
         raise LabError('无法识别 Docker/Compose 版本，请使用正式发布版本')
     return tuple(int(x or 0) for x in match.groups())
 
+def normalized_architecture(value):
+    """只归一化本仓库已审核的两类 CPU；未知平台不能冒充已支持。"""
+    return {'x86_64': 'amd64', 'amd64': 'amd64',
+            'aarch64': 'arm64', 'arm64': 'arm64'}.get(str(value).lower())
+
+def report_platform(info, env):
+    """doctor 只报告显式平台覆盖，不删除变量、不改设置、不启用仿真。"""
+    raw_arch = info.get('Architecture') or '未知'
+    daemon_arch = normalized_architecture(raw_arch)
+    print(f"Docker daemon 平台：{info.get('OSType', 'linux')}/{daemon_arch or raw_arch}（原始架构：{raw_arch}）")
+    override = env.get('DOCKER_DEFAULT_PLATFORM', '')
+    if not override:
+        print('DOCKER_DEFAULT_PLATFORM：未设置或为空；由 Docker 按 daemon 平台选择镜像。')
+    else:
+        # JSON 引号转义控制字符，避免把异常环境变量当终端控制序列输出。
+        print('DOCKER_DEFAULT_PLATFORM：' + json.dumps(override, ensure_ascii=False) + '（保留显式覆盖）')
+        parts = override.split('/')
+        override_arch = normalized_architecture(parts[1]) if len(parts) in (2, 3) else None
+        if not daemon_arch or not override_arch:
+            print('提醒：平台架构未识别，不能确认覆盖与 daemon 是否匹配；请核对镜像 manifest。')
+        elif parts[0] != info.get('OSType', 'linux') or override_arch != daemon_arch:
+            print('警告：显式平台与 Docker daemon 不匹配，可能使用仿真而更慢/占用更多资源，或无法运行；不会自动改动覆盖值。')
+        else:
+            print('显式平台与 Docker daemon 的系统及 CPU 架构匹配；平台变体和实际运行仍需验收。')
+    if not daemon_arch:
+        print('提醒：本仓库尚未审核该 daemon 架构；不能据此宣称镜像可运行。')
+    print('镜像 manifest 支持不等于 Mac 实测通过；Intel/Apple Silicon 的实际运行与资源峰值仍待验收。')
+
 def docker_ready(config):
     env = docker_env(config)
     if not shutil.which('docker'):
@@ -302,14 +330,15 @@ def main(argv=None):
     elif args.args:
         raise LabError(action + ' 不接受额外参数')
     if action == 'doctor':
-        print(f'系统：{platform.system()} {platform.machine()}；Python：{platform.python_version()}')
+        print(f'脚本所在主机：{platform.system()} {platform.machine()}；Python：{platform.python_version()}（不代替 Docker daemon 架构）')
         print(f'仓库所在磁盘剩余：{shutil.disk_usage(ROOT).free / 1024**3:.1f} GiB（不是 Docker VM 的可用空间）')
     info, ver = docker_ready(config)
     if action == 'up':
         config, envpath = settings(init=True)
     cmd, env = compose(config, envpath), docker_env(config)
     if action == 'doctor':
-        print(f"Docker Engine：{info['ServerVersion']}；Compose：{ver}；架构：{info.get('Architecture', '未知')}")
+        print(f"Docker Engine：{info['ServerVersion']}；Compose：{ver}")
+        report_platform(info, env)
         print(f"Docker 分配资源：{info.get('NCPU', '?')} CPU，{info.get('MemTotal', 0) / 1024**3:.1f} GiB")
         run(cmd + ['config', '--quiet'], env)
         if info.get('MemTotal', 0) < 3 * 1024**3:

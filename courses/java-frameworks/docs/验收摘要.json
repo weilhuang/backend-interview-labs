@@ -7,25 +7,29 @@
   "tasks": 14,
   "placeholders": 20,
   "reference_tests": {
-    "passed": 61,
+    "passed": 63,
     "failed": 0,
-    "scope": "冻结前全课61项；生命周期修复后受影响6项已单独严格重跑，当前全课63项待新CI"
+    "skipped": 0,
+    "scope": "完整框架基础测试，真实GitHub CI，不含独立MySQL集成"
   },
   "student_stubs_rejected": 14,
-  "wrong_implementations_rejected": 17,
+  "wrong_implementations_rejected": 18,
   "complete_callers_passed": 14,
   "mysql_integration_compile": "passed，Testcontainers1.20.6",
-  "mysql_container_runtime": "not_run",
+  "mysql_container_runtime": "passed，独立MySQL事务测试1项",
   "source_paths_verified": 22,
   "startup_health_stop": "passed",
   "browser_ui": {
-    "status": "blocked",
-    "browser": "已安装Chromium，尝试在云端执行Playwright",
-    "completed_ui_checks": 0,
-    "reason": "Chromium创建进程单例Unix socket时返回Operation not permitted；页面尚未打开",
-    "http_page_serving": "02/07真实HTTP测试已验证HTML由服务返回，不能代替UI交互",
-    "test_script": "authoring/verify_frontend.cjs",
-    "security": "未改变系统安全设置或安装新浏览器"
+    "status": "passed",
+    "completed_ui_checks": 11,
+    "browser": "GitHub runner Chrome，Playwright1.62.1，沙箱启用",
+    "scope": "02真实HTTP后端，07同源页面不外推为独立数据库部署UI已验",
+    "evidence": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36735424856",
+    "screenshots": [
+      "界面证据/桌面.png",
+      "界面证据/窄屏.png"
+    ],
+    "limitations": "Academy及macOS仍未验收"
   },
   "academy_native_import": "not_run",
   "boot4_runtime": "not_run",
@@ -111,5 +115,15 @@
       }
     ],
     "macos": "使用macOS支持的ps参数与Bash3语法；未在真实macOS执行，不能标记跨平台实测通过"
-  }
+  },
+  "historical_initial_browser_attempt": {
+    "status": "blocked",
+    "browser": "已安装Chromium，尝试在云端执行Playwright",
+    "completed_ui_checks": 0,
+    "reason": "Chromium创建进程单例Unix socket时返回Operation not permitted；页面尚未打开",
+    "http_page_serving": "02/07真实HTTP测试已验证HTML由服务返回，不能代替UI交互",
+    "test_script": "authoring/verify_frontend.cjs",
+    "security": "未改变系统安全设置或安装新浏览器"
+  },
+  "current_evidence_commit": "5d091ef0c906c0d14d4c8e5b2d307e8ec13d13b9"
 }

@@ -2,7 +2,7 @@
   "日期": "2026-09-30",
   "JDK": "Temurin21.0.12.1+1",
   "真实Gradle": "8.10.2",
-  "无Docker测试": 20,
+  "无Docker测试": 27,
   "失败": 0,
   "分课单元数": {
     "Kafka": 6,
@@ -10,10 +10,10 @@
   },
   "Java文件": {
     "课内": 50,
-    "公共支持": 8
+    "公共支持": 9
   },
   "源码HTTP核对": 12,
-  "真实Docker": "未运行",
+  "真实Docker": "GitHub CI run36740557583：41项中40通过、C09-05存储1失败；本地修复后真实Docker待新CI",
   "Academy界面": "未运行",
   "课程归档": "未声称官方导出通过",
   "标识符修复": {
@@ -24,5 +24,79 @@
     "严格21编译": "全部源代码及真实MySQL测试通过",
     "快速单元/空解/错解": "12单元完整再次通过，20个无Docker测试",
     "Docker实际执行": "未运行，待新CI；H2不作为排序规则证明"
+  },
+  "RocketMQ存储预分配修复": {
+    "修复基线": "bddc80e88b8843d12f2d391c2249e89340c72c6e",
+    "运行": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583",
+    "作业": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583/job/109973521221",
+    "原始JUnit": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583/artifacts/11110966359",
+    "artifact_SHA256": "f12f4d631492115deb0c90ec665e3c0d3f7f82becc5fbd646aa65531b2acf3b5",
+    "实际测试计数": {
+      "全部": 41,
+      "快速单测": 24,
+      "真实服务": 17,
+      "通过": 40,
+      "失败": 1,
+      "失败单元": "rocketmq-05-storage"
+    },
+    "真实通过范围": [
+      "Kafka六节及MySQL身份排序回归",
+      "RocketMQ真实QueryRoute和双消费组收发",
+      "未确认重投与原生DLQ",
+      "FIFO/延迟",
+      "事务真实回查、独立回滚不可见与控制提交、MySQL幂等",
+      "双broker对照"
+    ],
+    "失败原始证据": [
+      "发送后find列出起始位点0及1073741824两段",
+      "重启协议成功且随机宿主端口32802→32803",
+      "store.log恢复物理上界1889，正常truncate删除1073741824未使用预分配段",
+      "原已写0段存留检查通过；下一预分配段检查失败；后续disk1恢复断言未执行"
+    ],
+    "固定源码": [
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/MappedFileQueue.java#L344-L356",
+        "结论": "当前与下一段分别提交预分配"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/AllocateMappedFileService.java#L53-L96",
+        "结论": "创建nextNextReq时就排队分配下一段"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/CommitLog.java#L324-L405",
+        "结论": "正常恢复按有效记录末尾截断"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/MappedFileQueue.java#L193-L211",
+        "结论": "物理上界之后的预分配段被destroy"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/DefaultMessageStore.java#L1142-L1149",
+        "结论": "brokerStatus的commitLogMaxOffset来源为getMaxPhyOffset"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/MappedFileQueue.java#L445-L451",
+        "结论": "已写上界=最后已挂载段起始位点+getReadPosition"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/tools/src/main/java/org/apache/rocketmq/tools/command/broker/BrokerStatusSubCommand.java",
+        "结论": "官方工具输出key: value数据行"
+      }
+    ],
+    "修复合同": "send确认后快照物理已写上界，直接目录中起始位点严格小于上界的非空20位原段重启后逐一保留；完整disk1事件、缺失集和ack保持；不要求未写入预分配段存留",
+    "本地验证": {
+      "严格JDK21": "全部课程、支持代码及真实服务测试编译通过",
+      "作者与学生回归": "12节作者单测、12空解拒绝、12固定错解拒绝、恢复作者解回归通过",
+      "真实Gradle8.10.2": "全12节27项无Docker测试通过，38任务成功",
+      "存储新增回归": 3,
+      "新增错误变体": "将物理边界<改<=、无条件包含预分配段，两者均可编译且被同一公开LabTest拒绝",
+      "独立RocketMQ作者项目": "首次独立项目真实Gradle17项无Docker测试、20任务成功；补清单后的v2与首次运行47项Java源码/构建配置/依赖锁/共享镜像台账SHA256逐字节相同，精确复用首次运行证据；v2全部9个support源码登记及6节静态检查通过，故意遗漏RocketRuntime的负例被拒绝",
+      "格式与元数据": "4个变更Java的google-java-format检查通过；12节源码/答案/可见文件/UTF-16占位通过；本节由正式生成器从lessons.json重建",
+      "证据目录": "build/storage-written-check",
+      "Docker和IDE边界": "本地未运行真实Docker；本轮未执行Academy预览/导出/干净导入，独立源码项目不冒充官方归档",
+      "打包遗漏门禁": "validate_course新增support/src全量Java必须登记于additional_files约束，避免源码根编译掩盖Academy归档缺依赖",
+      "重复本机构建": "v2重复Gradle因云端资源与操作延迟未完成，已只对本任务会话发中断并确认退出130；未将其标为成功；运行输入等价摘要见standalone-runtime-equivalence.json"
+    },
+    "新真实CI": "未运行，不能宣称完整消息workflow通过"
   }
 }

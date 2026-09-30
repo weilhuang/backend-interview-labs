@@ -301,6 +301,90 @@ class LabTests(unittest.TestCase):
         with patch.object(lab.shutil,'which',return_value='/mock/docker'), patch.object(lab,'run',side_effect=results):
             self.assertEqual(lab.docker_ready(self.config), (info,'2.20.0'))
 
+    def test_architecture_aliases_are_normalized(self):
+        for raw, expected in [('aarch64', 'arm64'), ('arm64', 'arm64'),
+                              ('x86_64', 'amd64'), ('amd64', 'amd64')]:
+            with self.subTest(raw=raw):
+                self.assertEqual(lab.normalized_architecture(raw), expected)
+        self.assertIsNone(lab.normalized_architecture('riscv64'))
+        self.assertIsNone(lab.normalized_architecture(None))
+
+    def platform_report(self, arch, override=None):
+        env = {} if override is None else {'DOCKER_DEFAULT_PLATFORM': override}
+        before = dict(env)
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            lab.report_platform({'OSType': 'linux', 'Architecture': arch}, env)
+        self.assertEqual(env, before)
+        return output.getvalue()
+
+    def test_platform_report_without_override(self):
+        for override in (None, ''):
+            with self.subTest(override=override):
+                output = self.platform_report('aarch64', override)
+                self.assertIn('linux/arm64（原始架构：aarch64）', output)
+                self.assertIn('DOCKER_DEFAULT_PLATFORM：未设置或为空', output)
+                self.assertNotIn('警告：', output)
+                self.assertIn('不等于 Mac 实测通过', output)
+
+    def test_platform_report_matching_override_and_aliases(self):
+        for arch, override in [('aarch64', 'linux/arm64/v8'), ('arm64', 'linux/aarch64'),
+                               ('x86_64', 'linux/amd64'), ('amd64', 'linux/x86_64')]:
+            with self.subTest(arch=arch, override=override):
+                output = self.platform_report(arch, override)
+                self.assertIn(json.dumps(override), output)
+                self.assertIn('保留显式覆盖', output)
+                self.assertIn('系统及 CPU 架构匹配', output)
+                self.assertNotIn('警告：', output)
+
+    def test_platform_report_mismatching_override_warns_only(self):
+        for arch, override in [('aarch64', 'linux/amd64'), ('x86_64', 'linux/arm64/v8'),
+                               ('amd64', 'windows/amd64')]:
+            with self.subTest(arch=arch, override=override):
+                output = self.platform_report(arch, override)
+                self.assertIn('警告：显式平台与 Docker daemon 不匹配', output)
+                self.assertIn('仿真而更慢/占用更多资源，或无法运行', output)
+                self.assertIn('不会自动改动覆盖值', output)
+
+    def test_platform_report_unknown_platform_does_not_claim_support(self):
+        for arch, override in [('riscv64', None), ('riscv64', 'linux/amd64'),
+                               ('arm64', 'invalid'), ('arm64', 'linux/riscv64')]:
+            with self.subTest(arch=arch, override=override):
+                output = self.platform_report(arch, override)
+                self.assertIn('提醒：', output)
+                self.assertNotIn('系统及 CPU 架构匹配', output)
+
+    def test_platform_report_escapes_override_control_characters(self):
+        output = self.platform_report('arm64', 'linux/amd64\n\x1b[31m')
+        self.assertIn('linux/amd64\\n\\u001b[31m', output)
+        self.assertNotIn('\x1b', output)
+
+    def test_explicit_platform_override_survives_docker_env(self):
+        with patch.dict(os.environ, {'DOCKER_DEFAULT_PLATFORM': 'linux/amd64'}):
+            self.assertEqual(lab.docker_env(self.config)['DOCKER_DEFAULT_PLATFORM'], 'linux/amd64')
+            self.assertEqual(os.environ['DOCKER_DEFAULT_PLATFORM'], 'linux/amd64')
+
+    def test_doctor_uses_daemon_architecture_without_changing_override(self):
+        info = {'OSType': 'linux', 'ServerVersion': '28.0.0', 'Architecture': 'aarch64',
+                'NCPU': 2, 'MemTotal': 4 * 1024**3}
+        output = io.StringIO()
+        with patch.object(lab, 'docker_ready', return_value=(info, '2.38.2')), \
+                patch.object(lab, 'run', side_effect=self.fake_run) as run, \
+                patch.object(lab.platform, 'machine', return_value='x86_64'), \
+                patch.dict(os.environ, {'DOCKER_DEFAULT_PLATFORM': 'linux/amd64'}), \
+                contextlib.redirect_stdout(output):
+            self.assertEqual(lab.main(['doctor']), 0)
+            self.assertEqual(os.environ['DOCKER_DEFAULT_PLATFORM'], 'linux/amd64')
+        self.assertIn('x86_64', output.getvalue())
+        self.assertIn('Docker daemon 平台：linux/arm64', output.getvalue())
+        self.assertIn('警告：显式平台与 Docker daemon 不匹配', output.getvalue())
+        self.assertEqual(len(run.call_args_list), 2)
+        self.assertEqual(run.call_args_list[0].args[0][-2:], ['config', '--quiet'])
+        self.assertEqual(run.call_args_list[1].args[0], ['docker', 'system', 'df'])
+        for call in run.call_args_list:
+            self.assertEqual(call.args[1]['DOCKER_DEFAULT_PLATFORM'], 'linux/amd64')
+        self.assertFalse((lab.INFRA / '.env').exists())
+
     def test_failed_up_never_deletes_data(self):
         def fail(args, *a, **kw):
             return subprocess.CompletedProcess(args,1 if 'up' in args else 0,'','')

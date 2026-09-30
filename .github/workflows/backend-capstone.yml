@@ -94,6 +94,7 @@ jobs:
             courses/backend-capstone/**/build/test-results/
             courses/backend-capstone/build/variants/
             courses/backend-capstone/build/*.png
+            courses/backend-capstone/build/browser-layout.json
             courses/backend-capstone/build/compose.log
             courses/backend-capstone/build/process-recovery.json
             courses/backend-capstone/authoring/*report.json

@@ -33,4 +33,8 @@ additional_files:
 - name: docs/验收摘要.json
 - name: docs/云端验收复现.md
 - name: scripts/test-process-control.py
+- name: docs/界面证据/桌面.png
+  is_binary: true
+- name: docs/界面证据/窄屏.png
+  is_binary: true
 yaml_version: 2

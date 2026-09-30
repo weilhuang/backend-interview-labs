@@ -1,35 +1,48 @@
 package labs.messaging;
 
 import apache.rocketmq.v2.Code;
-
-import org.apache.rocketmq.shaded.io.grpc.Status;
-
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
+import org.apache.rocketmq.shaded.io.grpc.Status;
 
 /** 固定5.3.2发行包的启动入口与资源预算；不改写镜像中的官方脚本。 */
 public final class RocketRuntime {
-    private RocketRuntime() {}
+  private RocketRuntime() {}
 
-    /** 只有启动期可等待这些传输暂态，业务操作与认证错误不重试。 */
-    public static boolean transientReadinessFailure(Status.Code code) {
-        return code == Status.Code.UNAVAILABLE || code == Status.Code.DEADLINE_EXCEEDED;
+  /** 20位文件名是段起始物理位点；预分配下一段有文件长度，但尚未写入消息。 */
+  public static List<String> writtenCommitLogFiles(String listing, long maxOffset) {
+    if (maxOffset <= 0) throw new IllegalArgumentException("已确认发送后写入上界必须大于零");
+    var written = new ArrayList<String>();
+    for (String path : listing.lines().toList()) {
+      if (!path.matches("/home/rocketmq/store/commitlog/[0-9]{20}"))
+        throw new IllegalArgumentException("不是直接CommitLog数据文件：" + path);
+      long start = Long.parseLong(path.substring(path.lastIndexOf('/') + 1));
+      if (start < maxOffset) written.add(path);
     }
+    if (written.isEmpty()) throw new IllegalArgumentException("没有包含已写记录的CommitLog段");
+    return written.stream().sorted().toList();
+  }
 
-    /** 新探针主题传播可等待；内部固定端口和认证失败必须明确失败。 */
-    public static boolean protocolReady(Code code, Set<String> returned, String requested) {
-        if (code == Code.TOPIC_NOT_FOUND) return false;
-        if (code != Code.OK) throw new IllegalStateException("就绪协议拒绝：" + code);
-        if (returned.isEmpty()) return false;
-        if (!returned.equals(Set.of(requested)))
-            throw new IllegalStateException(
-                    "Proxy返回不可达路由：requested=" + requested + ", returned=" + returned);
-        return true;
-    }
+  /** 只有启动期可等待这些传输暂态，业务操作与认证错误不重试。 */
+  public static boolean transientReadinessFailure(Status.Code code) {
+    return code == Status.Code.UNAVAILABLE || code == Status.Code.DEADLINE_EXCEEDED;
+  }
 
-    public static String startupScript() {
-        return """
+  /** 新探针主题传播可等待；内部固定端口和认证失败必须明确失败。 */
+  public static boolean protocolReady(Code code, Set<String> returned, String requested) {
+    if (code == Code.TOPIC_NOT_FOUND) return false;
+    if (code != Code.OK) throw new IllegalStateException("就绪协议拒绝：" + code);
+    if (returned.isEmpty()) return false;
+    if (!returned.equals(Set.of(requested)))
+      throw new IllegalStateException(
+          "Proxy返回不可达路由：requested=" + requested + ", returned=" + returned);
+    return true;
+  }
+
+  public static String startupScript() {
+    return """
 set -u
 cat > /tmp/lab-broker.conf <<'BROKER'
 brokerClusterName=LabCluster
@@ -119,47 +132,46 @@ while :; do
   sleep 1
 done
 """
-                .replace("@@ADMIN_SCRIPT@@", adminCommand()[2]);
-    }
+        .replace("@@ADMIN_SCRIPT@@", adminCommand()[2]);
+  }
 
-    /** Proxy日志默认写文件，容器仍运行时也必须在删除前读取。 */
-    public static String[] fileLogsCommand() {
-        return new String[] {
-            "sh",
-            "-c",
-            """
-            for file in /home/rocketmq/logs/rocketmqlogs/proxy.log \
-                        /home/rocketmq/logs/rocketmqlogs/broker.log \
-                        /home/rocketmq/logs/rocketmqlogs/broker_default.log \
-                        /home/rocketmq/logs/rocketmqlogs/transaction.log \
-                        /home/rocketmq/logs/rocketmqlogs/store.log \
-                        /home/rocketmq/logs/rocketmqlogs/namesrv.log; do
-              [ -f "$file" ] || continue
-              printf '\\n=== %s (last 6000 bytes) ===\\n' "$file"
-              tail -c 6000 "$file"
-            done
-            """
-        };
-    }
+  /** Proxy日志默认写文件，容器仍运行时也必须在删除前读取。 */
+  public static String[] fileLogsCommand() {
+    return new String[] {
+      "sh",
+      "-c",
+      """
+      for file in /home/rocketmq/logs/rocketmqlogs/proxy.log \
+                  /home/rocketmq/logs/rocketmqlogs/broker.log \
+                  /home/rocketmq/logs/rocketmqlogs/broker_default.log \
+                  /home/rocketmq/logs/rocketmqlogs/transaction.log \
+                  /home/rocketmq/logs/rocketmqlogs/store.log \
+                  /home/rocketmq/logs/rocketmqlogs/namesrv.log; do
+        [ -f "$file" ] || continue
+        printf '\\n=== %s (last 6000 bytes) ===\\n' "$file"
+        tail -c 6000 "$file"
+      done
+      """
+    };
+  }
 
-    public static String[] adminCommand(String... arguments) {
-        // tools.sh硬编码-Xms1g/-Xmx1g且不读取JAVA_OPT_EXT，不能在同一小容器里再启动1GiB工具JVM。
-        String script =
-                """
-                exec "${JAVA_HOME}/bin/java" -Xms32m -Xmx128m -Xmn32m \
-                  -XX:MaxMetaspaceSize=128m -XX:MaxDirectMemorySize=32m \
-                  "-Drmq.logback.configurationFile=${ROCKETMQ_HOME}/conf/rmq.tools.logback.xml" \
-                  -cp ".:${ROCKETMQ_HOME}/conf:${ROCKETMQ_HOME}/lib/*" \
-                  org.apache.rocketmq.tools.command.MQAdminStartup "$@"
-                """;
-        ArrayList<String> command =
-                new ArrayList<>(Arrays.asList("sh", "-c", script, "lab-mqadmin"));
-        command.addAll(Arrays.asList(arguments));
-        return command.toArray(String[]::new);
-    }
+  public static String[] adminCommand(String... arguments) {
+    // tools.sh硬编码-Xms1g/-Xmx1g且不读取JAVA_OPT_EXT，不能在同一小容器里再启动1GiB工具JVM。
+    String script =
+        """
+        exec "${JAVA_HOME}/bin/java" -Xms32m -Xmx128m -Xmn32m \
+          -XX:MaxMetaspaceSize=128m -XX:MaxDirectMemorySize=32m \
+          "-Drmq.logback.configurationFile=${ROCKETMQ_HOME}/conf/rmq.tools.logback.xml" \
+          -cp ".:${ROCKETMQ_HOME}/conf:${ROCKETMQ_HOME}/lib/*" \
+          org.apache.rocketmq.tools.command.MQAdminStartup "$@"
+        """;
+    ArrayList<String> command = new ArrayList<>(Arrays.asList("sh", "-c", script, "lab-mqadmin"));
+    command.addAll(Arrays.asList(arguments));
+    return command.toArray(String[]::new);
+  }
 
-    public static String tail(String value, int maximum) {
-        if (value.length() <= maximum) return value;
-        return "[earlier output omitted]\n" + value.substring(value.length() - maximum);
-    }
+  public static String tail(String value, int maximum) {
+    if (value.length() <= maximum) return value;
+    return "[earlier output omitted]\n" + value.substring(value.length() - maximum);
+  }
 }

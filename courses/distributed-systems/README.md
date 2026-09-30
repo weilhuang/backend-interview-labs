@@ -17,7 +17,7 @@
 | 数据客户端 | MySQL Connector/J 9.2.0；Kafka客户端3.9.1；Jedis5.2.0 |
 | 其他直接依赖 | javax.annotation-api 1.3.2（仅编译生成stub）、SLF4J Simple2.0.16；全部传递依赖逐配置精确版本见各模块gradle.lockfile |
 | 容器镜像 | 唯一来源仓库`infra/versions.env`：MYSQL_IMAGE、KAFKA_IMAGE、REDIS_IMAGE。当前台账MySQL8.4.7、Kafka3.9.1、Redis7.4.7；代码不复制镜像常量 |
-| Docker | 单元/真实回环RPC不需要；MySQL/Kafka/Redis集成必须有Docker daemon。当前dot云端无daemon，动态集成待GitHub Ubuntu Docker CI |
+| Docker | 单元/真实回环RPC不需要；MySQL/Kafka/Redis集成必须有Docker daemon。制作环境无daemon；GitHub Ubuntu Docker CI已通过9项真实服务集成，精确提交与范围见中文阶段报告 |
 | IDE与Academy | 目标IntelliJ IDEA 2026.1.5 / Academy 2026.9-2026.1-1070；本课GUI预览/Check/Reset/导出/干净导入均单独待验，不继承其他课程结果 |
 | 前端 | 本课不需要图形前端；已提供两套真实RPC调用端及完整集成调用链，学习者无需制作前端 |
 | 服务与资源 | 本机RPC随机回环端口；容器随机映射端口。最大并行集成为两个MySQL或MySQL+Kafka+Redis。建议至少4CPU/6GiB空闲内存，此建议不是已测最低配置 |
