@@ -726,7 +726,7 @@
   },
   "database_integration": {
     "docker_in_this_cloud": "UNAVAILABLE",
-    "new_three_phase_integration": "REDIS_PASS; MYSQL_FIRST_RUN_FAIL_AND_TEST_FIX_PENDING",
+    "new_three_phase_integration": "REDIS_PASS; MYSQL_INITIAL_AND_REFERENCE_PASS_REBUILT_STOCK_FAIL",
     "mysql_local_contract": "FAIL before tests due to missing HikariCP 6.2.1 metadata; not learner rejection",
     "redis_contract": "INTEGRATION_REQUIRED for 04-consistency,05-replication,06-leases; their pure unit starts passed 3/2/2 tests",
     "ci_suites": {
@@ -758,6 +758,17 @@
       "original_full_tests": "PASS 40 tests",
       "new_roundtrip": "FAIL on learner 05-deadlock observation-only tests",
       "fix_runtime": "NOT_RUN; next-commit CI required"
+    },
+    "mysql_second_ci": {
+      "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
+      "author_tests": 41,
+      "author_status": "PASS",
+      "initial_tests": 24,
+      "initial_attributable_failures": 14,
+      "initial_status": "PASS",
+      "reference_tests": 24,
+      "reference_status": "PASS",
+      "rebuilt_status": "FAIL: StockDatabaseTest duplicate INSERT real deadlock before editable code"
     }
   },
   "native_archive_comparison": {
@@ -788,17 +799,30 @@
   },
   "github_ci": {
     "new_quality_gate_commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
-    "new_quality_gate_execution": "FIRST_RUN_PARTIAL_RESULTS_VERIFIED; MYSQL_FIX_AWAITING_NEW_COMMIT",
+    "new_quality_gate_execution": "SECOND_RUN_COMPLETED_FAILURE; STOCK_TEST_ORDER_FIX_PENDING",
     "published_baseline": "1fb27d8885bf1eb62b112d2e15f5478becf697fa; 9 green workflows, not evidence for unpublished changes",
     "first_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
-    "mysql_gate": "FAIL; test coverage fix prepared",
-    "redis_gate": "PASS; real integration 19 tests per phase, failures 13/0/13, no skips"
+    "mysql_gate": "FAIL in rebuilt learner: real duplicate-insert deadlock before TODO; test baseline fix awaiting next CI",
+    "redis_gate": "PASS; real integration 19 tests per phase, failures 13/0/13, no skips",
+    "latest_completed_commit": "7956917ebc1aed76ed5c580838e01e2eaf29dc1c",
+    "latest_completed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
+    "messaging_gate": "PASS: author 52 tests; three phases 35 tests with failures 13/0/13 and zero skips",
+    "second_run": {
+      "actual_jobs_passed": 11,
+      "actual_jobs_failed": 1,
+      "total_jobs_passed": 13,
+      "total_jobs_failed": 2,
+      "course_roundtrips_started": 10,
+      "course_roundtrips_completed_pass": 9,
+      "wall_seconds": 1124,
+      "runner_seconds": 5360,
+      "timing_is_billing_receipt": false
+    }
   },
   "native_idea": "NOT_RUN by these scripts; separate GUI report defines actual tested scope",
   "remaining": [
-    "Framework current asset snapshot full roundtrip",
-    "MySQL corrected real integration three phases in next-commit isolated Docker CI; Redis already passed first-run integration gate",
-    "New-commit GitHub CI for all selected workflows",
+    "MySQL stock-baseline fix in a fresh full Docker CI run",
+    "All selected workflows on the next commit",
     "Six dependency-rich courses: remaining 80 individual placeholders",
     "Full-task native Academy acceptance and C02 new official export; pilot missing-document release decision"
   ],
@@ -946,7 +970,7 @@
     "courses/data-storage/mysql-engineering/mysql/05-locks/05-deadlock/test/LockDatabaseTest.java": "b1881a5e60af7498202f6e6f4e4e60224d2d93010040a97775b7b0dcaf8c9fd8"
   },
   "mysql_retry_policy_fix": {
-    "status": "LOCAL_VERIFIED_DOCKER_CI_PENDING",
+    "status": "VERIFIED_IN_SECOND_CI; whole-course rebuilt learner separately blocked in stock task",
     "head_observed": "b79832d59e18a9a4901ed78817e9a52a876007fa",
     "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
     "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251/job/110039459294",
@@ -1001,7 +1025,7 @@
     "historical_mysql_full_test_count": 40,
     "new_mysql_full_test_expected_count": 41,
     "new_mysql_deadlock_integration_test_count": 4,
-    "new_docker_runtime": "NOT_RUN_IN_CLOUD; requires next-commit GitHub CI",
+    "new_docker_runtime": "Second CI: author 41 tests and 05-deadlock real error policy assertions passed; see separate stock failure",
     "workflow_and_gate": "UNCHANGED",
     "first_ci_evidence": {
       "mysql": {
@@ -1021,5 +1045,25 @@
         "artifact_member": "build/quality/redis-roundtrip.json"
       }
     }
+  },
+  "mysql_stock_baseline_fix": {
+    "status": "LOCAL_VERIFIED_NEXT_CI_REQUIRED",
+    "failed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
+    "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960/job/110051578372",
+    "failure": "ExecutionException -> MySQLTransactionRollbackException 1213 at dedupe INSERT before learner TODO during rebuilt learner concurrent same-request test",
+    "changes": [
+      "Run real quantity=2 APPLIED and persisted state baseline before starting workers",
+      "Reset all data then retain 8 requests on 4 workers with no pre-seeded same-request row",
+      "Require exactly 1 APPLIED, 7 REPLAY, correct conflict rejection, stock=9, version=1, one reservation"
+    ],
+    "local_validation": {
+      "all_7_tasks_compile": "PASS JDK21",
+      "pure_contracts": 17,
+      "quality_selftests": 50,
+      "control_flow_probes": 3,
+      "probes_are_real_mysql": false
+    },
+    "reference_source_and_retry_semantics": "UNCHANGED",
+    "gate_and_workflows": "UNCHANGED"
   }
 }

@@ -39,7 +39,7 @@ UPDATE stock SET qty=qty-n WHERE qty>=n
 
 1. 填写reserve的条件更新，必须同时检验sku、剩余数量并增加version；失败用异常触发整笔rollback
 2. 执行30请求库存测试：APPLIED恰为10，最终库存0，reservation行数10
-3. 并发发8次相同requestId：只1次APPLIED，其余REPLAY；用相同id不同sku/数量必须拒绝
+3. 先用一个数量为2的请求验证APPLIED、库存8、version1和参数绑定的去重行；完整reset后，再用4个线程并发发8次相同requestId：只1次APPLIED，其余7次REPLAY；用相同id不同sku/数量必须拒绝，最终库存9、version1且仅1条去重记录
 4. 运行乐观锁旧版本、售罄无占位、连接创建失败和业务异常释放测试
 5. 观测线程数、并发预算、查询超时与服务器max_connections；补充真实连接池集成可作为迁移，不把Gate叫池化
 
@@ -52,6 +52,8 @@ UPDATE stock SET qty=qty-n WHERE qty>=n
 ```
 
 unitTest不是完整验收。test默认真正启动MySQL，不装Docker、没有daemon或镜像下载失败会报错，绝不自动skip并宣称通过。run使用已经启动的共享实验库，需要首页所列LAB_DB环境变量；没有隐式重置。首次或重复运行前显式执行首页reset命令，只删除c06_*实验表数据。
+
+同请求并发用例先验证单请求基础能力，再测试竞争。未实现的扣减会在INSERT后回滚；多个相同键的等待者可能因此出现真正的InnoDB死锁，掩盖本应直接看到的TODO。前置断言在创建线程池前执行，且成功后重置全部合成数据，不预种并发请求的去重行、不减少8个请求或4个线程，也不捕获/放宽1213错误。它仍检验从空去重表开始的并发扣减，而非只检验已完成请求的重放。
 
 先独立修改StockLab.java的占位区；正常测试后故意破坏一个条件，记录哪条可见测试抓到它，再恢复。IDE里可直接打开全部测试和Usage。引用资源/构建不能缺文件时从仓库根保留support与sql。
 
