@@ -31,7 +31,7 @@ Kafka -> inbox去重 -> 业务效果
 
 1. 运行LabTest验证旧schema和坏字段负例
 2. 运行BrokerTest，在AFTER_PUBLISH_BEFORE_MARK故障屏障后重发，断言两条消息与一次下游效果
-3. 运行ReplicaTest：三个真实broker/controller并发就绪、ISR=3，停止当时leader，断言此前确认消息及故障后发送均可消费
+3. 运行ReplicaTest：三个真实broker/controller并发就绪、ISR=3，停止当时leader，断言此前确认消息及故障后发送均可消费；CreateTopics的控制器确认不等于各broker已可见元数据，更不等于ISR满足条件。故障前须有界等待真实RF=3、ISR=3与有效leader，只重试主题/leader暂不可见及元数据请求超时，永久配置或权限错误立即失败
 4. 查看deadLetter保留原文和错误原因；独立补DLQ发布失败不得提交原位点的测试
 5. 先读下方局限，再设计并实现一版带租约/批次/重试次数的多发布器，重复必须仍被消费端去重
 

@@ -4,7 +4,7 @@
 
 ## 当前验证状态
 
-[run36746760650](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650)对应head `1fb27d8885bf1eb62b112d2e15f5478becf697fa`，完整消息workflow已通过：27项快测、17项真实broker/MySQL测试，0失败/0错误/0跳过；12节作者解、空解与错误变体拒绝及恢复回归也通过。RocketMQ存储重启已完成原已写CommitLog段和完整原事件恢复断言。证据及适用边界见[验证报告](验证报告.md)；IDE/Academy官方导出和干净导入仍是独立门禁，不据此宣称完整V1发布。
+[最新run36759817251](https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251/job/110039459692)对应head `b79832d59e18a9a4901ed78817e9a52a876007fa`，完整消息套件44项中1项失败：三Kafka副本实验在新主题元数据尚未传播时立即查询，尚未执行节点停止。现已为业务主题与组位点主题补上有界RF=3/ISR=3/leader就绪屏障，新增8项确定性回归全部通过，真实Kafka修复效果待下一提交CI确认。先前head `1fb27d8885bf1eb62b112d2e15f5478becf697fa` 的完整消息CI通过仅作为历史证据保留。详细归因、测试与保证边界见[验证报告](验证报告.md)；IDE/Academy官方导出和干净导入仍是独立门禁，不据此宣称完整V1发布。
 
 ## 版本、环境与开课自检
 

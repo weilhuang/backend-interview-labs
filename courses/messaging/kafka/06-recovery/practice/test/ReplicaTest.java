@@ -69,25 +69,8 @@ class ReplicaTest {
                                                     "unclean.leader.election.enable",
                                                     "false"));
                     admin.createTopics(List.of(config)).all().get(30, TimeUnit.SECONDS);
-                    long deadline = System.nanoTime() + Duration.ofSeconds(45).toNanos();
-                    var info =
-                            admin.describeTopics(List.of(topic))
-                                    .allTopicNames()
-                                    .get()
-                                    .get(topic)
-                                    .partitions()
-                                    .getFirst();
-                    while (info.isr().size() != 3 && System.nanoTime() < deadline) {
-                        Thread.sleep(100);
-                        info =
-                                admin.describeTopics(List.of(topic))
-                                        .allTopicNames()
-                                        .get()
-                                        .get(topic)
-                                        .partitions()
-                                        .getFirst();
-                    }
-                    assertEquals(3, info.isr().size(), "必须等到三个副本真实同步后再注入故障");
+                    // CreateTopics成功不代表每个broker已能返回新主题元数据。
+                    ReplicaReadiness.awaitTopic(admin, topic, 1, Duration.ofSeconds(45));
                     // 先完成RF=3的组位点主题初始化，隔离初始化和故障恢复两个阶段。
                     consumer.subscribe(List.of(topic));
                     long joinDeadline = System.nanoTime() + Duration.ofSeconds(60).toNanos();
@@ -95,19 +78,8 @@ class ReplicaTest {
                         consumer.poll(Duration.ofMillis(200));
                     }
                     assertEquals(1, consumer.assignment().size(), "故障前必须完成真实消费组入组");
-                    boolean offsetsReady = false;
-                    while (!offsetsReady && System.nanoTime() < joinDeadline) {
-                        var offsets =
-                                admin.describeTopics(List.of("__consumer_offsets"))
-                                        .allTopicNames()
-                                        .get(20, TimeUnit.SECONDS)
-                                        .get("__consumer_offsets");
-                        offsetsReady =
-                                offsets.partitions().stream()
-                                        .allMatch(partition -> partition.isr().size() == 3);
-                        if (!offsetsReady) consumer.poll(Duration.ofMillis(200));
-                    }
-                    assertTrue(offsetsReady, "故障前组位点主题也必须已有三个同步副本");
+                    ReplicaReadiness.awaitTopic(
+                            admin, "__consumer_offsets", 0, Duration.ofSeconds(45));
                     producer.send(new ProducerRecord<>(topic, "o1", "停止前已确认"))
                             .get(20, TimeUnit.SECONDS);
                     int leader =

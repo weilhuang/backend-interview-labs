@@ -377,12 +377,15 @@
         "original_report_sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf",
         "original_status": "FAIL",
         "source_manifest_sha256": "086d62f97b18b4f746be27c03c704ab9f99d1db950f270196c01083f18e1b368",
-        "changed_inputs": [],
+        "changed_inputs": [
+          "mysql/05-locks/05-deadlock/test/LockDatabaseTest.java"
+        ],
         "asset_set_matches": true,
         "phases": [],
         "retained_xml_recheck": [],
         "original_error": "mysql/01-model/01-order-contract: no fresh JUnit XML; compilation/environment failure is not learner rejection",
-        "current_status": "NOT_COMPLETED"
+        "current_status": "STALE_INPUTS_AND_NOT_COMPLETED",
+        "current_source_note": "Real CI subsequently exposed the retryable coverage gap; the public integration test was changed afterward and awaits next-commit Docker execution."
       },
       {
         "course": "data-storage/redis-engineering",
@@ -723,14 +726,39 @@
   },
   "database_integration": {
     "docker_in_this_cloud": "UNAVAILABLE",
-    "new_three_phase_integration": "NOT_RUN",
+    "new_three_phase_integration": "REDIS_PASS; MYSQL_FIRST_RUN_FAIL_AND_TEST_FIX_PENDING",
     "mysql_local_contract": "FAIL before tests due to missing HikariCP 6.2.1 metadata; not learner rejection",
     "redis_contract": "INTEGRATION_REQUIRED for 04-consistency,05-replication,06-leases; their pure unit starts passed 3/2/2 tests",
     "ci_suites": {
       "data-storage/mysql-engineering": "integration",
       "data-storage/redis-engineering": "integration"
     },
-    "capstone_recovery": "OBSERVATION_ONLY in integration; contract layer owns learner rejection"
+    "capstone_recovery": "OBSERVATION_ONLY in integration; contract layer owns learner rejection",
+    "redis_first_ci": {
+      "status": "PASS",
+      "tests_per_phase": [
+        19,
+        19,
+        19
+      ],
+      "failures_by_phase": [
+        13,
+        0,
+        13
+      ],
+      "skipped_by_phase": [
+        0,
+        0,
+        0
+      ],
+      "commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
+      "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251"
+    },
+    "mysql_first_ci": {
+      "original_full_tests": "PASS 40 tests",
+      "new_roundtrip": "FAIL on learner 05-deadlock observation-only tests",
+      "fix_runtime": "NOT_RUN; next-commit CI required"
+    }
   },
   "native_archive_comparison": {
     "tool": "Read-only comparison of existing official ZIP metadata and existing native-imported plaintext; tool does not perform import or decrypt payloads",
@@ -759,14 +787,17 @@
     "existing_zip_files": "UNCHANGED"
   },
   "github_ci": {
-    "new_quality_gate_commit": "NOT_PUBLISHED",
-    "new_quality_gate_execution": "NOT_RUN",
-    "published_baseline": "1fb27d8885bf1eb62b112d2e15f5478becf697fa; 9 green workflows, not evidence for unpublished changes"
+    "new_quality_gate_commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
+    "new_quality_gate_execution": "FIRST_RUN_PARTIAL_RESULTS_VERIFIED; MYSQL_FIX_AWAITING_NEW_COMMIT",
+    "published_baseline": "1fb27d8885bf1eb62b112d2e15f5478becf697fa; 9 green workflows, not evidence for unpublished changes",
+    "first_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
+    "mysql_gate": "FAIL; test coverage fix prepared",
+    "redis_gate": "PASS; real integration 19 tests per phase, failures 13/0/13, no skips"
   },
   "native_idea": "NOT_RUN by these scripts; separate GUI report defines actual tested scope",
   "remaining": [
     "Framework current asset snapshot full roundtrip",
-    "MySQL/Redis real integration three phases in isolated Docker CI",
+    "MySQL corrected real integration three phases in next-commit isolated Docker CI; Redis already passed first-run integration gate",
     "New-commit GitHub CI for all selected workflows",
     "Six dependency-rich courses: remaining 80 individual placeholders",
     "Full-task native Academy acceptance and C02 new official export; pilot missing-document release decision"
@@ -863,6 +894,34 @@
     {
       "path": "build/quality/docs-link-check-final.json",
       "sha256": "82337ab77fa680b561661a1badb14242148945e748f86681fe15d9da065f8c2f"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/verification.json",
+      "sha256": "ddf053df179ac23d535ea9c068080925acd0e74160a11bb8654d96be1880c9eb"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/local-verification.json",
+      "sha256": "00c1d2e3e75f82f8f121a135b53c592b67c5acc7923f9f559c113d7e01bc177a"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/metadata.json",
+      "sha256": "3125ae432b4d4d4bdfd71ed50a1d4e1e5a2663c8f1084eb931989542e96cfa54"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/gate-selftests.log",
+      "sha256": "9949b8c9cc3935cde422493fe6dce947a401a6cf81dce19ba44db78609b05ed8"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/integration-test-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/mysql-first-ci-roundtrip.json",
+      "sha256": "e4f10314a9c4a284f4bc086371279c1935c00f7e0e0d5bcb9f6f3d8c9d75abfc"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/redis-first-ci-roundtrip.json",
+      "sha256": "99758c66de0cae69f48e254e9613c6a7c7d16c595c988e7808a3dfccaeeb17d0"
     }
   ],
   "validated_source_sha256": {
@@ -883,6 +942,84 @@
     "courses/distributed-systems/distributed-course/services/02-grpc/test/labs/distributed/GrpcTest.java": "8e2181f5078a3eca100b56fca3304d26be4a5b7bca52aa93e5b10e40f5b7fa9e",
     "courses/distributed-systems/distributed-course/services/02-grpc/test/labs/distributed/RpcFailureObserverTest.java": "45d4076786ba90dff772672d79b6b6f123668742b3d74d021ccb89b292234a8a",
     "courses/distributed-systems/distributed-course/services/02-grpc/task-info.yaml": "2ea198b7dd42174c490c648e1310208f74ec215c8b8fd7eb99f0e90d610276f2",
-    "courses/distributed-systems/distributed-course/services/08-capacity/test/labs/distributed/CapacityTest.java": "8308423be80c4bac284cefc04fb8a7902c889dd5fba36ea3b2bb1e4c01adf400"
+    "courses/distributed-systems/distributed-course/services/08-capacity/test/labs/distributed/CapacityTest.java": "8308423be80c4bac284cefc04fb8a7902c889dd5fba36ea3b2bb1e4c01adf400",
+    "courses/data-storage/mysql-engineering/mysql/05-locks/05-deadlock/test/LockDatabaseTest.java": "b1881a5e60af7498202f6e6f4e4e60224d2d93010040a97775b7b0dcaf8c9fd8"
+  },
+  "mysql_retry_policy_fix": {
+    "status": "LOCAL_VERIFIED_DOCKER_CI_PENDING",
+    "head_observed": "b79832d59e18a9a4901ed78817e9a52a876007fa",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
+    "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251/job/110039459294",
+    "failure": "Original integration-only XML selected LockDatabaseTest (3 tests passed) while the actual learner retryable TODO was rejected by LockContractTest (2 tests, 1 failure).",
+    "changes": [
+      "Pass real deadlock SQL error 1213 to LockLab.retryable and require true after rollback",
+      "Pass real lock-wait SQL error 1205 to retryable and require true",
+      "Add actual duplicate-key SQL error 1062 and require false",
+      "Rethrow SQL errors outside each scenario unchanged; no gate/workflow exemptions"
+    ],
+    "changed_source": "courses/data-storage/mysql-engineering/mysql/05-locks/05-deadlock/test/LockDatabaseTest.java",
+    "source_sha256": "b1881a5e60af7498202f6e6f4e4e60224d2d93010040a97775b7b0dcaf8c9fd8",
+    "local_validation": {
+      "integration_runtime": "NOT_RUN_NO_DOCKER",
+      "integration_test_compile": "PASS",
+      "variants": [
+        {
+          "variant": "reference",
+          "status": "PASS_EXPECTED",
+          "exit_code": 0,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        },
+        {
+          "variant": "learner-todo",
+          "status": "PASS_EXPECTED",
+          "exit_code": 1,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        },
+        {
+          "variant": "wrong-always-retry",
+          "status": "PASS_EXPECTED",
+          "exit_code": 1,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        },
+        {
+          "variant": "wrong-never-retry",
+          "status": "PASS_EXPECTED",
+          "exit_code": 1,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        }
+      ]
+    },
+    "gate_selftests": 50,
+    "metadata": {
+      "status": "PASS",
+      "tasks": 7
+    },
+    "historical_mysql_full_test_count": 40,
+    "new_mysql_full_test_expected_count": 41,
+    "new_mysql_deadlock_integration_test_count": 4,
+    "new_docker_runtime": "NOT_RUN_IN_CLOUD; requires next-commit GitHub CI",
+    "workflow_and_gate": "UNCHANGED",
+    "first_ci_evidence": {
+      "mysql": {
+        "status": "FAIL",
+        "artifact_name": "c06-mysql-test-reports-36759817251-1.zip",
+        "artifact_sha256": "c1d528f9de888355405f92d750a821894b2dc8f33c834cf3a83250dcf43c3dce",
+        "machine_report": "build/quality/mysql-lock-retry-policy-20260930/mysql-first-ci-roundtrip.json",
+        "machine_report_sha256": "e4f10314a9c4a284f4bc086371279c1935c00f7e0e0d5bcb9f6f3d8c9d75abfc",
+        "artifact_member": "build/quality/mysql-roundtrip.json"
+      },
+      "redis": {
+        "status": "PASS",
+        "artifact_name": "c07-redis-test-reports-36759817251-1.zip",
+        "artifact_sha256": "aa7a10b7a25a95cb6a819a5114eab2f569a1ce157fae0fc805a1d24eca454277",
+        "machine_report": "build/quality/mysql-lock-retry-policy-20260930/redis-first-ci-roundtrip.json",
+        "machine_report_sha256": "99758c66de0cae69f48e254e9613c6a7c7d16c595c988e7808a3dfccaeeb17d0",
+        "artifact_member": "build/quality/redis-roundtrip.json"
+      }
+    }
   }
 }

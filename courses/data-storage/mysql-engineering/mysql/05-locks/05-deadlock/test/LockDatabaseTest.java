@@ -46,6 +46,9 @@ class LockDatabaseTest {
             return 0;
         } catch (SQLException e) {
             c.rollback();
+            // 只接受本场景制造出的真实死锁；连接/SQL错误不能冒充死锁证据。
+            if (e.getErrorCode() != 1213) throw e;
+            assertTrue(LockLab.retryable(e), "真实死锁必须交由学习者策略判定为可重试");
             return e.getErrorCode();
         } finally {
             c.rollback();
@@ -74,12 +77,26 @@ class LockDatabaseTest {
                                                 Db.update(
                                                         b,
                                                         "INSERT INTO c06_stock VALUES(150,1,0)"));
-                        assertEquals(1205, e.getErrorCode());
+                        if (e.getErrorCode() != 1205) throw e;
+                        assertTrue(LockLab.retryable(e), "真实锁等待超时必须被判定为可重试");
                     } else assertEquals(1, Db.update(b, "INSERT INTO c06_stock VALUES(150,1,0)"));
                 } finally {
                     a.rollback();
                 }
             }
+        }
+    }
+
+    @Test
+    void realDuplicateKeyMustNotBeRetried() throws Exception {
+        try (Connection c = MySqlFixture.open()) {
+            SQLException duplicate =
+                    assertThrows(
+                            SQLException.class,
+                            () -> Db.update(c, "INSERT INTO c06_stock VALUES(101,1,0)"));
+            // reset已植入sku=101；只有真实1062属于这条非重试边界。
+            if (duplicate.getErrorCode() != 1062) throw duplicate;
+            assertFalse(LockLab.retryable(duplicate), "重复主键不能作为死锁盲目重试");
         }
     }
 

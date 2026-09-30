@@ -141,3 +141,17 @@ python scripts/quality/academy_gate.py legacy-metadata --report build/quality/ac
 - [并发控制](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)：同组的取消/排队行为
 - [Actions 官方依赖缓存](https://github.com/actions/cache)：缓存下载依赖与恢复键
 - [重新运行工作流与任务](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs)：重跑全部、失败或具体任务的区别
+
+## 首轮新增门禁的实际运行（2026-09-30 UTC）
+
+[提交 b79832d 的运行 36759817251](https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251) 已完成：
+
+- 12 个实际测试 job 中 10 个通过、2 个失败；规划和静态检查通过，最终总门禁正确失败
+- MySQL 原真实测试通过，新学员门禁发现死锁课的集成用例未调用学习者重试策略；这是真实覆盖缺口
+- Kafka 的三副本测试在主题创建后的第一次元数据查询碰到暂态不可见，尚未进入 ISR 就绪等待；这是测试同步缺陷
+- 其余八个课程工程的新三阶段门禁均通过；消息课程三阶段尚未运行，不能借用旧提交的通过结果
+- 工作流墙钟用时 16 分 29 秒；按全部 job 的实际开始/完成时间累计为 **87 分 59 秒 runner 执行时间**
+
+这些是 GitHub 返回的执行时刻，**不是账单、计费取整后的分钟数或账户剩余额度**。这轮两个失败也让后续步骤未执行，所以 87 分 59 秒不能当作完整成功验收的固定成本。新增课程判题验证会增加实际运行量；同一大 PR 的累计代码范围仍覆盖所有模块，不会把一次文档提交伪装成整个 PR 无须验证。
+
+本轮没有预算、付费 runner、仓库可见性或计划任务改动。后续修复须用新提交重跑，历史红色结果保留为可复核证据。

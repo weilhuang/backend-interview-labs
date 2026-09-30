@@ -15,6 +15,10 @@ files:
   visible: true
 - name: test/LabTest.java
   visible: true
+- name: test/ReplicaReadiness.java
+  visible: true
+- name: test/ReplicaReadinessTest.java
+  visible: true
 - name: test/ReplicaTest.java
   visible: true
 - name: gradle.lockfile
