@@ -28,9 +28,7 @@ class BrokerTest {
                     .restartContainerCmd(broker.getContainerId())
                     .withTimeout(5)
                     .exec();
-            org.testcontainers.containers.wait.strategy.Wait.forListeningPort()
-                    .withStartupTimeout(Duration.ofMinutes(2))
-                    .waitUntilReady(broker);
+            broker.awaitReady(Duration.ofMinutes(2));
             broker.admin("topicStatus", "-n", "127.0.0.1:9876", "-t", topic);
             try (var recovered = broker.consumer(group, topic)) {
                 var record = RocketClient.receive(recovered, 1, Duration.ofSeconds(60)).getFirst();

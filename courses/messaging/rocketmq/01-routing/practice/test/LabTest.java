@@ -61,5 +61,38 @@ class LabTest {
         assertTrue(
                 RocketAdminResult.succeeded(
                         "printMsg", 0, "minOffset=0, maxOffset=0, MessageQueue\n", ""));
+        assertFalse(
+                RocketAdminResult.succeeded("clusterList", 0, "#Cluster Name #Broker Name", ""));
+        assertFalse(
+                RocketAdminResult.succeeded(
+                        "clusterList", 137, "LabCluster broker-a 0 127.0.0.1:10911 V5_3_2", ""));
+        assertTrue(
+                RocketAdminResult.succeeded(
+                        "clusterList", 0, "LabCluster broker-a 0 127.0.0.1:10911 V5_3_2", ""));
+    }
+
+    @Test
+    void 管理工具使用独立小堆且参数不拼入shell() {
+        String[] command = RocketRuntime.adminCommand("updateSubGroup", "-g", "group name; false");
+        assertEquals("sh", command[0]);
+        assertEquals("-c", command[1]);
+        assertTrue(command[2].contains("-Xmx128m"));
+        assertTrue(command[2].contains("org.apache.rocketmq.tools.command.MQAdminStartup \"$@\""));
+        assertFalse(command[2].contains("tools.sh"));
+        assertFalse(command[2].contains("group name"));
+        assertEquals("group name; false", command[6]);
+        String startup = RocketRuntime.startupScript();
+        assertTrue(startup.contains("ROCKETMQ_BROKER_EXIT=%s"));
+        assertTrue(startup.contains("tail -n 40"));
+        assertTrue(startup.contains("-Xmx128m"));
+        assertTrue(startup.contains("useEndpointPortFromRequest\":true"));
+        assertTrue(startup.contains("timerWheelEnable=true\n"));
+    }
+
+    @Test
+    void 失败诊断只保留有界日志尾部() {
+        assertEquals("short", RocketRuntime.tail("short", 20));
+        assertTrue(RocketRuntime.tail("old".repeat(100) + "ROOT_CAUSE", 20).endsWith("ROOT_CAUSE"));
+        assertTrue(RocketRuntime.tail("old".repeat(100) + "ROOT_CAUSE", 20).length() < 50);
     }
 }

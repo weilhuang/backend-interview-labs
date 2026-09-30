@@ -18,6 +18,13 @@ public final class RocketAdminResult {
             return false;
         }
         return switch (command) {
+            case "clusterList" ->
+                    stdout.lines()
+                            .anyMatch(
+                                    line ->
+                                            line.trim()
+                                                    .matches(
+                                                            "LabCluster\\s+broker-a\\s+0\\s+127\\.0\\.0\\.1:10911\\s+.*"));
             case "updateTopic" ->
                     stdout.contains("create topic to ") && stdout.contains(" success.");
             case "updateSubGroup" ->

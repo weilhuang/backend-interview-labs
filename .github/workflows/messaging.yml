@@ -44,6 +44,9 @@ jobs:
         run: |
           python -m pip install -r authoring/requirements.txt
           python authoring/validate_course.py
+      - name: RocketMQ首个真实路由就绪与收发冒烟
+        timeout-minutes: 8
+        run: ./gradlew --no-daemon --max-workers=1 :rocketmq-01-routing:test -PwithDocker -PdockerApiVersion=1.44 --tests BrokerTest --console=plain
       - name: 串行真实broker和数据库测试
         run: ./gradlew --no-daemon --max-workers=1 test -PwithDocker -PdockerApiVersion=1.44 --continue --console=plain
       - name: 学生起点与作者答案负例回归

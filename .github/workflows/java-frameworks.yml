@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: '22'
       - name: 元数据与真实完整构建
+        timeout-minutes: 10
         run: |
           java -version
           javac -version
@@ -40,15 +41,19 @@ jobs:
           python authoring/validate_course.py
           ./gradlew --no-daemon test verificationClasspath --console=plain
       - name: 真正MySQL事务集成
+        timeout-minutes: 5
         run: ./gradlew --no-daemon :03-transactions:integrationTest --console=plain
       - name: 所有可见调用方验证
+        timeout-minutes: 5
         run: python authoring/verify_callers.py --jdk "$JAVA_HOME"
       - name: 正确性反例验证
+        timeout-minutes: 12
         run: |
           curl --fail --location --retry 3 https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.12.2/junit-platform-console-standalone-1.12.2.jar -o "$RUNNER_TEMP/framework-junit.jar"
           echo "329bd10288875a74d04c9ca6b7c9889c265ddf87b21a9ea42a7f7392f391472a  $RUNNER_TEMP/framework-junit.jar" | sha256sum --check
           python authoring/verify_negative_cases.py --console "$RUNNER_TEMP/framework-junit.jar" --jdk "$JAVA_HOME"
       - name: 使用runner现有浏览器准备界面验证
+        timeout-minutes: 5
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: |
@@ -61,8 +66,10 @@ jobs:
           ./scripts/course.sh start 02-http-contract
           ./scripts/course.sh check
       - name: 真实浏览器创建重试失败恢复与窄屏检查
+        timeout-minutes: 3
         run: node authoring/verify_frontend.cjs
       - name: 停止本次课程服务
+        timeout-minutes: 2
         if: always()
         run: ./scripts/course.sh stop
       - name: 保存测试证据与界面截图

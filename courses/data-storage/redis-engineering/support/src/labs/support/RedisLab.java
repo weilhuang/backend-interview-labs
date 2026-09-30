@@ -42,6 +42,9 @@ public final class RedisLab implements AutoCloseable {
     return prefix + name;
   }
 
+  /** 当前宿主端口；重启后由夹具inspect刷新，可能与初次启动不同。 */
+  public int port() { return mappedPort; }
+
   public Jedis connect() {
     return new Jedis(container.getHost(), mappedPort, 500, 500);
   }
