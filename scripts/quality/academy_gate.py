@@ -13,7 +13,6 @@ import os
 from pathlib import Path, PurePosixPath
 import re
 import shutil
-import signal
 import stat
 import subprocess
 import sys
@@ -23,6 +22,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 import yaml
+
+from process_runner import check_support, run_logged
 
 REPO = Path(__file__).resolve().parents[2]
 IGNORED = {'build', '.gradle', '.idea', '__pycache__', '.git'}
@@ -320,6 +321,29 @@ def expected_todo_exception(evidence):
     return re.search(r'java\.lang\.UnsupportedOperationException[^\n]{0,180}(?:' + markers + r')', evidence) is not None
 
 
+def inspect_todo_chain(evidence, file, task_path):
+    """No cleanup/runtime exception may borrow another branch's valid TODO."""
+    if not expected_todo_exception(evidence):
+        return
+    wrappers = {'java.util.concurrent.ExecutionException', 'java.util.concurrent.CompletionException'}
+    # Existing real XML contains these transport/context wrappers. Scope each to
+    # its actual course; every terminal/suppressed exception still needs its own TODO.
+    if task_path.startswith('framework-course/'):
+        wrappers.update({'org.springframework.beans.factory.BeanCreationException',
+                         'org.springframework.beans.BeanInstantiationException'})
+    if task_path in ('distributed-course/services/03-dubbo', 'distributed-course/services/08-capacity'):
+        wrappers.add('org.apache.dubbo.remoting.RemotingException')
+    for relation, line in re.findall(r'(Caused by:|Suppressed:)\s+([^\n]+)', evidence):
+        kind = line.split(':', 1)[0].split(' ', 1)[0]
+        own_todo = kind == 'java.lang.UnsupportedOperationException' and expected_todo_exception(line)
+        if relation == 'Suppressed:':
+            require(own_todo,
+                    f'{file}: suppressed runtime/cleanup exception lacks its own recognized TODO')
+        else:
+            require(own_todo or kind in wrappers,
+                    f'{file}: unexpected nested runtime/cleanup exception alongside TODO: {kind}')
+
+
 def inspect_junit_failures(root, file, task_path=""):
     """Require actual test failures; dependency/runner/container errors fail closed."""
     attributed = 0
@@ -337,6 +361,7 @@ def inspect_junit_failures(root, file, task_path=""):
         for failure in case.findall('failure'):
             evidence = ' '.join([failure.get('type', ''), failure.get('message', ''), failure.text or ''])
             require(not any(token in evidence for token in blocked), f'{file}: infrastructure failure is not learner rejection')
+            inspect_todo_chain(evidence, file, task_path)
             kind = failure.get('type', '')
             if kind in ('java.lang.AssertionError', 'org.opentest4j.AssertionFailedError',
                         'org.opentest4j.MultipleFailuresError', 'org.junit.ComparisonFailure'):
@@ -416,21 +441,10 @@ def run_gradle(directory, model, args, phase, logs, expected_pass):
         env['GRADLE_USER_HOME'] = str(args.gradle_user_home.resolve())
     log = logs / (phase + '.log')
     start = time.monotonic()
-    with log.open('w', encoding='utf-8') as stream:
-        proc = subprocess.Popen(command, cwd=directory, env=env, stdout=stream, stderr=subprocess.STDOUT,
-                                start_new_session=True)
-        try:
-            code = proc.wait(timeout=args.timeout)
-        except (subprocess.TimeoutExpired, KeyboardInterrupt) as error:
-            os.killpg(proc.pid, signal.SIGTERM)
-            try:
-                proc.wait(timeout=15)
-            except subprocess.TimeoutExpired:
-                os.killpg(proc.pid, signal.SIGKILL)
-                proc.wait()
-            if isinstance(error, KeyboardInterrupt):
-                raise
-            raise GateError(f'{phase}: exceeded {args.timeout}s; see {log}') from error
+    try:
+        code = run_logged(command, cwd=directory, env=env, log=log, timeout=args.timeout)
+    except subprocess.TimeoutExpired as error:
+        raise GateError(f'{phase}: exceeded {args.timeout}s including group cleanup; see {log}') from error
     require((code == 0) if expected_pass else (code == 1), f'{phase}: unexpected Gradle exit {code}; see {log}')
     results = collect_results(directory, selected, goal, expected_pass)
     return {'phase': phase, 'status': 'PASS', 'goal': goal, 'command': command, 'exit_code': code,
@@ -483,6 +497,7 @@ def course_summary(model, repo):
 
 
 def roundtrip(model, args, summary):
+    check_support()
     work = args.work_dir.resolve() / summary['course'].replace('/', '__')
     require(not work.exists(), f'work directory already exists; choose a new --work-dir: {work}')
     work.mkdir(parents=True)
@@ -531,6 +546,12 @@ def main(argv=None):
     parser.add_argument('--offline', action='store_true')
     parser.add_argument('--timeout', type=int, default=900, help='Per-phase Gradle timeout in seconds')
     args = parser.parse_args(argv)
+    if args.mode == 'roundtrip':
+        try:
+            check_support()
+        except OSError as error:
+            print(f'FAIL: {error}')
+            return 1
     report = {'schema_version': SCHEMA, 'mode': args.mode, 'suite': args.suite, 'status': 'PASS', 'native_idea': 'NOT_RUN',
               'native_archive_export_import': 'NOT_RUN', 'native_reset': 'NOT_RUN',
               'docker_integration': 'NOT_RUN', 'fixture_kind': 'repository source fixture, not Academy course archive',

@@ -70,7 +70,8 @@
     ],
     "not_audited": {
       "courses": 6,
-      "placeholders": 80
+      "placeholders": 80,
+      "scope": "Historical remaining80 after original four-course tool only; additional_contract_regions records37 later independent checks"
     }
   },
   "gradle_roundtrip": {
@@ -694,7 +695,7 @@
     }
   },
   "framework": {
-    "status": "STALE_INPUTS",
+    "status": "CI_PASS_AT_e66c2fddf2ce172b140e9a577e43c9828f9307a1",
     "historical_tests_per_phase": 63,
     "historical_failures_by_phase": [
       47,
@@ -722,11 +723,13 @@
       "中文阶段报告.md"
     ],
     "changed_assets_count_at_final_recheck": 16,
-    "changed_assets_during_original_run": 15
+    "changed_assets_during_original_run": 15,
+    "historical_local_status": "STALE_INPUTS",
+    "historical_fields_scope": "Original local stale-input run and interrupted retry; superseded for current CI by github_ci.third_run"
   },
   "database_integration": {
     "docker_in_this_cloud": "UNAVAILABLE",
-    "new_three_phase_integration": "REDIS_PASS; MYSQL_INITIAL_AND_REFERENCE_PASS_REBUILT_STOCK_FAIL",
+    "new_three_phase_integration": "MYSQL_AND_REDIS_PASS_AT_e66c2fddf2ce172b140e9a577e43c9828f9307a1",
     "mysql_local_contract": "FAIL before tests due to missing HikariCP 6.2.1 metadata; not learner rejection",
     "redis_contract": "INTEGRATION_REQUIRED for 04-consistency,05-replication,06-leases; their pure unit starts passed 3/2/2 tests",
     "ci_suites": {
@@ -799,13 +802,13 @@
   },
   "github_ci": {
     "new_quality_gate_commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
-    "new_quality_gate_execution": "SECOND_RUN_COMPLETED_FAILURE; STOCK_TEST_ORDER_FIX_PENDING",
+    "new_quality_gate_execution": "THIRD_RUN_COMPLETED_SUCCESS; NEW_REGION_GATE_NOT_RUN",
     "published_baseline": "1fb27d8885bf1eb62b112d2e15f5478becf697fa; 9 green workflows, not evidence for unpublished changes",
     "first_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
-    "mysql_gate": "FAIL in rebuilt learner: real duplicate-insert deadlock before TODO; test baseline fix awaiting next CI",
+    "mysql_gate": "PASS at e66c2fd; integration24 tests/phase, failures14/0/14",
     "redis_gate": "PASS; real integration 19 tests per phase, failures 13/0/13, no skips",
-    "latest_completed_commit": "7956917ebc1aed76ed5c580838e01e2eaf29dc1c",
-    "latest_completed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
+    "latest_completed_commit": "e66c2fddf2ce172b140e9a577e43c9828f9307a1",
+    "latest_completed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36766340612",
     "messaging_gate": "PASS: author 52 tests; three phases 35 tests with failures 13/0/13 and zero skips",
     "second_run": {
       "actual_jobs_passed": 11,
@@ -817,14 +820,22 @@
       "wall_seconds": 1124,
       "runner_seconds": 5360,
       "timing_is_billing_receipt": false
+    },
+    "third_run": {
+      "conclusion": "success",
+      "course_roundtrips_completed_pass": 10,
+      "evidence_scope": "Existing full workflows and roundtrips only; new region gate not run",
+      "timing_is_billing_receipt": false,
+      "evidence_summary_sha256": "e4d7eece9fb82650e2e3dcdf9f18169d1e04f0a89206f766ea3bf6281649fa60"
     }
   },
   "native_idea": "NOT_RUN by these scripts; separate GUI report defines actual tested scope",
   "remaining": [
-    "MySQL stock-baseline fix in a fresh full Docker CI run",
+    "Real execution of four distributed regions and two XA semantic controls on exact next CI commit",
     "All selected workflows on the next commit",
-    "Six dependency-rich courses: remaining 80 individual placeholders",
-    "Full-task native Academy acceptance and C02 new official export; pilot missing-document release decision"
+    "43 individual regions not yet proven by the original76 plus additional37 batches",
+    "Full-task native Academy acceptance and C02 new official export; pilot missing-document release decision",
+    "Native macOS runtime of author quality tools"
   ],
   "evidence_files": [
     {
@@ -970,7 +981,7 @@
     "courses/data-storage/mysql-engineering/mysql/05-locks/05-deadlock/test/LockDatabaseTest.java": "b1881a5e60af7498202f6e6f4e4e60224d2d93010040a97775b7b0dcaf8c9fd8"
   },
   "mysql_retry_policy_fix": {
-    "status": "VERIFIED_IN_SECOND_CI; whole-course rebuilt learner separately blocked in stock task",
+    "status": "CI_PASS; complete MySQL roundtrip confirmed at e66c2fd after second-run stock fix",
     "head_observed": "b79832d59e18a9a4901ed78817e9a52a876007fa",
     "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
     "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251/job/110039459294",
@@ -1047,7 +1058,7 @@
     }
   },
   "mysql_stock_baseline_fix": {
-    "status": "LOCAL_VERIFIED_NEXT_CI_REQUIRED",
+    "status": "CI_PASS_AT_e66c2fddf2ce172b140e9a577e43c9828f9307a1",
     "failed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
     "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960/job/110051578372",
     "failure": "ExecutionException -> MySQLTransactionRollbackException 1213 at dedupe INSERT before learner TODO during rebuilt learner concurrent same-request test",
@@ -1065,5 +1076,74 @@
     },
     "reference_source_and_retry_semantics": "UNCHANGED",
     "gate_and_workflows": "UNCHANGED"
+  },
+  "additional_contract_regions": {
+    "status": "PASS_WITH_SCOPED_EVIDENCE",
+    "head_sha": "e66c2fddf2ce172b140e9a577e43c9828f9307a1",
+    "method": "fresh JDK21 compilation and actual JUnit Platform execution; no Gradle/Docker/IDEA execution",
+    "unique_regions": 37,
+    "by_course": {
+      "java-frameworks": 9,
+      "distributed-systems": 21,
+      "backend-capstone": 7
+    },
+    "full_module_contract_regions": 36,
+    "selected_existing_method_regions": 1,
+    "selected_method": "labs.distributed.CapacityTest#入口无等待拒绝与异常许可归还",
+    "full_capacity_mutant_suite_status": "UNCLASSIFIED_FAILURE; not a clean full-suite rejection",
+    "reference_module_runs": 14,
+    "reference_module_tests": 83,
+    "additional_focused_reference_tests": 1,
+    "final_mutant_test_invocations": 220,
+    "failure_events": 84,
+    "strict_proof_failure_events": 82,
+    "secondary_barrier_assertions_excluded": 2,
+    "combined_with_prior_76_unique_regions": 113,
+    "remaining_of_156_not_proven_by_these_two_batches": 43,
+    "source_manifest_matches": {
+      "java-frameworks": "140/140",
+      "backend-capstone": "106/106",
+      "distributed-systems": "157/158; generated metadata-report differs, no Java/build/test-input difference"
+    },
+    "evidence_sha256": {
+      "summary.json": "7f9eee58448bd4e0a7fa832211697cce974dc5724bd1800c6950cbe1c0d4cbd0",
+      "case-integrity.json": "d94bb3d69e5517de358830f84e67240170caec4a6d103c27c0b7498113b5e7e1",
+      "ci-source-provenance.json": "4e4f9feb8b555ed2b20c0085fb5c3a017c5fec5869196e0cb20f17e84ea2d702",
+      "report.md": "45d00ec8e889e480dabbfc0c8d24774568ea1b386ce3263543b024f9cad1cea1"
+    },
+    "evidence_availability": "Hashes identify retained local audit evidence, not files newly published in this repository or the upcoming CI artifact",
+    "native_idea": "NOT_RUN",
+    "native_macos_runtime": "NOT_RUN"
+  },
+  "distributed_real_region_gate": {
+    "status": "NOT_RUN",
+    "regions": [
+      "DS-17",
+      "DS-19",
+      "DS-21",
+      "DS-22"
+    ],
+    "semantic_controls": [
+      "DS-17-omit-ra-commit",
+      "DS-17-omit-rb-commit"
+    ],
+    "semantic_controls_are_additional_regions": false,
+    "reference_runs": 2,
+    "planned_total_runs": 8,
+    "per_process_seconds": 300,
+    "shared_total_execution_seconds": 900,
+    "step_timeout_minutes": 16,
+    "job_timeout_minutes": 60,
+    "acceptance": "--execute and PASS at status/docker_integration/runtime.status, execution_requested=true, all expected rows PASS and all8 runs completed",
+    "preparation_only": "NOT_RUN with exit2; not runtime success",
+    "next_required": "Real GitHub execution for exact new commit",
+    "native_idea": "NOT_RUN",
+    "native_macos_runtime": "NOT_RUN"
+  },
+  "author_quality_runtime_platforms": {
+    "linux_ci": "Python3.12",
+    "macos_author_scripts": "Python>=3.13 with waitid/WNOWAIT; capability checked before fixture writes/Java execution",
+    "macos_runtime_validation": "NOT_RUN",
+    "student_idea_gradle_python_requirement": "UNCHANGED; author tools are not in ordinary student entrypoints"
   }
 }

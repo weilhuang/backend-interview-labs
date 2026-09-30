@@ -8,7 +8,7 @@ jobs:
   verify:
     name: real-distributed
     runs-on: ubuntu-24.04
-    timeout-minutes: 50
+    timeout-minutes: 60
     defaults:
       run:
         working-directory: courses/distributed-systems
@@ -61,12 +61,49 @@ jobs:
             --java-home "$JAVA_HOME" --timeout 600 \
             --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
             --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
+      - name: 四个真实服务编码区与XA提交语义控制
+        timeout-minutes: 16
+        working-directory: ${{ github.workspace }}
+        env:
+          ORG_GRADLE_PROJECT_dockerApiVersion: '1.44'
+        run: |
+          python scripts/quality/distributed_integration_audit.py \
+            --execute --xa-commit-controls --java-home "$JAVA_HOME" \
+            --timeout 300 --total-timeout 900 \
+            --work-dir build/quality/distributed-region-audit \
+            --report build/quality/distributed-region-audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path('build/quality/distributed-region-audit.json').read_text())
+          runtime = report['runtime']
+          def require(condition, message):
+              if not condition:
+                  raise SystemExit(message)
+          require(report['status'] == report['docker_integration'] == runtime['status'] == 'PASS',
+                  'Real-service execution did not pass; preparation is never acceptance')
+          require(runtime['execution_requested'] is True and runtime['completed_runs'] == runtime['planned_runs'] == 8,
+                  'Expected all eight sequential reference, region and semantic-control runs')
+          require(report['limits']['gradle_process_seconds'] == 300 and report['limits']['total_execution_seconds'] == 900,
+                  'Unexpected integration execution budget')
+          expected = {'reference_runs': ('module', {'06-transactions', '07-outbox-cache'}),
+                      'mutation_runs': ('region', {'DS-17', 'DS-19', 'DS-21', 'DS-22'}),
+                      'semantic_control_runs': ('region', {'DS-17-omit-ra-commit', 'DS-17-omit-rb-commit'})}
+          for section, (key, identities) in expected.items():
+              rows = report[section]
+              require(len(rows) == len(identities) and {row[key] for row in rows} == identities
+                      and all(row['status'] == 'PASS' for row in rows), 'Incomplete or failed ' + section)
+          PY
       - name: 保存完整测试与负例证据
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: 分布式课程验证报告-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
+            build/quality/distributed-region-audit.json
+            build/quality/distributed-region-audit/**/source-manifest.json
+            build/quality/distributed-region-audit/**/*.log
+            build/quality/distributed-region-audit/**/build/test-results/
             build/quality/distributed-systems-roundtrip.json
             build/quality/distributed-systems-roundtrip/**/source-manifest.json
             build/quality/distributed-systems-roundtrip/**/*.log

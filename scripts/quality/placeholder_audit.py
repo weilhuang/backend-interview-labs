@@ -15,6 +15,8 @@ import time
 import xml.etree.ElementTree as ET
 import copy
 
+from process_runner import check_support, run_logged
+
 from academy_gate import (REPO, GateError, digest, discover, inspect_course,
                           replace_placeholders, require, inspect_junit_failures, expected_todo_exception)
 
@@ -23,6 +25,7 @@ JUNIT_SHA = 'b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc'
 
 
 def run_case(model, task, java_home, junit, directory, changed=None):
+    check_support()
     directory.mkdir(parents=True)
     source_root = directory / 'sources'
     classes = directory / 'classes'
@@ -42,16 +45,14 @@ def run_case(model, task, java_home, junit, directory, changed=None):
         sources.append(str(target))
     command = [str(java_home / 'bin/javac'), '--release', '21', '-encoding', 'UTF-8',
                '-parameters', '-cp', str(junit), '-d', str(classes)] + sources
-    compile_result = subprocess.run(command, text=True, capture_output=True, timeout=60)
-    (directory / 'compile.log').write_text(compile_result.stdout + compile_result.stderr)
-    require(compile_result.returncode == 0, f'{directory}: compilation error is not mutation rejection')
+    compile_code = run_logged(command, log=directory / 'compile.log', timeout=60)
+    require(compile_code == 0, f'{directory}: compilation error is not mutation rejection')
     command = [str(java_home / 'bin/java'), '-Xmx192m', '-XX:ActiveProcessorCount=2',
                '-jar', str(junit), 'execute', '--class-path', str(classes), '--scan-class-path',
                '--disable-banner', '--disable-ansi-colors', '--details=summary', '--fail-if-no-tests',
                '--reports-dir', str(directory / 'xml')]
-    result = subprocess.run(command, text=True, capture_output=True, timeout=90)
-    output = result.stdout + result.stderr
-    (directory / 'junit.log').write_text(output)
+    exit_code = run_logged(command, log=directory / 'junit.log', timeout=90)
+    output = (directory / 'junit.log').read_text(encoding='utf-8')
     counts = {}
     for key in ('found', 'started', 'successful', 'failed', 'skipped', 'aborted'):
         match = re.search(r'\[\s*(\d+) tests ' + key + r'\s*\]', output)
@@ -82,8 +83,8 @@ def run_case(model, task, java_home, junit, directory, changed=None):
         attributed += inspect_junit_failures(normalized, file, task['path'])
     require(xml_tests == counts['found'] and xml_failures == counts['failed'],
             f'{directory}: XML/console summary mismatch')
-    expected = (result.returncode == 1 and counts['failed'] > 0 and attributed == counts['failed']) if changed else result.returncode == 0 and counts['failed'] == 0
-    return {'status': 'PASS' if expected else 'FAIL', 'tests': counts, 'exit_code': result.returncode,
+    expected = (exit_code == 1 and counts['failed'] > 0 and attributed == counts['failed']) if changed else exit_code == 0 and counts['failed'] == 0
+    return {'status': 'PASS' if expected else 'FAIL', 'tests': counts, 'exit_code': exit_code,
             'log': str(directory / 'junit.log'), 'changed': changed}
 
 
@@ -95,6 +96,12 @@ def main(argv=None):
     parser.add_argument('--report', type=Path, default=REPO / 'build/quality/placeholder-audit.json')
     parser.add_argument('--work-dir', type=Path, default=REPO / 'build/quality/placeholder-audit')
     args = parser.parse_args(argv)
+    if True:
+        try:
+            check_support()
+        except OSError as error:
+            print(f'FAIL: {error}')
+            return 1
     report = {'schema_version': 1, 'status': 'PASS', 'native_idea': 'NOT_RUN', 'gradle': 'NOT_RUN',
               'docker_integration': 'NOT_RUN', 'kind': 'independent placeholder rejection via javac/JUnit', 'courses': []}
     start = time.monotonic()

@@ -115,6 +115,22 @@ Gradle 缓存仅覆盖 `caches/modules-2` 与 Wrapper 分发，不缓存编译�
 
 本次没有修改 branch protection/rulesets。若仓库已有旧 workflow 检查名的必需状态规则，迁移前需核实其名称；不要未经授权修改规则，也不要把永远 skipped 的检查设成唯一门禁。
 
+## 分布式四区真实拒绝门禁
+
+分布式工作流保留原来的完整 `test`、`integrationTest`、作者错误变体与一次 `--suite contract` 三阶段闭环，另在同一隔离 runner 顺序运行 `distributed_integration_audit.py --execute --xa-commit-controls`。它不是为整课重复三遍容器测试：先验证06事务、07Outbox/缓存两个参考模块，再分别只替换 DS-17（XA transfer）、DS-19（publishOne）、DS-21（fill）、DS-22（invalidate）一个声明编码区。两次额外语义控制分别删除 XA 两个资源的正常提交语句；不计作新增编码区。
+
+- 8次Gradle调用串行，共享900秒总执行预算；每个进程最多300秒，终止/清理预留包含在预算内。两次语义控制没有另加900秒
+- helper step上限16分钟，完整distributed job上限60分钟；原三阶段step仍为35分钟。总job上限也是硬停止边界，并不保证各step同时耗尽其上限后仍能完成；超时失败，不能算预期错误解
+- 继承现有Docker API兼容设置1.44，只开一个Gradle worker。使用Testcontainers/Ryuk会话清理，不执行全局Docker prune
+- CI显式检查 `status/docker_integration/runtime.status=PASS`、`execution_requested=true`、8/8完成以及2参考、4指定编码区、2指定语义控制的逐条PASS。省略 `--execute` 仅准备夹具，返回2且为 `NOT_RUN`，不能放行
+- 使用全新work-dir/report；归档报告JSON（含输入SHA-256清单）、源码manifest、日志和新鲜JUnit XML，7天保留。不上载整个编译树、依赖缓存或重复源码夹具。失败也尝试上传；runner被强制终止时仍可能缺少报告
+
+这是新门禁配置，**四区及两个语义控制的真实执行仍须在包含本次修改的准确提交上取得成功证据**。`e66c2fd` 的绿灯是旧基线，不会自动证明新门禁已运行。详见[质量阶段报告](quality/中文阶段报告.md#补充审计37个合同区与四个真实服务区)。新增检查会增加实际运行量；没有账户账单、余额或计费取整数据，不能据此承诺金额或节省比例。
+
+### 作者工具平台前提
+
+使用共享进程组清理器的作者质量脚本（Gradle三阶段、逐占位审计、分布式逐区真实验证）要求Linux/macOS及相应进程API：Linux CI继续使用Python3.12，macOS作者环境需要Python3.13或以上，以提供 `os.waitid` / `WNOWAIT`。缺少能力时在创建工作副本或启动Java前明确失败。本次只完成Linux上的Python自测，macOS原生运行未验收。普通学习者通过IDEA/Gradle学课不调用这些作者脚本，不新增Python要求。
+
 ## 本地检查
 
 ```sh

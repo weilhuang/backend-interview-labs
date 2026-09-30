@@ -3,8 +3,11 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import sys
 import unittest
 import zipfile
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 SPEC = importlib.util.spec_from_file_location('academy_gate', Path(__file__).resolve().parents[1] / 'academy_gate.py')
 gate = importlib.util.module_from_spec(SPEC)
@@ -160,6 +163,49 @@ class GateTests(unittest.TestCase):
         with self.assertRaisesRegex(gate.GateError, 'unclassified failure'):
             self.results(False)
 
+    def test_todo_with_unknown_suppressed_cleanup_is_rejected(self):
+        for failure in ('java.sql.SQLNonTransientConnectionException: rollback failed',
+                        'java.net.SocketTimeoutException: timeout',
+                        'java.sql.SQLException: original was java.lang.UnsupportedOperationException: TODO',
+                        'java.lang.UnsupportedOperationException: unrelated platform error'):
+            self.xml('<testsuite tests="1" failures="1"><testcase name="contract"><failure type="java.lang.UnsupportedOperationException">'
+                     'java.lang.UnsupportedOperationException: TODO\nSuppressed: ' + failure + '</failure></testcase></testsuite>')
+            with self.subTest(failure=failure), self.assertRaisesRegex(gate.GateError, 'suppressed'):
+                self.results(False)
+
+    def test_recognized_suppressed_todo_keeps_its_own_attribution(self):
+        self.xml('<testsuite tests="1" failures="1"><testcase name="contract"><failure type="java.lang.UnsupportedOperationException">'
+                 'java.lang.UnsupportedOperationException: TODO main\nSuppressed: java.lang.UnsupportedOperationException: TODO close'
+                 '</failure></testcase></testsuite>')
+        self.assertEqual(1, self.results(False)[0]['attributable_failures'])
+
+    def test_todo_with_unknown_nested_environment_exception_is_rejected(self):
+        for message in ('rollback failed', 'original was java.lang.UnsupportedOperationException: TODO'):
+            self.xml('<testsuite tests="1" failures="1"><testcase name="contract"><failure type="java.lang.UnsupportedOperationException">'
+                     'java.lang.UnsupportedOperationException: TODO\nCaused by: java.sql.SQLException: ' + message +
+                     '</failure></testcase></testsuite>')
+            with self.subTest(message=message), self.assertRaisesRegex(gate.GateError, 'nested'):
+                self.results(False)
+
+    def test_known_context_wrapper_is_course_scoped(self):
+        evidence = ('org.springframework.beans.factory.BeanCreationException: wrapper\n'
+                    'Caused by: org.springframework.beans.BeanInstantiationException: wrapper\n'
+                    'Caused by: java.lang.UnsupportedOperationException: 请按题目实现本步骤')
+        gate.inspect_todo_chain(evidence, Path('sample.xml'), 'framework-course/01-boot/01-config')
+        with self.assertRaisesRegex(gate.GateError, 'nested'):
+            gate.inspect_todo_chain(evidence, Path('sample.xml'), 'unrelated-course/task')
+
+    def test_observed_dubbo_wrapper_allows_capacity_dependency_only(self):
+        evidence = ('org.apache.dubbo.rpc.RpcException: wrapper\n'
+                    'Caused by: java.util.concurrent.ExecutionException: wrapper\n'
+                    'Caused by: org.apache.dubbo.remoting.RemotingException: wrapper\n'
+                    'Caused by: java.lang.UnsupportedOperationException: 请按本步骤合同完成实现')
+        for task in ('distributed-course/services/03-dubbo', 'distributed-course/services/08-capacity'):
+            gate.inspect_todo_chain(evidence, Path('sample.xml'), task)
+        for task in ('distributed-course/services/06-transactions', 'unrelated-course/task'):
+            with self.subTest(task=task), self.assertRaisesRegex(gate.GateError, 'nested'):
+                gate.inspect_todo_chain(evidence, Path('sample.xml'), task)
+
     def test_unrelated_unsupported_operation_is_not_todo(self):
         self.xml('<testsuite tests="1" failures="1"><testcase name="startsRuntime"><failure type="java.lang.UnsupportedOperationException">Platform does not support this process operation</failure></testcase></testsuite>')
         with self.assertRaisesRegex(gate.GateError, 'unclassified'):
@@ -204,8 +250,7 @@ class GateTests(unittest.TestCase):
                                gradle_arg=[], offline=True, java_home=Path('/jdk21'),
                                gradle_user_home=None, timeout=2)
         model = {'root': Path('/courses/java-foundations'), 'tasks': [{'path': 'section/task'}]}
-        with patch.object(gate.subprocess, 'Popen') as popen:
-            popen.return_value.wait.return_value = -9
+        with patch.object(gate, 'run_logged', return_value=-9):
             with self.assertRaisesRegex(gate.GateError, 'unexpected Gradle exit -9'):
                 gate.run_gradle(self.root, model, args, 'killed', self.root, False)
 

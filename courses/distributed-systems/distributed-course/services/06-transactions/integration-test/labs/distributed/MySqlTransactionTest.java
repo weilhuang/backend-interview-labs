@@ -2,7 +2,12 @@ package labs.distributed;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.mysql.cj.jdbc.MysqlXADataSource;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import javax.transaction.xa.XAResource;
 import labs.distributed.support.*;
 import labs.distributed.transactions.*;
 import org.junit.jupiter.api.Test;
@@ -39,6 +44,49 @@ class MySqlTransactionTest {
       assertEquals(70, a.scalar("SELECT balance FROM xa_account"));
       assertEquals(130, b.scalar("SELECT balance FROM xa_account"));
       assertEquals(0, recovered.recover("xa_commit"));
+
+      Path normalJournal = temporary.resolve("normal.log");
+      new XaTransfer(a, b, normalJournal).transfer("xa_normal", 20, false, false);
+      // 必须先只读检查两个资源；不能调用恢复器修复漏掉的commit，也不能先读被锁余额。
+      assertAll(
+          () -> assertEquals(0, preparedBranches(Images.database(first), "xa_normal"), "转出分支未完成"),
+          () -> assertEquals(0, preparedBranches(Images.database(second), "xa_normal"), "转入分支未完成"));
+      assertEquals("COMMIT xa_normal\n", Files.readString(normalJournal));
+      assertEquals(50, a.scalar("SELECT balance FROM xa_account"));
+      assertEquals(150, b.scalar("SELECT balance FROM xa_account"));
+      var normalRecovered = new XaTransfer(a, b, normalJournal);
+      assertEquals(0, normalRecovered.recover("xa_normal"));
+      assertEquals(0, normalRecovered.recover("xa_normal"));
+      assertEquals(50, a.scalar("SELECT balance FROM xa_account"));
+      assertEquals(150, b.scalar("SELECT balance FROM xa_account"));
+    }
+  }
+
+  private static int preparedBranches(Database database, String transaction) throws Exception {
+    var source = new MysqlXADataSource();
+    source.setUrl(database.url());
+    source.setUser(database.user());
+    source.setPassword(database.password());
+    source.setConnectTimeout(5000);
+    source.setSocketTimeout(15000);
+    var connection = source.getXAConnection();
+    try {
+      var resource = connection.getXAResource();
+      try {
+        return (int)
+            Arrays.stream(resource.recover(XAResource.TMSTARTRSCAN))
+                .filter(branch -> branch.getFormatId() == 0xC10)
+                .filter(
+                    branch ->
+                        Arrays.equals(
+                            branch.getGlobalTransactionId(),
+                            transaction.getBytes(StandardCharsets.UTF_8)))
+                .count();
+      } finally {
+        resource.recover(XAResource.TMENDRSCAN);
+      }
+    } finally {
+      connection.close();
     }
   }
 
