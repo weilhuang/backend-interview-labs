@@ -130,5 +130,7 @@ jobs:
             build/quality/redis-roundtrip/**/build/test-results/
             courses/data-storage/redis-engineering/redis/**/build/reports/tests/
             courses/data-storage/redis-engineering/redis/**/build/test-results/
+            courses/data-storage/redis-engineering/support/build/reports/tests/
+            courses/data-storage/redis-engineering/support/build/test-results/
           retention-days: 7
           if-no-files-found: error

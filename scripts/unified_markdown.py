@@ -67,7 +67,7 @@ def migrate(text, cid, source_root, mapping, relative):
             if actual=='unitTest' and cid not in ('mysql-engineering','redis-engineering','distributed-systems'):actual='test'
             selected=[x for x in entries if 'source_task' in x]
             if actual in ('integrationTest','compileIntegrationTestJava'):
-                selected=[x for x in selected if (source_root/x['source_task']/'integration-test').is_dir() or cid=='redis-engineering']
+                selected=[x for x in selected if any(p.is_file() for p in (source_root/x['source_task']/'integration-test').rglob('*.java')) or cid=='redis-engineering']
             if not selected:return goal
             return ' '.join(x['gradle_project']+':'+actual for x in selected)
         def command(match):

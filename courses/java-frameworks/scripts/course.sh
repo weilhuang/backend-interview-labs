@@ -50,16 +50,38 @@ case "$action" in
   token="$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
   [[ "$token" =~ ^[0-9a-f]{32}$ ]] || { echo '未能生成安全的实例标记';exit 1; }
   printf '%s\n' "$token" > "$STATE/token"
+  # fork 后的子进程可能短暂仍显示启动脚本的命令行；只等待本次直接子进程。
+  launch_command="$(LC_ALL=C ps -ww -p "$$" -o command=)"
   nohup "$JAVA_BIN" "-Dframework.lab.token=$token" "-Dframework.lab.instance=$ROOT" -cp "$(cat "$cp_file")" labs.frameworks.Lab > "$STATE/application.log" 2>&1 &
-  echo $! > "$STATE/pid"; echo "$module" > "$STATE/module"
+  pid=$!
+  echo "$pid" > "$STATE/pid"; echo "$module" > "$STATE/module"
+  launch_identity="$(LC_ALL=C ps -p "$pid" -o ppid= -o lstart= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
+  read -r launch_parent launch_time <<< "$launch_identity"
+  [[ "$launch_parent" == "$$" && -n "$launch_time" ]] || { echo '启动子进程身份不匹配';exit 1; }
+  for ((attempt=0; attempt<100; attempt++)); do
+   alive "$pid" || { echo '启动子进程已退出';exit 1; }
+   current_identity="$(LC_ALL=C ps -p "$pid" -o ppid= -o lstart= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
+   [[ "$current_identity" == "$launch_identity" ]] || { echo '启动子进程身份已改变';exit 1; }
+   command="$(LC_ALL=C ps -ww -p "$pid" -o command= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
+   if [[ " $command " == *" -Dframework.lab.token=$token "* && " $command " == *" -Dframework.lab.instance=$ROOT "* && " $command " == *" labs.frameworks.Lab "* ]]; then break;fi
+   # 仅继承自本次启动脚本的命令行可以重试；其他身份立即失败，不做HTTP探测。
+   [[ "$command" == "$launch_command" ]] || { echo '启动子进程实例身份不匹配';exit 1; }
+   sleep 0.1
+  done
+  ((attempt<100)) || { echo '等待启动子进程实例身份超时，请查看build/server/application.log';exit 1; }
   echo '启动中；执行scripts/course.sh check验证就绪，再打开http://127.0.0.1:18084'
   ;;
  check)
   [[ -f "$STATE/pid" ]] || { echo '没有本课程服务PID，请先start';exit 1; }
   pid="$(cat "$STATE/pid")"
-  alive "$pid" && owned "$pid" || { echo '服务未运行或实例身份不匹配，拒绝把其他HTTP服务当作本课程';exit 1; }
   for ((attempt=0; attempt<30; attempt++)); do
-   if curl --noproxy '*' --fail --silent http://127.0.0.1:18084/api/orders > "$STATE/health-response.json"; then echo '真实HTTP就绪，返回订单列表';exit 0;fi
+   alive "$pid" && owned "$pid" || { echo '服务未运行或实例身份不匹配，拒绝把其他HTTP服务当作本课程';exit 1; }
+   if http_status="$(curl --noproxy '*' --fail --silent --max-time 1 --dump-header "$STATE/health-headers.txt" --output "$STATE/health-response.json" --write-out '%{http_code}' http://127.0.0.1:18084/api/orders)"; then
+    response_token="$(awk 'tolower($0) ~ /^x-framework-lab-instance:/ { count++; sub(/^[^:]*:[ \t]*/, ""); sub(/[ \t\r]+$/, ""); token=$0 } END { if (count != 1) exit 1; print token }' "$STATE/health-headers.txt")" || { echo 'HTTP响应实例标记不匹配：必须且只能有一个实例响应头';exit 1; }
+    [[ "$http_status" == 200 && "$response_token" == "$(cat "$STATE/token")" ]] || { echo 'HTTP响应实例标记不匹配，拒绝把其他HTTP服务当作本课程';exit 1; }
+    alive "$pid" && owned "$pid" || { echo 'HTTP响应后本课程实例已退出或身份不匹配';exit 1; }
+    echo '真实HTTP就绪且实例标记匹配，返回订单列表';exit 0
+   fi
    sleep 1
   done
   echo '尚未就绪，请查看build/server/application.log';exit 1

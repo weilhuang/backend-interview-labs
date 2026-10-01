@@ -21,6 +21,15 @@ COURSES = ('java-foundations', 'java-concurrency', 'java-jvm', 'java-frameworks'
 IGNORE = {'build', '.gradle', '.idea', '__pycache__', '.git', 'node_modules'}
 WRAPPER = {'gradlew', 'gradlew.bat', 'gradle/wrapper/gradle-wrapper.jar', 'gradle/wrapper/gradle-wrapper.properties'}
 SCHEMA = 1
+# Root verification is a source-build contract, not best-effort task discovery.
+# Optional JMH remains outside both test aggregates, even with -PwithJmh.
+SUPPORT_TEST_TASKS = {
+    ('java-foundations', 'common'): {'test': 'test', 'unitTest': 'test'},
+    ('java-foundations', 'benchmark'): {},
+    ('redis-engineering', 'support'): {'test': 'test', 'unitTest': 'unitTest'},
+    ('distributed-systems', 'support'): {'test': 'test', 'unitTest': 'unitTest'},
+    ('messaging', 'support'): {'test': 'test', 'unitTest': 'test'},
+}
 
 def digest(data): return hashlib.sha256(data).hexdigest()
 def dump_json(value): return json.dumps(value, ensure_ascii=False, indent=2) + '\n'
@@ -123,9 +132,12 @@ def mapping(sources):
                                   'placeholders': task['placeholders']})
         for support in ('common', 'support', 'benchmark'):
             if (root / support).is_dir() and (support != 'support' or cid in ('redis-engineering', 'distributed-systems', 'messaging')):
+                require((cid, support) in SUPPORT_TEST_TASKS,
+                        f'{cid}:{support}: 缺少支撑项目聚合测试合同')
                 data['support_projects'].append({'source_course': cid, 'original_module': support,
                     'gradle_project': f':{cid}-{support}', 'path': f'materials/{cid}/{support}',
-                    'optional_property': 'withJmh' if support == 'benchmark' else None})
+                    'optional_property': 'withJmh' if support == 'benchmark' else None,
+                    'test_tasks': SUPPORT_TEST_TASKS[(cid, support)].copy()})
         for source in sorted(root.rglob('*')):
             if not source.is_file(): continue
             rel = source.relative_to(root)
@@ -250,13 +262,22 @@ subprojects {
     }
 }
 def taskProjects = courseMap.tasks.collect { project(it.gradle_project) }
+def supportTestTasks = { String aggregate ->
+    courseMap.support_projects.findAll { it.original_module != 'benchmark' }.collect { item ->
+        def target = item.test_tasks[aggregate]
+        if (!target) throw new GradleException('缺少支撑项目聚合测试合同：' + item.gradle_project + ':' + aggregate)
+        project(item.gradle_project).tasks.named(target)
+    }
+}
 tasks.register('test') {
     description = '执行所有原生判题；数据库及分布式重点题要求真实 Docker'
     dependsOn taskProjects.collect { it.tasks.named('test') }
+    dependsOn supportTestTasks('test')
 }
 tasks.register('unitTest') {
     description = '低内存局部快测；不能代替完整判题或 Docker 验收'
     dependsOn taskProjects.collect { it.tasks.findByName('unitTest') ?: it.tasks.named('test') }
+    dependsOn supportTestTasks('unitTest')
 }
 tasks.register('fullCheck') {
     description = '完整验收：全部原生判题、框架与综合项目集成、消息真实服务'

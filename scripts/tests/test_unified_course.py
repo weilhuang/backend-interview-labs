@@ -55,6 +55,28 @@ class UnifiedCourseTests(unittest.TestCase):
  def tearDownClass(cls):cls.temp.cleanup()
  def test_complete_static_contract(self):
   r=v.validate(self.root);self.assertEqual((r['tasks'],r['placeholders']),(84,136))
+ def test_framework_process_script_retains_reviewed_source(self):
+  path='materials/java-frameworks/scripts/course.sh'
+  source=ROOT/'courses/java-frameworks/scripts/course.sh'
+  self.assertEqual((self.root/path).read_bytes(),source.read_bytes())
+  files=json.loads((self.root/'authoring/source-provenance.json').read_text())['files']
+  entry=next(item for item in files if item['path']==path)
+  self.assertEqual(entry['transformation'],'identity')
+  self.assertEqual(entry['source_sha256'],u.digest(source.read_bytes()))
+  self.assertEqual(entry['sha256'],entry['source_sha256'])
+ def test_generated_framework_startup_regression(self):
+  import subprocess
+  environment=dict(os.environ,FRAMEWORK_STARTUP_SCRIPT=str(self.root/'materials/java-frameworks/scripts/course.sh'))
+  result=subprocess.run([sys.executable,str(ROOT/'scripts/tests/test_framework_startup.py'),
+    'FrameworkStartupTests.test_delayed_same_child_exec_then_separate_http_check'],
+    env=environment,capture_output=True,text=True,timeout=30)
+  self.assertEqual(result.returncode,0,(result.stdout,result.stderr))
+ def test_generated_framework_http_identity_regressions(self):
+  import subprocess
+  environment=dict(os.environ,FRAMEWORK_STARTUP_SCRIPT=str(self.root/'materials/java-frameworks/scripts/course.sh'))
+  result=subprocess.run([sys.executable,str(ROOT/'scripts/tests/test_framework_http_identity.py')],
+    env=environment,capture_output=True,text=True,timeout=15)
+  self.assertEqual(result.returncode,0,(result.stdout,result.stderr))
  def test_official_module_names(self):
   m=json.loads((self.root/'authoring/course-map.json').read_text())
   self.assertEqual(len({t['gradle_project'] for t in m['tasks']}),84)
@@ -107,6 +129,49 @@ class UnifiedCourseTests(unittest.TestCase):
    u.gradle_adapter("plugins { id 'base' }\nsubprojects { implementation project(':unknown') }",'java-foundations',mapping,{})
  def test_output_refuses_existing_directory(self):
   with self.assertRaisesRegex(ValueError,'目标必须不存在'):u.build(Path('/not-used'),self.root)
+
+
+class SupportTestAggregationTests(unittest.TestCase):
+ def test_generated_support_test_capabilities_are_explicit(self):
+  mapping=json.loads((COURSE/'authoring/course-map.json').read_text())
+  actual={item['gradle_project']:item['test_tasks'] for item in mapping['support_projects']}
+  self.assertEqual(actual,{
+   ':java-foundations-common':{'test':'test','unitTest':'test'},
+   ':java-foundations-benchmark':{},
+   ':redis-engineering-support':{'test':'test','unitTest':'unitTest'},
+   ':distributed-systems-support':{'test':'test','unitTest':'unitTest'},
+   ':messaging-support':{'test':'test','unitTest':'test'},
+  })
+  self.assertEqual(len(mapping['tasks']),84)
+  for aggregate in ('test','unitTest'):
+   support_targets=[item['gradle_project']+':'+item['test_tasks'][aggregate]
+                    for item in mapping['support_projects'] if item['test_tasks']]
+   self.assertEqual(len(support_targets),4)
+   self.assertFalse(any('benchmark' in target for target in support_targets))
+ def test_generated_root_aggregates_keep_course_and_support_dependencies(self):
+  build=(COURSE/'build.gradle').read_text()
+  self.assertIn('def taskProjects = courseMap.tasks.collect { project(it.gradle_project) }',build)
+  for aggregate,course_dependency in (
+   ('test',"dependsOn taskProjects.collect { it.tasks.named('test') }"),
+   ('unitTest',"dependsOn taskProjects.collect { it.tasks.findByName('unitTest') ?: it.tasks.named('test') }"),
+  ):
+   body=build.split("tasks.register('"+aggregate+"') {",1)[1].split('\n}',1)[0]
+   self.assertIn(course_dependency,body)
+   self.assertIn("dependsOn supportTestTasks('"+aggregate+"')",body)
+ def test_support_task_resolution_fails_closed_and_never_schedules_jmh(self):
+  build=(COURSE/'build.gradle').read_text()
+  body=build.split('def supportTestTasks = { String aggregate ->',1)[1].split('\n}',1)[0]
+  self.assertIn("courseMap.support_projects.findAll { it.original_module != 'benchmark' }",body)
+  self.assertIn('def target = item.test_tasks[aggregate]',body)
+  self.assertIn('if (!target) throw new GradleException(',body)
+  self.assertIn('project(item.gradle_project).tasks.named(target)',body)
+  for silent_fallback in ('findProject','findByName','?:','catch','withJmh'):
+   self.assertNotIn(silent_fallback,body)
+ def test_new_support_project_requires_a_declared_test_contract(self):
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory)/'java-concurrency';(root/'common').mkdir(parents=True)
+   with self.assertRaisesRegex(ValueError,'缺少支撑项目聚合测试合同'):
+    u.mapping([(root,{'tasks':[]},{'content':[]})])
 
 
 class WrapperPropertyNormalizationTests(unittest.TestCase):
