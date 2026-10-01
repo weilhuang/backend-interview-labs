@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 from dataclasses import dataclass
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -17,7 +18,7 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
-from safe_io import (absolute, directory_fd, exclusive_writer, new_directory,
+from safe_io import (BoundaryError, absolute, directory_fd, exclusive_writer, new_directory,
                      read_regular, regular_reader, replace_regular, validate_directory, write_new)
 from run_official import cli_environment, sanitized_environment
 from collect_evidence import sanitize_text
@@ -30,6 +31,10 @@ DUMP_LIMIT = 512 * 1024
 PNG_LIMIT = 4 * 1024 * 1024
 MIN_FREE = 2 * 1024**3
 EXPECTED_EXIT = 20
+# 厂商配置读取与证据输出分开；固定归档实测 product-info 为319506字节，SHA已核。
+METADATA_LIMITS = {'toolchain_pins': 65536, 'idea_product_info': 512 * 1024,
+                   'helper_jdk_release': 65536, 'idea_jbr_release': 65536}
+FIXED_PRODUCT_INFO_SHA256 = '9a051df5f04c52a12252f6f61ea414836b125530a4f43110bcd29fde51c9cb7f'
 OUTCOMES = {'EXPECTED_INPUT_ERROR_NOT_ACCEPTANCE': 20, 'UNRESOLVED_TIMEOUT': 21,
             'UNEXPECTED_EXIT': 22, 'PREFLIGHT_OR_COLLECTION_ERROR': 23,
             'OWNERSHIP_UNVERIFIED': 24}
@@ -287,13 +292,48 @@ def xauthority_bytes():
     return struct.pack('!H', 65535) + b''.join(struct.pack('!H', len(field)) + field for field in fields)
 
 
-def preflight(idea, plugins, root):
+def read_preflight_metadata(path, label, observations):
+    """同一 no-follow 普通文件描述符度量/读取/哈希，只记录标签和非敏感文件元数据。"""
+    require(label in METADATA_LIMITS, '未知预检metadata标签')
+    limit = METADATA_LIMITS[label]
+    item = {'label': label, 'limit_bytes': limit, 'status': 'OPENING'}
+    observations.append(item)
+    try:
+        with regular_reader(path) as stream:
+            before = os.fstat(stream.fileno())
+            item['size_bytes'] = before.st_size
+            if before.st_size > limit:
+                item['status'] = 'REJECTED_SIZE'
+                raise BoundaryError(f'预检metadata超界：label={label}, size_bytes={before.st_size}, limit_bytes={limit}')
+            data = stream.read(limit + 1)
+            after = os.fstat(stream.fileno())
+            item['size_after_bytes'] = after.st_size
+            item['read_bytes'] = len(data)
+            identity = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+            if (len(data) > limit or len(data) != before.st_size
+                    or any(getattr(before, key) != getattr(after, key) for key in identity)):
+                item['status'] = 'REJECTED_CHANGED_FILE'
+                raise BoundaryError('预检metadata读取期间改变：label=' + label)
+            item['sha256'] = hashlib.sha256(data).hexdigest()
+            if label == 'idea_product_info' and item['sha256'] != FIXED_PRODUCT_INFO_SHA256:
+                item['status'] = 'REJECTED_FIXED_HASH'
+                raise BoundaryError('固定官方product-info SHA256不符：label=' + label)
+            item['status'] = 'READ_FIXED_HASH_VERIFIED' if label == 'idea_product_info' else 'READ_HASH_RECORDED'
+            return data
+    except (OSError, ValueError):
+        if item['status'] == 'OPENING':
+            item['status'] = 'UNAVAILABLE'
+        raise
+
+
+def preflight(idea, plugins, root, observations=None):
     require(os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('RUNNER_ENVIRONMENT') == 'github-hosted',
             '仅允许新的 GitHub-hosted CI runner；禁止个人工作站或 self-hosted runner')
-    pins = json.loads(read_regular(Path(__file__).with_name('toolchain.json'), 65536))
+    observations = [] if observations is None else observations
+    pins = json.loads(read_preflight_metadata(Path(__file__).with_name('toolchain.json'), 'toolchain_pins', observations))
     require(pins['idea']['build'] == '261.27258.48' and pins['academy']['version'] == '2026.9-2026.1-1070',
             '候选只允许已批准固定版本')
-    info = json.loads(read_regular(idea / 'product-info.json', 256 * 1024))
+    info = json.loads(read_preflight_metadata(idea / 'product-info.json', 'idea_product_info', observations))
     require((info['productCode'], info['version'], info['buildNumber']) ==
             ('IU', pins['idea']['version'], pins['idea']['build']), 'IDE 身份不符')
     jar = plugins / 'JetBrainsAcademy/lib' / ('JetBrainsAcademy-' + pins['academy']['version'] + '.jar')
@@ -302,7 +342,8 @@ def preflight(idea, plugins, root):
     require(metadata.findtext('id') == 'com.jetbrains.edu' and metadata.findtext('version') == pins['academy']['version'],
             'Academy 身份不符')
     java = Path(os.environ.get('JAVA_HOME', '/nonexistent')).resolve()
-    require(re.search(r'^JAVA_VERSION="21(?:[."+])', read_regular(java / 'release', 65536).decode(), re.M),
+    helper_release = read_preflight_metadata(java / 'release', 'helper_jdk_release', observations).decode()
+    require(re.search(r'^JAVA_VERSION="21(?:[."+])', helper_release, re.M),
             'Robot helper 必须使用现有 Java 21')
     for binary in (idea / 'bin/idea', java / 'bin/java'):
         require(binary.is_file() and os.access(binary, os.X_OK), '所需已有可执行文件不可用')
@@ -315,8 +356,8 @@ def preflight(idea, plugins, root):
     require(shutil.disk_usage(root).free >= MIN_FREE, '诊断启动前空间不足')
     jcmd = idea / 'jbr/bin/jcmd'
     metadata = {}
-    for name, path in (('helper_jdk', java), ('idea_jbr', idea / 'jbr')):
-        raw = read_regular(path / 'release', 65536).decode()
+    releases = {'helper_jdk': helper_release, 'idea_jbr': read_preflight_metadata(idea / 'jbr/release', 'idea_jbr_release', observations).decode()}
+    for name, raw in releases.items():
         metadata[name] = {key: value for key, value in re.findall(r'^(JAVA_VERSION|JAVA_RUNTIME_VERSION|IMPLEMENTOR|IMPLEMENTOR_VERSION)="([^"]+)"$', raw, re.M)}
     metadata['tool_paths'] = {'java': str(java / 'bin/java'), 'jcmd': str(jcmd),
                               'Xvfb': xvfb, 'xwininfo': shutil.which('xwininfo')}
@@ -359,6 +400,7 @@ class Probe:
                         'filesystem_sandbox': False,
                         'cleanup_scope': '只核验已登记且归属未改变的进程；未登记或脱离会话的后代交给本次 runner 销毁回收',
                         'full_process_tree_exit_verified': False,
+                        'metadata_reads': [],
                         'observations': [], 'cleanup_errors': []}
 
     def launch(self, command, label, pass_fds=()):
@@ -523,7 +565,7 @@ def execute(args):
     probe = Probe(root, env, args.seconds, started=started)
     ide = None
     try:
-        tools = preflight(idea, plugins, root)
+        tools = preflight(idea, plugins, root, probe.summary['metadata_reads'])
         check_deadline(probe.cutoff)
         probe.summary['toolchain'] = {'idea_build': 'IU-' + tools['pins']['idea']['build'],
                                      'academy_version': tools['pins']['academy']['version']}

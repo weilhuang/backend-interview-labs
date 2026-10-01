@@ -1,5 +1,6 @@
 """普通 Python fixture 与静态约束回归；本测试绝不启动 Java、IDE、GUI 或 Docker。"""
 import ast
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -16,6 +17,60 @@ import startup_diagnostic as diag
 
 
 class StartupDiagnosticTests(unittest.TestCase):
+    def test_metadata_records_real_size_hash_and_nonsensitive_label(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'release'
+            content = b'JAVA_VERSION="21.0.12"\n'
+            path.write_bytes(content)
+            observations = []
+            self.assertEqual(diag.read_preflight_metadata(path, 'helper_jdk_release', observations), content)
+            self.assertEqual(observations[0], {'label': 'helper_jdk_release', 'limit_bytes': 65536,
+                'size_bytes': len(content), 'size_after_bytes': len(content), 'read_bytes': len(content),
+                'sha256': hashlib.sha256(content).hexdigest(), 'status': 'READ_HASH_RECORDED'})
+            self.assertNotIn(str(path), json.dumps(observations))
+
+    def test_oversize_metadata_reports_fstat_size_before_reading_contents(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'release'
+            path.write_bytes(b'F' * 65537)
+            observations = []
+            with self.assertRaisesRegex(diag.BoundaryError, 'label=helper_jdk_release, size_bytes=65537, limit_bytes=65536'):
+                diag.read_preflight_metadata(path, 'helper_jdk_release', observations)
+            self.assertEqual(observations[0]['status'], 'REJECTED_SIZE')
+            self.assertNotIn('read_bytes', observations[0])
+
+    def test_only_product_metadata_has_larger_bound_and_fixed_hash(self):
+        self.assertEqual(diag.METADATA_LIMITS, {'toolchain_pins': 65536, 'idea_product_info': 524288,
+                                              'helper_jdk_release': 65536, 'idea_jbr_release': 65536})
+        self.assertEqual(diag.LOG_LIMIT, 262144)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'product-info.json'
+            data = b'{"productCode":"IU"}'.ljust(319506, b' ')
+            self.assertEqual(len(data), 319506)
+            path.write_bytes(data)
+            observations = []
+            with self.assertRaisesRegex(diag.BoundaryError, 'SHA256'):
+                diag.read_preflight_metadata(path, 'idea_product_info', observations)
+            self.assertEqual(observations[0]['status'], 'REJECTED_FIXED_HASH')
+            # 普通配置fixture只在测试中替换期望hash；实际生产值锁定官方归档读取结果。
+            with patch.object(diag, 'FIXED_PRODUCT_INFO_SHA256', hashlib.sha256(data).hexdigest()):
+                self.assertEqual(diag.read_preflight_metadata(path, 'idea_product_info', []), data)
+
+    def test_metadata_nofollow_and_all_other_bounds_are_preserved(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'ordinary'
+            source.write_text('普通metadata')
+            linked = root / 'linked'
+            linked.symlink_to(source)
+            observations = []
+            with self.assertRaises(OSError):
+                diag.read_preflight_metadata(linked, 'toolchain_pins', observations)
+            self.assertEqual(observations[0]['status'], 'UNAVAILABLE')
+            with patch.object(diag, 'regular_reader') as reader, self.assertRaises(ValueError):
+                diag.read_preflight_metadata(source, 'unknown_label', [])
+            reader.assert_not_called()
+
     def test_only_nonexistent_archive_and_nonacceptance_flags(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
