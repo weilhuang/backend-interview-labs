@@ -201,6 +201,17 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertFalse(accepted(bad))
             self.assertFalse(accepted({'status': 'PASS'}))
 
+    def test_lab_discovery_installs_pinned_generator_dependencies_first(self):
+        steps = self.workflow('lab-environment')['jobs']['real-lab']['steps']
+        install = next(i for i, step in enumerate(steps)
+                       if step.get('run') == 'python3 -m pip install -r scripts/quality/requirements.txt')
+        discovery = next(i for i, step in enumerate(steps)
+                         if 'python3 -m unittest discover -s scripts/tests -v' in step.get('run', ''))
+        self.assertLess(install, discovery)
+        self.assertNotIn('if', steps[install])
+        self.assertNotIn('continue-on-error', steps[install])
+        self.assertEqual((ROOT / 'scripts/quality/requirements.txt').read_text().strip(), 'PyYAML==6.0.2')
+
     def test_static_checks_have_jdk_and_do_not_run_docker(self):
         steps=self.workflow('ci')['jobs']['static']['steps']
         self.assertTrue(any(s.get('uses')=='actions/setup-java@v4' and s['with']['java-version']=='21' for s in steps))

@@ -20,6 +20,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: 安装固定静态检查依赖
+        run: python3 -m pip install -r scripts/quality/requirements.txt
       - name: 静态约束与无Docker回归
         run: |
           bash -n scripts/lab.sh
