@@ -1,0 +1,132 @@
+name: 单一课程官方 Academy 打包
+on:
+  push:
+    branches: [academy-validation/smoke, academy-validation/full]
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 首次先做官方导出与干净导入；只有完整验收通过才发布 ZIP
+        type: choice
+        options: [export-import-smoke, full-validation]
+        default: export-import-smoke
+        required: true
+      display:
+        description: 首次用 headless；只有确认图形初始化阻塞后再选 xvfb
+        type: choice
+        options: [headless, xvfb]
+        default: headless
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: academy-official-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    name: official-one-course
+    runs-on: ubuntu-24.04
+    timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 80 || 25 }}
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        timeout-minutes: 1
+        with:
+          python-version: '3.12'
+      - name: 初始化小型证据目录并安装固定 Python 依赖
+        timeout-minutes: 1
+        run: |
+          TOOLCHAIN_DIR="$RUNNER_TEMP/academy-tools-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ACADEMY_RUN="$RUNNER_TEMP/academy-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          EVIDENCE_DIR="$RUNNER_TEMP/academy-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          printf 'TOOLCHAIN_DIR=%s\nACADEMY_RUN=%s\nEVIDENCE_DIR=%s\n' "$TOOLCHAIN_DIR" "$ACADEMY_RUN" "$EVIDENCE_DIR" >> "$GITHUB_ENV"
+          mkdir "$EVIDENCE_DIR"
+          printf '{"status":"NOT_RUN","reason":"pipeline initialization"}\n' > "$EVIDENCE_DIR/bootstrap.json"
+          python -m pip install -r scripts/quality/requirements.txt
+      - name: 检查当前提交完整源码 CI，复用已有结果而不重跑 15 个任务
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/academy/check_source_ci.py --report "$EVIDENCE_DIR/source-ci.json"
+      - name: 解析器与安全边界静态回归
+        timeout-minutes: 1
+        run: |
+          python -m unittest discover -s scripts/academy/tests -v
+          bash -n scripts/academy/install_toolchain.sh
+      - uses: actions/setup-java@v4
+        timeout-minutes: 1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: 标准 runner 容量与 Docker 预检
+        timeout-minutes: 1
+        run: |
+          df -h "$RUNNER_TEMP"
+          free -m
+          docker version
+          docker compose version
+          python - <<'PY'
+          import os, shutil
+          # 1.58 GB tar + 4.2 GB IDE briefly coexist; retain room for runtime.
+          assert shutil.disk_usage(os.environ['RUNNER_TEMP']).free >= 10*1024**3, 'Less than 10 GiB free before install'
+          PY
+          if [ '${{ inputs.display }}' = xvfb ]; then command -v xvfb-run; fi
+      - name: 下载固定官方 IDEA 和 Academy 并校验 SHA256
+        timeout-minutes: 7
+        run: bash scripts/academy/install_toolchain.sh "$TOOLCHAIN_DIR" > "$EVIDENCE_DIR/install.log" 2>&1
+      - name: 官方 CLI 导出、原字节捕获与按所选阶段验收
+        id: official
+        timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 60 || 8 }}
+        env:
+          PHASE: ${{ github.ref == 'refs/heads/academy-validation/full' && 'full-validation' || (github.ref == 'refs/heads/academy-validation/smoke' && 'export-import-smoke' || inputs.phase) }}
+          DISPLAY_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.display || 'headless' }}
+        run: |
+          python scripts/academy/run_official.py \
+            --repo "$GITHUB_WORKSPACE" --run-root "$ACADEMY_RUN" \
+            --idea-home "$TOOLCHAIN_DIR/idea" --plugins-home "$TOOLCHAIN_DIR/plugins" \
+            --source-ci-report "$EVIDENCE_DIR/source-ci.json" \
+            --phase "$PHASE" --display "$DISPLAY_MODE"
+      - name: 最终发布需要独立统一环境真实验收（当前明确阻塞）
+        id: release_gate
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        run: python scripts/academy/release_gate.py --native-summary "$ACADEMY_RUN/evidence/summary.json" --report "$ACADEMY_RUN/evidence/release-gate.json"
+      - name: 汇总失败或成功的小型证据（绝不复制 ZIP、配置或缓存）
+        id: evidence
+        if: always()
+        timeout-minutes: 1
+        run: |
+          ACADEMY_RUN="$RUNNER_TEMP/academy-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          EVIDENCE_DIR="$RUNNER_TEMP/academy-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ARTIFACT_EVIDENCE_DIR="$RUNNER_TEMP/academy-artifact-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          printf 'ARTIFACT_EVIDENCE_DIR=%s\n' "$ARTIFACT_EVIDENCE_DIR" >> "$GITHUB_ENV"
+          if [ -f scripts/academy/collect_evidence.py ]; then
+            python scripts/academy/collect_evidence.py --run "$ACADEMY_RUN" --bootstrap "$EVIDENCE_DIR" --evidence "$ARTIFACT_EVIDENCE_DIR"
+          else
+            mkdir "$ARTIFACT_EVIDENCE_DIR"
+            printf '{"status":"NOT_RUN","reason":"checkout or setup failed"}\n' > "$ARTIFACT_EVIDENCE_DIR/summary.json"
+          fi
+      - name: 保存小型验收证据
+        timeout-minutes: 1
+        if: always() && steps.evidence.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-evidence-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: error
+          path: ${{ env.ARTIFACT_EVIDENCE_DIR }}/
+      - name: 仅完整必需门禁全绿后保存可导入官方 ZIP
+        timeout-minutes: 1
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.official.outcome == 'success' && steps.release_gate.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-interview-academy-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            ${{ env.ACADEMY_RUN }}/dist/backend-interview-academy.zip
+            ${{ env.ACADEMY_RUN }}/dist/SHA256SUMS

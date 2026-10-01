@@ -70,6 +70,22 @@ def validate(root: Path, files: list[str]) -> dict:
             if not target.is_relative_to(root):
                 errors.append(f'{name}: link escapes repository {href}')
                 continue
+            # These template links describe the generated course layout. Resolve only
+            # the two exact known links to their tracked author sources; generated
+            # courses are checked independently at their own root with no mapping.
+            template_sources = {
+                '../shared/versions.env': 'infra/versions.env',
+                '../materials/backend-capstone/docs/前端使用.md': 'courses/backend-capstone/docs/前端使用.md',
+            }
+            if name == 'scripts/unified-environment/docs/统一环境.md' and parsed.path in template_sources:
+                source = template_sources[parsed.path]
+                target = (root / source).resolve()
+                if not target.is_relative_to(root):
+                    errors.append(f'{name}: template source escapes repository {href}')
+                    continue
+                if source not in known or not target.is_file():
+                    errors.append(f'{name}: missing tracked template source {href}')
+                    continue
             rel = target.relative_to(root).as_posix()
             if rel not in known and not any(value.startswith(rel.rstrip('/') + '/') for value in known):
                 errors.append(f'{name}: missing tracked link target {href}')

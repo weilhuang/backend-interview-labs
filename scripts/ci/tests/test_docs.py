@@ -33,5 +33,43 @@ class DocsTests(unittest.TestCase):
             self.assertEqual(len(validate(root,['README.md'])['errors']),1)
 
 
+    def test_exact_template_links_require_tracked_author_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            name = 'scripts/unified-environment/docs/统一环境.md'
+            doc = root / name
+            doc.parent.mkdir(parents=True)
+            doc.write_text('[ledger](../shared/versions.env)\n[frontend](../materials/backend-capstone/docs/前端使用.md)')
+            sources = ['infra/versions.env', 'courses/backend-capstone/docs/前端使用.md']
+            for source in sources:
+                target = root / source
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text('# 页面\n')
+            self.assertEqual(validate(root, [name] + sources)['errors'], [])
+            self.assertEqual(len(validate(root, [name])['errors']), 2)
+            ledger = root / sources[0]
+            ledger.unlink()
+            self.assertEqual(len(validate(root, [name] + sources)['errors']), 1)
+            with tempfile.TemporaryDirectory() as outside:
+                other = Path(outside) / 'versions.env'
+                other.write_text('external')
+                ledger.symlink_to(other)
+                self.assertEqual(len(validate(root, [name] + sources)['errors']), 1)
+            ledger.unlink()
+            ledger.write_text('restored')
+            doc.write_text('[wrong](../shared/other.env)')
+            self.assertEqual(len(validate(root, [name] + sources)['errors']), 1)
+
+    def test_generated_course_links_are_checked_without_source_mapping(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'docs').mkdir()
+            (root / 'docs/统一环境.md').write_text('[ledger](../shared/versions.env)')
+            self.assertEqual(len(validate(root, ['docs/统一环境.md'])['errors']), 1)
+            (root / 'shared').mkdir()
+            (root / 'shared/versions.env').write_text('MYSQL_IMAGE=mysql:fixed')
+            self.assertEqual(validate(root, ['docs/统一环境.md', 'shared/versions.env'])['errors'], [])
+
+
 if __name__ == '__main__':
     unittest.main()

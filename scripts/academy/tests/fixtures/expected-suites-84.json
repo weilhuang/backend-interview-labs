@@ -1,0 +1,1096 @@
+{
+  "tasks": [
+    {
+      "path": "section/lesson/task-00",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 00"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-01",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 01"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-02",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 02"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-03",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 03"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-04",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 04"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-05",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 05"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-06",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 06"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-07",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 07"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-08",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 08"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-09",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 09"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-10",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 10"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-11",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 11"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-12",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 12"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-13",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 13"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-14",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 14"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-15",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 15"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-16",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 16"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-17",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 17"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-18",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 18"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-19",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 19"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-20",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 20"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-21",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 21"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-22",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 22"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-23",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 23"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-24",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 24"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-25",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 25"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-26",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 26"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-27",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 27"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-28",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 28"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-29",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 29"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-30",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 30"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-31",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 31"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-32",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 32"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-33",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 33"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-34",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 34"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-35",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 35"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-36",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 36"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-37",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 37"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-38",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 38"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-39",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 39"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-40",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 40"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-41",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 41"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-42",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 42"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-43",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 43"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-44",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 44"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-45",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 45"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-46",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 46"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-47",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 47"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-48",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 48"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-49",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 49"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-50",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 50"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-51",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 51"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-52",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 52"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-53",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 53"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-54",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 54"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-55",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 55"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-56",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 56"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-57",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 57"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-58",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 58"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-59",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 59"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-60",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 60"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-61",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 61"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-62",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 62"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-63",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 63"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-64",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 64"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-65",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 65"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-66",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 66"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-67",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 67"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-68",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 68"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-69",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 69"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-70",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 70"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-71",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 71"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-72",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 72"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-73",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 73"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-74",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 74"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-75",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 75"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-76",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 76"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-77",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 77"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-78",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 78"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-79",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 79"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-80",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 80"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-81",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 81"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-82",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 82"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    },
+    {
+      "path": "section/lesson/task-83",
+      "suite": [
+        "root_node",
+        "合成测试课程",
+        "section",
+        "lesson",
+        "练习 83"
+      ],
+      "expected_link_urls": [
+        "https://example.com/source"
+      ]
+    }
+  ]
+}
