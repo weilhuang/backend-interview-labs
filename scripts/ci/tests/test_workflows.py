@@ -222,6 +222,37 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn('plan.py --check-inventory',commands)
         self.assertIn('validate_docs.py',commands)
 
+    def test_font_setup_has_bounded_network_retries_and_unchanged_budgets(self):
+        targets = [
+            ('java-frameworks', 'ui', '安装发行版中文字体以核验中文排版', '3', '12'),
+            ('backend-capstone', 'verify', '工具链与中文字体', '5', '50'),
+            ('academy-official', 'environment', '浏览器中文字体和标准runner资源检查', '3', '65'),
+        ]
+        for suite, key, title, step_budget, job_budget in targets:
+            with self.subTest(workflow=suite, job=key):
+                job = self.workflow(suite)['jobs'][key]
+                steps = [step for step in job['steps'] if step.get('name') == title]
+                self.assertEqual(len(steps), 1)
+                step = steps[0]
+                self.assertEqual(job['runs-on'], 'ubuntu-24.04')
+                self.assertEqual(job['timeout-minutes'], job_budget)
+                self.assertEqual(step['timeout-minutes'], step_budget)
+                self.assertNotIn('continue-on-error', step)
+                run = step['run']
+                self.assertIn('set -euo pipefail', run)
+                self.assertIn('apt_network=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)', run)
+                self.assertIn('sudo apt-get "${apt_network[@]}" update --error-on=any', run)
+                self.assertIn('sudo apt-get "${apt_network[@]}" install -y fonts-noto-cjk', run)
+                self.assertEqual(run.count('sudo apt-get'), 2)
+                self.assertIn("echo 'APT 更新索引：连接/数据超时 20 秒；每个失败文件最多重试 2 次'", run)
+                self.assertIn("echo 'APT 安装 fonts-noto-cjk：沿用相同网络限制和原步骤总时限'", run)
+                for forbidden in ('-qq', '|| true', '--ignore-missing', '--allow-unauthenticated', 'AllowInsecure', 'Verify-Peer', 'sources.list', 'apt.conf.d'):
+                    self.assertNotIn(forbidden, run)
+        environment = self.workflow('academy-official')['jobs']['environment']
+        self.assertEqual(sum(int(step['timeout-minutes']) for step in environment['steps']), 63)
+        acceptance = next(step for step in environment['steps'] if step.get('id') == 'environment')
+        self.assertEqual(acceptance['timeout-minutes'], '50')
+
 
 if __name__=='__main__':
     unittest.main()
