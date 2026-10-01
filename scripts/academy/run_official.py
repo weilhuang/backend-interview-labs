@@ -13,6 +13,7 @@ import subprocess
 import time
 import traceback
 import re
+from wrapper_diagnostic import compare_wrapper
 from safe_io import absolute, read_regular, write_new, replace_regular, validate_directory, exclusive_writer, directory_fd
 from gates import (GateError, require, read_json, dump, sha, build_contract, redact_contract,
                    inspect_archive, inspect_import, inspect_author_changes, validate_report)
@@ -229,6 +230,8 @@ def execute(a):
         require(sha(captured)==sha(read_regular(archive,limit=128*1024*1024)),'captured archive bytes changed')
         result['stages']['archive']=inspect_archive(archive,contract,pins);dump(evidence/'archive.json',result['stages']['archive'])
         result['stages']['author_changes']=inspect_author_changes(author,contract);dump(evidence/'author-changes.json',result['stages']['author_changes'])
+        result['stages']['student_wrapper_diagnostic']=compare_wrapper(author,student)
+        dump(evidence/'student-wrapper-diagnostic.json',result['stages']['student_wrapper_diagnostic'])
         result['stages']['student_import']=inspect_import(student,contract,'student');dump(evidence/'student-import.json',result['stages']['student_import'])
         archive_hash=sha(read_regular(archive,limit=128*1024*1024));write_new(evidence/'SHA256SUMS',f'{archive_hash}  backend-interview-academy.zip\n'.encode())
         result['stages']['gradle_jvm']=inspect_gradle_evidence(root,[student]);dump(evidence/'gradle-jvm-gate.json',result['stages']['gradle_jvm'])
@@ -252,6 +255,8 @@ def execute(a):
         require(run['exit_code']==0 and not run['timed_out'] and not run['disk_low'],'official validateCourse process failed')
         require(report.is_file(),'missing official validation JSON')
         require(result['stages']['native_validation']['status']=='PASS','native Tests or description links failed; exit 0 is insufficient')
+        result['stages']['educator_wrapper_diagnostic']=compare_wrapper(author,validation)
+        dump(evidence/'educator-wrapper-diagnostic.json',result['stages']['educator_wrapper_diagnostic'])
         result['stages']['educator_import']=inspect_import(validation,contract,'educator');dump(evidence/'educator-import.json',result['stages']['educator_import'])
         result['stages']['gradle_jvm']=inspect_gradle_evidence(root,[student,validation]);dump(evidence/'gradle-jvm-gate.json',result['stages']['gradle_jvm'])
         require(sha(read_regular(archive,limit=128*1024*1024))==archive_hash,'archive changed during validation')

@@ -108,6 +108,49 @@ class UnifiedCourseTests(unittest.TestCase):
  def test_output_refuses_existing_directory(self):
   with self.assertRaisesRegex(ValueError,'目标必须不存在'):u.build(Path('/not-used'),self.root)
 
+
+class WrapperPropertyNormalizationTests(unittest.TestCase):
+ # Captured pinned Academy WrapperInit + official Gradle 8.10.2 / JDK21
+ # minimal preflight. These are not bytes recovered from the Actions import.
+ BEFORE = b'distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.10.2-bin.zip\ndistributionSha256Sum=31c55713e40233a8303827ceb42ca48a47267a0ad4bab9177123121e71524c26\nnetworkTimeout=10000\nvalidateDistributionUrl=true\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n'
+ AFTER = b'distributionBase=GRADLE_USER_HOME\ndistributionPath=wrapper/dists\ndistributionSha256Sum=31c55713e40233a8303827ceb42ca48a47267a0ad4bab9177123121e71524c26\ndistributionUrl=https\\://services.gradle.org/distributions/gradle-8.10.2-bin.zip\nnetworkTimeout=10000\nvalidateDistributionUrl=true\nzipStoreBase=GRADLE_USER_HOME\nzipStorePath=wrapper/dists\n'
+ def test_matches_fixed_sdk_preflight_exact_bytes(self):
+  self.assertEqual(u.digest(self.BEFORE),'1de17d500d4671816e3ee230e897e8722157da899c534850aa8ab5cce9577da0')
+  self.assertEqual(u.digest(self.AFTER),'09debb2fbd9878414d0632cc40a7e285966bfd0625c0d430bfa11e3cab173335')
+  self.assertEqual(u.normalize_wrapper_properties(self.BEFORE),self.AFTER)
+  self.assertEqual(u.normalize_wrapper_properties(self.AFTER),self.AFTER)
+ def test_preserves_every_value_and_escape(self):
+  actual=u.normalize_wrapper_properties(self.BEFORE)
+  self.assertEqual(dict(line.split(b'=',1) for line in actual.splitlines()),
+                   dict(line.split(b'=',1) for line in self.BEFORE.splitlines()))
+  self.assertEqual(sorted(actual.splitlines(keepends=True)),sorted(self.BEFORE.splitlines(keepends=True)))
+ def test_unknown_duplicate_missing_and_unfamiliar_format_rejected(self):
+  invalid=[self.BEFORE+b'unknown=value\n',self.BEFORE+b'networkTimeout=10000\n',
+           self.BEFORE.replace(b'networkTimeout=10000\n',b''),
+           self.BEFORE.replace(b'\n',b'\r\n'),self.BEFORE.rstrip(b'\n'),
+           b'# comment\n'+self.BEFORE,self.BEFORE+b'\n',
+           self.BEFORE.replace(b'networkTimeout=10000',b'networkTimeout=10000\\'),
+           self.BEFORE.replace(b'distributionBase=',b'distributionBase : ')]
+  for data in invalid:
+   with self.subTest(data=data):
+    with self.assertRaisesRegex(ValueError,'Wrapper properties:'):u.normalize_wrapper_properties(data)
+ def test_generated_wrapper_and_provenance(self):
+  path='gradle/wrapper/gradle-wrapper.properties'
+  self.assertEqual((COURSE/path).read_bytes(),self.AFTER)
+  entries=json.loads((COURSE/'authoring/source-provenance.json').read_text())['files']
+  entry=next(x for x in entries if x['path']==path)
+  self.assertEqual(entry,{'source':'courses/java-foundations/'+path,'path':path,
+                        'source_sha256':u.digest(self.BEFORE),'sha256':u.digest(self.AFTER),
+                        'transformation':'gradle-8.10.2-wrapper-property-line-order'})
+ def test_generation_leaves_nine_source_courses_unchanged(self):
+  def snapshot():
+   return {p.relative_to(ROOT).as_posix():u.digest(p.read_bytes())
+           for name in u.COURSES for p in (ROOT/'courses'/name).rglob('*')
+           if p.is_file() and not u.IGNORE.intersection(p.parts)}
+  before=snapshot()
+  with tempfile.TemporaryDirectory() as directory:u.build(ROOT,Path(directory)/'course')
+  self.assertEqual(snapshot(),before)
+
 class OutputSafetyTests(unittest.TestCase):
  def setUp(self):
   self.temp=tempfile.TemporaryDirectory();self.repo=Path(self.temp.name)/'repo';self.repo.mkdir()

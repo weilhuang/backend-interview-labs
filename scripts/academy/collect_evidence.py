@@ -8,6 +8,7 @@ from gates import dump
 from safe_io import absolute, new_directory, read_regular, validate_directory, write_new
 NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','source-contract.json',
        'archive.json','author-changes.json','student-import.json','educator-import.json',
+       'student-wrapper-diagnostic.json','educator-wrapper-diagnostic.json',
        'official-validation.json','validation-gate.json','SHA256SUMS','generation.log','failure.log',
        'export.stdout.log','export.stderr.log','validate.stdout.log','validate.stderr.log',
        'export-idea.log','validate-idea.log','export-idea-pretermination.log','validate-idea-pretermination.log','gradle-jvm.jsonl','gradle-jvm-gate.json','unified-source-validation.json','release-gate.json'}
