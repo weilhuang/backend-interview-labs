@@ -1,0 +1,155 @@
+{
+  "references": {
+    "spring-framework": {
+      "tag": "v6.2.19",
+      "commit": "6214eae8bd02c2ed7ab382bb8d16a9cc6de49522",
+      "verified": true
+    },
+    "spring-boot": {
+      "tag": "v3.5.16",
+      "commit": "0566f6933049aca6bc5ffc6d559fffade9cd2e0c",
+      "verified": true
+    },
+    "spring-security": {
+      "tag": "6.5.11",
+      "commit": "73b077790fcb04ac3712033d3e939daf42264545",
+      "verified": true
+    }
+  },
+  "files": [
+    {
+      "url": "https://github.com/spring-projects/spring-boot/blob/0566f6933049aca6bc5ffc6d559fffade9cd2e0c/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/AutoConfigurationImportSelector.java",
+      "verified": true,
+      "bytes": 20864,
+      "sha256": "d3043e5d5a86e3fa9501ee8d02d7b90b45bc1f47db705e1d471b77d964f21134"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-boot/blob/0566f6933049aca6bc5ffc6d559fffade9cd2e0c/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/condition/OnBeanCondition.java",
+      "verified": true,
+      "bytes": 34484,
+      "sha256": "28dbf132ebad58d23ebb561c9b265ab213ec9a978064ad84c145c0598a58f2bf"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-boot/blob/0566f6933049aca6bc5ffc6d559fffade9cd2e0c/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jdbc/DataSourceAutoConfiguration.java",
+      "verified": true,
+      "bytes": 7329,
+      "sha256": "8e0f9fa71cbc3608e6b77cac7f7daeafc1e9a7953f5a42a77860b86bbcc19937"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-boot/blob/0566f6933049aca6bc5ffc6d559fffade9cd2e0c/spring-boot-project/spring-boot-test/src/main/java/org/springframework/boot/test/context/SpringBootTestContextBootstrapper.java",
+      "verified": true,
+      "bytes": 17081,
+      "sha256": "c39b481dced7f02fc93f54e761272227eadb09a7aa5a5b65ec8be2f3559f9a04"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-boot/blob/0566f6933049aca6bc5ffc6d559fffade9cd2e0c/spring-boot-project/spring-boot/src/main/java/org/springframework/boot/context/properties/ConfigurationPropertiesBindingPostProcessor.java",
+      "verified": true,
+      "bytes": 4369,
+      "sha256": "3dca637d918e354dcc78fb4c7d6c6bfad51073e237778ea8a4dc7798684a921d"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-aop/src/main/java/org/springframework/aop/framework/JdkDynamicAopProxy.java",
+      "verified": true,
+      "bytes": 12628,
+      "sha256": "584042929918b22cfd085b6da475b1df28b5ee01a182b1ef4d5a84e1321b00c1"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-aop/src/main/java/org/springframework/aop/framework/ReflectiveMethodInvocation.java",
+      "verified": true,
+      "bytes": 9668,
+      "sha256": "7aec9f1c60868019200336b5f6f2b1f54b3a081732b6187b0b5cf33154211f87"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractAutowireCapableBeanFactory.java",
+      "verified": true,
+      "bytes": 80854,
+      "sha256": "194299d43325b1e49e349056fdfabb360d3f79b488ece1eec62598820257eec0"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-beans/src/main/java/org/springframework/beans/factory/support/AbstractBeanFactory.java",
+      "verified": true,
+      "bytes": 80112,
+      "sha256": "3abfe00adc90fe08447fc8e762c88a946ccdc0bc2a44d301de7092c957fe9571"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-beans/src/main/java/org/springframework/beans/factory/support/DefaultSingletonBeanRegistry.java",
+      "verified": true,
+      "bytes": 30713,
+      "sha256": "32c0c7ed849acc2b8d3bd21969c5463c8e448ece77c1ef69b467f57c30a248b7"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-context/src/main/java/org/springframework/context/support/AbstractApplicationContext.java",
+      "verified": true,
+      "bytes": 60703,
+      "sha256": "162ab648688af3b07c352f86eeb000bea4fd765242d5af71db16d5009c700c9e"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-context/src/main/java/org/springframework/context/support/DefaultLifecycleProcessor.java",
+      "verified": true,
+      "bytes": 26433,
+      "sha256": "6237527ab87476809d751e97f8a9cb16434e1d895cfb62b0b55a78c9afabc0a4"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-jdbc/src/main/java/org/springframework/jdbc/core/JdbcTemplate.java",
+      "verified": true,
+      "bytes": 62182,
+      "sha256": "370ac9d4293981f97c7902fc850e64a12b51fef5fc6a60c9806f07625fd89a2f"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-jdbc/src/main/java/org/springframework/jdbc/datasource/DataSourceTransactionManager.java",
+      "verified": true,
+      "bytes": 21132,
+      "sha256": "2b6f56d3245e0302422a616f25ddc566d9cdf605a5b308a6a8fd1d47c938e3af"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-tx/src/main/java/org/springframework/transaction/interceptor/TransactionAspectSupport.java",
+      "verified": true,
+      "bytes": 42401,
+      "sha256": "c717b844b838066cae4c238d7f987fa8d0ac8bc270ad55f0688a8a965f2703b6"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-tx/src/main/java/org/springframework/transaction/interceptor/TransactionInterceptor.java",
+      "verified": true,
+      "bytes": 5984,
+      "sha256": "b38aaf3a90b2c6972010156691b0344e17888c1b7b755fd1cf8af5fb856cc0be"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-tx/src/main/java/org/springframework/transaction/support/TransactionTemplate.java",
+      "verified": true,
+      "bytes": 6919,
+      "sha256": "055b122028fff42bfb980b9743c5f4d03a531593f8ed202f367670b3df918c97"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-web/src/main/java/org/springframework/web/method/support/InvocableHandlerMethod.java",
+      "verified": true,
+      "bytes": 14070,
+      "sha256": "f80967b262e9eed09023920950b9800cfebe5e77e38a919a96d7624059e500ca"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-webmvc/src/main/java/org/springframework/web/servlet/DispatcherServlet.java",
+      "verified": true,
+      "bytes": 63346,
+      "sha256": "9693a9bfa5d4bf8725336553654a227525bcd044ef9ae641dd2fb30c5b43b6b9"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-framework/blob/6214eae8bd02c2ed7ab382bb8d16a9cc6de49522/spring-webmvc/src/main/java/org/springframework/web/servlet/mvc/method/annotation/RequestMappingHandlerAdapter.java",
+      "verified": true,
+      "bytes": 47295,
+      "sha256": "74a826720c4371277895206bb1f0793764730f2626e783eb87e54e608702ded7"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-security/blob/6.5.11/web/src/main/java/org/springframework/security/web/FilterChainProxy.java",
+      "verified": true,
+      "bytes": 18394,
+      "sha256": "b0a7aa9b704a9d9070b258d958b0f858dc844c941af01fc47eb73ccd432cda37"
+    },
+    {
+      "url": "https://github.com/spring-projects/spring-security/blob/6.5.11/web/src/main/java/org/springframework/security/web/access/intercept/AuthorizationFilter.java",
+      "verified": true,
+      "bytes": 8916,
+      "sha256": "78eb4f1ea4766fcc3adb40550f53023c847f8a3aed56b368044208badba1a181"
+    }
+  ],
+  "all_paths_verified": true,
+  "source_debugging": "源码链接核验不等于IDE断点验收"
+}

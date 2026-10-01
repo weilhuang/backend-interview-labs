@@ -1,0 +1,26 @@
+{
+  "browser": "runner已安装Chrome，Playwright驱动，保留沙箱",
+  "status": "passed",
+  "checks": [
+    "中文页面和空态",
+    "真实后端创建",
+    "同键重试同一订单",
+    "冲突有明确提示",
+    "表单边界阻止非法输入",
+    "在途禁用与完成恢复",
+    "网络失败恢复操作",
+    "五秒超时与结果未知提示",
+    "真实旧刷新响应不覆盖新结果",
+    "窄屏无横向溢出",
+    "浏览器无脚本异常"
+  ],
+  "screenshots": [
+    "build/ui/mobile.png",
+    "build/ui/desktop.png"
+  ],
+  "backend": "02真实Spring Boot内存订单服务",
+  "note": "07同一前端资源；07 HTTP/JDBC另由真实集成测试验证。本记录不等于Academy导入。",
+  "commit": "5d091ef0c906c0d14d4c8e5b2d307e8ec13d13b9",
+  "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36735424856",
+  "job": 109955726288
+}

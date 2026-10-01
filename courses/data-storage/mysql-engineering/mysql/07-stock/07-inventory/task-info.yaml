@@ -1,0 +1,25 @@
+type: edu
+custom_name: C06-07 · 库存并发与资源边界
+files:
+- name: src/labs/StockLab.java
+  visible: true
+  placeholders:
+  - offset: 1127
+    length: 649
+    placeholder_text: '        throw new UnsupportedOperationException("请按题目完成这一阶段");
+
+      '
+- name: src/labs/Usage.java
+  visible: true
+- name: answer.md
+  visible: true
+- name: test/StockContractTest.java
+  visible: true
+- name: test/StockDatabaseTest.java
+  visible: true
+- name: src/labs/PoolLab.java
+  visible: true
+- name: test/PoolDatabaseTest.java
+  visible: true
+- name: test/ReplicaDatabaseTest.java
+  visible: true

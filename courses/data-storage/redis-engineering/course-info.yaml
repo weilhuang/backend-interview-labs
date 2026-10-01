@@ -1,0 +1,39 @@
+type: marketplace
+title: Java后端实验室 · C07 Redis与缓存一致性
+language: Chinese
+summary: 完整七单元：真实Redis与MySQL、可控竞态、版本失效恢复、双节点复制和租约fencing。全部测试、调用端及标准解公开。无Docker时仅可做纯Java验证。
+programming_language: Java
+content:
+- redis
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: shared/README.md
+- name: shared/versions.env
+- name: shared/versions.env.sha256
+- name: shared/source-manifest.json
+- name: shared/versions.gradle
+- name: shared/src/labs/environment/VersionLedger.java
+- name: README.md
+- name: 中文阶段报告.md
+- name: SOURCES.md
+- name: THIRD_PARTY_NOTICES.md
+- name: LICENSE-JetBrains-template
+- name: build.gradle
+- name: settings.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: support/src/labs/support/Images.java
+- name: support/src/labs/support/MySqlLab.java
+- name: support/src/labs/support/RedisLab.java
+- name: support/src/labs/support/Transactions.java
+- name: authoring/materialize_learner.py
+- name: authoring/requirements.txt
+- name: authoring/sync_metadata.py
+- name: authoring/validate_course.py
+- name: authoring/verify_unit.sh
+yaml_version: 2

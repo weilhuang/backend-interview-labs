@@ -1,0 +1,19 @@
+type: edu
+custom_name: C06-01 · 数据模型与 SQL 契约
+files:
+- name: src/labs/OrderQueries.java
+  visible: true
+  placeholders:
+  - offset: 267
+    length: 202
+    placeholder_text: '        throw new UnsupportedOperationException("请按题目完成这一阶段");
+
+      '
+- name: src/labs/Usage.java
+  visible: true
+- name: answer.md
+  visible: true
+- name: test/OrderContractTest.java
+  visible: true
+- name: test/OrderDatabaseTest.java
+  visible: true

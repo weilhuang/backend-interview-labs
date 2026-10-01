@@ -1,0 +1,4 @@
+type: lesson
+custom_name: C08-02 生产端确认、重试与幂等
+content:
+- practice

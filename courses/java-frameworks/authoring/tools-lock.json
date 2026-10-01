@@ -1,0 +1,13 @@
+{
+  "python_yaml": "6.0.3",
+  "playwright_author_verification": "1.62.1",
+  "junit_console": {
+    "version": "1.12.2",
+    "sha256": "329bd10288875a74d04c9ca6b7c9889c265ddf87b21a9ea42a7f7392f391472a"
+  },
+  "google_java_format": {
+    "version": "1.24.0",
+    "sha256": "812f805f58112460edf01bf202a8e61d0fd1f35c0d4fabd54220640776ec57a1"
+  },
+  "note": "作者工具，不是学习者前端运行依赖；工具JAR存build/tools，不进入课程归档"
+}

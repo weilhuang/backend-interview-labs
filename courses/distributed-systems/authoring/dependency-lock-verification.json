@@ -1,0 +1,153 @@
+{
+  "time_utc": "2026-09-30T15:12:48.222736+00:00",
+  "initial_ci": {
+    "head": "44fe121d",
+    "run": 36733937715,
+    "job": 109950568139,
+    "result": "官方.module与本地POM-only解析图不同，首轮在依赖锁阶段失败"
+  },
+  "verification": {
+    "official_metadata_files": 43,
+    "subprojects": 9,
+    "resolved_classpaths_per_project": 6,
+    "resolved_classpaths": 54,
+    "fresh_gradle_cache": true,
+    "offline": true,
+    "write_locks_during_verification": false,
+    "tests": 38,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "integration": "本机阶段仅编译；后续成功GitHub CI实际运行9项Docker集成，0失败/错误/跳过"
+  },
+  "command": "JAVA_HOME=<JDK21> GRADLE_USER_HOME=<新建空目录> LAB_MAVEN_REPOSITORY=file://<官方原始POM、.module和JAR缓存> gradle --offline --no-daemon --max-workers=1 test verificationClasspath --continue --console=plain",
+  "locks": {
+    "support/gradle.lockfile": "3b3bab4eadb21dbd39ebf51cbb752144c70ddc8bf3e057539410c9182f4207c0",
+    "distributed-course/services/01-failure-model/gradle.lockfile": "41f6f1de06b175b4e115193da825add00435adb22363b239946c135b3ae3a4b7",
+    "distributed-course/services/02-grpc/gradle.lockfile": "a5f96f3b506c52068ec3e505b19bc2aa211b7ea2212aa292b9da96d2416619fa",
+    "distributed-course/services/03-dubbo/gradle.lockfile": "655d691e48d859d48c7f8e0e746fb1f3621cb5edb3d8eea950de493fa10c866c",
+    "distributed-course/services/04-resilience/gradle.lockfile": "12acea0b9370836157df5ca5606768ccc3beda02ab98af2e6d84c3aeb63030b1",
+    "distributed-course/services/05-idempotency/gradle.lockfile": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76",
+    "distributed-course/services/06-transactions/gradle.lockfile": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76",
+    "distributed-course/services/07-outbox-cache/gradle.lockfile": "36de96abbb48978b36b5181cffaaa2dc8f7faf0b6565fe81970dd0947f475302",
+    "distributed-course/services/08-capacity/gradle.lockfile": "43f52cac94471680fe4de5c02fff4de75421975c79694c4fd4c3167f712418ab"
+  },
+  "suites": [
+    {
+      "suite": "labs.distributed.LabTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.GrpcTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.DiscoveryTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.DubboTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.LabTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.IdempotencyTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.RetryTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.TransactionTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.ProjectionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "labs.distributed.CapacityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "current_status": "PASSED_IN_REAL_DOCKER_CI",
+  "ci_verification": {
+    "run_id": 36738093982,
+    "job_id": 109964986131,
+    "run_url": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36738093982",
+    "head_sha": "70af2cd8b6bca72c9ae8bff4753dc84ca91c6360",
+    "checked_out_merge_sha": "3bcf69d3c69fbdd11ba387d54ecdf77c89874162",
+    "conclusion": "success",
+    "unit": {
+      "suites": 12,
+      "tests": 44,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "integration": {
+      "suites": 4,
+      "tests": 9,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "variants": {
+      "total": 25,
+      "blank_rejected": 8,
+      "wrong_rejected": 9,
+      "alternative_passed": 8,
+      "all_compiled": true,
+      "all_expected_outcomes": true
+    },
+    "platform": {
+      "os": "Ubuntu 24.04.5 LTS",
+      "runner_image": "ubuntu-24.04",
+      "runner_image_version": "20260927.320.1",
+      "architecture": "x86_64",
+      "cpu_count": 2,
+      "memory": "7.756GiB",
+      "jdk_runtime": "Eclipse Temurin 21.0.12.1+1-LTS",
+      "gradle": "8.10.2",
+      "docker_engine": "28.0.4",
+      "docker_api_server": "1.48",
+      "docker_api_test_override": "1.44",
+      "docker_compose": "2.38.2",
+      "testcontainers": "1.20.6"
+    }
+  }
+}

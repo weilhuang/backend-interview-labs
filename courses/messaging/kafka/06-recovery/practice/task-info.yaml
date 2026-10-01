@@ -1,0 +1,25 @@
+type: edu
+custom_name: C08-06 副本故障、毒消息与恢复评审 · 编码与故障验证
+files:
+- name: src/labs/messaging/Lab.java
+  visible: true
+  placeholders:
+  - offset: 1343
+    length: 893
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请按题目实现本方法");
+
+      '
+- name: src/labs/messaging/Usage.java
+  visible: true
+- name: test/BrokerTest.java
+  visible: true
+- name: test/LabTest.java
+  visible: true
+- name: test/ReplicaReadiness.java
+  visible: true
+- name: test/ReplicaReadinessTest.java
+  visible: true
+- name: test/ReplicaTest.java
+  visible: true
+- name: gradle.lockfile
+  visible: true

@@ -1,0 +1,9 @@
+# 第三方来源与许可
+
+Wrapper与Academy测试失败输出协议来源于[JetBrains Academy Java模板commit c23b40acc8e1a0628e036598935ee6139cca0077](https://github.com/jetbrains-academy/java-course-template/tree/c23b40acc8e1a0628e036598935ee6139cca0077)，MIT许可保留于LICENSE-JetBrains-template，本课并非官方课程。
+
+Gradle8.10.2分发摘要由wrapper properties固定，wrapper JAR SHA256 a8451eeda314d0568b5340498b36edf147a8f0d692c5ff58082d477abe9146e4。JUnit Platform1.11.4 console JAR SHA256 b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc，第三方JAR不随课程源码提交。
+
+Java代码用GoogleJavaFormat1.24.0 AOSP四空格，官方Maven工件SHA256 812f805f58112460edf01bf202a8e61d0fd1f35c0d4fabd54220640776ec57a1；格式器不打包。JMH1.37来自OpenJDK项目及官方Maven坐标org.openjdk.jmh，许可见其上游项目。
+
+教学实现、测试与中文说明为本项目原创；OpenJDK源码只提供固定官方链接、符号与短证据，不复制实现文件。JDI记录实际运行版本/src.zip摘要，GA源码阅读与补丁二进制不混称。

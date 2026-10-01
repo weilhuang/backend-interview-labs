@@ -1,0 +1,9 @@
+type: section
+custom_name: C08 Kafka 消息可靠性
+content:
+- 01-contract
+- 02-producer
+- 03-inbox
+- 04-rebalance
+- 05-transactions
+- 06-recovery

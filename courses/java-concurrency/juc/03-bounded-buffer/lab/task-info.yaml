@@ -1,0 +1,24 @@
+type: edu
+custom_name: 03 · monitor与Condition：可关闭有界缓冲区
+files:
+- name: src/labs/BoundedBuffers.java
+  visible: true
+  placeholders:
+  - offset: 808
+    length: 232
+    placeholder_text: '            throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 1181
+    length: 219
+    placeholder_text: '            throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 2245
+    length: 388
+    placeholder_text: '            throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 2761
+    length: 379
+    placeholder_text: '            throw new UnsupportedOperationException("TODO：请实现本段契约");'
+- name: src/labs/BoundedBuffersUsage.java
+  visible: true
+- name: test/BoundedBuffersTest.java
+  visible: true
+- name: solution/Alternative.java.txt
+  visible: true

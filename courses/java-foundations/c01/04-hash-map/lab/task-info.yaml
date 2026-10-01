@@ -1,0 +1,22 @@
+type: edu
+custom_name: 哈希键契约与拉链扩容模型
+files:
+- name: solutions/MiniHashMap.java.txt
+  visible: true
+- name: src/labs/foundation/MiniHashMap.java
+  visible: true
+  placeholders:
+  - offset: 1310
+    length: 470
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：按公开合同完成实现");
+
+      '
+  - offset: 2324
+    length: 492
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：按公开合同完成实现");
+
+      '
+- name: src/labs/foundation/MiniHashMapUsage.java
+  visible: true
+- name: test/MiniHashMapTest.java
+  visible: true

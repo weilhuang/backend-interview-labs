@@ -1,0 +1,9 @@
+# 上游出处与使用说明
+
+- 课程结构、Gradle教育检查失败输出协议、Wrapper文件参考[JetBrains Academy Java课程模板固定提交c23b40acc8e1a0628e036598935ee6139cca0077](https://github.com/jetbrains-academy/java-course-template/tree/c23b40acc8e1a0628e036598935ee6139cca0077)，许可证为MIT，原文保留在LICENSE-JetBrains-template。本课程不是JetBrains官方课程
+- Wrapper启动器取自官方模板；分发版本明确使用Gradle8.10.2，以支持JDK21。JAR的SHA-256为a8451eeda314d0568b5340498b36edf147a8f0d692c5ff58082d477abe9146e4；分发包校验和写在gradle-wrapper.properties，来自官方services.gradle.org
+- JUnit依赖来自Maven Central，Jupiter5.11.4 / Platform1.11.4。验证控制台JAR的SHA-256为b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc。依赖JAR不提交到课程
+- 任务实现、完整调用端、测试和中文教学内容为本项目编写。没有复制OpenJDK实现源码到学员代码中；源码阅读链接固定为OpenJDK21 GA的jdk-21+35，对应提交890adb6410dab4606a4f26a942aed02fb2f55387
+- 教学IntVector不是JDK ArrayList的完整克隆。基线已按用户要求统一为21，官方旧模板使用17不构成本课程的版本上限
+- YAML参考官方模板及educational-plugin的格式定义；离线检查不能替代实际IDE/插件导入验收
+- 本项目自行编写的教学内容、标题和注释使用中文；第三方原始Wrapper注释与许可证保留原文，以维持上游出处和版权信息

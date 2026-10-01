@@ -1,0 +1,373 @@
+{
+  "jdk": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)",
+  "release": 21,
+  "metadata": "PASS",
+  "gradle": {
+    "status": "PASS",
+    "version": "8.10.2",
+    "method": "官方本地分发+仅测试环境init脚本映射Maven原版依赖，本身build.gradle依赖不变",
+    "tests": 38,
+    "modules": 8,
+    "wrapper_network_bootstrap": "BLOCKED，CI待验证"
+  },
+  "idea_academy": "NOT_RUN",
+  "tasks": [
+    {
+      "task": "juc/01-publication/lab",
+      "reference": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "配置=Snapshot[version=1, routes=[/orders]]\n受理序号=1\n受控错误计数=1\n"
+      },
+      "learner_expected_fail": {
+        "found": 4,
+        "successful": 1,
+        "failed": 3
+      },
+      "alternative": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 4,
+          "successful": 3,
+          "failed": 1
+        },
+        {
+          "found": 4,
+          "successful": 3,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "task": "juc/02-cancellation/lab",
+      "reference": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "资源已释放\n关闭完成=true\n"
+      },
+      "learner_expected_fail": {
+        "found": 5,
+        "successful": 2,
+        "failed": 3
+      },
+      "alternative": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        },
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        }
+      ]
+    },
+    {
+      "task": "juc/03-bounded-buffer/lab",
+      "reference": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "订单-1\n订单-2\n已排空且关闭\n订单-1\n订单-2\n已排空且关闭\n"
+      },
+      "learner_expected_fail": {
+        "found": 4,
+        "successful": 0,
+        "failed": 4
+      },
+      "alternative": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 4,
+          "successful": 3,
+          "failed": 1
+        },
+        {
+          "found": 4,
+          "successful": 2,
+          "failed": 2
+        }
+      ]
+    },
+    {
+      "task": "juc/04-aqs/lab",
+      "reference": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "单许可执行区\n单许可执行区\n全部完成\n"
+      },
+      "learner_expected_fail": {
+        "found": 4,
+        "successful": 1,
+        "failed": 3
+      },
+      "alternative": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 4,
+          "successful": 1,
+          "failed": 3
+        },
+        {
+          "found": 4,
+          "successful": 1,
+          "failed": 3
+        }
+      ]
+    },
+    {
+      "task": "juc/05-atomics/lab",
+      "reference": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "预留2=true\n再次预留2=false\n旧版本更新=false\n计数={订单=1}\n"
+      },
+      "learner_expected_fail": {
+        "found": 4,
+        "successful": 0,
+        "failed": 4
+      },
+      "alternative": {
+        "found": 4,
+        "successful": 4,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 4,
+          "successful": 3,
+          "failed": 1
+        },
+        {
+          "found": 4,
+          "successful": 3,
+          "failed": 1
+        },
+        {
+          "found": 4,
+          "successful": 3,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "task": "juc/06-executor/lab",
+      "reference": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "订单已校验\n池已退出=true\n"
+      },
+      "learner_expected_fail": {
+        "found": 5,
+        "successful": 1,
+        "failed": 4
+      },
+      "alternative": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        },
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        },
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "task": "juc/07-futures/lab",
+      "reference": {
+        "found": 7,
+        "successful": 7,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "Summary[primary=订单:请求-42, secondary=次要服务降级]\n"
+      },
+      "learner_expected_fail": {
+        "found": 7,
+        "successful": 0,
+        "failed": 7
+      },
+      "alternative": {
+        "found": 7,
+        "successful": 7,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 7,
+          "successful": 6,
+          "failed": 1
+        },
+        {
+          "found": 7,
+          "successful": 5,
+          "failed": 2
+        },
+        {
+          "found": 7,
+          "successful": 6,
+          "failed": 1
+        }
+      ]
+    },
+    {
+      "task": "juc/08-virtual-threads/lab",
+      "reference": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "caller": {
+        "status": "PASS",
+        "stdout": "订单0，虚拟线程=true\n订单1，虚拟线程=true\n订单2，虚拟线程=true\n订单3，虚拟线程=true\n订单4，虚拟线程=true\n订单5，虚拟线程=true\n订单6，虚拟线程=true\n订单7，虚拟线程=true\n"
+      },
+      "learner_expected_fail": {
+        "found": 5,
+        "successful": 1,
+        "failed": 4
+      },
+      "alternative": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 2,
+          "failed": 3
+        },
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        },
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ]
+    }
+  ],
+  "status": "PASS",
+  "reference_tests": 38,
+  "mutants_killed": 20,
+  "learner_tasks_rejected": 8,
+  "student_gradle_copy": {
+    "status": "EXPECTED_FAIL",
+    "modules": 8,
+    "tests": 38,
+    "failures": 32,
+    "compile_errors": 0,
+    "academy_archive": false
+  },
+  "format": {
+    "tool": "google-java-format1.24.0",
+    "style": "AOSP四空格",
+    "java_files": 24,
+    "status": "PASS"
+  },
+  "jcmd": {
+    "status": "PARTIAL_BLOCKED",
+    "reason": "云平台Attach有界等待超时；未改系统安全设置"
+  },
+  "jfr": {
+    "status": "PASS",
+    "virtual_thread_start": 8,
+    "virtual_thread_end": 8,
+    "thread_park": 10,
+    "business_total": 28,
+    "child_exit_code": 0,
+    "interpretation": "人工评阅另计"
+  },
+  "debug_aqs": {
+    "status": "PASS",
+    "symbol": "AbstractQueuedSynchronizer.releaseShared",
+    "state": 0,
+    "runtime": "Temurin21.0.12.1+1",
+    "record": "docs/实际调试记录.md",
+    "ga_source_dynamic_verification": false
+  },
+  "source_sha256": {
+    "juc/01-publication/lab/src/labs/PublicationLab.java": "3a0c6aaa7edfc9c0cd21d9f557766c4e1aa62fcdee785e90c2e69c2f13311c26",
+    "juc/01-publication/lab/src/labs/PublicationLabUsage.java": "7945889180bc0130483c9387b84f791923afd044292123904326c0d3fa0b9b53",
+    "juc/01-publication/lab/test/PublicationLabTest.java": "a0f229b1d998101ee7836d6d5e6ff1aa1eb0ed4db22327879450e4f90e38e766",
+    "juc/02-cancellation/lab/src/labs/CooperativeWorker.java": "a13b2672b31cd5ef2150739c50630bd99be85ce781b62a8e31ac0533d56104f7",
+    "juc/02-cancellation/lab/src/labs/CooperativeWorkerUsage.java": "2b6a075c33671718c15966c3448b4c7876a151220248e97bc5c67324cd58a68e",
+    "juc/02-cancellation/lab/test/CooperativeWorkerTest.java": "b11e90f118a28086e16708793d07b3789c526e7120216a62ec62ba0a8687b818",
+    "juc/03-bounded-buffer/lab/src/labs/BoundedBuffers.java": "9abb24a95599e805f2ec8e9af8dc859a0fc78ff2be0d957ffb965f22dbc9f893",
+    "juc/03-bounded-buffer/lab/src/labs/BoundedBuffersUsage.java": "4bab4f42056aea146cc22bc9dc2b94b3386412b22f0b5251654f2dd8481b85f3",
+    "juc/03-bounded-buffer/lab/test/BoundedBuffersTest.java": "c59fbd5496a6e3c32425f6d29a75cf0e6d1741b4b72dfa231b7433444a85f6e6",
+    "juc/04-aqs/lab/src/labs/OneShotGate.java": "8e71a7bd633a1d825f33213b12d311118e4942bf08075f2bf982dcf4b6ae3741",
+    "juc/04-aqs/lab/src/labs/OneShotGateUsage.java": "cde37ff5d7f3b331726c159d1b1049a1be756819ac8dfcda41905ddf21d3ce1f",
+    "juc/04-aqs/lab/test/OneShotGateTest.java": "c1697a176f046ea4a6acf5c8c2dfea9377b0c321057eae0d7cdea1a8a51ad2b6",
+    "juc/05-atomics/lab/src/labs/AtomicLedger.java": "7b15a45788d47dc71c354bbd7d52f908044e1b133ddce5720c40de51e1995c1c",
+    "juc/05-atomics/lab/src/labs/AtomicLedgerUsage.java": "4ae0c697603d0343ba382ff0eca1e08e7af9a9dc904da306fc0c90c95232d841",
+    "juc/05-atomics/lab/test/AtomicLedgerTest.java": "e58a4e625b1a48e717cfbbd3afa7ec4148ae3cf69644ea32e5c2db886a233267",
+    "juc/06-executor/lab/src/labs/BoundedExecutor.java": "576ad44ea44e58640fad2da6990792a619e9290cba7e4cb06bff063029346dcd",
+    "juc/06-executor/lab/src/labs/BoundedExecutorUsage.java": "ebad54791c022ce37c2c12c142fee0f044e48620fb72d87c00a7f6b630682dd0",
+    "juc/06-executor/lab/test/BoundedExecutorTest.java": "9ebb082e207827b2c4be72270ac3e4e87f887372cab18b88b4c27ca7130a071b",
+    "juc/07-futures/lab/src/labs/AsyncGateway.java": "7cfcc5490848eb9d23a0120bd30af30a9ef09e3a1433d07b2cbc138f2275f245",
+    "juc/07-futures/lab/src/labs/AsyncGatewayUsage.java": "cb672e13fa997f7055a394b98b2de0e4a7318789ae18cc61e969dbd9593baaf5",
+    "juc/07-futures/lab/test/AsyncGatewayTest.java": "cd652f18d854c727a319870003f4dab9b93b7011226392a6d569d28a6073b05a",
+    "juc/08-virtual-threads/lab/src/labs/VirtualGateway.java": "e0b6011891322a69a96e755beb18d119ac15a63e5863bea1c4b353dab5be1351",
+    "juc/08-virtual-threads/lab/src/labs/VirtualGatewayUsage.java": "352e3d8aca718fb3a8bb456054fc32699d9f884711484eea3431831728099595",
+    "juc/08-virtual-threads/lab/test/VirtualGatewayTest.java": "f169ddb119a05ec4677e9cdba8d53c4938c2fc44c151b8accbef222e81ee8896"
+  }
+}

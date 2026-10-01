@@ -1,0 +1,154 @@
+[
+  {
+    "repository": "grpc/grpc-java",
+    "tag": "v1.71.0",
+    "files": [
+      {
+        "path": "core/src/main/java/io/grpc/internal/ClientCallImpl.java",
+        "sha256": "2e633c8b3226ce4b9551bac528712f524fe7eb58c93a2ef437d8e2ae8f4fe08b",
+        "bytes": 28540,
+        "url": "https://github.com/grpc/grpc-java/blob/865c4432569dfdf738b3cf07bcdb6d6e3285f761/core/src/main/java/io/grpc/internal/ClientCallImpl.java"
+      },
+      {
+        "path": "core/src/main/java/io/grpc/internal/RetriableStream.java",
+        "sha256": "0e134f8e46443b45fd9fdc6e7af8e0206ef164f564ff73e2ec9f74645097d854",
+        "bytes": 54829,
+        "url": "https://github.com/grpc/grpc-java/blob/865c4432569dfdf738b3cf07bcdb6d6e3285f761/core/src/main/java/io/grpc/internal/RetriableStream.java"
+      },
+      {
+        "path": "stub/src/main/java/io/grpc/stub/ClientCalls.java",
+        "sha256": "94bf6660da51f3ed505f08be40085cb3039f6fa9a87339d246145751f107e864",
+        "bytes": 34001,
+        "url": "https://github.com/grpc/grpc-java/blob/865c4432569dfdf738b3cf07bcdb6d6e3285f761/stub/src/main/java/io/grpc/stub/ClientCalls.java"
+      },
+      {
+        "path": "stub/src/main/java/io/grpc/stub/ServerCalls.java",
+        "sha256": "3193b1ad2d64b557b8e4738623bd9a0678f73f0300f272218b79893f7dc93ea7",
+        "bytes": 17264,
+        "url": "https://github.com/grpc/grpc-java/blob/865c4432569dfdf738b3cf07bcdb6d6e3285f761/stub/src/main/java/io/grpc/stub/ServerCalls.java"
+      }
+    ],
+    "commit": "865c4432569dfdf738b3cf07bcdb6d6e3285f761",
+    "status": "verified"
+  },
+  {
+    "repository": "apache/dubbo",
+    "tag": "dubbo-3.3.6",
+    "files": [
+      {
+        "path": "dubbo-cluster/src/main/java/org/apache/dubbo/rpc/cluster/support/FailoverClusterInvoker.java",
+        "sha256": "5e29a7e769fd8cf76605ede6c577be538c7e5c82f88cfb47065ca48ae83c9fde",
+        "bytes": 6520,
+        "url": "https://github.com/apache/dubbo/blob/f1585880bee4ca7776f44380c47c994217721ffe/dubbo-cluster/src/main/java/org/apache/dubbo/rpc/cluster/support/FailoverClusterInvoker.java"
+      },
+      {
+        "path": "dubbo-config/dubbo-config-api/src/main/java/org/apache/dubbo/config/ReferenceConfig.java",
+        "sha256": "c161e0fc10220b77c0f901c031069911125870c2e9f7ea6dd015abf52d6b2c86",
+        "bytes": 37076,
+        "url": "https://github.com/apache/dubbo/blob/f1585880bee4ca7776f44380c47c994217721ffe/dubbo-config/dubbo-config-api/src/main/java/org/apache/dubbo/config/ReferenceConfig.java"
+      },
+      {
+        "path": "dubbo-rpc/dubbo-rpc-api/src/main/java/org/apache/dubbo/rpc/filter/ContextFilter.java",
+        "sha256": "08922fe0016459ff133fde3ca1d446de54ddc91ce07bdd9163cfd51acbd4c4c3",
+        "bytes": 9529,
+        "url": "https://github.com/apache/dubbo/blob/f1585880bee4ca7776f44380c47c994217721ffe/dubbo-rpc/dubbo-rpc-api/src/main/java/org/apache/dubbo/rpc/filter/ContextFilter.java"
+      },
+      {
+        "path": "dubbo-registry/dubbo-registry-zookeeper/src/main/java/org/apache/dubbo/registry/zookeeper/ZookeeperRegistry.java",
+        "sha256": "4e1a86a63cc2ce8f0fef5794604e501050ff23de53a9cfa0da16d81444c10c04",
+        "bytes": 20103,
+        "url": "https://github.com/apache/dubbo/blob/f1585880bee4ca7776f44380c47c994217721ffe/dubbo-registry/dubbo-registry-zookeeper/src/main/java/org/apache/dubbo/registry/zookeeper/ZookeeperRegistry.java"
+      }
+    ],
+    "commit": "f1585880bee4ca7776f44380c47c994217721ffe",
+    "status": "verified"
+  },
+  {
+    "repository": "resilience4j/resilience4j",
+    "tag": "v2.3.0",
+    "files": [
+      {
+        "path": "resilience4j-circuitbreaker/src/main/java/io/github/resilience4j/circuitbreaker/internal/CircuitBreakerStateMachine.java",
+        "sha256": "1a3003ef783cfba15c47a9b81c919613c80461e85b52e365307f1ff342189216",
+        "bytes": 41683,
+        "url": "https://github.com/resilience4j/resilience4j/blob/c2c6575114fc0650177fb21e1ff967f14acde39c/resilience4j-circuitbreaker/src/main/java/io/github/resilience4j/circuitbreaker/internal/CircuitBreakerStateMachine.java"
+      },
+      {
+        "path": "resilience4j-bulkhead/src/main/java/io/github/resilience4j/bulkhead/internal/SemaphoreBulkhead.java",
+        "sha256": "faa6c3fee5b4dd6ef4a704889989c0a9206b8e28a59204448b57e0496c0dabaa",
+        "bytes": 9001,
+        "url": "https://github.com/resilience4j/resilience4j/blob/c2c6575114fc0650177fb21e1ff967f14acde39c/resilience4j-bulkhead/src/main/java/io/github/resilience4j/bulkhead/internal/SemaphoreBulkhead.java"
+      }
+    ],
+    "commit": "c2c6575114fc0650177fb21e1ff967f14acde39c",
+    "status": "verified"
+  },
+  {
+    "repository": "mysql/mysql-connector-j",
+    "tag": "9.2.0",
+    "files": [
+      {
+        "path": "src/main/user-impl/java/com/mysql/cj/jdbc/MysqlXAConnection.java",
+        "sha256": "6c2d89eaf78681caf63ff007ea4ba563dd62f505760d490d46d931708bff4ae1",
+        "bytes": 12555,
+        "url": "https://github.com/mysql/mysql-connector-j/blob/a3909bfeb62d5a517ab444bb88ba7ecf26100297/src/main/user-impl/java/com/mysql/cj/jdbc/MysqlXAConnection.java"
+      }
+    ],
+    "commit": "a3909bfeb62d5a517ab444bb88ba7ecf26100297",
+    "status": "verified"
+  },
+  {
+    "repository": "apache/kafka",
+    "tag": "3.9.1",
+    "files": [
+      {
+        "path": "clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java",
+        "sha256": "e0198f0db038bc55a151c02d9e22d91e79f7e9379bce0248802eb80e5908e058",
+        "bytes": 55562,
+        "url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java"
+      },
+      {
+        "path": "clients/src/main/java/org/apache/kafka/clients/producer/internals/TransactionManager.java",
+        "sha256": "ec3d0562522ba390ee7cb05bad0b9ae3de9cf673e7a95df2e8f11f8e4e306a77",
+        "bytes": 81493,
+        "url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/TransactionManager.java"
+      }
+    ],
+    "commit": "f745dfdcee2b9851204ddbbcd423626ab87294bc",
+    "status": "verified"
+  },
+  {
+    "repository": "redis/redis",
+    "tag": "7.4.7",
+    "files": [
+      {
+        "path": "src/db.c",
+        "sha256": "eee5b6618aebea4e45157556fbf7c1a4a33dcea58ca4f440fe0a0e4da99c5561",
+        "bytes": 105042,
+        "url": "https://github.com/redis/redis/blob/4d1a341aaf0b96f9d2c43418efac732e31dc28ad/src/db.c"
+      },
+      {
+        "path": "src/eval.c",
+        "sha256": "958c6a668b9e7aba92f65063d9e538a9e2c44aa041be55ec6dc51cb0193d9527",
+        "bytes": 64518,
+        "url": "https://github.com/redis/redis/blob/4d1a341aaf0b96f9d2c43418efac732e31dc28ad/src/eval.c"
+      }
+    ],
+    "commit": "4d1a341aaf0b96f9d2c43418efac732e31dc28ad",
+    "status": "verified"
+  },
+  {
+    "repository": "redis/jedis",
+    "tag": "v5.2.0",
+    "files": [
+      {
+        "path": "src/main/java/redis/clients/jedis/Jedis.java",
+        "sha256": "00dccffa50f00239c4a9170d7a4c8779dd92ab7995a4482e14eb0681ee5d9b6e",
+        "bytes": 366984,
+        "url": "https://github.com/redis/jedis/blob/54426424a21070bba3b12454e48aa692efc3a9fa/src/main/java/redis/clients/jedis/Jedis.java"
+      }
+    ],
+    "commit": "54426424a21070bba3b12454e48aa692efc3a9fa",
+    "status": "verified"
+  }
+]

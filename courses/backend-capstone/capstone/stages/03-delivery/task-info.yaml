@@ -1,0 +1,26 @@
+type: edu
+custom_name: 03 Kafka、gRPC与每个确认窗口的重放
+files:
+- name: gradle.lockfile
+  visible: true
+- name: integration-test/labs/capstone/DeliveryIntegrationTest.java
+  visible: true
+- name: src/labs/capstone/DeliveryFlow.java
+  visible: true
+  placeholders:
+  - offset: 4952
+    length: 134
+    placeholder_text: '        Exercise.unimplemented();
+
+      '
+  - offset: 5222
+    length: 132
+    placeholder_text: '        Exercise.unimplemented();
+
+      '
+- name: test/labs/capstone/BrokerConfigTest.java
+  visible: true
+- name: test/labs/capstone/DeliveryTest.java
+  visible: true
+- name: test/labs/capstone/WireTest.java
+  visible: true

@@ -1,0 +1,41 @@
+import java.time.Duration
+import org.gradle.api.tasks.testing.TestResult
+plugins { id 'base' }
+allprojects {
+ group='dev.backendlabs'; version='1.0.0-draft'
+ repositories { mavenCentral() }
+}
+subprojects {
+ apply plugin:'java'
+ java { toolchain { languageVersion=JavaLanguageVersion.of(21) } }
+ sourceSets { main { java.setSrcDirs(['src']) }; test { java.setSrcDirs(['test']) } }
+ dependencies {
+  testImplementation platform('org.junit:junit-bom:5.11.4')
+  testImplementation 'org.junit.jupiter:junit-jupiter'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+ }
+ tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21 }
+ tasks.withType(Test).configureEach {
+  useJUnitPlatform(); maxHeapSize='192m'; maxParallelForks=1
+  if(!project.hasProperty('debugLab')) timeout=Duration.ofSeconds(60)
+  systemProperty 'junit.jupiter.execution.timeout.mode','disabled_on_debug'
+  outputs.upToDateWhen { false }
+  testLogging { events 'failed','skipped'; exceptionFormat 'full' }
+  afterTest { descriptor,result ->
+   if(result.resultType==TestResult.ResultType.FAILURE) {
+    def lines=(result.exception?.message?:'答案不符合要求').split('\n',-1)
+    println "#educational_plugin FAILED + ${lines[0]}"
+    lines.drop(1).each { println "#educational_plugin${it}" };println ''
+   }
+  }
+ }
+ tasks.register('run',JavaExec) {
+  group='application';description='运行完整中文调用示例';dependsOn tasks.named('classes')
+  classpath=sourceSets.main.runtimeClasspath
+  mainClass='labs.jvm.'+fileTree('src/labs/jvm').matching { include '*Usage.java' }.singleFile.name.replace('.java','')
+  maxHeapSize='96m'
+ }
+}
+tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
+tasks.named('check') { dependsOn tasks.named('test') }
+tasks.named('wrapper') { gradleVersion='8.10.2' }

@@ -1,0 +1,19 @@
+type: edu
+custom_name: C07-05 · 持久化复制与故障转移
+files:
+- name: src/labs/Replication.java
+  visible: true
+  placeholders:
+  - offset: 685
+    length: 274
+    placeholder_text: '    throw new UnsupportedOperationException("TODO：按中文步骤实现核心方法");
+
+      '
+- name: src/labs/ReplicationUsage.java
+  visible: true
+- name: test/labs/ReplicationIntegrationTest.java
+  visible: true
+- name: test/labs/ReplicationTest.java
+  visible: true
+- name: solution.md
+  visible: true

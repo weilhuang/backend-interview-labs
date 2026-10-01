@@ -1,0 +1,1240 @@
+{
+  "historical_snapshot_notice": {
+    "marked_historical_utc": "2026-10-01",
+    "meaning": "Historical per-commit snapshots and original FAIL/NOT_RUN evidence are preserved below; not the current release state",
+    "current_readiness": "release-readiness-20261001.json",
+    "current_release_index": "../curriculum/09-v1-progress.md",
+    "post_commit_truth": "https://github.com/weilhuang/backend-interview-labs/pull/1 ; corresponding exact-commit CI run and evidence comment"
+  },
+  "schema_version": 1,
+  "status": "PARTIAL_VERIFIED_WITH_EXPLICIT_GAPS",
+  "date_utc": "2026-09-30",
+  "scope": "Cloud-only author quality gates; no claim of native IDEA/Academy release acceptance",
+  "metadata": {
+    "status": "PASS",
+    "courses": 10,
+    "tasks": 96,
+    "placeholders": 156,
+    "legacy_validators_passed": 10,
+    "report": "build/quality/academy-legacy-metadata-final-r2.json"
+  },
+  "gate_self_tests": {
+    "status": "PASS",
+    "tests": 97,
+    "scope": "Current post-fourth-run narrow attribution fix; Python only, not new Docker runtime",
+    "log_sha256": "689e6549f857c7c4ad0bdb5a2dd88b3cb05e03cb93c2700e5df5a1fb4cafc919",
+    "previous_historical_run": {
+      "status": "PASS",
+      "tests": 50,
+      "log": "build/quality/gate-self-tests-final.log"
+    }
+  },
+  "independent_placeholders": {
+    "status": "PASS",
+    "courses": 4,
+    "tasks": 43,
+    "reference_cases": 43,
+    "independent_placeholders": 76,
+    "survivors": 0,
+    "method": "javac --release 21 and pinned JUnit 1.11.4; strict per-test XML attribution; not Gradle/IDEA",
+    "current_inputs": "All retained Java compilation inputs re-compared to current sources and exact individual placeholder replacements",
+    "report": "build/quality/placeholder-audit-final-consolidated.json",
+    "course_results": [
+      {
+        "course": "java-foundations",
+        "status": "PASS",
+        "tasks": 16,
+        "reference_cases": 16,
+        "independent_placeholders": 29,
+        "original_report": "build/quality/placeholder-audit-core-r2.json",
+        "source_basis": "Unchanged roundtrip-core-r3 manifest plus exact current source/placeholder versus every retained javac input",
+        "current_source_manifest_sha256": "65da59c2be690f28d2084f081bf6db2ba8f9da3970989ec4357b546d7731d817"
+      },
+      {
+        "course": "java-concurrency",
+        "status": "PASS",
+        "tasks": 8,
+        "reference_cases": 8,
+        "independent_placeholders": 17,
+        "original_report": "build/quality/placeholder-audit-c02-final.json",
+        "source_basis": "Embedded input manifest",
+        "current_source_manifest_sha256": "4d28ff1cc7ffe8300e85ba554b1d9a95a6a95f0020dbe86060d4e86cb30b4054"
+      },
+      {
+        "course": "java-jvm",
+        "status": "PASS",
+        "tasks": 7,
+        "reference_cases": 7,
+        "independent_placeholders": 10,
+        "original_report": "build/quality/placeholder-audit-jvm-pilot-final-r2.json",
+        "source_basis": "Embedded input manifest",
+        "current_source_manifest_sha256": "ced259f8597c8b3fbd3db9e5d35abd311bc8ea1a78bc93eee96529bbd3dc22cf"
+      },
+      {
+        "course": "java-recovery-collections",
+        "status": "PASS",
+        "tasks": 12,
+        "reference_cases": 12,
+        "independent_placeholders": 20,
+        "original_report": "build/quality/placeholder-audit-jvm-pilot-final-r2.json",
+        "source_basis": "Embedded input manifest",
+        "current_source_manifest_sha256": "1f0c58ab82e249e78678a82ff87a5bc611b6c0c15b1b29b7b32838867e41ced4"
+      }
+    ],
+    "not_audited": {
+      "courses": 6,
+      "placeholders": 80,
+      "scope": "Historical remaining80 after original four-course tool only; additional_contract_regions records37 later independent checks"
+    }
+  },
+  "gradle_roundtrip": {
+    "method": "Source fixture archive, clean learner rejection, reference acceptance, separate clean learner reconstruction rejection; no native Reset",
+    "historical_three_phase_completed_courses": 8,
+    "historical_three_phase_completed_tasks": 82,
+    "status": "SEVEN_CURRENT_SOURCE_SNAPSHOTS_RETAINED_XML_PASS; FRAMEWORK_AND_DATABASES_PENDING",
+    "current_source_and_retained_xml_pass_courses": 7,
+    "current_source_and_retained_xml_pass_tasks": 68,
+    "recheck_report": "build/quality/roundtrip-final-evidence-recheck.json",
+    "recheck_limit": "Read-only final classifier check of retained reference and rebuilt-learner XML. First learner XML was replaced during the original reference phase; original three-phase machine reports preserve its counts. No new Gradle rerun is claimed for this recheck.",
+    "course_results": [
+      {
+        "course": "java-foundations",
+        "original_report": "build/quality/academy-roundtrip-core-r3.json",
+        "original_report_sha256": "cf023f37d82c9d97e9cc0ee349bea89f822fea8dc34c1f89c6c899e09b29a482",
+        "original_status": "PASS",
+        "source_manifest_sha256": "0e281a2e6567a3d77c85764963c0869a7a6bce0dbe538b870b715b1779b1a924",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 52,
+            "failures": 47
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 52,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 52,
+            "failures": 47
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 16,
+            "tests": 52,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 16,
+            "tests": 52,
+            "failures": 47
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      },
+      {
+        "course": "java-jvm",
+        "original_report": "build/quality/academy-roundtrip-core-r3.json",
+        "original_report_sha256": "cf023f37d82c9d97e9cc0ee349bea89f822fea8dc34c1f89c6c899e09b29a482",
+        "original_status": "PASS",
+        "source_manifest_sha256": "408fc9a8c7677057b0cae25bd2161a28e9cfcbc06d6727ae0d7c2a010aa0e8e1",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 30,
+            "failures": 21
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 30,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 30,
+            "failures": 21
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 7,
+            "tests": 30,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 7,
+            "tests": 30,
+            "failures": 21
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      },
+      {
+        "course": "java-recovery-collections",
+        "original_report": "build/quality/academy-roundtrip-core-r3.json",
+        "original_report_sha256": "cf023f37d82c9d97e9cc0ee349bea89f822fea8dc34c1f89c6c899e09b29a482",
+        "original_status": "PASS",
+        "source_manifest_sha256": "18df48516dc55b47e264b9851fbd366dce3edef2700a937e869c06d482f14e5f",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 65,
+            "failures": 63
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 65,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 65,
+            "failures": 63
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 12,
+            "tests": 65,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 12,
+            "tests": 65,
+            "failures": 63
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      },
+      {
+        "course": "java-frameworks",
+        "original_report": "build/quality/academy-roundtrip-services.json",
+        "original_report_sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf",
+        "original_status": "FAIL",
+        "source_manifest_sha256": "2b7c18848d9d86f5f4cb60032f88e57ca2bb75009692d502ade53870f3a08f27",
+        "changed_inputs": [
+          "README.md",
+          "framework-course/01-boot/01-configuration/task.md",
+          "framework-course/01-boot/02-http-contract/task.md",
+          "framework-course/01-boot/03-transactions/task.md",
+          "framework-course/01-boot/04-test-layers/task.md",
+          "framework-course/01-boot/05-security/task.md",
+          "framework-course/01-boot/06-runtime-lifecycle/task.md",
+          "framework-course/01-boot/07-integrated-service/task.md",
+          "framework-course/02-source/08-container-di/task.md",
+          "framework-course/02-source/09-bean-lifecycle/task.md",
+          "framework-course/02-source/10-circular-boundary/task.md",
+          "framework-course/02-source/11-aop-proxy/task.md",
+          "framework-course/02-source/12-transaction-source/task.md",
+          "framework-course/02-source/13-mvc-source/task.md",
+          "framework-course/02-source/14-autoconfiguration/task.md",
+          "中文阶段报告.md"
+        ],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 63,
+            "failures": 47
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 63,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 63,
+            "failures": 47
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 14,
+            "tests": 63,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 14,
+            "tests": 63,
+            "failures": 47
+          }
+        ],
+        "original_error": "author source changed during verification; evidence is stale",
+        "current_status": "STALE_INPUTS"
+      },
+      {
+        "course": "backend-capstone",
+        "original_report": "build/quality/academy-roundtrip-services.json",
+        "original_report_sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf",
+        "original_status": "PASS",
+        "source_manifest_sha256": "68e3f9cd485645b430526bb44fa881e9ee8692a9d26b9b9b92bc03e05f5cfdf5",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 35,
+            "failures": 28
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 35,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 35,
+            "failures": 28
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 5,
+            "tests": 35,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 5,
+            "tests": 35,
+            "failures": 28
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      },
+      {
+        "course": "data-storage/mysql-engineering",
+        "original_report": "build/quality/academy-roundtrip-services.json",
+        "original_report_sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf",
+        "original_status": "FAIL",
+        "source_manifest_sha256": "086d62f97b18b4f746be27c03c704ab9f99d1db950f270196c01083f18e1b368",
+        "changed_inputs": [
+          "mysql/05-locks/05-deadlock/test/LockDatabaseTest.java"
+        ],
+        "asset_set_matches": true,
+        "phases": [],
+        "retained_xml_recheck": [],
+        "original_error": "mysql/01-model/01-order-contract: no fresh JUnit XML; compilation/environment failure is not learner rejection",
+        "current_status": "STALE_INPUTS_AND_NOT_COMPLETED",
+        "current_source_note": "Real CI subsequently exposed the retryable coverage gap; the public integration test was changed afterward and awaits next-commit Docker execution."
+      },
+      {
+        "course": "data-storage/redis-engineering",
+        "original_report": "build/quality/academy-roundtrip-services.json",
+        "original_report_sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf",
+        "original_status": "FAIL",
+        "source_manifest_sha256": "3dfb2c9e7affff119605857d3a70ed3d6aac932b6edaef8b80b48e68bc10af29",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [],
+        "retained_xml_recheck": [],
+        "original_error": "redis/04-consistency: unexpected test outcome {'tests': 3, 'failures': 0, 'errors': 0, 'skipped': 0}",
+        "current_status": "NOT_COMPLETED"
+      },
+      {
+        "course": "messaging",
+        "original_report": "build/quality/academy-roundtrip-services.json",
+        "original_report_sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf",
+        "original_status": "PASS",
+        "source_manifest_sha256": "506b6008473f65b2a45cd2924676c7390475c8c92eec8a008f13f9fad93c3ce4",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 27,
+            "failures": 13
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 27,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 27,
+            "failures": 13
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 12,
+            "tests": 27,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 12,
+            "tests": 27,
+            "failures": 13
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      },
+      {
+        "course": "java-concurrency",
+        "original_report": "build/quality/academy-roundtrip-c02-final.json",
+        "original_report_sha256": "5197d7c74c096d3983478e592aace8b5d734075c90eeea97c400721030ff718b",
+        "original_status": "PASS",
+        "source_manifest_sha256": "8877efa789f3f3d4c89ff0ea484d2cddde4c36a5c9285bef5254bdb1f2222781",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 38,
+            "failures": 32
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 38,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 38,
+            "failures": 32
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 8,
+            "tests": 38,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 8,
+            "tests": 38,
+            "failures": 32
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      },
+      {
+        "course": "distributed-systems",
+        "original_report": "build/quality/academy-roundtrip-distributed-final-r2.json",
+        "original_report_sha256": "b21876f7f961004fc1f29b462c838eb90004fd69a87e1d10f944e507e1ec8df2",
+        "original_status": "PASS",
+        "source_manifest_sha256": "ec06da7a76c583dbc570995982537a6f16a8a98f040f2c8d3964bac1595070da",
+        "changed_inputs": [],
+        "asset_set_matches": true,
+        "phases": [
+          {
+            "phase": "learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 48,
+            "failures": 37
+          },
+          {
+            "phase": "reference-accepted",
+            "status": "PASS",
+            "exit_code": 0,
+            "goal": "test",
+            "tests": 48,
+            "failures": 0
+          },
+          {
+            "phase": "rebuilt-learner-rejected",
+            "status": "PASS",
+            "exit_code": 1,
+            "goal": "test",
+            "tests": 48,
+            "failures": 37
+          }
+        ],
+        "retained_xml_recheck": [
+          {
+            "folder": "first-import",
+            "status": "PASS",
+            "expected": "reference-accepted",
+            "tasks": 8,
+            "tests": 48,
+            "failures": 0
+          },
+          {
+            "folder": "second-import",
+            "status": "PASS",
+            "expected": "rebuilt-learner-rejected",
+            "tasks": 8,
+            "tests": 48,
+            "failures": 37
+          }
+        ],
+        "current_status": "PASS_RETAINED_XML"
+      }
+    ]
+  },
+  "c02_test_fix": {
+    "status": "PASS",
+    "mechanism": "Completion-order child failure propagation, cancel peers, bounded cleanup, preserve primary exception and interruption; canonical generator synchronized",
+    "source_files": [
+      "courses/java-concurrency/juc/03-bounded-buffer/lab/test/BoundedBuffersTest.java",
+      "courses/java-concurrency/authoring/build_course.py"
+    ],
+    "reference_cases": 8,
+    "alternative_correct_cases": 8,
+    "learner_cases_rejected": 8,
+    "fixed_wrong_variants_rejected": 20,
+    "variant_report": "courses/java-concurrency/build/verification/report.json",
+    "strict_independent_placeholders": 17,
+    "final_gradle_tests_per_phase": 38,
+    "final_gradle_failures_by_phase": [
+      32,
+      0,
+      32
+    ],
+    "final_gradle_seconds": 53.8,
+    "official_archive": "UNCHANGED_OLD_TEST; new export/import required"
+  },
+  "distributed_grpc": {
+    "status": "FIXED_AND_FINAL_STRICT_GRADLE_ROUNDTRIP_PASS",
+    "tasks": [
+      "distributed-course/services/02-grpc",
+      "distributed-course/services/08-capacity"
+    ],
+    "finding": "Final classifier rejects three client io.grpc.StatusRuntimeException UNKNOWN failures. Retained stderr records server-side learner TODO in Lab$TraceInterceptor.interceptCall. No generic RPC/network exception allowance was added.",
+    "historical_result": "44 tests per phase, failures 37/0/37, but not final strict gate acceptance",
+    "mechanism": "Shared public diagnostic observer associates the original server exception with an endpoint-local RPC identifier and attaches it only to the same failing client RPC. Task02 and task08 tests use it. Streaming onError and task08 worker completion wake and propagate original failures. No gate exception allowlist was expanded.",
+    "tests_per_phase": [
+      48,
+      48,
+      48
+    ],
+    "failures_by_phase": [
+      37,
+      0,
+      37
+    ],
+    "seconds": 158.35,
+    "report": "build/quality/academy-roundtrip-distributed-final-r2.json",
+    "focused_verification": {
+      "reference_tests": 9,
+      "reference_failures": 0,
+      "variants": [
+        {
+          "mode": "starter",
+          "compile_exit": 0,
+          "test_exit": 1,
+          "tests": 9,
+          "failures": 4,
+          "skipped": 0,
+          "failure_kinds": [
+            [
+              "java.lang.UnsupportedOperationException",
+              "手动流控只交付请求数量且取消可结束流()"
+            ],
+            [
+              "java.lang.UnsupportedOperationException",
+              "真实网络响应传播上下文且验证参数()"
+            ],
+            [
+              "java.lang.UnsupportedOperationException",
+              "截止传播取消并清理服务端挂起资源()"
+            ],
+            [
+              "java.lang.UnsupportedOperationException",
+              "两跳调用继承更短的上游截止而不重置总预算()"
+            ]
+          ]
+        },
+        {
+          "mode": "reserve-todo",
+          "compile_exit": 0,
+          "test_exit": 1,
+          "tests": 9,
+          "failures": 1,
+          "skipped": 0,
+          "failure_kinds": [
+            [
+              "java.lang.UnsupportedOperationException",
+              "真实网络响应传播上下文且验证参数()"
+            ]
+          ]
+        },
+        {
+          "mode": "watch-todo",
+          "compile_exit": 0,
+          "test_exit": 1,
+          "tests": 9,
+          "failures": 1,
+          "skipped": 0,
+          "failure_kinds": [
+            [
+              "java.lang.UnsupportedOperationException",
+              "手动流控只交付请求数量且取消可结束流()"
+            ]
+          ]
+        },
+        {
+          "mode": "wrong-contract",
+          "compile_exit": 0,
+          "test_exit": 1,
+          "tests": 9,
+          "failures": 1,
+          "skipped": 0,
+          "failure_kinds": [
+            [
+              "org.opentest4j.AssertionFailedError",
+              "真实网络响应传播上下文且验证参数()"
+            ]
+          ]
+        },
+        {
+          "mode": "equivalent",
+          "compile_exit": 0,
+          "test_exit": 0,
+          "tests": 9,
+          "failures": 0,
+          "skipped": 0,
+          "failure_kinds": []
+        }
+      ],
+      "observer_boundary_tests": 4,
+      "network": "Real loopback TCP unchanged; observer boundary unit tests use a fake transport only for diagnostic-isolation assertions"
+    }
+  },
+  "framework": {
+    "status": "CI_PASS_AT_e66c2fddf2ce172b140e9a577e43c9828f9307a1",
+    "historical_tests_per_phase": 63,
+    "historical_failures_by_phase": [
+      47,
+      0,
+      47
+    ],
+    "change_scope": "README and 14 task descriptions",
+    "later_local_rerun": "INTERRUPTED exit 130; not a pass",
+    "changed_assets_at_final_recheck": [
+      "README.md",
+      "framework-course/01-boot/01-configuration/task.md",
+      "framework-course/01-boot/02-http-contract/task.md",
+      "framework-course/01-boot/03-transactions/task.md",
+      "framework-course/01-boot/04-test-layers/task.md",
+      "framework-course/01-boot/05-security/task.md",
+      "framework-course/01-boot/06-runtime-lifecycle/task.md",
+      "framework-course/01-boot/07-integrated-service/task.md",
+      "framework-course/02-source/08-container-di/task.md",
+      "framework-course/02-source/09-bean-lifecycle/task.md",
+      "framework-course/02-source/10-circular-boundary/task.md",
+      "framework-course/02-source/11-aop-proxy/task.md",
+      "framework-course/02-source/12-transaction-source/task.md",
+      "framework-course/02-source/13-mvc-source/task.md",
+      "framework-course/02-source/14-autoconfiguration/task.md",
+      "中文阶段报告.md"
+    ],
+    "changed_assets_count_at_final_recheck": 16,
+    "changed_assets_during_original_run": 15,
+    "historical_local_status": "STALE_INPUTS",
+    "historical_fields_scope": "Original local stale-input run and interrupted retry; superseded for current CI by github_ci.third_run"
+  },
+  "database_integration": {
+    "docker_in_this_cloud": "UNAVAILABLE",
+    "new_three_phase_integration": "MYSQL_AND_REDIS_PASS_AT_e66c2fddf2ce172b140e9a577e43c9828f9307a1",
+    "mysql_local_contract": "FAIL before tests due to missing HikariCP 6.2.1 metadata; not learner rejection",
+    "redis_contract": "INTEGRATION_REQUIRED for 04-consistency,05-replication,06-leases; their pure unit starts passed 3/2/2 tests",
+    "ci_suites": {
+      "data-storage/mysql-engineering": "integration",
+      "data-storage/redis-engineering": "integration"
+    },
+    "capstone_recovery": "OBSERVATION_ONLY in integration; contract layer owns learner rejection",
+    "redis_first_ci": {
+      "status": "PASS",
+      "tests_per_phase": [
+        19,
+        19,
+        19
+      ],
+      "failures_by_phase": [
+        13,
+        0,
+        13
+      ],
+      "skipped_by_phase": [
+        0,
+        0,
+        0
+      ],
+      "commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
+      "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251"
+    },
+    "mysql_first_ci": {
+      "original_full_tests": "PASS 40 tests",
+      "new_roundtrip": "FAIL on learner 05-deadlock observation-only tests",
+      "fix_runtime": "NOT_RUN; next-commit CI required"
+    },
+    "mysql_second_ci": {
+      "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
+      "author_tests": 41,
+      "author_status": "PASS",
+      "initial_tests": 24,
+      "initial_attributable_failures": 14,
+      "initial_status": "PASS",
+      "reference_tests": 24,
+      "reference_status": "PASS",
+      "rebuilt_status": "FAIL: StockDatabaseTest duplicate INSERT real deadlock before editable code"
+    }
+  },
+  "native_archive_comparison": {
+    "tool": "Read-only comparison of existing official ZIP metadata and existing native-imported plaintext; tool does not perform import or decrypt payloads",
+    "foundations": {
+      "status": "PASS",
+      "tasks": 16,
+      "report": "build/quality/official-c00-c01-archive.json"
+    },
+    "jvm": {
+      "status": "PASS",
+      "tasks": 7,
+      "report": "build/quality/official-c03-archive.json"
+    },
+    "c02": {
+      "historical_before_test_fix": "PASS, 8 tasks",
+      "current_source": "FAIL_EXPECTED_OLD_PUBLIC_TEST",
+      "report": "build/quality/official-c02-after-test-fix.json",
+      "existing_zip_sha256_verified": "0cab108fe8c8b5aa59f8ba2c225fe689799803c1ccace9870d29854713d928ef"
+    },
+    "pilot": {
+      "status": "FAIL_ADDITIONAL_DOCUMENT_MISSING",
+      "missing_asset": "阶段报告.md",
+      "task_structure_and_placeholders": "PASS",
+      "report": "build/quality/official-pilot-archive.json"
+    },
+    "existing_zip_files": "UNCHANGED"
+  },
+  "github_ci": {
+    "new_quality_gate_commit": "b79832d59e18a9a4901ed78817e9a52a876007fa",
+    "new_quality_gate_execution": "FOURTH_RUN_COMPLETED_FAILURE; NEXT_FIX_RUNTIME_NOT_RUN",
+    "published_baseline": "1fb27d8885bf1eb62b112d2e15f5478becf697fa; 9 green workflows, not evidence for unpublished changes",
+    "first_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
+    "mysql_gate": "PASS at e66c2fd; integration24 tests/phase, failures14/0/14",
+    "redis_gate": "PASS; real integration 19 tests per phase, failures 13/0/13, no skips",
+    "latest_completed_commit": "84781e8cf393606d4445313335071ed9d95aaffa",
+    "latest_completed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515",
+    "messaging_gate": "FAIL at84781e8: author52 tests,51pass/1fail/0skip; RocketMQ brokerStatus exceeded15s before restart; subsequent roundtrip NOT_RUN",
+    "second_run": {
+      "actual_jobs_passed": 11,
+      "actual_jobs_failed": 1,
+      "total_jobs_passed": 13,
+      "total_jobs_failed": 2,
+      "course_roundtrips_started": 10,
+      "course_roundtrips_completed_pass": 9,
+      "wall_seconds": 1124,
+      "runner_seconds": 5360,
+      "timing_is_billing_receipt": false
+    },
+    "third_run": {
+      "conclusion": "success",
+      "course_roundtrips_completed_pass": 10,
+      "evidence_scope": "Existing full workflows and roundtrips only; new region gate not run",
+      "timing_is_billing_receipt": false,
+      "evidence_summary_sha256": "e4d7eece9fb82650e2e3dcdf9f18169d1e04f0a89206f766ea3bf6281649fa60"
+    },
+    "fourth_run": {
+      "conclusion": "failure",
+      "head_sha": "84781e8cf393606d4445313335071ed9d95aaffa",
+      "actual_jobs_passed": 10,
+      "actual_jobs_failed": 2,
+      "total_jobs_passed": 12,
+      "total_jobs_failed": 3,
+      "failed_actual_suites": [
+        "distributed",
+        "messaging"
+      ],
+      "aggregate_gate": "FAIL",
+      "timing_is_billing_receipt": false,
+      "next_fix_runtime": "NOT_RUN"
+    }
+  },
+  "native_idea": "NOT_RUN by these scripts; separate GUI report defines actual tested scope",
+  "remaining": [
+    "New exact-commit full CI: both XA semantic controls accepted by narrowly corrected attribution, all8 distributed audit runs complete",
+    "RocketMQ explicit-NameServer fix and original restart/recovery test plus subsequent course roundtrip in real CI",
+    "39 individual regions outside prior76 plus additional37 plus four independently rejected real TODO regions",
+    "Full-task native Academy acceptance and C02 new official export; pilot missing-document release decision",
+    "Native macOS runtime of author quality tools"
+  ],
+  "evidence_files": [
+    {
+      "path": "build/quality/academy-legacy-metadata-final-r2.json",
+      "sha256": "74418e2970177525850edb183d0555086e8670e1a3da7522a448fcd1fb875ab5"
+    },
+    {
+      "path": "build/quality/academy-roundtrip-core-r3.json",
+      "sha256": "cf023f37d82c9d97e9cc0ee349bea89f822fea8dc34c1f89c6c899e09b29a482"
+    },
+    {
+      "path": "build/quality/academy-roundtrip-services.json",
+      "sha256": "0b92c29fd34625cf480e42725d994709694e3668b89effcbefd9e21af0f389bf"
+    },
+    {
+      "path": "build/quality/academy-roundtrip-c02-final.json",
+      "sha256": "5197d7c74c096d3983478e592aace8b5d734075c90eeea97c400721030ff718b"
+    },
+    {
+      "path": "build/quality/placeholder-audit-core-r2.json",
+      "sha256": "801fd0d61ec35a2d3928b7966750fe042c8eb050e93eb532f1c24fca3e2688a0"
+    },
+    {
+      "path": "build/quality/placeholder-audit-foundations-final-recheck.json",
+      "sha256": "3e460d58e606a05a1c24ad356761198d25c3ba395e5195789ea9893b0053323d"
+    },
+    {
+      "path": "build/quality/placeholder-audit-c02-final.json",
+      "sha256": "d6ee1251a240c0a9102f0de86cbad86382b83b211cc41385b7f2452a7f74da40"
+    },
+    {
+      "path": "build/quality/placeholder-audit-jvm-pilot-final-r2.json",
+      "sha256": "9cbfebf0e6c29f42fdcf115ed05eb6153498ed620e8baefcb0a3aa1f4b236245"
+    },
+    {
+      "path": "build/quality/placeholder-audit-final-consolidated.json",
+      "sha256": "8e1709c99edad394bdbbf53525e4de5aacbac3ddda10e928c78a434ca6ea42d5"
+    },
+    {
+      "path": "build/quality/roundtrip-final-evidence-recheck.json",
+      "sha256": "41a1d459b5d8b6d080292537316033451d3d4ba3785e78cff469e4752d97507b"
+    },
+    {
+      "path": "build/quality/official-c00-c01-archive.json",
+      "sha256": "300fabaf4299d7a5e6aa350d6c7e29af81fe7ab11678a86476bcc2c2a27485af"
+    },
+    {
+      "path": "build/quality/official-c02-archive.json",
+      "sha256": "d19c4073fe2a5ed5f9bfb19e8d6bf21491f772121be5095b7bfde3222b0a1f7b"
+    },
+    {
+      "path": "build/quality/official-c02-after-test-fix.json",
+      "sha256": "a6ab4fe79a4f03cbbb55b215370d8b467f7df28456f344f3acd0a25371e92bfb"
+    },
+    {
+      "path": "build/quality/official-c03-archive.json",
+      "sha256": "370ed533a852fdf5ac64fac877f1bb6a26d686a0fead736cc6c55c5a324842c4"
+    },
+    {
+      "path": "build/quality/official-pilot-archive.json",
+      "sha256": "6bf7fdde2757ab38075982fe3efd178fa1090cd1b0b65580c43431ccaab943ea"
+    },
+    {
+      "path": "build/quality/academy-roundtrip-distributed-final.json",
+      "sha256": "b9b7a58c3bfa1b557a5692acaa8fd3f07512e3190474226ab0e7a546a705e0a2"
+    },
+    {
+      "path": "build/quality/academy-roundtrip-distributed-final-r2.json",
+      "sha256": "b21876f7f961004fc1f29b462c838eb90004fd69a87e1d10f944e507e1ec8df2"
+    },
+    {
+      "path": "build/quality/gate-self-tests-final.log",
+      "sha256": "264be029c700ac186925646d78a9291fc6d79faa516022194ed348dfbfe32bfa"
+    },
+    {
+      "path": "courses/java-concurrency/build/verification/report.json",
+      "sha256": "1f7acf51e8d42b39dc16e1d101ea540bc69eba5b67e48de9c03c46857330db94"
+    },
+    {
+      "path": "build/quality/grpc-failure-attribution/focused-results.json",
+      "sha256": "6a41c06f79d206d815d1125e9070e1eb429b2906eac1df394027c5aceec330b4"
+    },
+    {
+      "path": "build/quality/grpc-failure-attribution/reference-r2.log",
+      "sha256": "684d207f941fc6363ffe561d445936493e4447cfcb4e6486eab3b2c002a8dac5"
+    },
+    {
+      "path": "build/quality/grpc-failure-attribution/capacity-final.log",
+      "sha256": "3e82410f22b7f077d7a5227ed3cdba079ebe6e522b1c9b6487404184fb096bfd"
+    },
+    {
+      "path": "build/quality/docs-link-check-final.json",
+      "sha256": "82337ab77fa680b561661a1badb14242148945e748f86681fe15d9da065f8c2f"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/verification.json",
+      "sha256": "ddf053df179ac23d535ea9c068080925acd0e74160a11bb8654d96be1880c9eb"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/local-verification.json",
+      "sha256": "00c1d2e3e75f82f8f121a135b53c592b67c5acc7923f9f559c113d7e01bc177a"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/metadata.json",
+      "sha256": "3125ae432b4d4d4bdfd71ed50a1d4e1e5a2663c8f1084eb931989542e96cfa54"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/gate-selftests.log",
+      "sha256": "9949b8c9cc3935cde422493fe6dce947a401a6cf81dce19ba44db78609b05ed8"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/integration-test-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/mysql-first-ci-roundtrip.json",
+      "sha256": "e4f10314a9c4a284f4bc086371279c1935c00f7e0e0d5bcb9f6f3d8c9d75abfc"
+    },
+    {
+      "path": "build/quality/mysql-lock-retry-policy-20260930/redis-first-ci-roundtrip.json",
+      "sha256": "99758c66de0cae69f48e254e9613c6a7c7d16c595c988e7808a3dfccaeeb17d0"
+    }
+  ],
+  "validated_source_sha256": {
+    "scripts/quality/academy_gate.py": "ab989ba8283b182268ea7d399e19d991dee7dc64f30a5299e108d1e4cf8addc0",
+    "scripts/quality/archive_contract.py": "3e243785265dce611df884b7cce000d2d3fa7e4d4af6b225efd62154758244da",
+    "scripts/quality/placeholder_audit.py": "4411543088266ad3a6b7a46b113e7a51969a74c52d713823e9f17d3317b754b4",
+    "scripts/quality/requirements.txt": "01e08410080741c1f164e3b7459ea15db5966cef6629bfeb2691175f269efd00",
+    "scripts/quality/tests/test_academy_gate.py": "52b0e063f5ca81afb5a0ccd6f65846367de973549f7ad929619af3d51f8d2ef5",
+    "scripts/quality/tests/test_archive_contract.py": "4ef552f8aadc4affa88748f3492ce47c88fb88915793b91c4cebed91ff109b4c",
+    "scripts/quality/tests/test_concurrency_test_source.py": "8ee18e367099c1a6f0528ee18f59c3899847c0fe4261aa5e276f9d20040c9b23",
+    "scripts/quality/tests/test_placeholder_audit.py": "8870890e9b720db31e865983a0534aa99409146626159b5b8cf21279879c3d28",
+    "courses/java-concurrency/juc/03-bounded-buffer/lab/test/BoundedBuffersTest.java": "adf5849f76944e42afdf52c83430a1571e49f130f6f4bf7e30218cd9db098a15",
+    "courses/java-concurrency/authoring/build_course.py": "b0e615ba6c81a8bcaca93411117d716ac3acd2af2fec7ded30111f6e1838d361",
+    "courses/distributed-systems/distributed-course/services/02-grpc/src/labs/distributed/grpc/Lab.java": "5422397e971cc8ac567edcdc67c129488a322fc8a1b4aada7e4b02661240e954",
+    "courses/distributed-systems/distributed-course/services/02-grpc/solutions/labs/distributed/grpc/Lab.java": "5422397e971cc8ac567edcdc67c129488a322fc8a1b4aada7e4b02661240e954",
+    "courses/distributed-systems/distributed-course/services/02-grpc/src/labs/distributed/grpc/RpcFailureObserver.java": "b3b0aa8e36040f70742f7de12955db11c44e5ce82b350f835d32df838ad9708b",
+    "courses/distributed-systems/distributed-course/services/02-grpc/solutions/labs/distributed/grpc/RpcFailureObserver.java": "b3b0aa8e36040f70742f7de12955db11c44e5ce82b350f835d32df838ad9708b",
+    "courses/distributed-systems/distributed-course/services/02-grpc/test/labs/distributed/GrpcTest.java": "8e2181f5078a3eca100b56fca3304d26be4a5b7bca52aa93e5b10e40f5b7fa9e",
+    "courses/distributed-systems/distributed-course/services/02-grpc/test/labs/distributed/RpcFailureObserverTest.java": "45d4076786ba90dff772672d79b6b6f123668742b3d74d021ccb89b292234a8a",
+    "courses/distributed-systems/distributed-course/services/02-grpc/task-info.yaml": "2ea198b7dd42174c490c648e1310208f74ec215c8b8fd7eb99f0e90d610276f2",
+    "courses/distributed-systems/distributed-course/services/08-capacity/test/labs/distributed/CapacityTest.java": "8308423be80c4bac284cefc04fb8a7902c889dd5fba36ea3b2bb1e4c01adf400",
+    "courses/data-storage/mysql-engineering/mysql/05-locks/05-deadlock/test/LockDatabaseTest.java": "b1881a5e60af7498202f6e6f4e4e60224d2d93010040a97775b7b0dcaf8c9fd8"
+  },
+  "mysql_retry_policy_fix": {
+    "status": "CI_PASS; complete MySQL roundtrip confirmed at e66c2fd after second-run stock fix",
+    "head_observed": "b79832d59e18a9a4901ed78817e9a52a876007fa",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251",
+    "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36759817251/job/110039459294",
+    "failure": "Original integration-only XML selected LockDatabaseTest (3 tests passed) while the actual learner retryable TODO was rejected by LockContractTest (2 tests, 1 failure).",
+    "changes": [
+      "Pass real deadlock SQL error 1213 to LockLab.retryable and require true after rollback",
+      "Pass real lock-wait SQL error 1205 to retryable and require true",
+      "Add actual duplicate-key SQL error 1062 and require false",
+      "Rethrow SQL errors outside each scenario unchanged; no gate/workflow exemptions"
+    ],
+    "changed_source": "courses/data-storage/mysql-engineering/mysql/05-locks/05-deadlock/test/LockDatabaseTest.java",
+    "source_sha256": "b1881a5e60af7498202f6e6f4e4e60224d2d93010040a97775b7b0dcaf8c9fd8",
+    "local_validation": {
+      "integration_runtime": "NOT_RUN_NO_DOCKER",
+      "integration_test_compile": "PASS",
+      "variants": [
+        {
+          "variant": "reference",
+          "status": "PASS_EXPECTED",
+          "exit_code": 0,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        },
+        {
+          "variant": "learner-todo",
+          "status": "PASS_EXPECTED",
+          "exit_code": 1,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        },
+        {
+          "variant": "wrong-always-retry",
+          "status": "PASS_EXPECTED",
+          "exit_code": 1,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        },
+        {
+          "variant": "wrong-never-retry",
+          "status": "PASS_EXPECTED",
+          "exit_code": 1,
+          "tests": 2,
+          "kind": "Pure contract only; not new database test runtime"
+        }
+      ]
+    },
+    "gate_selftests": 50,
+    "metadata": {
+      "status": "PASS",
+      "tasks": 7
+    },
+    "historical_mysql_full_test_count": 40,
+    "new_mysql_full_test_expected_count": 41,
+    "new_mysql_deadlock_integration_test_count": 4,
+    "new_docker_runtime": "Second CI: author 41 tests and 05-deadlock real error policy assertions passed; see separate stock failure",
+    "workflow_and_gate": "UNCHANGED",
+    "first_ci_evidence": {
+      "mysql": {
+        "status": "FAIL",
+        "artifact_name": "c06-mysql-test-reports-36759817251-1.zip",
+        "artifact_sha256": "c1d528f9de888355405f92d750a821894b2dc8f33c834cf3a83250dcf43c3dce",
+        "machine_report": "build/quality/mysql-lock-retry-policy-20260930/mysql-first-ci-roundtrip.json",
+        "machine_report_sha256": "e4f10314a9c4a284f4bc086371279c1935c00f7e0e0d5bcb9f6f3d8c9d75abfc",
+        "artifact_member": "build/quality/mysql-roundtrip.json"
+      },
+      "redis": {
+        "status": "PASS",
+        "artifact_name": "c07-redis-test-reports-36759817251-1.zip",
+        "artifact_sha256": "aa7a10b7a25a95cb6a819a5114eab2f569a1ce157fae0fc805a1d24eca454277",
+        "machine_report": "build/quality/mysql-lock-retry-policy-20260930/redis-first-ci-roundtrip.json",
+        "machine_report_sha256": "99758c66de0cae69f48e254e9613c6a7c7d16c595c988e7808a3dfccaeeb17d0",
+        "artifact_member": "build/quality/redis-roundtrip.json"
+      }
+    }
+  },
+  "mysql_stock_baseline_fix": {
+    "status": "CI_PASS_AT_e66c2fddf2ce172b140e9a577e43c9828f9307a1",
+    "failed_run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960",
+    "failed_job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36763385960/job/110051578372",
+    "failure": "ExecutionException -> MySQLTransactionRollbackException 1213 at dedupe INSERT before learner TODO during rebuilt learner concurrent same-request test",
+    "changes": [
+      "Run real quantity=2 APPLIED and persisted state baseline before starting workers",
+      "Reset all data then retain 8 requests on 4 workers with no pre-seeded same-request row",
+      "Require exactly 1 APPLIED, 7 REPLAY, correct conflict rejection, stock=9, version=1, one reservation"
+    ],
+    "local_validation": {
+      "all_7_tasks_compile": "PASS JDK21",
+      "pure_contracts": 17,
+      "quality_selftests": 50,
+      "control_flow_probes": 3,
+      "probes_are_real_mysql": false
+    },
+    "reference_source_and_retry_semantics": "UNCHANGED",
+    "gate_and_workflows": "UNCHANGED"
+  },
+  "additional_contract_regions": {
+    "status": "PASS_WITH_SCOPED_EVIDENCE",
+    "head_sha": "e66c2fddf2ce172b140e9a577e43c9828f9307a1",
+    "method": "fresh JDK21 compilation and actual JUnit Platform execution; no Gradle/Docker/IDEA execution",
+    "unique_regions": 37,
+    "by_course": {
+      "java-frameworks": 9,
+      "distributed-systems": 21,
+      "backend-capstone": 7
+    },
+    "full_module_contract_regions": 36,
+    "selected_existing_method_regions": 1,
+    "selected_method": "labs.distributed.CapacityTest#入口无等待拒绝与异常许可归还",
+    "full_capacity_mutant_suite_status": "UNCLASSIFIED_FAILURE; not a clean full-suite rejection",
+    "reference_module_runs": 14,
+    "reference_module_tests": 83,
+    "additional_focused_reference_tests": 1,
+    "final_mutant_test_invocations": 220,
+    "failure_events": 84,
+    "strict_proof_failure_events": 82,
+    "secondary_barrier_assertions_excluded": 2,
+    "combined_with_prior_76_unique_regions": 113,
+    "remaining_of_156_not_proven_by_these_two_batches": 43,
+    "source_manifest_matches": {
+      "java-frameworks": "140/140",
+      "backend-capstone": "106/106",
+      "distributed-systems": "157/158; generated metadata-report differs, no Java/build/test-input difference"
+    },
+    "evidence_sha256": {
+      "summary.json": "7f9eee58448bd4e0a7fa832211697cce974dc5724bd1800c6950cbe1c0d4cbd0",
+      "case-integrity.json": "d94bb3d69e5517de358830f84e67240170caec4a6d103c27c0b7498113b5e7e1",
+      "ci-source-provenance.json": "4e4f9feb8b555ed2b20c0085fb5c3a017c5fec5869196e0cb20f17e84ea2d702",
+      "report.md": "45d00ec8e889e480dabbfc0c8d24774568ea1b386ce3263543b024f9cad1cea1"
+    },
+    "evidence_availability": "Hashes identify retained local audit evidence, not files newly published in this repository or the upcoming CI artifact",
+    "native_idea": "NOT_RUN",
+    "native_macos_runtime": "NOT_RUN"
+  },
+  "distributed_real_region_gate": {
+    "status": "FAIL",
+    "regions": [
+      "DS-17",
+      "DS-19",
+      "DS-21",
+      "DS-22"
+    ],
+    "semantic_controls": [
+      "DS-17-omit-ra-commit",
+      "DS-17-omit-rb-commit"
+    ],
+    "semantic_controls_are_additional_regions": false,
+    "reference_runs": 2,
+    "planned_total_runs": 8,
+    "per_process_seconds": 300,
+    "shared_total_execution_seconds": 900,
+    "step_timeout_minutes": 16,
+    "job_timeout_minutes": 60,
+    "acceptance": "--execute and PASS at status/docker_integration/runtime.status, execution_requested=true, all expected rows PASS and all8 runs completed",
+    "preparation_only": "NOT_RUN with exit2; not runtime success",
+    "next_required": "New exact-commit CI with narrow serialization fix: all2 references,4TODO mutations and2 semantic controls; current next run NOT_RUN",
+    "native_idea": "NOT_RUN",
+    "native_macos_runtime": "NOT_RUN",
+    "head_sha": "84781e8cf393606d4445313335071ed9d95aaffa",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515",
+    "reference_runs_passed": 2,
+    "mutation_runs_passed": [
+      "DS-17",
+      "DS-19",
+      "DS-21",
+      "DS-22"
+    ],
+    "completed_runs": 6,
+    "runtime_seconds": 293.81,
+    "semantic_control_results": {
+      "DS-17-omit-ra-commit": {
+        "runtime": "EXECUTED",
+        "gate_status": "FAIL_ATTRIBUTION",
+        "observed": "Exact outgoing-branch assertion expected0 but saw1 prepared branch",
+        "serialization": "MultipleFailuresError with app// stack frames and repeated same assertion under Suppressed and Caused by"
+      },
+      "DS-17-omit-rb-commit": {
+        "runtime": "NOT_RUN",
+        "gate_status": "NOT_RUN"
+      }
+    },
+    "evidence_sha256": {
+      "distributed-region-audit.json": "995e34c8fdfef6fb7f70b07fd99746afbdc7f034fa5b27df59c1bd426611ac4f",
+      "omit-ra-MySqlTransactionTest.xml": "3dd6fbdaf7b6a548ce2b7c3ad0ea0923f3157e98c4a61360469a677203da942f"
+    },
+    "post_failure_local_validation": {
+      "quality_python_selftests": 97,
+      "retained_real_xml_rechecked": 7,
+      "new_container_execution": "NOT_RUN"
+    }
+  },
+  "author_quality_runtime_platforms": {
+    "linux_ci": "Python3.12",
+    "macos_author_scripts": "Python>=3.13 with waitid/WNOWAIT; capability checked before fixture writes/Java execution",
+    "macos_runtime_validation": "NOT_RUN",
+    "student_idea_gradle_python_requirement": "UNCHANGED; author tools are not in ordinary student entrypoints"
+  },
+  "messaging_admin_timeout": {
+    "status": "FAIL_AT_84781e8",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36776413515",
+    "author_tests": 52,
+    "passed": 51,
+    "failed": 1,
+    "skipped": 0,
+    "failure_location": "rocketmq/05-storage BrokerTest line20, brokerStatus before restart",
+    "whole_exec_timeout_seconds": 15,
+    "restart_recovery_executed": false,
+    "subsequent_course_roundtrip": "NOT_RUN",
+    "source_risk": "RocketMQ5.3.2 may perform NameServer address discovery if explicit configuration is absent",
+    "observed_root_cause": "UNCONFIRMED; no internal process stack captured",
+    "planned_fix": "brokerStatus explicit -n127.0.0.1:9876; reject real admin invocation without valid -n; preserve15s fatal non-retry timeout and add bounded execID/stdout/stderr diagnostics",
+    "next_fix_runtime": "NOT_RUN",
+    "failure_xml_sha256": "f6b8515f28736b77959b4a67ee00680355b357e933eb873336d0b51a425cb9dc",
+    "next_expected_author_tests": {
+      "total": 54,
+      "pure_contract": 37,
+      "real_service": 17,
+      "runtime": "NOT_RUN"
+    }
+  },
+  "independent_region_accounting": {
+    "prior_core": 76,
+    "additional_contract": 37,
+    "new_real_todo_regions": 4,
+    "remaining_of_156": 39,
+    "semantic_controls_add_regions": false,
+    "complete_integration_gate": "FAIL; region counts do not override overall gate"
+  }
+}

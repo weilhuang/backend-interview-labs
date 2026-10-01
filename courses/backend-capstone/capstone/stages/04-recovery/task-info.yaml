@@ -1,0 +1,17 @@
+type: edu
+custom_name: 04 Compose健康、持久化恢复与事故证据
+files:
+- name: gradle.lockfile
+  visible: true
+- name: integration-test/labs/capstone/RecoveryIntegrationTest.java
+  visible: true
+- name: src/labs/capstone/RecoveryPolicy.java
+  visible: true
+  placeholders:
+  - offset: 393
+    length: 472
+    placeholder_text: '        return Exercise.unimplemented();
+
+      '
+- name: test/labs/capstone/RecoveryTest.java
+  visible: true

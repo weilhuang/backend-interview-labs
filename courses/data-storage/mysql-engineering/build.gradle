@@ -1,0 +1,52 @@
+import java.time.Duration
+import org.gradle.api.tasks.testing.TestResult
+plugins { id 'base' }
+allprojects { repositories { mavenCentral() } }
+subprojects {
+    apply plugin: 'java'
+    sourceSets {
+        main { java.srcDirs 'src', rootProject.file('support/src'); resources.srcDirs rootProject.file('sql') }
+        test { java.srcDirs 'test', rootProject.file('support/test') }
+    }
+    dependencies {
+        implementation 'com.zaxxer:HikariCP:6.2.1'
+        runtimeOnly 'com.mysql:mysql-connector-j:9.2.0'
+        testImplementation platform('org.junit:junit-bom:5.11.4')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        testImplementation 'org.testcontainers:mysql:1.20.6'
+        testImplementation 'org.testcontainers:junit-jupiter:1.20.6'
+        testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.16'
+    }
+    tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21 }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform(); timeout=Duration.ofMinutes(8); maxParallelForks=1
+        systemProperty 'course.root', rootProject.projectDir.absolutePath
+        outputs.upToDateWhen { false }
+        testLogging { events 'passed','failed','skipped'; exceptionFormat 'full'; showStandardStreams=true }
+        afterTest { descriptor, result ->
+            if (result.resultType == TestResult.ResultType.FAILURE) {
+                println '#educational_plugin FAILED + ' + (result.exception?.message ?: '本题断言失败').replace('\n','\n#educational_plugin')
+            }
+        }
+    }
+    tasks.register('unitTest', Test) {
+        description='只运行纯逻辑契约；不能代替真实 MySQL 集成验收'
+        testClassesDirs=sourceSets.test.output.classesDirs; classpath=sourceSets.test.runtimeClasspath
+        useJUnitPlatform { excludeTags 'integration' }
+    }
+    tasks.register('reset', JavaExec) {
+        dependsOn classes; classpath=sourceSets.main.runtimeClasspath; mainClass='labs.Schema'
+        args '--reset-c06-only'
+    }
+    tasks.register('run', JavaExec) {
+        dependsOn classes; classpath=sourceSets.main.runtimeClasspath; mainClass='labs.Usage'
+        systemProperty 'course.root', rootProject.projectDir.absolutePath
+    }
+}
+tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
+tasks.register('unitTest') { dependsOn subprojects.collect { it.tasks.named('unitTest') } }
+tasks.named('check') { dependsOn tasks.named('test') }
+
+// 在各模块源目录配置完成后统一接入可独立发行的镜像台账。
+apply from: 'shared/versions.gradle'

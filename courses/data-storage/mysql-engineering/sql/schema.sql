@@ -1,0 +1,7 @@
+-- 只创建本课专用表，统一 InnoDB、UTC 时刻和整数分金额。
+CREATE TABLE IF NOT EXISTS c06_customer (id BIGINT PRIMARY KEY, tenant_id BIGINT NOT NULL, name VARCHAR(80) NOT NULL) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS c06_orders (id BIGINT PRIMARY KEY, tenant_id BIGINT NOT NULL, request_id VARCHAR(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin NOT NULL, customer_id BIGINT NOT NULL, status VARCHAR(16) NOT NULL, total_cents BIGINT NOT NULL, created_at DATETIME(6) NOT NULL, UNIQUE KEY uq_c06_request(tenant_id,request_id), CONSTRAINT fk_c06_customer FOREIGN KEY(customer_id) REFERENCES c06_customer(id), CONSTRAINT ck_c06_total CHECK(total_cents>=0)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS c06_item (order_id BIGINT NOT NULL, sku BIGINT NOT NULL, quantity INT NOT NULL, unit_cents BIGINT NOT NULL, PRIMARY KEY(order_id,sku), CONSTRAINT fk_c06_order FOREIGN KEY(order_id) REFERENCES c06_orders(id), CONSTRAINT ck_c06_quantity CHECK(quantity>0)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS c06_stock (sku BIGINT PRIMARY KEY, quantity INT NOT NULL, version BIGINT NOT NULL DEFAULT 0, CONSTRAINT ck_c06_stock CHECK(quantity>=0)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS c06_reservation (request_id VARCHAR(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin PRIMARY KEY, sku BIGINT NOT NULL, quantity INT NOT NULL, CONSTRAINT ck_c06_reserve CHECK(quantity>0)) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS c06_recovery (id BIGINT PRIMARY KEY, note VARCHAR(80) NOT NULL) ENGINE=InnoDB;

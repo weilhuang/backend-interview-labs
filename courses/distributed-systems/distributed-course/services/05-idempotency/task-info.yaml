@@ -1,0 +1,46 @@
+type: edu
+custom_name: 05 持久化幂等、租约与重试预算
+files:
+- name: gradle.lockfile
+  visible: true
+- name: integration-test/labs/distributed/MySqlIdempotencyTest.java
+  visible: true
+- name: solutions/labs/distributed/Usage.java
+  visible: true
+- name: solutions/labs/distributed/idempotency/IdempotencyStore.java
+  visible: true
+- name: solutions/labs/distributed/idempotency/RetryBudget.java
+  visible: true
+- name: solutions/labs/distributed/idempotency/TransactionRetry.java
+  visible: true
+- name: src/labs/distributed/Usage.java
+  visible: true
+- name: src/labs/distributed/idempotency/IdempotencyStore.java
+  visible: true
+  placeholders:
+  - offset: 3421
+    length: 1168
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+  - offset: 5322
+    length: 1446
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/idempotency/RetryBudget.java
+  visible: true
+  placeholders:
+  - offset: 1242
+    length: 895
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/idempotency/TransactionRetry.java
+  visible: true
+- name: test/labs/distributed/IdempotencyTest.java
+  visible: true
+- name: test/labs/distributed/RetryTest.java
+  visible: true
+- name: test/labs/distributed/TransactionRetryTest.java
+  visible: true

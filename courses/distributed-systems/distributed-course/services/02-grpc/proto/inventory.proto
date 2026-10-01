@@ -1,0 +1,20 @@
+syntax = "proto3";
+package inventory.v1;
+option java_package = "labs.distributed.grpc.protocol";
+option java_multiple_files = true;
+// 字段编号是兼容契约，删除字段必须保留编号，不能改作其他含义。
+service Inventory {
+  rpc Quote(QuoteRequest) returns (InventoryReply);
+  rpc Reserve(ReserveRequest) returns (InventoryReply);
+  rpc Watch(WatchRequest) returns (stream InventoryReply);
+}
+message QuoteRequest { string sku = 1; reserved 2; }
+message ReserveRequest { string key = 1; string sku = 2; int32 quantity = 3; }
+message WatchRequest { int32 count = 1; }
+message InventoryReply {
+  string sku = 1;
+  int32 available = 2;
+  string trace_id = 3;
+  int64 remaining_millis = 4;
+  string payload = 5;
+}

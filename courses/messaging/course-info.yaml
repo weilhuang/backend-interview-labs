@@ -1,0 +1,48 @@
+type: marketplace
+title: 后端面试实验室：Kafka 与 RocketMQ
+language: Chinese
+summary: 两门消息队列课程十二个实验单元，包含完整源码、调用端、全部测试、每节标准答案、真实容器故障验证与面试追问；Linux真实容器与正反解门禁已通过，Academy界面与归档仍待独立验收，不代表完整V1发布。
+programming_language: Java
+content:
+- kafka
+- rocketmq
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: README.md
+- name: 验证报告.md
+- name: build.gradle
+- name: settings.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: THIRD_PARTY_NOTICES.md
+- name: LICENSE-JetBrains-template
+- name: authoring/source-revisions.json
+- name: authoring/source-evidence.json
+- name: .courseignore
+- name: support/gradle.lockfile
+- name: support/src/labs/messaging/Event.java
+- name: support/src/labs/messaging/FailurePoint.java
+- name: support/src/labs/messaging/Images.java
+- name: support/src/labs/messaging/Inbox.java
+- name: support/src/labs/messaging/KafkaSupport.java
+- name: support/src/labs/messaging/RocketAdminResult.java
+- name: support/src/labs/messaging/RocketClient.java
+- name: support/src/labs/messaging/RocketRuntime.java
+- name: support/src/labs/messaging/RocketSupport.java
+- name: authoring/check_sources.py
+- name: authoring/download_compile_dependencies.py
+- name: authoring/generate_course.py
+- name: authoring/lessons.json
+- name: authoring/manifest.json
+- name: authoring/materialize_course.py
+- name: authoring/maven_read_proxy.py
+- name: authoring/requirements.txt
+- name: authoring/validate_course.py
+- name: authoring/verification-evidence.json
+- name: authoring/verify.py
+yaml_version: 2

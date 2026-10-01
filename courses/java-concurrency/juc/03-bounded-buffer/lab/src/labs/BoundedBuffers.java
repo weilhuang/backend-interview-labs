@@ -1,0 +1,121 @@
+package labs;
+
+import java.util.*;
+import java.util.concurrent.locks.*;
+
+public final class BoundedBuffers {
+    private BoundedBuffers() {}
+
+    public interface Buffer<T> {
+        void put(T value) throws InterruptedException;
+
+        Optional<T> take() throws InterruptedException;
+
+        void close();
+
+        int size();
+    }
+
+    public static final class MonitorBuffer<T> implements Buffer<T> {
+        private final int capacity;
+        private final Deque<T> queue = new ArrayDeque<>();
+        private boolean closed;
+
+        public MonitorBuffer(int capacity) {
+            if (capacity < 1) throw new IllegalArgumentException("容量必须为正");
+            this.capacity = capacity;
+        }
+
+        public synchronized void put(T value) throws InterruptedException {
+            // 答案开始：监视器放入
+            Objects.requireNonNull(value);
+            while (queue.size() == capacity && !closed) wait();
+            if (closed) throw new IllegalStateException("缓冲区已关闭");
+            queue.addLast(value);
+            notifyAll();
+            // 答案结束：监视器放入
+        }
+
+        public synchronized Optional<T> take() throws InterruptedException {
+            // 答案开始：监视器取出
+            while (queue.isEmpty() && !closed) wait();
+            if (queue.isEmpty()) return Optional.empty();
+            T value = queue.removeFirst();
+            notifyAll();
+            return Optional.of(value);
+            // 答案结束：监视器取出
+        }
+
+        public synchronized void close() {
+            closed = true;
+            notifyAll();
+        }
+
+        public synchronized int size() {
+            return queue.size();
+        }
+    }
+
+    public static final class LockBuffer<T> implements Buffer<T> {
+        private final int capacity;
+        private final Deque<T> queue = new ArrayDeque<>();
+        private final ReentrantLock lock = new ReentrantLock();
+        private final Condition notEmpty = lock.newCondition(), notFull = lock.newCondition();
+        private boolean closed;
+
+        public LockBuffer(int capacity) {
+            if (capacity < 1) throw new IllegalArgumentException("容量必须为正");
+            this.capacity = capacity;
+        }
+
+        public void put(T value) throws InterruptedException {
+            // 答案开始：显式锁放入
+            Objects.requireNonNull(value);
+            lock.lockInterruptibly();
+            try {
+                while (queue.size() == capacity && !closed) notFull.await();
+                if (closed) throw new IllegalStateException("缓冲区已关闭");
+                queue.addLast(value);
+                notEmpty.signal();
+            } finally {
+                lock.unlock();
+            }
+            // 答案结束：显式锁放入
+        }
+
+        public Optional<T> take() throws InterruptedException {
+            // 答案开始：显式锁取出
+            lock.lockInterruptibly();
+            try {
+                while (queue.isEmpty() && !closed) notEmpty.await();
+                if (queue.isEmpty()) return Optional.empty();
+                T value = queue.removeFirst();
+                notFull.signal();
+                return Optional.of(value);
+            } finally {
+                lock.unlock();
+            }
+            // 答案结束：显式锁取出
+        }
+
+        public void close() {
+            lock.lock();
+            try {
+                closed = true;
+                notEmpty.signalAll();
+                notFull.signalAll();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        public int size() {
+            lock.lock();
+            try {
+                return queue.size();
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+}

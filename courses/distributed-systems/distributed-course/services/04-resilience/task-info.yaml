@@ -1,0 +1,31 @@
+type: edu
+custom_name: 04 限流、熔断与并发隔离
+files:
+- name: gradle.lockfile
+  visible: true
+- name: solutions/labs/distributed/Lab.java
+  visible: true
+- name: solutions/labs/distributed/Usage.java
+  visible: true
+- name: src/labs/distributed/Lab.java
+  visible: true
+  placeholders:
+  - offset: 1119
+    length: 343
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+  - offset: 2143
+    length: 330
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+  - offset: 3483
+    length: 204
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/Usage.java
+  visible: true
+- name: test/labs/distributed/LabTest.java
+  visible: true

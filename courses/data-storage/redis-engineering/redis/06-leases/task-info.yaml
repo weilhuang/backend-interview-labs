@@ -1,0 +1,19 @@
+type: edu
+custom_name: C07-06 · 分布式租约与fencing
+files:
+- name: src/labs/Leases.java
+  visible: true
+  placeholders:
+  - offset: 1286
+    length: 276
+    placeholder_text: '    throw new UnsupportedOperationException("TODO：按中文步骤实现核心方法");
+
+      '
+- name: src/labs/LeasesUsage.java
+  visible: true
+- name: test/labs/LeasesIntegrationTest.java
+  visible: true
+- name: test/labs/LeasesTest.java
+  visible: true
+- name: solution.md
+  visible: true

@@ -1,0 +1,27 @@
+type: edu
+custom_name: 03 · 泛型、异常与有界栈
+files:
+- name: src/labs/BoundedStack.java
+  visible: true
+  placeholders:
+  - offset: 387
+    length: 156
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
+
+      '
+  - offset: 580
+    length: 56
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
+
+      '
+  - offset: 674
+    length: 56
+    placeholder_text: '        throw new UnsupportedOperationException("TODO: 请实现本方法");
+
+      '
+- name: test/BoundedStackTest.java
+  visible: true
+- name: test/BoundedStackExamplesTest.java
+  visible: true
+- name: src/labs/BoundedStackUsage.java
+  visible: true

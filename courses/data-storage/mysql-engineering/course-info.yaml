@@ -1,0 +1,46 @@
+type: marketplace
+title: C06 MySQL 索引与事务工程
+language: Chinese
+summary: 七单元完整JDBC/MySQL工程：数据模型、索引计划、慢SQL、MVCC、锁与死锁、日志恢复、库存并发；全部测试与标准解公开。
+programming_language: Java
+content:
+- mysql
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: shared/README.md
+- name: shared/versions.env
+- name: shared/versions.env.sha256
+- name: shared/source-manifest.json
+- name: shared/versions.gradle
+- name: shared/src/labs/environment/VersionLedger.java
+- name: .courseignore
+- name: .gitignore
+- name: LICENSE-JetBrains-template
+- name: README.md
+- name: SOURCES.md
+- name: THIRD_PARTY_NOTICES.md
+- name: authoring/materialize_learner.py
+- name: authoring/requirements.txt
+- name: authoring/sync_metadata.py
+- name: authoring/validate_course.py
+- name: authoring/verify_unit.sh
+- name: build.gradle
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: settings.gradle
+- name: sql/migration-v2.sql
+- name: sql/observations.sql
+- name: sql/reset.sql
+- name: sql/schema.sql
+- name: sql/seed.sql
+- name: support/src/labs/Db.java
+- name: support/src/labs/Images.java
+- name: support/src/labs/Schema.java
+- name: support/test/labs/MySqlFixture.java
+- name: 中文阶段报告.md
+yaml_version: 2

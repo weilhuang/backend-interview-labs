@@ -1,0 +1,124 @@
+[
+  {
+    "task": "kafka/01-contract/practice",
+    "module": "kafka-01-contract",
+    "title": "C08-01 日志分区与消费契约",
+    "source_url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/BuiltInPartitioner.java",
+    "source_symbol": "partitionForKey",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "kafka/02-producer/practice",
+    "module": "kafka-02-producer",
+    "title": "C08-02 生产端确认、重试与幂等",
+    "source_url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java",
+    "source_symbol": "completeBatch",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "kafka/03-inbox/practice",
+    "module": "kafka-03-inbox",
+    "title": "C08-03 消费提交与数据库幂等",
+    "source_url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java",
+    "source_symbol": "commitOffsetsSync",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "kafka/04-rebalance/practice",
+    "module": "kafka-04-rebalance",
+    "title": "C08-04 重平衡、所有权与积压",
+    "source_url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/consumer/internals/ConsumerCoordinator.java",
+    "source_symbol": "onJoinPrepare",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "kafka/05-transactions/practice",
+    "module": "kafka-05-transactions",
+    "title": "C08-05 Kafka事务与精确一次边界",
+    "source_url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/TransactionManager.java",
+    "source_symbol": "sendOffsetsToTransaction",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "kafka/06-recovery/practice",
+    "module": "kafka-06-recovery",
+    "title": "C08-06 副本故障、毒消息与恢复评审",
+    "source_url": "https://github.com/apache/kafka/blob/f745dfdcee2b9851204ddbbcd423626ab87294bc/clients/src/main/java/org/apache/kafka/clients/producer/internals/Sender.java",
+    "source_symbol": "handleProduceResponse",
+    "docker_tests": [
+      "BrokerTest.java",
+      "ReplicaTest.java"
+    ]
+  },
+  {
+    "task": "rocketmq/01-routing/practice",
+    "module": "rocketmq-01-routing",
+    "title": "C09-01 消息模型、路由与完整调用",
+    "source_url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/route/RouteActivity.java",
+    "source_symbol": "convertToAddressList",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "rocketmq/02-retry/practice",
+    "module": "rocketmq-02-retry",
+    "title": "C09-02 有界重试、真实重投与隔离队列",
+    "source_url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/broker/src/main/java/org/apache/rocketmq/broker/processor/PopMessageProcessor.java",
+    "source_symbol": "processRequest",
+    "docker_tests": [
+      "BrokerTest.java",
+      "NativeDeadLetterTest.java"
+    ]
+  },
+  {
+    "task": "rocketmq/03-order-delay/practice",
+    "module": "rocketmq-03-order-delay",
+    "title": "C09-03 实体内顺序、延迟投递与迟到事件",
+    "source_url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/producer/SendMessageActivity.java",
+    "source_symbol": "sendMessage",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "rocketmq/04-transactions/practice",
+    "module": "rocketmq-04-transactions",
+    "title": "C09-04 事务消息、本地事务与回查恢复",
+    "source_url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/broker/src/main/java/org/apache/rocketmq/broker/transaction/queue/TransactionalMessageServiceImpl.java",
+    "source_symbol": "check",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "rocketmq/05-storage/practice",
+    "module": "rocketmq-05-storage",
+    "title": "C09-05 存储路径、刷盘确认与故障恢复",
+    "source_url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/CommitLog.java",
+    "source_symbol": "asyncPutMessage",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  },
+  {
+    "task": "rocketmq/06-comparison/practice",
+    "module": "rocketmq-06-comparison",
+    "title": "C09-06 共同契约、恢复证据与选型评审",
+    "source_url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/proxy/src/main/java/org/apache/rocketmq/proxy/grpc/v2/consumer/AckMessageActivity.java",
+    "source_symbol": "ackMessage",
+    "docker_tests": [
+      "BrokerTest.java"
+    ]
+  }
+]

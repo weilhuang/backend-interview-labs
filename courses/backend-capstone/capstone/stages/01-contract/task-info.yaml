@@ -1,0 +1,25 @@
+type: edu
+custom_name: 01 需求、状态机与业务不变量
+files:
+- name: gradle.lockfile
+  visible: true
+- name: src/labs/capstone/OrderRules.java
+  visible: true
+  placeholders:
+  - offset: 255
+    length: 269
+    placeholder_text: '        Exercise.unimplemented();
+
+      '
+  - offset: 903
+    length: 243
+    placeholder_text: '        return Exercise.unimplemented();
+
+      '
+  - offset: 1240
+    length: 156
+    placeholder_text: '        return Exercise.unimplemented();
+
+      '
+- name: test/labs/capstone/ContractTest.java
+  visible: true

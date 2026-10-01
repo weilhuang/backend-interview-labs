@@ -1,0 +1,15 @@
+type: edu
+custom_name: 08 · 虚拟线程：资源约束与事故证据
+files:
+- name: src/labs/VirtualGateway.java
+  visible: true
+  placeholders:
+  - offset: 875
+    length: 1593
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+- name: src/labs/VirtualGatewayUsage.java
+  visible: true
+- name: test/VirtualGatewayTest.java
+  visible: true
+- name: solution/Alternative.java.txt
+  visible: true

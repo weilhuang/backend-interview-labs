@@ -1,0 +1,6 @@
+{
+  "source": "infra/versions.env",
+  "sha256": "633dd50e7da950a0da9ddb86484e11a63b475a82c89688c3a8f2640c24568a4b",
+  "generator": "scripts/sync_course_versions.py",
+  "notice": "自动生成的独立课程快照；修改版本须先改仓库真源，再重新生成。SHA256 用于一致性检查，不是数字签名。"
+}

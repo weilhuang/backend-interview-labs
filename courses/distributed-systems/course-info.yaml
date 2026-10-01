@@ -1,0 +1,52 @@
+type: marketplace
+title: 分布式服务与一致性：RPC、治理与故障恢复
+language: Chinese
+summary: 完整C10八单元，真实gRPC/Dubbo、MySQL持久化幂等、XA/TCC/Saga、Kafka Outbox与Redis缓存；验证边界见中文阶段报告。
+programming_language: Java
+content:
+- distributed-course
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: support/gradle.lockfile
+- name: support/src/labs/distributed/support/Database.java
+- name: support/src/labs/distributed/support/Images.java
+- name: scripts/course.sh
+- name: docs/保证边界与故障矩阵.md
+- name: docs/源码路线.md
+- name: docs/环境与发行.md
+- name: docs/验收摘要.json
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: authoring/build_course.py
+- name: authoring/validate_course.py
+- name: authoring/verify_variants.py
+- name: authoring/materialize_learner.py
+- name: authoring/build_distribution.py
+- name: authoring/requirements.txt
+- name: authoring/manifest.json
+- name: authoring/source-verification.json
+- name: authoring/verify_sources.py
+- name: authoring/regenerate_proto.py
+- name: authoring/tools-lock.json
+- name: authoring/metadata-report.json
+- name: authoring/variants-report.json
+- name: authoring/callers-report.json
+- name: authoring/maven_read_proxy.py
+- name: authoring/prefetch_maven.py
+- name: authoring/resolve_cloud_dependencies.py
+- name: authoring/prefetch_gradle_metadata.py
+- name: authoring/dependency-metadata-evidence.json
+- name: authoring/dependency-lock-verification.json
+- name: authoring/mysql-recovery-fix-verification.json
+- name: README.md
+- name: 中文阶段报告.md
+- name: THIRD_PARTY_NOTICES.md
+- name: LICENSE-JetBrains-template
+- name: build.gradle
+- name: settings.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+yaml_version: 2

@@ -1,0 +1,10 @@
+type: lesson
+custom_name: 框架源码与机制
+content:
+- 08-container-di
+- 09-bean-lifecycle
+- 10-circular-boundary
+- 11-aop-proxy
+- 12-transaction-source
+- 13-mvc-source
+- 14-autoconfiguration

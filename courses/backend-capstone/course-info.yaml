@@ -1,0 +1,86 @@
+type: marketplace
+title: C14后端综合项目：订单库存与可恢复消息
+language: Chinese
+summary: 五阶段独立编码检查点，真实MySQL、Redis、Kafka和gRPC，公开源码、调用方、全部测试、标准答案与中文前端。验收状态见阶段报告。
+programming_language: Java
+content:
+- capstone
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: LICENSE-JetBrains-template
+- name: README.md
+- name: THIRD_PARTY_NOTICES.md
+- name: app/src/main/java/labs/capstone/BootApp.java
+- name: app/src/main/java/labs/capstone/Broker.java
+- name: app/src/main/java/labs/capstone/Config.java
+- name: app/src/main/java/labs/capstone/Database.java
+- name: app/src/main/java/labs/capstone/DeliveryMain.java
+- name: app/src/main/java/labs/capstone/DeliveryRpc.java
+- name: app/src/main/java/labs/capstone/DeliveryStore.java
+- name: app/src/main/java/labs/capstone/Exercise.java
+- name: app/src/main/java/labs/capstone/HealthMain.java
+- name: app/src/main/java/labs/capstone/Json.java
+- name: app/src/main/java/labs/capstone/Model.java
+- name: app/src/main/java/labs/capstone/OrderCache.java
+- name: app/src/main/java/labs/capstone/Runtime.java
+- name: app/src/main/java/labs/capstone/Usage.java
+- name: app/src/main/java/labs/capstone/protocol/DeliveryGrpc.java
+- name: app/src/main/java/labs/capstone/protocol/DeliveryOuterClass.java
+- name: app/src/main/java/labs/capstone/protocol/OrderEvent.java
+- name: app/src/main/java/labs/capstone/protocol/OrderEventOrBuilder.java
+- name: app/src/main/java/labs/capstone/protocol/ProbeRequest.java
+- name: app/src/main/java/labs/capstone/protocol/ProbeRequestOrBuilder.java
+- name: app/src/main/java/labs/capstone/protocol/Receipt.java
+- name: app/src/main/java/labs/capstone/protocol/ReceiptOrBuilder.java
+- name: app/src/main/resources/application.properties
+- name: app/src/main/resources/static/index.html
+- name: authoring/build_lessons.py
+- name: authoring/manifest.json
+- name: authoring/metadata-report.json
+- name: authoring/prepare_export.py
+- name: authoring/register_course.py
+- name: authoring/requirements.txt
+- name: authoring/script-report.json
+- name: authoring/validate_course.py
+- name: authoring/variant-report.json
+- name: authoring/verification-report.json
+- name: authoring/verify_variants.py
+- name: build.gradle
+- name: compose.yaml
+- name: docs/前端使用.md
+- name: docs/故障演练.md
+- name: docs/源码与版本.md
+- name: docs/界面证据/README.md
+- name: docs/界面证据/ci-36746760606-1440px.png
+  is_binary: true
+- name: docs/界面证据/ci-36746760606-390px.png
+  is_binary: true
+- name: docs/界面证据/ci-36746760606-browser-layout.json
+- name: docs/界面证据/ci-36746760606-process-recovery.json
+- name: docs/答辩与盲测标准解.md
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: protocol/delivery.proto
+- name: reference/01-contract/src/labs/capstone/OrderRules.java
+- name: reference/02-reliability/src/labs/capstone/OrderService.java
+- name: reference/03-delivery/src/labs/capstone/DeliveryFlow.java
+- name: reference/04-recovery/src/labs/capstone/RecoveryPolicy.java
+- name: reference/05-defense/src/labs/capstone/Audit.java
+- name: scripts/browser-smoke.mjs
+- name: scripts/check.py
+- name: scripts/course.sh
+- name: scripts/draw-defense.py
+- name: scripts/recovery-check.py
+- name: scripts/test-script-safety.py
+- name: settings.gradle
+- name: shared/integration-test/labs/capstone/RealServices.java
+- name: shared/test/labs/capstone/FastDatabase.java
+- name: shared/versions.env
+- name: shared/versions.sha256
+- name: 中文阶段报告.md
+yaml_version: 2

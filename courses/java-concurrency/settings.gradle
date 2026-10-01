@@ -1,0 +1,10 @@
+rootProject.name = 'java-concurrency'
+file('juc').eachDir { lesson ->
+    lesson.eachDir { task ->
+        if (new File(task, 'task-info.yaml').isFile()) {
+            String module = "juc-${lesson.name}-${task.name}"
+            include(module)
+            project(":${module}").projectDir = task
+        }
+    }
+}

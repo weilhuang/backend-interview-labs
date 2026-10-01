@@ -1,0 +1,376 @@
+{
+  "日期": "2026-09-30",
+  "最新真实CI": {
+    "日期": "2026-09-30",
+    "head_sha": "1fb27d8885bf1eb62b112d2e15f5478becf697fa",
+    "实际PR合并测试提交": "6f93d2e67d532f0ecd9caadefe0a7a8903e371e5",
+    "run": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650",
+    "job": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650/job/109994791367",
+    "artifact": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650/artifacts/11114025074",
+    "artifact_SHA256": "4631d9658735fc7eed43de64623169afd34bc7f8501edea1e5d5349404ae9e8f",
+    "workflow": "success",
+    "独立真实路由冒烟": "success",
+    "完整真实套件": "success",
+    "正反解步骤": "success",
+    "环境": {
+      "OS": "Ubuntu24.04.5 Linux/amd64",
+      "JDK": "Temurin21.0.12.1+1",
+      "Gradle": "8.10.2",
+      "Docker_Engine": "28.0.4",
+      "Compose": "2.38.2",
+      "docker_java_API": "1.44"
+    },
+    "完整Gradle套件": {
+      "JUnit类": 26,
+      "总项数": 44,
+      "快速": 27,
+      "真实服务": 17,
+      "失败": 0,
+      "错误": 0,
+      "跳过": 0,
+      "Kafka": {
+        "快速": 10,
+        "真实": 9
+      },
+      "RocketMQ": {
+        "快速": 17,
+        "真实": 8
+      },
+      "Gradle任务": 38,
+      "计数边界": "完整套件去重计数，不累加独立路由冒烟或正反解重复运行"
+    },
+    "正反解": {
+      "严格编译单元": 12,
+      "作者解单元": 12,
+      "空解可编译且被拒绝": 12,
+      "固定错解可编译且被拒绝": 12,
+      "恢复作者解单元": 12,
+      "恢复后快速测试": 27,
+      "说明": "artifact的verification/report.json里Docker动态未运行仅指verify.py本身；真实Docker已由前序withDocker步骤执行"
+    },
+    "存储恢复": {
+      "testcase": "同步刷盘配置下容器重启保留已确认消息()",
+      "time_seconds": 91.623,
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "发送确认后物理写入上界": 1887,
+      "直接目录文件": [
+        "00000000000000000000",
+        "00000000001073741824"
+      ],
+      "必须保留的已写原段": [
+        "00000000000000000000"
+      ],
+      "重启前协议端点": "localhost:32801",
+      "重启后协议端点": "localhost:32802",
+      "恢复物理上界": 1887,
+      "完整原事件": {
+        "id": "disk1",
+        "order": "o1",
+        "sequence": 1,
+        "cents": 100
+      },
+      "断言": [
+        "原已写段test -s返回0",
+        "重建消费者收到完整Event(disk1,o1,1,100)",
+        "Lab.missing为空",
+        "ack完成"
+      ],
+      "断言证据": "未跳过JUnit testcase通过，并核对该head完整BrokerTest；原始日志未单独打印事件正文，不以位点单独推断恢复",
+      "固定源码": "https://github.com/weilhuang/backend-interview-labs/blob/1fb27d8885bf1eb62b112d2e15f5478becf697fa/courses/messaging/rocketmq/05-storage/practice/test/BrokerTest.java",
+      "源码Git_blob_SHA": "6614f71e9de01f3b2dad92446e6912489a792dad",
+      "日志注意": "RocketMQ夹具失败：清理前快照是当前统一诊断前缀；JUnit及步骤均成功，不能仅按该字符串判失败"
+    },
+    "JUnit逐类记录": [
+      {
+        "path": "kafka/01-contract/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/01-contract/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/02-producer/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/02-producer/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/03-inbox/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/03-inbox/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/04-rebalance/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/04-rebalance/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/05-transactions/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/05-transactions/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/06-recovery/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/06-recovery/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "kafka/06-recovery/practice/build/test-results/test/TEST-ReplicaTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/01-routing/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/01-routing/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/02-retry/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/02-retry/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/02-retry/practice/build/test-results/test/TEST-NativeDeadLetterTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/03-order-delay/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/03-order-delay/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/04-transactions/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/04-transactions/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/05-storage/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/05-storage/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/06-comparison/practice/build/test-results/test/TEST-BrokerTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "path": "rocketmq/06-comparison/practice/build/test-results/test/TEST-LabTest.xml",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "仍未验收": [
+      "本包Academy IDE预览/Check/Reset/官方导出/干净导入/试学",
+      "Mac与其他架构",
+      "任意故障零丢失或多副本容灾",
+      "完整V1发布"
+    ]
+  },
+  "JDK": "Temurin21.0.12.1+1",
+  "真实Gradle": "8.10.2",
+  "无Docker测试": 27,
+  "失败": 0,
+  "分课单元数": {
+    "Kafka": 6,
+    "RocketMQ": 6
+  },
+  "Java文件": {
+    "课内": 50,
+    "公共支持": 9
+  },
+  "源码HTTP核对": 12,
+  "真实Docker": "GitHub CI run36746760650全套success：44项=27快测+17真实服务，失败/错误/跳过均为0；真实存储重启与原事件恢复通过",
+  "Academy界面": "未运行",
+  "课程归档": "未声称官方导出通过",
+  "标识符修复": {
+    "范围": "Inbox四列及RocketMQ本地事务两列，共六个事件/订单身份主键",
+    "MySQL类型": "VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_bin",
+    "旧表": "检测错误排序规则后失败，不迁移或删除原数据",
+    "新增真实MySQL回归": 3,
+    "严格21编译": "全部源代码及真实MySQL测试通过",
+    "快速单元/空解/错解": "最新run36746760650十二单元完整再次通过，27项快测、12空解拒绝、12错解拒绝与恢复回归",
+    "Docker实际执行": "run36746760650真实MySQL回归已通过；H2仍不作为排序规则证明"
+  },
+  "RocketMQ存储预分配修复": {
+    "修复基线": "bddc80e88b8843d12f2d391c2249e89340c72c6e",
+    "运行": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583",
+    "作业": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583/job/109973521221",
+    "原始JUnit": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36740557583/artifacts/11110966359",
+    "artifact_SHA256": "f12f4d631492115deb0c90ec665e3c0d3f7f82becc5fbd646aa65531b2acf3b5",
+    "实际测试计数": {
+      "全部": 41,
+      "快速单测": 24,
+      "真实服务": 17,
+      "通过": 40,
+      "失败": 1,
+      "失败单元": "rocketmq-05-storage"
+    },
+    "真实通过范围": [
+      "Kafka六节及MySQL身份排序回归",
+      "RocketMQ真实QueryRoute和双消费组收发",
+      "未确认重投与原生DLQ",
+      "FIFO/延迟",
+      "事务真实回查、独立回滚不可见与控制提交、MySQL幂等",
+      "双broker对照"
+    ],
+    "失败原始证据": [
+      "发送后find列出起始位点0及1073741824两段",
+      "重启协议成功且随机宿主端口32802→32803",
+      "store.log恢复物理上界1889，正常truncate删除1073741824未使用预分配段",
+      "原已写0段存留检查通过；下一预分配段检查失败；后续disk1恢复断言未执行"
+    ],
+    "固定源码": [
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/MappedFileQueue.java#L344-L356",
+        "结论": "当前与下一段分别提交预分配"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/AllocateMappedFileService.java#L53-L96",
+        "结论": "创建nextNextReq时就排队分配下一段"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/CommitLog.java#L324-L405",
+        "结论": "正常恢复按有效记录末尾截断"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/MappedFileQueue.java#L193-L211",
+        "结论": "物理上界之后的预分配段被destroy"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/DefaultMessageStore.java#L1142-L1149",
+        "结论": "brokerStatus的commitLogMaxOffset来源为getMaxPhyOffset"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/store/src/main/java/org/apache/rocketmq/store/MappedFileQueue.java#L445-L451",
+        "结论": "已写上界=最后已挂载段起始位点+getReadPosition"
+      },
+      {
+        "url": "https://github.com/apache/rocketmq/blob/2baaf044ea9b12a73a89433242b7b7c56a1b89c2/tools/src/main/java/org/apache/rocketmq/tools/command/broker/BrokerStatusSubCommand.java",
+        "结论": "官方工具输出key: value数据行"
+      }
+    ],
+    "修复合同": "send确认后快照物理已写上界，直接目录中起始位点严格小于上界的非空20位原段重启后逐一保留；完整disk1事件、缺失集和ack保持；不要求未写入预分配段存留",
+    "本地验证": {
+      "严格JDK21": "全部课程、支持代码及真实服务测试编译通过",
+      "作者与学生回归": "12节作者单测、12空解拒绝、12固定错解拒绝、恢复作者解回归通过",
+      "真实Gradle8.10.2": "全12节27项无Docker测试通过，38任务成功",
+      "存储新增回归": 3,
+      "新增错误变体": "将物理边界<改<=、无条件包含预分配段，两者均可编译且被同一公开LabTest拒绝",
+      "独立RocketMQ作者项目": "首次独立项目真实Gradle17项无Docker测试、20任务成功；补清单后的v2与首次运行47项Java源码/构建配置/依赖锁/共享镜像台账SHA256逐字节相同，精确复用首次运行证据；v2全部9个support源码登记及6节静态检查通过，故意遗漏RocketRuntime的负例被拒绝",
+      "格式与元数据": "4个变更Java的google-java-format检查通过；12节源码/答案/可见文件/UTF-16占位通过；本节由正式生成器从lessons.json重建",
+      "证据目录": "build/storage-written-check",
+      "Docker和IDE边界": "本地未运行真实Docker；本轮未执行Academy预览/导出/干净导入，独立源码项目不冒充官方归档",
+      "打包遗漏门禁": "validate_course新增support/src全量Java必须登记于additional_files约束，避免源码根编译掩盖Academy归档缺依赖",
+      "重复本机构建": "v2重复Gradle因云端资源与操作延迟未完成，已只对本任务会话发中断并确认退出130；未将其标为成功；运行输入等价摘要见standalone-runtime-equivalence.json"
+    },
+    "新真实CI": "run36746760650/head1fb27d8885bf1eb62b112d2e15f5478becf697fa完整success；详细实证见最新真实CI字段；前述失败与本地中断仅为历史"
+  }
+}

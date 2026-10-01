@@ -1,0 +1,17 @@
+type: edu
+custom_name: 05 盲测变体、库存审计与2/5/15分钟答辩
+files:
+- name: gradle.lockfile
+  visible: true
+- name: integration-test/labs/capstone/DefenseIntegrationTest.java
+  visible: true
+- name: src/labs/capstone/Audit.java
+  visible: true
+  placeholders:
+  - offset: 399
+    length: 1974
+    placeholder_text: '        return Exercise.unimplemented();
+
+      '
+- name: test/labs/capstone/AuditTest.java
+  visible: true

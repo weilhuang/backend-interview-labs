@@ -1,0 +1,18 @@
+type: edu
+custom_name: 07 · 异步聚合：截止时间、降级、隔离与上下文
+files:
+- name: src/labs/AsyncGateway.java
+  visible: true
+  placeholders:
+  - offset: 1248
+    length: 959
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 2804
+    length: 1078
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+- name: src/labs/AsyncGatewayUsage.java
+  visible: true
+- name: test/AsyncGatewayTest.java
+  visible: true
+- name: solution/Alternative.java.txt
+  visible: true

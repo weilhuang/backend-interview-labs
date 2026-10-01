@@ -1,0 +1,8 @@
+rootProject.name = 'redis-engineering'
+include 'support'
+file('redis').eachDir { unit ->
+    if (new File(unit, 'task-info.yaml').isFile()) {
+        include("redis:${unit.name}")
+        project(":redis:${unit.name}").projectDir = unit
+    }
+}

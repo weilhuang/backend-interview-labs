@@ -1,0 +1,18 @@
+type: edu
+custom_name: 01 · JMM：安全发布与复合原子性
+files:
+- name: src/labs/PublicationLab.java
+  visible: true
+  placeholders:
+  - offset: 569
+    length: 57
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+  - offset: 761
+    length: 42
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：请实现本段契约");'
+- name: src/labs/PublicationLabUsage.java
+  visible: true
+- name: test/PublicationLabTest.java
+  visible: true
+- name: solution/Alternative.java.txt
+  visible: true

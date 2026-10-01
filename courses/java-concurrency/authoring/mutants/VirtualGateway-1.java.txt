@@ -1,0 +1,81 @@
+package labs;
+
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public final class VirtualGateway implements AutoCloseable {
+    private final ExecutorService executor =
+            Executors.newCachedThreadPool(r -> Thread.ofPlatform().daemon().unstarted(r));
+    private final Semaphore downstream, admission;
+    private final Set<FutureTask<?>> active = ConcurrentHashMap.newKeySet();
+
+    public VirtualGateway(int concurrency, int acceptedLimit) {
+        if (concurrency < 1
+                || concurrency > 16
+                || acceptedLimit < concurrency
+                || acceptedLimit > 64)
+            throw new IllegalArgumentException("实验限制为1到16个下游并发、最多64个受理任务");
+        downstream = new Semaphore(concurrency);
+        admission = new Semaphore(acceptedLimit);
+    }
+
+    public <T> Future<T> submit(Callable<T> action) {
+        // 答案开始：资源受限的虚拟线程任务
+        Objects.requireNonNull(action);
+        if (!admission.tryAcquire()) throw new RejectedExecutionException("受理上限已满");
+        FutureTask<T> task =
+                new FutureTask<>(
+                        () -> {
+                            downstream.acquire();
+                            try {
+                                return action.call();
+                            } finally {
+                                downstream.release();
+                            }
+                        }) {
+                    // 0=尚未启动，1=run正在执行，2=实际结束或在启动前取消。
+                    private final AtomicInteger phase = new AtomicInteger();
+
+                    private void releaseAdmission() {
+                        active.remove(this);
+                        admission.release();
+                    }
+
+                    public void run() {
+                        if (!phase.compareAndSet(0, 1)) return;
+                        try {
+                            super.run();
+                        } finally {
+                            phase.set(2);
+                            releaseAdmission();
+                        }
+                    }
+
+                    protected void done() {
+                        // 运行中取消只结束Future；许可必须等真正的run退出才归还。
+                        if (phase.compareAndSet(0, 2)) releaseAdmission();
+                    }
+                };
+        active.add(task);
+        try {
+            executor.execute(task);
+        } catch (RuntimeException rejected) {
+            task.cancel(false);
+            throw rejected;
+        }
+        return task;
+        // 答案结束：资源受限的虚拟线程任务
+    }
+
+    public int availableDownstream() {
+        return downstream.availablePermits();
+    }
+
+    public void close() throws InterruptedException {
+        for (var task : active) task.cancel(true);
+        executor.shutdownNow();
+        if (!executor.awaitTermination(2, TimeUnit.SECONDS))
+            throw new IllegalStateException("有任务未响应取消，请检查外部I/O超时");
+    }
+}

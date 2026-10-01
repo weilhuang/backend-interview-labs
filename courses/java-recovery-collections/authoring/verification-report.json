@@ -1,0 +1,383 @@
+{
+  "metadata": "passed",
+  "compiler": [
+    "javac"
+  ],
+  "compiler_flags": [
+    "--release",
+    "21"
+  ],
+  "jdk21_release_verified": true,
+  "junit_console_sha256": "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc",
+  "gradle": {
+    "status": "passed_in_github_actions",
+    "head_sha": "7ac4413f8d1bf591dc4f6a64b85e7b95c293b473",
+    "run_id": 36708242272,
+    "job_id": 109863541871,
+    "url": "https://github.com/weilhuang/backend-interview-labs/actions/runs/36708242272",
+    "verified_workflow_status": "completed",
+    "verified_workflow_conclusion": "success",
+    "jdk": "21",
+    "compiler_release": 21,
+    "local_environment_attempt": {
+      "status": "blocked_before_build",
+      "error": "java.net.SocketException: Network is unreachable",
+      "stage": "官方Gradle8.10.2分发包下载；构建与测试尚未执行",
+      "retry_scope": "默认网络、环境代理和允许的升级尝试均失败，未修改构建源"
+    },
+    "local_run_smoke": {
+      "status": "passed",
+      "distribution": "Gradle 8.10.2 官方ZIP，SHA-256匹配Wrapper配置",
+      "jdk": "Temurin21.0.12.1+1",
+      "mode": "offline",
+      "run_tasks": 12,
+      "build_result": "BUILD SUCCESSFUL",
+      "actionable_tasks": 24
+    },
+    "local_offline_test": {
+      "status": "blocked_dependency_cache",
+      "detail": "未缓存JUnit BOM5.11.4；不影响已通过的严格独立验证与真实CI"
+    }
+  },
+  "idea_academy": "未由本验证器执行，独立IDE检查仍待记录",
+  "tasks": [
+    {
+      "task": "java-pilot/01-recovery/01-money-total",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/01-recovery/02-parse-ids",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/01-recovery/03-bounded-stack",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/04-stable-dedup",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 1,
+          "failed": 4
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/05-map-key",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 1,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/06-top-words",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 5,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/07-snapshot",
+      "unmodified_learner": {
+        "found": 6,
+        "successful": 0,
+        "failed": 6
+      },
+      "mutants": [
+        {
+          "found": 6,
+          "successful": 4,
+          "failed": 2
+        }
+      ],
+      "alternative_correct": {
+        "found": 6,
+        "successful": 6,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/02-collections/08-safe-removal",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 2,
+          "failed": 3
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/03-internals/09-mini-array-list",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/03-internals/10-hash-index",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/04-capstone/11-lru-cache",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 0,
+        "failed": 5
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 4,
+          "failed": 1
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    },
+    {
+      "task": "java-pilot/04-capstone/12-recent-ids",
+      "unmodified_learner": {
+        "found": 5,
+        "successful": 1,
+        "failed": 4
+      },
+      "mutants": [
+        {
+          "found": 5,
+          "successful": 3,
+          "failed": 2
+        }
+      ],
+      "alternative_correct": {
+        "found": 5,
+        "successful": 5,
+        "failed": 0
+      }
+    }
+  ],
+  "reference": {
+    "found": 65,
+    "successful": 65,
+    "failed": 0
+  },
+  "caller_usage": [
+    {
+      "class": "PaidTotalsUsage",
+      "status": "passed",
+      "stdout": "已付款总额（分）=200\n"
+    },
+    {
+      "class": "IdParserUsage",
+      "status": "passed",
+      "stdout": "解析后的 ID=[3, 1, 2]\n"
+    },
+    {
+      "class": "BoundedStackUsage",
+      "status": "passed",
+      "stdout": "查看栈顶=Optional[b]\n弹出栈顶=Optional[b]\n剩余数量=1\n"
+    },
+    {
+      "class": "StableDedupUsage",
+      "status": "passed",
+      "stdout": "去重结果=[z, a, null]\n原始列表=[z, a, null, a, z]\n"
+    },
+    {
+      "class": "TenantKeyUsage",
+      "status": "passed",
+      "stdout": "查到用户=用户甲\n条目数量=1\n"
+    },
+    {
+      "class": "TopWordsUsage",
+      "status": "passed",
+      "stdout": "词=a，次数=2\n词=b，次数=2\n"
+    },
+    {
+      "class": "SnapshotsUsage",
+      "status": "passed",
+      "stdout": "原列表=[]\n结构快照=[a, b]\n"
+    },
+    {
+      "class": "SafeRemovalUsage",
+      "status": "passed",
+      "stdout": "删除数量=3\n剩余元素=[0, 3]\n"
+    },
+    {
+      "class": "IntVectorUsage",
+      "status": "passed",
+      "stdout": "删除值=2\n首项=1\n有效元素=4\n容量=8\n"
+    },
+    {
+      "class": "HashIndexUsage",
+      "status": "passed",
+      "stdout": "扰动后=65537\n桶索引=1\n"
+    },
+    {
+      "class": "LruCacheUsage",
+      "status": "passed",
+      "stdout": "从最旧到最新=[a, c]\n读取已淘汰键=Optional.empty\n"
+    },
+    {
+      "class": "RecentIdsUsage",
+      "status": "passed",
+      "stdout": "接受结果=[true, true, false, true, true]\n最终窗口=[c, a]\n"
+    }
+  ],
+  "timeout_probe": {
+    "found": 1,
+    "successful": 0,
+    "failed": 1
+  },
+  "alternative_correct_implementations_passed": 12,
+  "status": "passed",
+  "untouched_learner_tasks_rejected": 12,
+  "mutants_rejected": 12,
+  "checked_date_utc": "2026-09-30",
+  "runtime": "Eclipse Temurin 21.0.12.1+1-LTS",
+  "compiler_note": "已使用完整JDK21的javac与--release21严格编译；不是source/target降级结果。",
+  "content_visibility": {
+    "all_24_test_files_visible": true,
+    "standard_answers_in_all_12_task_descriptions": true,
+    "readme_in_additional_files": true,
+    "answer_unlock_or_collapse_required": false
+  },
+  "learner_copy": {
+    "implementation_files": 12,
+    "caller_files": 12,
+    "todo_placeholders": 20,
+    "public_standard_answers": 12,
+    "all_tests_visible": true,
+    "java_files_compiled_with_release21": 48,
+    "academy_course_root_or_archive": false
+  },
+  "chinese_comment_audit": {
+    "self_authored_java_comments": "passed",
+    "upstream_wrapper_and_license": "保留上游原文"
+  }
+}

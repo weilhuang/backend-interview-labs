@@ -1,0 +1,59 @@
+type: edu
+custom_name: 02 gRPC真实网络、截止与流控
+files:
+- name: gradle.lockfile
+  visible: true
+- name: proto/inventory.proto
+  visible: true
+- name: solutions/labs/distributed/Usage.java
+  visible: true
+- name: solutions/labs/distributed/grpc/Lab.java
+  visible: true
+- name: solutions/labs/distributed/grpc/RpcFailureObserver.java
+  visible: true
+- name: src/labs/distributed/Usage.java
+  visible: true
+- name: src/labs/distributed/grpc/Lab.java
+  visible: true
+  placeholders:
+  - offset: 1148
+    length: 380
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+  - offset: 2865
+    length: 502
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+  - offset: 4774
+    length: 428
+    placeholder_text: '        throw new UnsupportedOperationException("请按本步骤合同完成实现");
+
+      '
+- name: src/labs/distributed/grpc/RpcFailureObserver.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/InventoryGrpc.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/InventoryOuterClass.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/InventoryReply.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/InventoryReplyOrBuilder.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/QuoteRequest.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/QuoteRequestOrBuilder.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/ReserveRequest.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/ReserveRequestOrBuilder.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/WatchRequest.java
+  visible: true
+- name: src/labs/distributed/grpc/protocol/WatchRequestOrBuilder.java
+  visible: true
+- name: test/labs/distributed/GrpcTest.java
+  visible: true
+- name: test/labs/distributed/RpcFailureObserverTest.java
+  visible: true

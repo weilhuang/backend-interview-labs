@@ -1,0 +1,307 @@
+{
+  "source": "https://repo.maven.apache.org/maven2/",
+  "notice": "官方 POM 与 .module 原始字节；没有关闭 TLS、改写 POM 或禁用依赖锁。404 表示该固定坐标没有发布相应文件。",
+  "files": [
+    {
+      "path": "com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.pom",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.pom",
+      "sha256": "46d56b77e4547fa47d22ae44bc95e0c30efa2855b9eaab19f5349fbfe4c064ca",
+      "bytes": 6080,
+      "status": 200
+    },
+    {
+      "path": "com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.module",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.13.5/jackson-annotations-2.13.5.module",
+      "sha256": "5754476cdbfe1dce701ff41443b1474122fee5310780c9d16c4a0afef973bd94",
+      "bytes": 2523,
+      "status": 200
+    },
+    {
+      "path": "com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.pom",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.pom",
+      "sha256": "ad91ab6025eb48ae3262280c42efebb57b70d25c00ab0a69c5a3c7ca3a8078ee",
+      "bytes": 6517,
+      "status": 200
+    },
+    {
+      "path": "com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.module",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.13.5/jackson-core-2.13.5.module",
+      "sha256": "6266e6048af797bbeb46e5b1f1b9a383238d5928d40ff1318199045201ac32d9",
+      "bytes": 2492,
+      "status": 200
+    },
+    {
+      "path": "com/fasterxml/jackson/core/jackson-databind/2.13.5/jackson-databind-2.13.5.pom",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.13.5/jackson-databind-2.13.5.pom",
+      "sha256": "ae1a04d57790eaeb062a1fa22063ab68cec90a030b73de2d89ab0521f24656be",
+      "bytes": 17967,
+      "status": 200
+    },
+    {
+      "path": "com/fasterxml/jackson/core/jackson-databind/2.13.5/jackson-databind-2.13.5.module",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.13.5/jackson-databind-2.13.5.module",
+      "sha256": "1d0ce09d6a34e4c688980a5b6e3a7fc4aae114589df44a9aec97f6111ad85df2",
+      "bytes": 3226,
+      "status": 200
+    },
+    {
+      "path": "com/google/guava/guava/33.3.1-android/guava-33.3.1-android.pom",
+      "url": "https://repo.maven.apache.org/maven2/com/google/guava/guava/33.3.1-android/guava-33.3.1-android.pom",
+      "sha256": "c728db6f2705ca3ea6a3cf2cf1260dbeff3a4524249a1b1b900edcfe9d72142f",
+      "bytes": 9321,
+      "status": 200
+    },
+    {
+      "path": "com/google/guava/guava/33.3.1-android/guava-33.3.1-android.module",
+      "url": "https://repo.maven.apache.org/maven2/com/google/guava/guava/33.3.1-android/guava-33.3.1-android.module",
+      "sha256": "6971614ddeee003e54d2b69c6b0c94ce8a5b5eba980d16455c81df9089a7acb7",
+      "bytes": 7867,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-bulkhead/2.3.0/resilience4j-bulkhead-2.3.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-bulkhead/2.3.0/resilience4j-bulkhead-2.3.0.pom",
+      "sha256": "34c7ac4670d59478c56721af5d88714ef4bec891f0eac9cd8871d147e3d2e03c",
+      "bytes": 2341,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-bulkhead/2.3.0/resilience4j-bulkhead-2.3.0.module",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-bulkhead/2.3.0/resilience4j-bulkhead-2.3.0.module",
+      "sha256": "b39d625827f58e55eb6517301ca690b69a64999db4958f14bc4584db0497c36f",
+      "bytes": 2519,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-circuitbreaker/2.3.0/resilience4j-circuitbreaker-2.3.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-circuitbreaker/2.3.0/resilience4j-circuitbreaker-2.3.0.pom",
+      "sha256": "6bec8c995d2620ba81ad14a742cb1fec96ab087d659bf4dc1eadfcaf1b594494",
+      "bytes": 2347,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-circuitbreaker/2.3.0/resilience4j-circuitbreaker-2.3.0.module",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-circuitbreaker/2.3.0/resilience4j-circuitbreaker-2.3.0.module",
+      "sha256": "b19c3bd34c7b3247a39680cdebf3a5933e501bfc7e04869e2a02850e60d151ef",
+      "bytes": 2549,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-core/2.3.0/resilience4j-core-2.3.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-core/2.3.0/resilience4j-core-2.3.0.pom",
+      "sha256": "6ff0d3c03688346d504b35602348b5fb8f44676329f3f56ab73d44cb9f501515",
+      "bytes": 2336,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-core/2.3.0/resilience4j-core-2.3.0.module",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-core/2.3.0/resilience4j-core-2.3.0.module",
+      "sha256": "b15cb38bfd7c71c002339cebe1535505572e31543a32f4835b2bd729797b5f11",
+      "bytes": 2711,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-ratelimiter/2.3.0/resilience4j-ratelimiter-2.3.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-ratelimiter/2.3.0/resilience4j-ratelimiter-2.3.0.pom",
+      "sha256": "c6af4e9f066ae1b628ba106bf992f1a8270b2182bc5332db164e3a5b16df9436",
+      "bytes": 2344,
+      "status": 200
+    },
+    {
+      "path": "io/github/resilience4j/resilience4j-ratelimiter/2.3.0/resilience4j-ratelimiter-2.3.0.module",
+      "url": "https://repo.maven.apache.org/maven2/io/github/resilience4j/resilience4j-ratelimiter/2.3.0/resilience4j-ratelimiter-2.3.0.module",
+      "sha256": "2f1d8f4acdf0c04c045374c2270f3e1ee2f6043050f4c82de7c0936310b57f7b",
+      "bytes": 2534,
+      "status": 200
+    },
+    {
+      "path": "io/perfmark/perfmark-api/0.27.0/perfmark-api-0.27.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/io/perfmark/perfmark-api/0.27.0/perfmark-api-0.27.0.pom",
+      "sha256": "22c175c2c1823667630c84e73225767f5970492d8e6cbffb81a6575dba472d26",
+      "bytes": 1485,
+      "status": 200
+    },
+    {
+      "path": "io/perfmark/perfmark-api/0.27.0/perfmark-api-0.27.0.module",
+      "url": "https://repo.maven.apache.org/maven2/io/perfmark/perfmark-api/0.27.0/perfmark-api-0.27.0.module",
+      "sha256": "9f6c4e6a62b8defd14173acdb7db293d086353b224923eef6293f58161893cca",
+      "bytes": 1896,
+      "status": 200
+    },
+    {
+      "path": "org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.pom",
+      "sha256": "32355081d109095c3d5d374d5a43b4f4c1b75d549e983ef50723e2772e5302a0",
+      "bytes": 1526,
+      "status": 200
+    },
+    {
+      "path": "org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.module",
+      "url": "https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.module",
+      "sha256": "e08028131375b357d1d28734e9a4fb4216da84b240641cb3ef7e7c7d628223fc",
+      "bytes": 3504,
+      "status": 200
+    },
+    {
+      "path": "org/checkerframework/checker-qual/3.33.0/checker-qual-3.33.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/3.33.0/checker-qual-3.33.0.pom",
+      "sha256": "f55a922027a78fdd8b3ea15a0d8bfe3fec6a5ceac30c86aa8afa4a5b9b0df603",
+      "bytes": 2096,
+      "status": 200
+    },
+    {
+      "path": "org/checkerframework/checker-qual/3.33.0/checker-qual-3.33.0.module",
+      "url": "https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/3.33.0/checker-qual-3.33.0.module",
+      "sha256": "e8521d75625d41272c767d262a153ac163cc505b66644a2ef705fa8949ffb4e5",
+      "bytes": 3499,
+      "status": 200
+    },
+    {
+      "path": "org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.pom",
+      "sha256": "9313bf53b3efd8aaca266eea8b96e307976b65c0b16510cc6f02319fbaebed43",
+      "bytes": 2096,
+      "status": 200
+    },
+    {
+      "path": "org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.module",
+      "url": "https://repo.maven.apache.org/maven2/org/checkerframework/checker-qual/3.43.0/checker-qual-3.43.0.module",
+      "sha256": "f8163327245ab8625532948c72a930548cd97f34d6c3fe860fa6aec5a34d79b4",
+      "bytes": 3498,
+      "status": 200
+    },
+    {
+      "path": "org/junit/junit-bom/5.11.4/junit-bom-5.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/junit-bom/5.11.4/junit-bom-5.11.4.pom",
+      "sha256": "19d4b747b204805325b6334553296f986562277a4ac1cb5e593a5e4c4f5e4115",
+      "bytes": 5649,
+      "status": 200
+    },
+    {
+      "path": "org/junit/junit-bom/5.11.4/junit-bom-5.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/junit-bom/5.11.4/junit-bom-5.11.4.module",
+      "sha256": "a9a4f27be94e99b9d570162d246a80f686d277d5d31aeb5481047cf51daf46e4",
+      "bytes": 6993,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.pom",
+      "sha256": "a862df11ee539982efcb141d9c0ade7037bba0265d0b589d5fb84db0d212f1d9",
+      "bytes": 3205,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter/5.11.4/junit-jupiter-5.11.4.module",
+      "sha256": "a3c353ed7516ae1835eab95a087f4f09a5b0cc7d0b8b039fe77a039b8ab52103",
+      "bytes": 4978,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.pom",
+      "sha256": "512d23ff39c76665a1a3645526230bcf889bd49884304f7febe047b018eeb339",
+      "bytes": 3184,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-api/5.11.4/junit-jupiter-api-5.11.4.module",
+      "sha256": "a6ea2fefb3aa5868fd7a780ae1da1162e76dda3760b48015c2a419d2372ff3cb",
+      "bytes": 5212,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.pom",
+      "sha256": "b0a323b0d03444441d13d4630b40db5ef84160d2c2f585d4d646dc3882f99207",
+      "bytes": 3203,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-engine/5.11.4/junit-jupiter-engine-5.11.4.module",
+      "sha256": "db91163a8af005a32798565dd67537725189590deab6da03b31dbdda45686a18",
+      "bytes": 5259,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.pom",
+      "sha256": "8c359bbea07c64a6acdd8c1e13b4f77058b2432b35e86e9a95ddc63249a0ad54",
+      "bytes": 3010,
+      "status": 200
+    },
+    {
+      "path": "org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-params/5.11.4/junit-jupiter-params-5.11.4.module",
+      "sha256": "58865b8b4b998b9ab19c13f8e413b7e1d4819374dd5df69760c4c0b0bc4e9895",
+      "bytes": 5705,
+      "status": 200
+    },
+    {
+      "path": "org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.pom",
+      "sha256": "cd12d2b7c242f165548ed9c9406160dcedb6080925b47cf731e0fdae5fb4bce2",
+      "bytes": 2833,
+      "status": 200
+    },
+    {
+      "path": "org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-commons/1.11.4/junit-platform-commons-1.11.4.module",
+      "sha256": "0b9e2625c8f468b3cd4132cc0a805f89fe41f852d1adfff75f3eb1465ca1cb6b",
+      "bytes": 4373,
+      "status": 200
+    },
+    {
+      "path": "org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.pom",
+      "sha256": "943471579984212fbe69d03edec7c2ff4fbab1888be0b80c265ea70869fd8abd",
+      "bytes": 3205,
+      "status": 200
+    },
+    {
+      "path": "org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-engine/1.11.4/junit-platform-engine-1.11.4.module",
+      "sha256": "bf6ce1fb5951dc6c7de36adeef6aeaf78ef82d63831c5ccebce388da9fc5fe25",
+      "bytes": 5035,
+      "status": 200
+    },
+    {
+      "path": "org/junit/platform/junit-platform-launcher/1.11.4/junit-platform-launcher-1.11.4.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-launcher/1.11.4/junit-platform-launcher-1.11.4.pom",
+      "sha256": "b67cd53802e06aa82aa5966e99fb42917d220457849e5c080c8360753ed67c31",
+      "bytes": 3029,
+      "status": 200
+    },
+    {
+      "path": "org/junit/platform/junit-platform-launcher/1.11.4/junit-platform-launcher-1.11.4.module",
+      "url": "https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-launcher/1.11.4/junit-platform-launcher-1.11.4.module",
+      "sha256": "60c4533209ba587b1cda7d72c087f351a3231f9b91c94f3f76394b0e22341cc4",
+      "bytes": 4733,
+      "status": 200
+    },
+    {
+      "path": "org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.pom",
+      "url": "https://repo.maven.apache.org/maven2/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.pom",
+      "sha256": "9bf7cffc410f3e8372c2522578df9ca56d9d43bd937e30948706c232a943b355",
+      "bytes": 2035,
+      "status": 200
+    },
+    {
+      "path": "org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.module",
+      "url": "https://repo.maven.apache.org/maven2/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.module",
+      "sha256": "48bf1d6c8b5dc94f74652bd17900f654deb714350248cf5e8fca27b9090c8e0d",
+      "bytes": 3461,
+      "status": 200
+    },
+    {
+      "path": "com/fasterxml/jackson/jackson-bom/2.13.5/jackson-bom-2.13.5.pom",
+      "url": "https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-bom/2.13.5/jackson-bom-2.13.5.pom",
+      "sha256": "0a26b6f34ab93f9cfa80179888c6bf425f1c17dcd9c11db6561393930fdb746a",
+      "bytes": 17361,
+      "status": 200
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+type: marketplace
+title: Java后端面试实验室：编码恢复与集合完整课程
+language: Chinese
+summary: C00/C01完整16单元，JDK21主线；完整项目与公开测试、直接可读标准解、真实JDK源码观察、算法与订单CLI、索引查询和JMH。作者正确性验收与Academy发布验收分别记录。
+programming_language: Java
+content:
+- c00
+- c01
+environment_settings:
+  jvm_language_level: JDK_21
+additional_files:
+- name: common/src/labs/foundation/Order.java
+- name: common/src/labs/foundation/OrderCodec.java
+- name: common/src/labs/foundation/ParseFailure.java
+- name: scripts/trace_hashmap.py
+- name: diagnostics/src/labs/foundation/HashMapScenario.java
+- name: diagnostics/src/labs/foundation/TraceHashMap.java
+- name: benchmark/build.gradle
+- name: benchmark/src/labs/foundation/QueryBenchmark.java
+- name: benchmark/实验设计.md
+- name: docs/HashMap实际调试.md
+- name: docs/源码与评阅.md
+- name: docs/范围对照.md
+- name: README.md
+- name: 中文阶段报告.md
+- name: THIRD_PARTY_NOTICES.md
+- name: LICENSE-JetBrains-template
+- name: build.gradle
+- name: settings.gradle
+- name: gradle.properties
+- name: gradlew
+- name: gradlew.bat
+- name: gradle/wrapper/gradle-wrapper.properties
+- name: gradle/wrapper/gradle-wrapper.jar
+  is_binary: true
+- name: fixtures/invalid-orders.txt
+- name: fixtures/orders.txt
+- name: benchmark/短探索记录.md
+yaml_version: 2

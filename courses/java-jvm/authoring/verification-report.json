@@ -1,0 +1,403 @@
+{
+  "static": {
+    "tasks": 7,
+    "placeholders": 10,
+    "status": "PASS"
+  },
+  "environment": "openjdk version \"21.0.12.1\" 2026-08-18 LTS\nOpenJDK Runtime Environment Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.12.1+1 (build 21.0.12.1+1-LTS, mixed mode, sharing)\n",
+  "compiler": [
+    "${JAVA_HOME}/bin/javac",
+    "--release",
+    "21"
+  ],
+  "release_api_verified": true,
+  "gradle": {
+    "status": "PASS",
+    "version": "8.10.2",
+    "reference_tests": 30,
+    "reference_failed": 0,
+    "student_modules_expected_failed": 7,
+    "student_tests": 30,
+    "student_failed": 21,
+    "dependency_resolution": "官方Maven工件本地离线仓，仅测试临时init脚本；标准课程仍用mavenCentral"
+  },
+  "IDEA_Academy": "NOT_RUN",
+  "JDK25": "NOT_RUN：仅自选资料附录，已有25环境才运行；V1主线毕业不依赖，不下载或安装JDK",
+  "cases": [
+    {
+      "task": "C03-01",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "两倍=6\n常量=7，初始化事件=[]\n主动初始化=[父类, 子类]\n"
+    },
+    {
+      "task": "C03-01",
+      "case": "student",
+      "found": 4,
+      "successful": 2,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-01",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-01",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-01",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-02",
+      "case": "reference",
+      "found": 6,
+      "successful": 6,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "保留字节=2\n释放业务引用后=0\n"
+    },
+    {
+      "task": "C03-02",
+      "case": "student",
+      "found": 6,
+      "successful": 2,
+      "failed": 4,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-02",
+      "case": "alternative",
+      "found": 6,
+      "successful": 6,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-02",
+      "case": "mutant-0",
+      "found": 6,
+      "successful": 5,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-02",
+      "case": "mutant-1",
+      "found": 6,
+      "successful": 5,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-02",
+      "case": "mutant-2",
+      "found": 6,
+      "successful": 5,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-02",
+      "case": "mutant-3",
+      "found": 6,
+      "successful": 5,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-03",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "受控分配=Result[checksum=513276, allocatedBytes=268435456, peakPayloadBytes=524288]\n"
+    },
+    {
+      "task": "C03-03",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-03",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-03",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-03",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-04",
+      "case": "reference",
+      "found": 7,
+      "successful": 7,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "业务结果=订单完成\n剩余许可=2\n"
+    },
+    {
+      "task": "C03-04",
+      "case": "student",
+      "found": 7,
+      "successful": 5,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-04",
+      "case": "alternative",
+      "found": 7,
+      "successful": 7,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-04",
+      "case": "mutant-0",
+      "found": 7,
+      "successful": 5,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-04",
+      "case": "mutant-1",
+      "found": 7,
+      "successful": 5,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-05",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "纽约营业日总额=300\n缺失结果=B未找到\n"
+    },
+    {
+      "task": "C03-05",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-05",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-05",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-05",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-05",
+      "case": "mutant-2",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-06",
+      "case": "reference",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "退款变动=-40\n最新事件=[C, B]\n虚拟线程结果=[4, 9]\n"
+    },
+    {
+      "task": "C03-06",
+      "case": "student",
+      "found": 4,
+      "successful": 0,
+      "failed": 4,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-06",
+      "case": "alternative",
+      "found": 4,
+      "successful": 4,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-06",
+      "case": "mutant-0",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-06",
+      "case": "mutant-1",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-06",
+      "case": "mutant-2",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-06",
+      "case": "mutant-3",
+      "found": 4,
+      "successful": 3,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-07",
+      "case": "reference",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS",
+      "caller_stdout": "record patterns：FINAL，目标=25\nmodule imports：FINAL，目标=25\ncompact source files：FINAL，目标=25\nscoped values：FINAL，目标=25\nstructured concurrency：PREVIEW，目标=25\nprimitive patterns：PREVIEW，目标=25\nvector API：INCUBATOR，目标=25\n32-bit x86 port：REMOVED，目标=25\nJDK25实际编译状态：请单独运行 scripts/version25.py；未运行不得写PASS\n"
+    },
+    {
+      "task": "C03-07",
+      "case": "student",
+      "found": 3,
+      "successful": 0,
+      "failed": 3,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-07",
+      "case": "alternative",
+      "found": 3,
+      "successful": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    {
+      "task": "C03-07",
+      "case": "mutant-0",
+      "found": 3,
+      "successful": 1,
+      "failed": 2,
+      "status": "EXPECTED_FAIL"
+    },
+    {
+      "task": "C03-07",
+      "case": "mutant-1",
+      "found": 3,
+      "successful": 2,
+      "failed": 1,
+      "status": "EXPECTED_FAIL"
+    }
+  ],
+  "status": "PASS",
+  "wrapper_network": "BLOCKED：直接Wrapper首次下载时Network is unreachable",
+  "format": "PASS：Google Java Format1.24.0 AOSP四空格，格式化后全量复测",
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "diagnostics": {
+    "cpu": {
+      "status": "PARTIAL_BLOCKED",
+      "JFR": "PASS",
+      "cleanup": "PASS",
+      "jcmd": "BLOCKED：VM.version超过5秒",
+      "heap_dump": "NOT_RUN",
+      "source": "incident-cpu-1790768645731366943"
+    },
+    "lock": {
+      "status": "PARTIAL_BLOCKED",
+      "JFR": "PASS",
+      "cleanup": "PASS",
+      "jcmd": "BLOCKED：VM.version超过5秒",
+      "heap_dump": "NOT_RUN",
+      "source": "incident-lock-1790768659836250325"
+    },
+    "retention": {
+      "status": "PARTIAL_BLOCKED",
+      "JFR": "PASS",
+      "cleanup": "PASS",
+      "jcmd": "BLOCKED：VM.version超过5秒",
+      "heap_dump": "NOT_RUN",
+      "source": "incident-retention-1790768673661324462"
+    },
+    "pool": {
+      "status": "PARTIAL_BLOCKED",
+      "JFR": "PASS",
+      "cleanup": "PASS",
+      "jcmd": "BLOCKED：VM.version超过5秒",
+      "heap_dump": "NOT_RUN",
+      "source": "incident-pool-1790768687501799869"
+    }
+  },
+  "experiments": {
+    "gc_same_business_result": "PASS",
+    "gc_latency_interpretation": "O：小样本观察，不判断收集器优劣",
+    "layout_shallow_size": "OBSERVED：默认与关闭压缩对象引用两组，非规范固定值",
+    "java8_17_release_compilation": "PASS：JDK21编译和运行，不是实际8/17 VM",
+    "modules_export_negative": "PASS：公开API运行、未导出包预期编译失败",
+    "javap": "PASS：实际生成class反汇编",
+    "JDK25": "NOT_RUN：未配置JAVA25_HOME，脚本实际退出3"
+  },
+  "jdk25_appendix_required_for_v1": false
+}

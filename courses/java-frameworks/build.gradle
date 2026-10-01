@@ -1,0 +1,89 @@
+plugins { id 'base' }
+allprojects {
+    group = 'dev.weil.frameworklabs'
+    version = rootProject.providers.gradleProperty('courseVersion').get()
+    repositories {
+        if (System.getenv('LAB_MAVEN_OFFLINE_CACHE')) {
+            maven { url = uri(rootProject.file('build/maven-cache')); metadataSources { mavenPom(); artifact(); ignoreGradleMetadataRedirection() } }
+        } else if (System.getenv('LAB_MAVEN_PROXY')) {
+            // 仅云端验证时显式指定的本机只读桥；正常使用直接连接Maven Central。
+            maven { url = uri(System.getenv('LAB_MAVEN_PROXY')); allowInsecureProtocol = true }
+        } else { mavenCentral() }
+    }
+}
+subprojects {
+    apply plugin: 'java'
+    java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+    sourceSets {
+        main { java.setSrcDirs(['src']); resources.setSrcDirs(['resources']) }
+        test { java.setSrcDirs(['test']); resources.setSrcDirs(['test-resources']) }
+    }
+    dependencies {
+        implementation platform("org.springframework.boot:spring-boot-dependencies:${rootProject.property('springBootVersion')}")
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-aop'
+        implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        runtimeOnly 'com.h2database:h2'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        if (project.name == '05-security') {
+            implementation 'org.springframework.boot:spring-boot-starter-security'
+            testImplementation 'org.springframework.security:spring-security-test'
+        }
+        
+    }
+    if (project.name == '03-transactions') {
+        sourceSets { integrationTest { java.setSrcDirs(['integration-test']); resources.setSrcDirs(['resources']); compileClasspath += sourceSets.main.output; runtimeClasspath += sourceSets.main.output } }
+        configurations { integrationTestImplementation.extendsFrom testImplementation; integrationTestRuntimeOnly.extendsFrom testRuntimeOnly }
+        dependencies {
+            integrationTestImplementation enforcedPlatform('org.testcontainers:testcontainers-bom:1.20.6')
+            integrationTestImplementation 'org.testcontainers:mysql'
+            integrationTestImplementation 'org.testcontainers:junit-jupiter'
+            integrationTestRuntimeOnly 'com.mysql:mysql-connector-j'
+        }
+        tasks.register('integrationClasspath') { dependsOn integrationTestClasses; doLast { file("${buildDir}/integration-classpath.txt").text = sourceSets.integrationTest.runtimeClasspath.asPath } }
+        tasks.register('integrationTest', Test) {
+            description = '显式执行真实MySQL集成，必须具备Docker与共享镜像台账'
+            testClassesDirs = sourceSets.integrationTest.output.classesDirs
+            classpath = sourceSets.integrationTest.runtimeClasspath
+            useJUnitPlatform { includeTags 'docker' }
+        }
+    }
+    tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 21; options.compilerArgs += '-parameters' }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform { if (name != 'integrationTest') excludeTags 'docker' }
+        maxHeapSize = '512m'; maxParallelForks = 1
+        systemProperty 'server.address', '127.0.0.1'
+        outputs.upToDateWhen { false }
+        testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+        afterTest { descriptor, result ->
+            if (result.resultType == TestResult.ResultType.FAILURE) {
+                def lines = (result.exception?.message ?: '检查失败').split('\n', -1)
+                println "#educational_plugin FAILED + ${lines[0]}"
+                lines.drop(1).each { println "#educational_plugin${it}" }
+                println ''
+            }
+        }
+    }
+    tasks.register('run', JavaExec) {
+        dependsOn classes; classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'labs.frameworks.Lab'
+        if (project.hasProperty('appArgs')) args project.property('appArgs').split(' ')
+    }
+    tasks.register('usage', JavaExec) {
+        dependsOn classes; classpath = sourceSets.main.runtimeClasspath
+        mainClass = 'labs.frameworks.Usage'
+    }
+    tasks.register('verificationClasspath') {
+        dependsOn testClasses
+        doLast { file("${buildDir}/verification-classpath.txt").text = sourceSets.test.runtimeClasspath.asPath }
+    }
+    dependencyLocking { lockAllConfigurations() }
+}
+tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
+tasks.named('check') { dependsOn tasks.named('test') }
+
+// 在各模块源目录配置完成后统一接入可独立发行的镜像台账。
+apply from: 'shared/versions.gradle'

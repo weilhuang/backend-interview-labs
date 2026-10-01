@@ -1,0 +1,22 @@
+type: edu
+custom_name: 索引查询、缓存与TopK综合项目
+files:
+- name: solutions/IndexedOrders.java.txt
+  visible: true
+- name: src/labs/foundation/IndexedOrders.java
+  visible: true
+  placeholders:
+  - offset: 1641
+    length: 562
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：按公开合同完成实现");
+
+      '
+  - offset: 2360
+    length: 772
+    placeholder_text: '        throw new UnsupportedOperationException("TODO：按公开合同完成实现");
+
+      '
+- name: src/labs/foundation/IndexedOrdersUsage.java
+  visible: true
+- name: test/IndexedOrdersTest.java
+  visible: true

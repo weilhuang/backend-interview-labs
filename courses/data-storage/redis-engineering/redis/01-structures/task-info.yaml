@@ -1,0 +1,19 @@
+type: edu
+custom_name: C07-01 · 数据结构与原子命令
+files:
+- name: src/labs/Structures.java
+  visible: true
+  placeholders:
+  - offset: 328
+    length: 398
+    placeholder_text: '    throw new UnsupportedOperationException("TODO：按中文步骤实现核心方法");
+
+      '
+- name: src/labs/StructuresUsage.java
+  visible: true
+- name: test/labs/StructuresIntegrationTest.java
+  visible: true
+- name: test/labs/StructuresTest.java
+  visible: true
+- name: solution.md
+  visible: true
