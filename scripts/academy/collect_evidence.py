@@ -10,7 +10,7 @@ NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','sourc
        'archive.json','author-changes.json','student-import.json','educator-import.json',
        'official-validation.json','validation-gate.json','SHA256SUMS','generation.log','failure.log',
        'export.stdout.log','export.stderr.log','validate.stdout.log','validate.stderr.log',
-       'export-idea.log','validate-idea.log','gradle-jvm.jsonl','gradle-jvm-gate.json','unified-source-validation.json','release-gate.json'}
+       'export-idea.log','validate-idea.log','export-idea-pretermination.log','validate-idea-pretermination.log','gradle-jvm.jsonl','gradle-jvm-gate.json','unified-source-validation.json','release-gate.json'}
 BOOTSTRAP_NAMES={'source-ci.json','bootstrap.json','install.log'}
 MAX_FILE=4*1024*1024
 
@@ -54,7 +54,16 @@ def collect(run,evidence,bootstrap=None):
             from hashlib import sha256
             original_sha=sha256(data).hexdigest()
             try:
-                if name.endswith('.log'):data=sanitize_log(data[-256*1024:])
+                if name.endswith('.log'):
+                    log_limit=256*1024
+                    if name in {'export-idea-pretermination.log','validate-idea-pretermination.log'}:
+                        log_limit=128*1024
+                    elif name in {'export-idea.log','validate-idea.log'}:
+                        before=name.replace('-idea.log','-idea-pretermination.log')
+                        if before in output:log_limit=128*1024
+                    data=sanitize_log(data[-log_limit:])
+                    if name in {'export-idea.log','validate-idea.log','export-idea-pretermination.log','validate-idea-pretermination.log'}:
+                        data=data[:log_limit].decode('utf-8',errors='ignore').encode()
                 elif name.endswith('.json'):data=(json.dumps(sanitize_value(json.loads(data)),ensure_ascii=False,indent=2)+'\n').encode()
                 elif name.endswith('.jsonl'):data=('\n'.join(json.dumps(sanitize_value(json.loads(line)),ensure_ascii=False) for line in data.splitlines())+'\n').encode()
             except (ValueError,UnicodeError) as exc:

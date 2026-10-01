@@ -2,20 +2,64 @@
 """Version-pinned adapter around the real Academy CLI, never an archive creator."""
 from __future__ import annotations
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
 import shutil
 import signal
+import stat
 import subprocess
 import time
 import traceback
 import re
-from safe_io import absolute, read_regular, write_new, replace_regular, validate_directory, exclusive_writer
+from safe_io import absolute, read_regular, write_new, replace_regular, validate_directory, exclusive_writer, directory_fd
 from gates import (GateError, require, read_json, dump, sha, build_contract, redact_contract,
                    inspect_archive, inspect_import, inspect_author_changes, validate_report)
 
 MIN_FREE_BYTES = 2 * 1024**3
+IDE_LOG_BYTES = 256 * 1024
+IDE_SPLIT_BYTES = 128 * 1024
+
+def utc_now():
+    return datetime.now(timezone.utc).isoformat()
+
+def intermediate_archives(root, phase):
+    """Metadata only for the fixed export temp directory, never ZIP contents."""
+    require(phase in (None,"export","validate"),"unknown diagnostic phase")
+    if phase!='export':return {'status':'NOT_APPLICABLE'}
+    result={'status':'UNVERIFIED_INTERMEDIATE','count':0,'entries':[],
+            'scan_limit':1000,'entry_limit':10,'truncated':False,'content_read':False}
+    try:
+        with directory_fd(root/'export-profile/tmp') as directory:
+            with os.scandir(directory) as listing:
+                for scanned,entry in enumerate(listing):
+                    if scanned>=1000:
+                        result['truncated']=True;result['count_is_lower_bound']=True;break
+                    if not (entry.name.startswith('course_archive_') and entry.name.endswith('.zip')):continue
+                    info=os.stat(entry.name,dir_fd=directory,follow_symlinks=False)
+                    if not stat.S_ISREG(info.st_mode):raise ValueError('intermediate is not a regular file')
+                    result['count']+=1
+                    if len(result['entries'])<10:
+                        result['entries'].append({'basename':entry.name,'size_bytes':info.st_size})
+                    else:result['truncated']=True
+        return result
+    except Exception as exc:
+        return {'status':'UNAVAILABLE','error':type(exc).__name__,'content_read':False}
+
+def snapshot_before_stop(root, phase):
+    """Read only the fixed phase log before termination noise can replace it."""
+    require(phase in (None,"export","validate"),"unknown diagnostic phase")
+    result={"status":"NOT_RUN","at_utc":utc_now()}
+    if phase is None:return result
+    result["intermediate_archives"]=intermediate_archives(root,phase)
+    try:
+        data=read_regular(root/(phase+"-profile")/"log/idea.log",limit=IDE_SPLIT_BYTES,tail=True)
+        write_new(root/"evidence"/(phase+"-idea-pretermination.log"),data)
+        result.update(status="PASS",bytes=len(data))
+    except Exception as exc:
+        result.update(status="UNAVAILABLE",error=type(exc).__name__)
+    return result
 
 def fresh_target(target, root, forbidden):
     target=absolute(target); root=absolute(root)
@@ -33,9 +77,10 @@ def fresh_target(target, root, forbidden):
         require(not item.is_relative_to(target) and not target.is_relative_to(item),'CLI target overlaps source/toolchain/profile')
     return target
 
-def capture(command, env, cwd, stdout, stderr, timeout_seconds, disk_root):
+def capture(command, env, cwd, stdout, stderr, timeout_seconds, disk_root, phase=None):
     """Own process group only. Timeout/disk exhaustion is failure, never a pass."""
-    started=time.monotonic(); timed_out=False; disk_low=False
+    require(phase in (None,"export","validate"),"unknown diagnostic phase")
+    started=time.monotonic(); started_at=utc_now(); timed_out=False; disk_low=False; termination=None
     with exclusive_writer(stdout) as out, exclusive_writer(stderr) as err:
         proc=subprocess.Popen(command,env=env,cwd=cwd,stdout=out,stderr=err,start_new_session=True)
         while proc.poll() is None:
@@ -43,13 +88,16 @@ def capture(command, env, cwd, stdout, stderr, timeout_seconds, disk_root):
             timed_out=time.monotonic()-started>timeout_seconds
             disk_low=shutil.disk_usage(disk_root).free<MIN_FREE_BYTES
             if timed_out or disk_low:
+                termination=snapshot_before_stop(disk_root,phase)
                 os.killpg(proc.pid,signal.SIGTERM)
                 try:proc.wait(timeout=15)
                 except subprocess.TimeoutExpired:os.killpg(proc.pid,signal.SIGKILL);proc.wait()
                 break
     return {'exit_code':proc.returncode,'seconds':round(time.monotonic()-started,2),
             'timed_out':timed_out,'disk_low':disk_low,'timeout_seconds':timeout_seconds,
-            'free_bytes_after':shutil.disk_usage(disk_root).free}
+            'free_bytes_after':shutil.disk_usage(disk_root).free,
+            'started_at_utc':started_at,'finished_at_utc':utc_now(),
+            'pretermination_snapshot':termination}
 
 
 def sanitized_environment():
@@ -123,7 +171,11 @@ def small_logs(root,evidence):
     validate_directory(root);validate_directory(evidence)
     for phase in ('export','validate'):
         path=root/(phase+'-profile')/'log/idea.log'
-        try:data=read_regular(path,limit=256*1024,tail=True)
+        try:
+            read_regular(evidence/(phase+'-idea-pretermination.log'),limit=IDE_SPLIT_BYTES)
+            limit=IDE_LOG_BYTES-IDE_SPLIT_BYTES
+        except FileNotFoundError:limit=IDE_LOG_BYTES
+        try:data=read_regular(path,limit=limit,tail=True)
         except FileNotFoundError:continue
         write_new(evidence/(phase+'-idea.log'),data)
     for name in ('generation.log','failure.log','export.stdout.log','export.stderr.log','validate.stdout.log','validate.stderr.log'):
@@ -167,7 +219,7 @@ def execute(a):
         if a.display=='xvfb':command=['xvfb-run','-a','--server-args=-screen 0 1280x900x24',*command]
         else:env.pop('DISPLAY',None)
         require(not list((profile/'tmp').iterdir()),'export temp directory was not empty')
-        run=capture(command,env,repo,evidence/'export.stdout.log',evidence/'export.stderr.log',300 if a.phase=='export-import-smoke' else 600,root)
+        run=capture(command,env,repo,evidence/'export.stdout.log',evidence/'export.stderr.log',300 if a.phase=='export-import-smoke' else 600,root,phase='export')
         result['stages']['official_export_process']=run;dump(evidence/'summary.json',result)
         require(run['exit_code']==0 and not run['timed_out'] and not run['disk_low'],'official createCourse failed or resource budget exceeded')
         found=list((profile/'tmp').rglob('course_archive_*.zip'))
@@ -191,7 +243,7 @@ def execute(a):
                  '--tests','true','--links','true','--output-format','json','--output',str(report)]
         if a.display=='xvfb':command=['xvfb-run','-a','--server-args=-screen 0 1280x900x24',*command]
         else:env.pop('DISPLAY',None)
-        run=capture(command,env,repo,evidence/'validate.stdout.log',evidence/'validate.stderr.log',2700,root)
+        run=capture(command,env,repo,evidence/'validate.stdout.log',evidence/'validate.stderr.log',2700,root,phase='validate')
         result['stages']['official_validate_process']=run;dump(evidence/'summary.json',result)
         # Parse available failure reports even when process failed/timed out.
         if report.is_file():
