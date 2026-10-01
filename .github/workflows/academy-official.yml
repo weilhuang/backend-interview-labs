@@ -27,6 +27,8 @@ jobs:
     name: official-one-course
     runs-on: ubuntu-24.04
     timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 80 || 25 }}
+    outputs:
+      handoff_sha256: ${{ steps.handoff.outputs.sha256 }}
     steps:
       - uses: actions/checkout@v4
         timeout-minutes: 1
@@ -73,7 +75,7 @@ jobs:
           # 1.58 GB tar + 4.2 GB IDE briefly coexist; retain room for runtime.
           assert shutil.disk_usage(os.environ['RUNNER_TEMP']).free >= 10*1024**3, 'Less than 10 GiB free before install'
           PY
-          if [ '${{ inputs.display }}' = xvfb ]; then command -v xvfb-run; fi
+          if [ '${{ (github.event_name == 'push' && github.ref == 'refs/heads/academy-validation/full') || inputs.display == 'xvfb' }}' = true ]; then command -v xvfb-run; fi
       - name: 下载固定官方 IDEA 和 Academy 并校验 SHA256
         timeout-minutes: 7
         run: bash scripts/academy/install_toolchain.sh "$TOOLCHAIN_DIR" > "$EVIDENCE_DIR/install.log" 2>&1
@@ -82,18 +84,27 @@ jobs:
         timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 60 || 8 }}
         env:
           PHASE: ${{ github.ref == 'refs/heads/academy-validation/full' && 'full-validation' || (github.ref == 'refs/heads/academy-validation/smoke' && 'export-import-smoke' || inputs.phase) }}
-          DISPLAY_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.display || 'headless' }}
+          DISPLAY_MODE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/academy-validation/full') && 'xvfb' || (github.event_name == 'workflow_dispatch' && inputs.display || 'headless') }}
         run: |
           python scripts/academy/run_official.py \
             --repo "$GITHUB_WORKSPACE" --run-root "$ACADEMY_RUN" \
             --idea-home "$TOOLCHAIN_DIR/idea" --plugins-home "$TOOLCHAIN_DIR/plugins" \
             --source-ci-report "$EVIDENCE_DIR/source-ci.json" \
             --phase "$PHASE" --display "$DISPLAY_MODE"
-      - name: 最终发布需要独立统一环境真实验收（当前明确阻塞）
-        id: release_gate
+      - name: 封装同次官方导入快照与原字节ZIP（验收中间产物，非发行包）
+        id: handoff
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
         timeout-minutes: 1
-        run: python scripts/academy/release_gate.py --native-summary "$ACADEMY_RUN/evidence/summary.json" --report "$ACADEMY_RUN/evidence/release-gate.json"
+        run: |
+          python scripts/academy/native_handoff.py --run "$ACADEMY_RUN" --output "$RUNNER_TEMP/academy-import-handoff.stored.zip" > "$EVIDENCE_DIR/handoff.json"
+          python - <<'PYTHON'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/academy')
+          from safe_io import read_regular
+          value=json.loads(read_regular(Path(os.environ['EVIDENCE_DIR'])/'handoff.json', limit=65536))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream: stream.write('sha256='+value['handoff_sha256']+'\n')
+          PYTHON
       - name: 汇总失败或成功的小型证据（绝不复制 ZIP、配置或缓存）
         id: evidence
         if: always()
@@ -118,9 +129,102 @@ jobs:
           retention-days: 7
           if-no-files-found: error
           path: ${{ env.ARTIFACT_EVIDENCE_DIR }}/
+      - name: 传递验收中间产物（含ZIP与导入快照，非发行包）
+        timeout-minutes: 1
+        if: success() && steps.handoff.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-intermediate-NOT-A-RELEASE-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
+          path: ${{ runner.temp }}/academy-import-handoff.stored.zip
+
+  environment:
+    name: official-import-real-environment
+    needs: package
+    if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        timeout-minutes: 1
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        timeout-minutes: 1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        timeout-minutes: 1
+        with:
+          node-version: '22'
+      - name: 准备独立环境证据目录和已固定Python依赖
+        timeout-minutes: 1
+        run: |
+          printf 'ENV_RUN=%s\n' "$RUNNER_TEMP/unified-environment-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          python -m pip install -r scripts/quality/requirements.txt
+      - name: 浏览器中文字体和标准runner资源检查
+        timeout-minutes: 3
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk
+          fc-match sans:lang=zh-cn
+          google-chrome --version
+          docker version
+          docker compose version
+          python - <<'PYTHON'
+          import os, shutil
+          assert shutil.disk_usage(os.environ['RUNNER_TEMP']).free >= 10*1024**3, 'Less than 10 GiB free before real environment acceptance'
+          PYTHON
+      - name: 下载同一run/attempt的唯一官方中间产物
+        timeout-minutes: 1
+        uses: actions/download-artifact@v4
+        with:
+          name: academy-intermediate-NOT-A-RELEASE-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/academy-handoff-download
+      - name: 执行同归档真实环境验收（顺序profile及C14前端恢复）
+        id: environment
+        timeout-minutes: 50
+        env:
+          HANDOFF_SHA256: ${{ needs.package.outputs.handoff_sha256 }}
+        run: |
+          python scripts/academy/run_environment.py --repo "$GITHUB_WORKSPACE" --run-root "$ENV_RUN" \
+            --handoff "$RUNNER_TEMP/academy-handoff-download/academy-import-handoff.stored.zip" \
+            --handoff-sha256 "$HANDOFF_SHA256"
+      - name: 严格联合官方原生与同归档真实环境发布门禁
+        id: release_gate
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/release_gate.py --native-summary "$ENV_RUN/handoff/native-summary.json" \
+            --environment-summary "$ENV_RUN/evidence/summary.json" --identity "$ENV_RUN/handoff/identity.json" \
+            --archive "$ENV_RUN/handoff/backend-interview-academy.zip" --release-dir "$ENV_RUN/release" \
+            --report "$ENV_RUN/evidence/release-gate.json"
+      - name: 收集有界脱敏环境证据
+        id: environment_evidence
+        if: always()
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/collect_environment_evidence.py \
+            --run "$RUNNER_TEMP/unified-environment-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --output "$RUNNER_TEMP/unified-environment-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+      - name: 保存环境验收证据与提供前端的真实浏览器截图
+        if: always() && steps.environment_evidence.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-environment-evidence-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: error
+          path: ${{ runner.temp }}/unified-environment-evidence-${{ github.run_id }}-${{ github.run_attempt }}/
       - name: 仅完整必需门禁全绿后保存可导入官方 ZIP
         timeout-minutes: 1
-        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.official.outcome == 'success' && steps.release_gate.outcome == 'success'
+        if: success() && steps.environment.outcome == 'success' && steps.release_gate.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: backend-interview-academy-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -128,5 +232,5 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           path: |
-            ${{ env.ACADEMY_RUN }}/dist/backend-interview-academy.zip
-            ${{ env.ACADEMY_RUN }}/dist/SHA256SUMS
+            ${{ env.ENV_RUN }}/release/backend-interview-academy.zip
+            ${{ env.ENV_RUN }}/release/SHA256SUMS

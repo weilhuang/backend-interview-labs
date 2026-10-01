@@ -4,9 +4,9 @@
 
 ## 目前状态与首次实验
 
-固定官方 CLI 的本地尝试被运行环境的 Unix socket 限制挡在 IDEA 启动阶段，退出码 3；没有本次统一课程导出、导入或原生测试成功证据。Python 回归只验证门禁实现。
+官方 smoke 运行 `36913605767` 已实际通过：单课 11 个 section、84 题、136 个占位区，966 个合同文件的学生导入字节、元数据及 JDK 21 / Gradle 8.10.2 均通过。此次 smoke 不代表完整 84 题原生测试或统一环境验收通过；发布仍需同一次 full-validation 与环境 job 的完整证据。早期本地 Unix socket 限制不再描述当前官方 runner 结果。Python 回归只验证门禁实现。
 
-当前还未实现统一环境入口的独立真实 Docker 验收任务。即使完整原生 84 题通过，最终 ZIP 发布仍会明确阻塞，报告 `unified_environment_runtime=NOT_RUN`。旧分课 CI、模拟测试与 84 个原生正例都不能替代这一步。
+独立统一环境真实验收任务现已实现为第二个标准 Ubuntu job，但尚未在真实 Docker runner 执行。本候选仅完成普通功能重基与静态检查；压缩/PAX 边界独立验收仍未完成，整体为 `PARTIAL_NOT_APPROVED`。源码与 Python 合同回归、合成导入快照传输测试不能冒充运行成功。缺少第二个 job 的同归档完整成功证据时，最终 ZIP 仍被拒绝发布；旧分课 CI 或原生 84 个正例均不能代替它。
 
 新工作流尚未进入默认分支时，GitHub 不提供它的 workflow_dispatch。开发期使用两个精确命名的受控验证分支，不需要提前合并新 PR：
 
@@ -22,10 +22,14 @@
 
 ## 下载与导入
 
-待独立真实统一环境门禁补齐并实际通过、完整原生验收也通过后，运行详情页底部才会出现最终交付。当前仅有证据输出：
+只有完整原生验收与同归档真实统一环境门禁实际通过，运行详情页底部才会出现最终交付：
 
 - `backend-interview-academy-<提交>-<运行>-<尝试>`：最终交付
-- `academy-evidence-<提交>-<运行>-<尝试>`：小型过程报告；普通成功/失败尽力保存；硬取消或 runner 故障可能来不及上传
+- `academy-evidence-<提交>-<运行>-<尝试>`：原生过程报告
+- `academy-environment-evidence-<提交>-<运行>-<尝试>`：真实环境逐命令结果、资源归属、前端截图与最终联合门禁
+- `academy-intermediate-NOT-A-RELEASE-<提交>-<运行>-<尝试>`：两个 job 的验收中间产物，包含官方 ZIP 和官方已导入的学生/作者文件快照，仅保留 1 天。它在仓库 Actions 中可见，可能在后续环境验收失败时仍然存在，**不是发行包，不应作为课程交付下载**
+
+普通成功/失败尽力保存证据；硬取消或 runner 故障可能来不及上传。
 
 点击最终交付 artifact，浏览器会下载一个**外层 artifact ZIP**。先解压它，里面有：
 
@@ -34,15 +38,15 @@
 
 请在 Academy 的本地课程导入入口选择里面的 `backend-interview-academy.zip`，不要选择外层 artifact ZIP。`gh run download <运行ID> -n <artifact名>` 会自动解开外层包装。可以在解压目录运行 `sha256sum -c SHA256SUMS` 核对原字节。
 
-Artifacts 只保留 7 天，过期需要重新执行授权的打包。长期 GitHub Release 上传不属于本工作流。
+最终交付与验收证据只保留 7 天（中间产物为 1 天），过期需要重新执行授权的打包。长期 GitHub Release 上传不属于本工作流。
 
 ## 通过代表什么
 
 工作流区分精确 tested commit 的源码 CI、官方导出、官方学生导入、实际 Gradle JVM、官方原生 Check、描述链接和官方作者导入。官方验证命令即使报告失败也可能退出 0，所以退出码绝不单独代表通过。
 
-84 个原生 Check 使用各题实际配置的判题合同。命令行环境传入 `withDocker=true` 和 `dockerApiVersion=1.44`，但这不自动把每题所有独立 integrationTest 都并入原生 Check。特别是 C14 等课程，完整集成、恢复和浏览器验收仍由已有分层 CI 提供原分课基线；统一环境入口仍须独立真实验收。统一包的 UI Check/Reset、学习者负控和所有环境编排体验仍是单独验收项；报告明确保留 `NOT_RUN`，不会捏造 UI 成功。
+84 个原生 Check 使用各题实际配置的判题合同。命令行环境传入 `withDocker=true` 和 `dockerApiVersion=1.44`，但这不自动把每题所有独立 integrationTest 都并入原生 Check。已有分层 CI 继续提供原分课完整测试基线；新第二 job 验证统一导入布局、逐个真实服务和 C14 HTTP/浏览器/暂停恢复。此覆盖不声称穷尽所有网络故障窗口或所有操作系统体验。统一包的原生 GUI Check/Reset 和官方学习者负控仍是单独验收项，报告保留 `NOT_RUN`，不捏造 UI 成功。
 
-官方规则会省略 `.courseignore`、Wrapper 程序与 JAR；导入后由官方插件补齐 Wrapper。`gradle-wrapper.properties`、构建脚本、题目文件、测试、公共支撑和环境入口均按实际导入内容逐文件核对。官方包内部的加密字节不被重写。
+官方规则会省略 `.courseignore`、Wrapper 程序与 JAR；不能假定官方插件会补齐 Wrapper。统一课程使用 `bash scripts/gradle.sh`，首次显式 `prepare --download` 或 `prepare --zip /绝对路径/gradle-8.10.2-bin.zip`，校验仍保留的 `gradle-wrapper.properties` 中固定 URL/SHA256 并在课程树外准备 SDK。普通 Gradle 执行不自动下载；`verify` 为只读校验。使用 Bash 调用，不要求导入后脚本具有执行位。`gradle-wrapper.properties`、构建脚本、题目文件、测试、公共支撑和环境入口均按实际导入内容逐文件核对。官方包内部的加密字节不被重写。
 
 ## 运行资源与费用边界
 
@@ -52,7 +56,9 @@ Artifacts 只保留 7 天，过期需要重新执行授权的打包。长期 Git
 - 首轮不建立 IDE/Gradle/Docker 缓存，避免大缓存复制、缓存存储及陈旧结果风险；IDEA 下载临时包校验解压后即删
 - Docker 重检查按课程已有顺序按需启动，不预拉所有镜像，不一次启动全部共享服务
 - 原生测试前需至少 4 GiB 空间；运行中低于 2 GiB 即失败并停止当前 CLI 进程组，不清理宿主 Docker/系统目录
-- smoke 总预算 25 分钟，各步骤上限合计 24 分钟；full 总预算 80 分钟，各步骤上限合计 78 分钟，已含收集/上传余量。smoke 导出最多 5 分钟；full 导出最多 10 分钟，84 题及链接最多 45 分钟。预算是上限，不是已测耗时
+- native-package：smoke job 上限 25 分钟；full job 上限 80 分钟。导出最多 5/10 分钟，84 题及链接最多 45 分钟；各步骤上限保留证据收集余量
+- real-environment：独立标准 runner、job 上限 65 分钟，其中顺序运行脚本上限 50 分钟，留有工具准备、下载、证据与上传余量；不再安装 IDEA。每条命令另外具有不超过 20 分钟的超时、4 MiB 原始输出上限及 2 GiB 剩余磁盘门槛
+- full 的两个 job 串行，最坏 job 时间预算合计 145 分钟；这不是实测耗时或费用承诺。首轮不创建依赖/镜像缓存，也不自动重试全量任务
 - 超时、空间不足、新协议/登录/信任提示、SDK 选择失败或未知 CLI/JSON 变化都尽力保留有界证据并停止，不自动接受条款或降低检查标准；runner 丢失/硬取消不能保证留下 artifact
 
 ## 固定版本与证据
@@ -69,6 +75,21 @@ JDK21 路径通过 Academy 官方 `project.jdk` 属性指定；IDEA 自身仍运
 - [官方验证 JSON 类型](https://github.com/JetBrains/educational-plugin/blob/6b77322dcfc0fbab8c3e94ab5055b3f72d74460c/validation-results/src/com/jetbrains/edu/coursecreator/validation/ValidationResultNode.kt)
 - [GitHub artifact 下载说明](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/download-workflow-artifacts)
 
-## 待补齐的真实统一环境门禁
+## 两个 job 如何验证同一个课程
 
-应在与 IDEA 打包分开的标准 Ubuntu job 中，用新的独立课程目录与本次专属项目名/端口，按 profile 顺序执行 `start → doctor/health → 代表性真实写读 → stop`。MySQL、Redis、Kafka、RocketMQ 逐个运行；C14 还需统一 `start capstone --stage 05-defense`、`health`、`workbench-check`、保留的浏览器流程与故障恢复脚本。只能停止本次拥有的资源，不能全局 prune。健康探针本身不替代集成判题。该任务尚未实现、未运行，所以当前发布锁不能从输入参数或环境变量解除。
+1. 第一 job 重新只读核对精确 tested commit 的既有源码 CI，生成单课作者树，用固定官方 CLI 导出并抓取原字节 ZIP，验证官方学生与作者导入及全部 84 题/链接。源代码不是 CLI 的清理目标
+2. 它仅把合同白名单中的普通文件传入中间 ZIP_STORED（不压缩）容器：同一官方 ZIP、native summary、source contract，以及已经逐文件验证的官方学生/作者导入。每文件绑定 SHA256、大小和安全 mode；不递归打包 IDE 配置、Gradle 缓存、build、`.env`、日志或符号链接
+3. 第二 job 按精确 artifact 名下载同一 run/attempt 中间产物，并以第一 job 输出的 SHA256 再校验。解包前核对仓库、真实 tested commit、run/attempt、ZIP/contract hash、完整文件库存、安全相对路径和 mode；中间容器仅使用标准库 ZIP_STORED，拒绝其他压缩方式和非常规文件类型。Python 标准库会在检查 4000 项上限之前解析中心目录并分配条目对象；总容器字节上限不能视为严格的最坏内存或 CPU 上限。限制总容器 264 MiB、总载荷 256 MiB、单文件 128 MiB、4000 项、UTF-8 路径 1024 字节/32 层/单段 255 字节；先核对库存与总大小，再读取成员并在新目录中写入。官方课程 ZIP 作为其中一个普通文件按原字节传递，不重新压缩、修改或生成。再次验证学生/作者明文与原生元数据
+4. 运行使用这些**官方导入快照**，没有作者源码复制回退。先证明导入中缺少三个被排除的 Wrapper 程序/JAR，学生和作者的统一入口可用，再准备并验证固定 Gradle SDK。学生起点不执行应当失败的业务正例，其状态为 `NOT_RUN_EXPECTED_STARTER`
+5. 唯一镜像台账来自导入课程；Docker API 固定 1.44。专属 `totalacademy-ci-运行号-尝试号` 及 `-capstone` 项目启动前必须没有容器、卷或网络。端口是新分配的回环端口，启动后还核对实际发布绑定、精确 Compose 目录/配置标签、服务、镜像引用和挂载
+6. MySQL、Redis、Kafka、RocketMQ 逐个执行 `start → doctor → health → 实际绑定 → 宿主真实写读 → stop保卷 → start → 只读原标记 → stop`。宿主 JDBC、RESP、Kafka 和 RocketMQ SDK 走实际发布的回环端点。Java 探针仅复用导入课程严格锁定的 messaging-support 运行图中的外部客户端模块，不新建 Maven 依赖图；明确排除统一根注入的 environment-ledger 项目输出，不把尚未构建的项目 JAR 当外部依赖。RocketMQ 重启读取的是停止前留下的未消费消息，不重发伪造持久化
+7. C14 从 `05-defense` 的真正 installDist 启动，运行统一 workbench-check 和随课提供的原 browser-smoke，覆盖提交、同号重试、409 冲突、取消、Kafka/gRPC 投影以及 320/390/800/801/1440 像素视口。CI 单独装固定 Playwright；学生使用提供的前端不需要 Node
+8. 通过统一 `pause-service/recover-service` 暂停和恢复 orders、delivery；核对已确认订单仍在、配送停止时 replay 返回 503 且确有积压、恢复后同号投影与取消审计一致。容器 ID 与原阶段挂载必须不变，不默默切换到其他检查点
+9. 运行后再次核对所有导入合同源文件字节。每个必需检查都须有实际命令、退出码、超时上限、耗时和输出 SHA，并核对完整位置参数、客户端类/脚本、实际端口、请求路径/状态/内容和本次标记；缺失、跳过、仅健康检查、dry-run、echo、仅 --help/-version 等假证据均不能放行
+10. 普通 stop 先证明卷与容器保留；最后清理仅限启动前证明不存在、拥有精确本次 CI 标签/目录的临时容器、卷、网络。不会调用全局 prune、删除用户默认卷或读取外来容器日志。失败时也尝试同范围清理；runner 丢失/硬取消只能由临时 VM 生命周期收尾
+
+最终 `release_gate.py` 同时核对 native 与 environment 的仓库、commit、run/attempt、官方 ZIP、合同和中间产物 SHA，以及完整必需检查；还会在发布时重新以不跟随链接的方式读取实际 ZIP，核对字节数与所有证据中的预期 SHA，再创建独立只读发行副本；SHA256SUMS 只来自这些已验证的字节。仅上传这份通过门禁的副本到 `backend-interview-academy-*`，不对被替换的 ZIP 重新计算校验值来冒充通过。这条串行 artifact 交接没有等待自身源码 CI 再跑一轮的循环依赖。
+
+### 私有无压缩交接候选的验证范围
+
+ZIP_STORED 简化移除了自定义 gzip/tar/PAX 处理。旧 R2 的压缩/PAX 独立审查仍未完成，不能据此改标通过。适用范围仅限同一受信任工作流生产、经同 run/attempt 输出 SHA256 绑定的中间产物；不接受任意外部 ZIP。当前仅验证正常受信任生产者到消费者的合成文件往返、身份不匹配、普通内容意外变化及模式丢失；不代表异常容器/元数据、资源耗尽、竞态或全面安全验证。真实官方双导入、native84 与真实环境验收仍须同次受控运行证据。保留标准 runner 80+65 分钟上限、NOT-A-RELEASE 标识、仓库 Actions 读者可见和一天留存；不提前发布。

@@ -161,11 +161,16 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(w['jobs']['package']['runs-on'],'ubuntu-24.04')
         self.assertEqual(w['on']['workflow_dispatch']['inputs']['phase']['default'],'export-import-smoke')
     def test_final_artifact_has_all_gates_and_short_retention(self):
-        steps=self.workflow()['jobs']['package']['steps']; uploads=[s for s in steps if s.get('uses')=='actions/upload-artifact@v4']
+        workflow=self.workflow();package=workflow['jobs']['package'];environment=workflow['jobs']['environment']
+        uploads=[s for s in package['steps'] if s.get('uses')=='actions/upload-artifact@v4']
         self.assertEqual(len(uploads),2)
-        self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outcome == 'success'");self.assertIn("inputs.phase == 'full-validation'",uploads[1]['if'])
-        self.assertIn("steps.official.outcome == 'success'",uploads[1]['if'])
-        for s in uploads:self.assertEqual(s['with']['retention-days'],'7');self.assertEqual(s['with']['if-no-files-found'],'error')
+        self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outcome == 'success'")
+        self.assertIn("steps.handoff.outcome == 'success'",uploads[1]['if'])
+        self.assertEqual(uploads[1]['with']['retention-days'],'1');self.assertIn('NOT-A-RELEASE',uploads[1]['with']['name'])
+        final=environment['steps'][-1]
+        self.assertEqual(environment['needs'],'package');self.assertIn("inputs.phase == 'full-validation'",environment['if'])
+        self.assertIn("steps.environment.outcome == 'success'",final['if']);self.assertIn("steps.release_gate.outcome == 'success'",final['if'])
+        self.assertEqual(final['with']['retention-days'],'7');self.assertEqual(final['with']['if-no-files-found'],'error')
     def test_no_cache_schedule_or_paid_runner(self):
         w=self.workflow();self.assertNotIn('schedule',w['on']);self.assertEqual(w['on']['push']['branches'],['academy-validation/smoke','academy-validation/full'])
         self.assertFalse(any('cache' in s.get('uses','') for s in w['jobs']['package']['steps']))
@@ -404,11 +409,11 @@ class ReleaseBoundaryTests(unittest.TestCase):
             timeout=step['timeout-minutes']
             if step.get('id')=='official':full+=60;smoke+=8;continue
             full+=int(timeout)
-            if step.get('id')=='release_gate' or step.get('name','').startswith('仅完整'):continue
+            if step.get('id')=='handoff' or step.get('name','').startswith('传递验收'):continue
             smoke+=int(timeout)
         self.assertLessEqual(full,78);self.assertLessEqual(smoke,24)
     def test_final_upload_requires_release_gate(self):
-        upload=WorkflowTests().workflow()['jobs']['package']['steps'][-1]
+        upload=WorkflowTests().workflow()['jobs']['environment']['steps'][-1]
         self.assertIn("steps.release_gate.outcome == 'success'",upload['if'])
 
 if __name__=='__main__':unittest.main()
