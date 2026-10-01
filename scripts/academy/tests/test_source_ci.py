@@ -40,6 +40,35 @@ class SourceProofTests(unittest.TestCase):
     def test_duplicate_job_rejected(self):
         row={'name':'job','status':'completed','conclusion':'success'}
         with self.assertRaises(GateError):source.verify_jobs({'total_count':2,'jobs':[row,row]},{'job'})
+    def test_actual_fifteen_job_inventory_with_exact_matrix_display_names(self):
+        names=['文档元数据与门禁自测','PR累计验收范围',
+               'java-advanced / real-java-concurrency','java-advanced / real-java-jvm',
+               'java-foundations / real-java-foundations (java-foundations)',
+               'java-pilot / real-java-pilot (21)','data-storage / real-redis',
+               'java-frameworks / real-java-frameworks-ui','distributed / real-distributed',
+               'data-storage / real-mysql','lab-environment / real-lab-environment',
+               'messaging / real-messaging','backend-capstone / real-backend-capstone',
+               'java-frameworks / real-java-frameworks-backend','CI验收总门禁']
+        expected={name.split(' / ')[-1] for name in names}
+        expected.remove('real-java-foundations (java-foundations)')
+        expected.remove('real-java-pilot (21)')
+        expected.update({'real-java-foundations','real-java-pilot'})
+        jobs={'total_count':15,'jobs':[{'name':name,'status':'completed','conclusion':'success'} for name in names]}
+        source.verify_jobs(jobs,expected)
+        for index,bad in ((5,'java-pilot / real-java-pilot (17)'),
+                          (5,'java-pilot / real-java-pilot (21, extra)'),
+                          (5,'other / real-java-pilot (21)'),
+                          (4,'java-foundations / real-java-foundations (other-course)')):
+            changed=json.loads(json.dumps(jobs));changed['jobs'][index]['name']=bad
+            with self.assertRaises(GateError):source.verify_jobs(changed,expected)
+        missing=json.loads(json.dumps(jobs));missing['jobs'].pop();missing['total_count']-=1
+        with self.assertRaises(GateError):source.verify_jobs(missing,expected)
+        duplicate=json.loads(json.dumps(jobs));duplicate['jobs'].append({'name':'real-java-pilot','status':'completed','conclusion':'success'});duplicate['total_count']+=1
+        with self.assertRaises(GateError):source.verify_jobs(duplicate,expected)
+        for field,value in [('status','in_progress'),('conclusion','skipped'),('conclusion','failure')]:
+            changed=json.loads(json.dumps(jobs));changed['jobs'][5][field]=value
+            with self.assertRaises(GateError):source.verify_jobs(changed,expected)
+
     def run_gate(self,mutator=None):
         with tempfile.TemporaryDirectory() as d:
             root=Path(d);(root/'scripts/ci').mkdir(parents=True);(root/'scripts/ci/plan.py').write_text("SUITES={'s': []}\nREAL_JOBS={'s':['real']}\n")

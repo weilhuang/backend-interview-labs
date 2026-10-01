@@ -67,8 +67,17 @@ def validate_source_evidence(evidence,run,tested_sha,suites):
 
 def verify_jobs(jobs,expected):
     require(jobs['total_count']==len(jobs['jobs']),'source job list was truncated')
-    names=[j['name'].split(' / ')[-1] for j in jobs['jobs']]
-    require(len(names)==len(set(names)) and set(names)==set(expected),'source job inventory mismatch')
+    # GitHub appends these two existing matrix values to reusable-workflow job
+    # display names. Match exact qualified aliases only; never strip arbitrary
+    # parenthesized values, which could accept a different JDK/course matrix.
+    matrix_aliases={
+        'java-pilot / real-java-pilot (21)': 'real-java-pilot',
+        'java-foundations / real-java-foundations (java-foundations)': 'real-java-foundations',
+    }
+    names=[matrix_aliases.get(j['name'],j['name'].split(' / ')[-1]) for j in jobs['jobs']]
+    require(len(names)==len(set(names)) and set(names)==set(expected),
+            'source job inventory mismatch: missing='+repr(sorted(set(expected)-set(names)))+
+            ', unexpected='+repr(sorted(set(names)-set(expected))))
     require(all(j['status']=='completed' and j['conclusion']=='success' for j in jobs['jobs']),'source jobs contain skipped/failed/incomplete status')
 
 def check(repo_root):
