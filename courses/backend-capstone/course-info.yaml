@@ -66,11 +66,11 @@ additional_files:
 - name: gradlew
 - name: gradlew.bat
 - name: protocol/delivery.proto
-- name: reference/src/labs/capstone/Audit.java
-- name: reference/src/labs/capstone/DeliveryFlow.java
-- name: reference/src/labs/capstone/OrderRules.java
-- name: reference/src/labs/capstone/OrderService.java
-- name: reference/src/labs/capstone/RecoveryPolicy.java
+- name: reference/01-contract/src/labs/capstone/OrderRules.java
+- name: reference/02-reliability/src/labs/capstone/OrderService.java
+- name: reference/03-delivery/src/labs/capstone/DeliveryFlow.java
+- name: reference/04-recovery/src/labs/capstone/RecoveryPolicy.java
+- name: reference/05-defense/src/labs/capstone/Audit.java
 - name: scripts/browser-smoke.mjs
 - name: scripts/check.py
 - name: scripts/course.sh

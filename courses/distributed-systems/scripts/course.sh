@@ -11,11 +11,12 @@ case "${1:-doctor}" in
     if command -v docker >/dev/null && docker info >/dev/null 2>&1; then
       echo 'Docker守护进程可用，可执行真实服务集成'
     else
-      echo 'Docker不可用：可以运行单元和本机RPC，MySQL/Kafka/Redis集成不能视为通过'
+      echo 'Docker不可用：只能执行unitTest局部快测；06/07完整Check及MySQL/Kafka/Redis集成不能视为通过'
     fi
     test -f ../../infra/versions.env || test -f shared/versions.env || { echo '缺少共享镜像版本台账'; exit 1; }
     ;;
   test) exec ./gradlew test ;;
+  unit) exec ./gradlew unitTest ;;
   integration) exec ./gradlew integrationTest ;;
   run)
     module="${2:-02-grpc}"
@@ -25,5 +26,5 @@ case "${1:-doctor}" in
     esac
     exec ./gradlew ":${module}:run"
     ;;
-  *) echo '用法：scripts/course.sh doctor|test|integration|run 模块名'; exit 2 ;;
+  *) echo '用法：scripts/course.sh doctor|unit|test|integration|run 模块名'; exit 2 ;;
 esac

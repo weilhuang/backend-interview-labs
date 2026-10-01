@@ -35,6 +35,12 @@ CONTRACT_INTEGRATION_REQUIRED = {
         'redis/06-leases': 'Editable lease operations call Redis; pure fencing model tests do not reject its empty body',
     }
 }
+CONTRACT_UNCOVERED_REGIONS = {
+    'distributed-systems': {
+        'distributed-course/services/06-transactions': ['DS-17'],
+        'distributed-course/services/07-outbox-cache': ['DS-19', 'DS-21', 'DS-22'],
+    }
+}
 INTEGRATION_OBSERVATIONS = {
     'backend-capstone': {
         'capstone/stages/04-recovery':
@@ -271,13 +277,16 @@ def make_learner(model, directory):
 def suite_plan(model, suite):
     name = model['root'].name
     if suite == 'contract':
-        goal = 'unitTest' if name in ('mysql-engineering', 'redis-engineering') else 'test'
+        goal = 'unitTest' if name in ('mysql-engineering', 'redis-engineering', 'distributed-systems') else 'test'
         tasks = []
         for task in model['tasks']:
             item = dict(task)
             reason = CONTRACT_INTEGRATION_REQUIRED.get(name, {}).get(task['path'])
             if reason:
                 item['integration_required'] = reason
+            regions = CONTRACT_UNCOVERED_REGIONS.get(name, {}).get(task['path'])
+            if regions:
+                item['outside_contract_regions'] = regions
             tasks.append(item)
         return goal, tasks, [], []
     require(name in ('mysql-engineering', 'redis-engineering', 'messaging',
@@ -416,6 +425,9 @@ def collect_results(directory, tasks, goal, expected_pass):
         require((failed == 0) if task_pass_expected else (failed > 0 and attributable > 0), f'{task["path"]}: unexpected test outcome {counts}')
         results.append({'path': task['path'], **counts,
                         'attributable_failures': attributable,
+                        **({'outside_contract_regions': task['outside_contract_regions'],
+                            'coverage_scope': 'task-start rejection only; real-service regions require the default-test audit'}
+                           if task.get('outside_contract_regions') else {}),
                         'rejection_contract': ('INTEGRATION_REQUIRED' if task.get('integration_required') else
                                                'OBSERVATION_ONLY' if task.get('observation_only') else 'REQUIRED'),
                         **({'reason': task.get('integration_required') or task.get('observation_only')}
@@ -580,6 +592,9 @@ def main(argv=None):
                 if args.mode == 'legacy-metadata':
                     entry['legacy'] = legacy_metadata(root, args.repo)
                 if args.mode == 'roundtrip':
+                    if args.suite == 'contract' and CONTRACT_UNCOVERED_REGIONS.get(root.name):
+                        entry['outside_contract_regions'] = CONTRACT_UNCOVERED_REGIONS[root.name]
+                        entry['coverage_scope'] = 'pure task-start contract only; not full default Check or independent-region acceptance'
                     roundtrip(model, args, entry)
                     if args.suite == 'contract' and CONTRACT_INTEGRATION_REQUIRED.get(root.name):
                         entry['status'] = 'INTEGRATION_REQUIRED'

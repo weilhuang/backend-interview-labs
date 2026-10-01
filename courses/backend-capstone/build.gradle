@@ -13,11 +13,13 @@ subprojects {
     apply plugin: 'application'
     java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
     application { mainClass = 'labs.capstone.BootApp' }
+    // Separate roots keep Gradle compilation and IDEA indexing in agreement.
+    // Each stage uses its editable class plus the other four completed classes.
+    def referenceSourceDirs = targets.keySet().findAll { it != project.name }
+        .collect { rootProject.file("reference/${it}/src") }
     sourceSets {
         main {
-            java.srcDirs = ['src', rootProject.file('app/src/main/java')]
-            java.srcDir rootProject.file('reference/src')
-            java.exclude { item -> item.file.parentFile.name == 'capstone' && item.file.name == targets[project.name] + '.java' && item.file.path.contains('/reference/') }
+            java.srcDirs = ['src', rootProject.file('app/src/main/java')] + referenceSourceDirs
             resources.srcDirs = [rootProject.file('app/src/main/resources')]
         }
         test { java.srcDirs = ['test', rootProject.file('shared/test')] }

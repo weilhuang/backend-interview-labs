@@ -25,7 +25,7 @@
 
 ## 完整项目在哪里
 
-本节只替换 `src/labs/capstone/Audit.java`。公共应用在 `app/src/main/java/labs/capstone/`，中文页面在 `app/src/main/resources/static/index.html`，其他已完成依赖在公开 `reference/src/labs/capstone/`。Gradle显式排除本节对应的reference同名类，防止测试绕过你的实现。`test/`与`integration-test/`是本节测试；`shared/`是可见的公共测试支撑。根README给出完整结构、接口与启动依赖。
+本节只替换 `src/labs/capstone/Audit.java`。公共应用在 `app/src/main/java/labs/capstone/`，中文页面在 `app/src/main/resources/static/index.html`，五个公开标准实现在 `reference/<阶段名>/src/labs/capstone/`。每个标准实现使用独立源码根；Gradle和IDEA只为本节加入其余四阶段的标准实现，本节同名类始终来自学习区，防止测试绕过你的实现。`test/`与`integration-test/`是本节测试；`shared/`是可见的公共测试支撑。根README给出完整结构、接口与启动依赖。
 
 ## 逐步动手
 

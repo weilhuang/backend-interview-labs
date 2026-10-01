@@ -9,6 +9,8 @@ jobs:
     name: real-distributed
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    env:
+      ORG_GRADLE_PROJECT_dockerApiVersion: '1.44'
     defaults:
       run:
         working-directory: courses/distributed-systems
@@ -42,7 +44,7 @@ jobs:
         run: |
           python -m pip install -r authoring/requirements.txt
           python authoring/validate_course.py
-      - name: 真实RPC、注册发现与全部单元
+      - name: 默认完整判题、真实RPC与注册发现
         run: ./gradlew --no-daemon --no-build-cache --max-workers=1 test verificationClasspath --continue --console=plain
       - name: 真实MySQL、Kafka、Redis与XA恢复
         run: ./gradlew --no-daemon --no-build-cache --max-workers=1 integrationTest --continue --console=plain -PdockerApiVersion=1.44
@@ -61,7 +63,7 @@ jobs:
             --java-home "$JAVA_HOME" --timeout 600 \
             --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
             --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
-      - name: 四个真实服务编码区与XA提交语义控制
+      - name: 默认Check入口的四个真实服务编码区与XA提交语义控制
         timeout-minutes: 16
         working-directory: ${{ github.workspace }}
         env:
@@ -80,6 +82,7 @@ jobs:
           def require(condition, message):
               if not condition:
                   raise SystemExit(message)
+          require(report['grading_task'] == 'test', 'Audit must exercise the native default test task')
           require(report['status'] == report['docker_integration'] == runtime['status'] == 'PASS',
                   'Real-service execution did not pass; preparation is never acceptance')
           require(runtime['execution_requested'] is True and runtime['completed_runs'] == runtime['planned_runs'] == 8,

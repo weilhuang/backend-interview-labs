@@ -119,7 +119,7 @@ def report_destination(path, author_course):
 def validate_xml(directory, case, changed, exit_code):
     expected_code = 1 if changed else 0
     require(exit_code == expected_code, f'unexpected Gradle exit {exit_code}; expected {expected_code}')
-    folder = directory / case['task'] / 'build/test-results/integrationTest'
+    folder = directory / case['task'] / 'build/test-results/test'
     files = sorted(folder.glob('TEST-*.xml'))
     expected = folder / ('TEST-' + case['test_class'] + '.xml')
     require(files == [expected], 'missing or unexpected integration class XML')
@@ -132,7 +132,7 @@ def validate_xml(directory, case, changed, exit_code):
     require(all(c.get('classname') == case['test_class'] for c in cases), 'unexpected testcase class')
     require(not root.findall('.//skipped'), 'skipped tests are not acceptance evidence')
     results = collect_results(directory, [{'path': case['task'], 'xml_classes': [case['test_class']]}],
-                              'integrationTest', not changed)
+                              'test', not changed)
     attributed = []
     if changed:
         for c in cases:
@@ -214,7 +214,7 @@ def run_case(model, archive, manifest, versions, args, case, changed, location):
             'fresh fixture must not contain XML or compiled classes')
     launcher = [str(args.gradle.resolve())] if args.gradle else ['bash', str(directory / 'gradlew')]
     command = launcher + ['--no-daemon', '--console=plain', '--max-workers=1', '--no-build-cache',
-                          '--rerun-tasks', 'clean', ':' + case['module'] + ':integrationTest',
+                          '--rerun-tasks', 'clean', ':' + case['module'] + ':test',
                           '--tests', case['test_class']]
     if args.offline:
         command.append('--offline')
@@ -279,7 +279,8 @@ def main(argv=None):
         print(f'FAIL: unsafe report destination; no file written: {error}')
         return 1
     report = {'schema_version': 1, 'status': 'NOT_RUN', 'native_idea': 'NOT_RUN',
-              'docker_integration': 'NOT_RUN', 'scope': 'four independent declared TODO regions',
+              'docker_integration': 'NOT_RUN', 'scope': 'four independent declared TODO regions through the default test task',
+              'grading_task': 'test', 'class_filter': 'existing real-service JUnit class',
               'regions': [], 'semantic_controls': [], 'reference_runs': [], 'mutation_runs': [],
               'semantic_control_runs': [],
               'runtime': {'execution_requested': args.execute, 'status': 'NOT_RUN', 'completed_runs': 0}}

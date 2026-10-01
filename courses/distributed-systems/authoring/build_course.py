@@ -308,6 +308,8 @@ def finish():
   if index==5:links += ['- [MySQL8.4语句锁与重复键共享锁](https://dev.mysql.com/doc/refman/8.4/en/innodb-locks-set.html)','- [MySQL8.4整事务死锁重试](https://dev.mysql.com/doc/refman/8.4/en/innodb-deadlocks-handling.html)']
   if index==6:links += ['- [MySQL8.4 XA状态与detach](https://dev.mysql.com/doc/refman/8.4/en/xa-states.html)','- [MySQL8.4 XA限制](https://dev.mysql.com/doc/refman/8.4/en/xa-restrictions.html)']
   source_text='\n'.join(links) or '源码验证正在执行，发布前必须回填固定提交；不得将当前标签入口称为验证通过。'
+  check_commands = (f'''本节完整判题：`./gradlew :{name}:test`，同时执行合同测试与真实服务测试；Academy Check 使用此默认入口，需要可用Docker。只完成纯合同部分、XA/发布/缓存编码区仍为TODO时不得判为完成；缺Docker、镜像拉取失败或服务启动异常也应失败，不能当作错误答案被正确拒绝。局部快测可显式执行 `./gradlew :{name}:unitTest`，绿色仅代表不依赖Docker的合同，不代表本节完成。`./gradlew :{name}:integrationTest` 保留为单独真实服务回归；完整调用端为 `./gradlew :{name}:run`。方法/类过滤仅用于定位问题，完成判定必须不加过滤地执行完整模块test。''' if name in ('06-transactions', '07-outbox-cache')
+                    else f'''本节单元检查：`./gradlew :{name}:test`；完整调用端：`./gradlew :{name}:run`。含数据库/消息服务的单元另执行 `./gradlew :{name}:integrationTest`，Docker不可用应明确失败，不能跳过后当作通过。每次修改先跑对应方法测试，再跑全模块回归。''')
   write(base/'task.md',f'''# {title}
 
 对应目录 {unit}。Java 21主线，本节可独立选择Gradle模块；依赖版本、完整源码与发布状态见课程首页。所有调用方、测试、数据定义和标准解直接可见。
@@ -332,7 +334,7 @@ def finish():
 
 以下命令用于源码仓库/公开源码包；Academy官方ZIP内用Check/Run或Gradle工具窗口执行同名任务。官方导出可能剔除Wrapper脚本/JAR，不能假设导入目录能直接运行./gradlew。独立服务课需同源shared/versions.env快照，缺失时不能视为发行完成。
 
-本节单元检查：`./gradlew :{name}:test`；完整调用端：`./gradlew :{name}:run`。含数据库/消息服务的单元另执行 `./gradlew :{name}:integrationTest`，Docker不可用应明确失败，不能跳过后当作通过。每次修改先跑对应方法测试，再跑全模块回归。
+{check_commands}
 
 ## 正确性合同与保证边界
 

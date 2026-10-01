@@ -66,7 +66,7 @@ python scripts/quality/academy_gate.py roundtrip \
 
 ## 4. 纯合同与真实服务分层
 
-默认 `--suite contract`：MySQL、Redis 使用现有 `unitTest`，其余课程使用现有 `test`。不会在后台偷偷启动 Docker。本轮已证实Redis 04一致性、05复制、06租约三个学员起点在纯unitTest全过：对应结果明确标为 `INTEGRATION_REQUIRED`。该课程的纯合同模式完成后整体仍为 `INTEGRATION_REQUIRED`、非零退出，不是学员拒绝通过。必须另运行真实integration模式。未知的未拒绝题则直接FAIL。不能把其他测试的成功当作该学习区已受测。
+默认 `--suite contract`：MySQL、Redis、分布式使用显式 `unitTest`，其余课程使用现有 `test`。不会在后台偷偷启动 Docker。分布式报告另外列出 `outside_contract_regions`：06的DS-17、07的DS-19/21/22不由该纯快测验收；其PASS只表示每题起点的局部合同，不能代表默认Check或全部编码区完成。本轮已证实Redis 04一致性、05复制、06租约三个学员起点在纯unitTest全过：对应结果明确标为 `INTEGRATION_REQUIRED`。该课程的纯合同模式完成后整体仍为 `INTEGRATION_REQUIRED`、非零退出，不是学员拒绝通过。必须另运行真实integration模式。未知的未拒绝题则直接FAIL。不能把其他测试的成功当作该学习区已受测。
 
 已有 Docker 的隔离发布环境可以显式执行：
 
@@ -135,7 +135,7 @@ python scripts/quality/distributed_integration_audit.py \
   --report build/quality/distributed-region-audit-new.json
 ```
 
-两个参考模块先通过，随后4个TODO变体及可选2个提交缺失控制串行执行。每次新源码树、新编译和新鲜XML，失败必须归因到精确编码区/预期断言；编译、环境、容器、超时、skip或其他未知异常仍失败。默认只准备、退出2，明确 `NOT_RUN`；只有 `--execute` 完成全部计划运行才可能PASS。300秒单进程与900秒总执行预算涵盖语义控制及终止清理，没有并行容器放大或预算外重试。
+这组审计改为调用默认`:06-transactions:test`或`:07-outbox-cache:test`，用`--tests`选择原有真实服务JUnit类，核验`build/test-results/test`，以直接守住默认判题任务包含真实服务类。测试源码、case数量与单独integrationTest均保留。它仍不等同于原生Check或不带过滤的整模块绿色，官方包还须另做原生无过滤Check验收。两个参考模块先通过，随后4个TODO变体及可选2个提交缺失控制串行执行。每次新源码树、新编译和新鲜XML，失败必须归因到精确编码区/预期断言；编译、环境、容器、超时、skip或其他未知异常仍失败。默认只准备、退出2，明确 `NOT_RUN`；只有 `--execute` 完成全部计划运行才可能PASS。300秒单进程与900秒总执行预算涵盖语义控制及终止清理，没有并行容器放大或预算外重试。
 
 适用平台仅针对作者工具：Linux CI Python3.12；macOS使用共享进程清理器需Python3.13或以上（`os.waitid` / `WNOWAIT`），不满足时在创建工作副本/启动Java前失败。普通学习者IDEA/Gradle流程不新增Python依赖。macOS原生运行未验证；这些脚本也不验证IDEA的Check、Reset、官方导出/导入。CI证据、时限与上传范围见[分层CI](../ci.md#分布式四区真实拒绝门禁)，最终计数与诊断边界见[阶段报告](中文阶段报告.md#补充审计37个合同区与四个真实服务区)。
 

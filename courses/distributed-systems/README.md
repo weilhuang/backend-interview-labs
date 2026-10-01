@@ -17,7 +17,7 @@
 | 数据客户端 | MySQL Connector/J 9.2.0；Kafka客户端3.9.1；Jedis5.2.0 |
 | 其他直接依赖 | javax.annotation-api 1.3.2（仅编译生成stub）、SLF4J Simple2.0.16；全部传递依赖逐配置精确版本见各模块gradle.lockfile |
 | 容器镜像 | 唯一来源仓库`infra/versions.env`：MYSQL_IMAGE、KAFKA_IMAGE、REDIS_IMAGE。当前台账MySQL8.4.7、Kafka3.9.1、Redis7.4.7；代码不复制镜像常量 |
-| Docker | 单元/真实回环RPC不需要；MySQL/Kafka/Redis集成必须有Docker daemon。制作环境无daemon；GitHub Ubuntu Docker CI已通过9项真实服务集成，精确提交与范围见中文阶段报告 |
+| Docker | 显式unitTest局部快测不需要；06/07默认test与Academy Check必须有Docker daemon，包含真实XA/Outbox/缓存练习区。其余真实服务仍用integrationTest。历史GitHub Docker CI范围见中文阶段报告；新入口须另验 |
 | IDE与Academy | 目标IntelliJ IDEA 2026.1.5 / Academy 2026.9-2026.1-1070；本课GUI预览/Check/Reset/导出/干净导入均单独待验，不继承其他课程结果 |
 | 前端 | 本课不需要图形前端；已提供两套真实RPC调用端及完整集成调用链，学习者无需制作前端 |
 | 服务与资源 | 本机RPC随机回环端口；容器随机映射端口。最大并行集成为两个MySQL或MySQL+Kafka+Redis。建议至少4CPU/6GiB空闲内存，此建议不是已测最低配置 |
@@ -33,16 +33,17 @@ cd courses/distributed-systems
 ./gradlew :01-failure-model:test :01-failure-model:run
 ./gradlew :02-grpc:test :02-grpc:run
 ./gradlew :03-dubbo:test :03-dubbo:run
-./gradlew test
+./gradlew unitTest # 显式局部快测，不能代表06/07完成
 # 以下需要真正可用的Docker；缺失时失败，不自动跳过
-./gradlew integrationTest
+./gradlew test # 06/07的默认判题包含真实服务编码区
+./gradlew integrationTest # 保留05–08全部真实服务回归
 ```
 
 Academy官方ZIP导入后使用题目Check/Run或IDE的Gradle工具窗口执行同名任务。当前官方导出会剔除gradlew、gradlew.bat与wrapper.jar；因此下文./gradlew命令仅适用于源码仓库/公开源码分发包，不能假设Academy导入目录自带Wrapper。不要要求学员靠猜测补文件。
 
 独立包必须带`shared/versions.env`同源快照；作者的`authoring/build_distribution.py`从根台账复制并记录哈希，Academy正式导出前需在对应作者工程中登记该快照。缺少台账的ZIP不算完整可运行发行版。
 
-`./gradlew test`包含真实回环TCP gRPC、Dubbo以及嵌入式真实ZooKeeper，另有H2 SQL合同快测；它不启动MySQL/Kafka/Redis容器。`integrationTest`是真实持久化与消息链路。第一次下载失败是环境/依赖错误，不能改测试来绕过。不要把作者本机Maven缓存作为发行依赖。
+`./gradlew unitTest`显式运行真实回环TCP gRPC、Dubbo、嵌入式真实ZooKeeper与H2 SQL局部合同，不启动容器。默认`test`在06/07还会执行原有`integration-test`中的真实MySQL XA、Kafka Outbox及Redis缓存测试，避免纯合同部分写完后整题误绿。缺Docker或服务启动失败必须失败。`integrationTest`仍单独保留05–08的完整真实持久化与消息链路。快测绿色、指定类/方法绿色都不表示整题完成；06/07完成前必须执行不带过滤的模块`test`。第一次下载失败是环境/依赖错误，不能改测试来绕过。不要把作者本机Maven缓存作为发行依赖。
 
 ## 8个独立编码单元
 
@@ -62,7 +63,7 @@ Academy官方ZIP导入后使用题目Check/Run或IDE的Gradle工具窗口执行�
 ## 如何学习而不只看答案
 
 1. 读企业场景和ASCII图，先运行完整调用方
-2. 从测试合同推导一个练习区，使用 `./gradlew :模块:test --tests '类名.方法名'` 逐步验证
+2. 从测试合同推导一个练习区，使用 `./gradlew :模块:test --tests '类名.方法名'` 逐步定位；过滤测试不是整题完成证据，06/07最终须无过滤运行模块test
 3. 引入本节的重复/超时/并发/崩溃条件，记录持久状态和可观察结果
 4. 跟踪固定源码入口，在标准答案之前写下机制推断
 5. 核对solutions，解释替代实现与边界，再独立完成迁移题和口述答辩

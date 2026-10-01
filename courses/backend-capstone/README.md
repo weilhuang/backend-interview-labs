@@ -57,7 +57,7 @@ backend-capstone/
     Usage.java / HealthMain.java   可见CLI与容器探针
     protocol/                     由公开proto固定工具生成
   app/src/main/resources/static/index.html  完整中文前端
-  reference/src/labs/capstone/     五个公开标准实现
+  reference/<阶段名>/src/labs/capstone/  五个公开标准实现，各自独立源码根
   capstone/stages/
     01-contract/ ... 05-defense/   每节src、test、integration-test、题面、YAML
   shared/test/                    H2控制流测试支撑，不能替代MySQL

@@ -1,4 +1,11 @@
 {
+  "historical_snapshot_notice": {
+    "marked_historical_utc": "2026-10-01",
+    "meaning": "Historical per-commit snapshots and original FAIL/NOT_RUN evidence are preserved below; not the current release state",
+    "current_readiness": "release-readiness-20261001.json",
+    "current_release_index": "../curriculum/09-v1-progress.md",
+    "post_commit_truth": "https://github.com/weilhuang/backend-interview-labs/pull/1 ; corresponding exact-commit CI run and evidence comment"
+  },
   "schema_version": 1,
   "status": "PARTIAL_VERIFIED_WITH_EXPLICIT_GAPS",
   "date_utc": "2026-09-30",

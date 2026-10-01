@@ -42,7 +42,7 @@ class DistributedIntegrationAuditTests(unittest.TestCase):
 
     def write(self, root, case=None):
         case = case or self.case
-        folder = self.root / case['task'] / 'build/test-results/integrationTest'
+        folder = self.root / case['task'] / 'build/test-results/test'
         folder.mkdir(parents=True, exist_ok=True)
         path = folder / ('TEST-' + case['test_class'] + '.xml')
         ET.ElementTree(root).write(path, encoding='utf-8')
@@ -198,10 +198,10 @@ class DistributedIntegrationAuditTests(unittest.TestCase):
         for case in self.cases:
             def synthetic_process(command, cwd, env, log, timeout):
                 audit.verify_inputs(cwd, manifest, case)
-                self.assertIn(':' + case['module'] + ':integrationTest', command)
+                self.assertIn(':' + case['module'] + ':test', command)
                 self.assertIn('--no-build-cache', command)
                 self.assertIn('--rerun-tasks', command)
-                folder = cwd / case['task'] / 'build/test-results/integrationTest'
+                folder = cwd / case['task'] / 'build/test-results/test'
                 folder.mkdir(parents=True)
                 ET.ElementTree(self.xml(case=case)).write(folder / ('TEST-' + case['test_class'] + '.xml'))
                 for source_set, owner in [('main', case['owner']), ('integrationTest', case['test_class'])]:

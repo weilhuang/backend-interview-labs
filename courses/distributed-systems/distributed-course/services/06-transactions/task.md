@@ -45,7 +45,7 @@ Saga：STARTED -> RESERVED -> COMPLETED
 
 以下命令用于源码仓库/公开源码包；Academy官方ZIP内用Check/Run或Gradle工具窗口执行同名任务。官方导出可能剔除Wrapper脚本/JAR，不能假设导入目录能直接运行./gradlew。独立服务课需同源shared/versions.env快照，缺失时不能视为发行完成。
 
-本节单元检查：`./gradlew :06-transactions:test`；完整调用端：`./gradlew :06-transactions:run`。含数据库/消息服务的单元另执行 `./gradlew :06-transactions:integrationTest`，Docker不可用应明确失败，不能跳过后当作通过。每次修改先跑对应方法测试，再跑全模块回归。
+本节完整判题：`./gradlew :06-transactions:test`，同时执行合同测试与真实服务测试；Academy Check 使用此默认入口，需要可用Docker。只完成纯合同部分、XA/发布/缓存编码区仍为TODO时不得判为完成；缺Docker、镜像拉取失败或服务启动异常也应失败，不能当作错误答案被正确拒绝。局部快测可显式执行 `./gradlew :06-transactions:unitTest`，绿色仅代表不依赖Docker的合同，不代表本节完成。`./gradlew :06-transactions:integrationTest` 保留为单独真实服务回归；完整调用端为 `./gradlew :06-transactions:run`。方法/类过滤仅用于定位问题，完成判定必须不加过滤地执行完整模块test。
 
 ## 正确性合同与保证边界
 

@@ -15,6 +15,8 @@ allprojects {
 }
 subprojects {
     apply plugin: 'java-library'
+    // Academy Check 调用模块 test；这两节的真实服务练习区必须同时参与判题。
+    def realGradingModule = project.name in ['06-transactions', '07-outbox-cache']
     java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
     sourceSets {
         main { java.setSrcDirs(['src']); resources.setSrcDirs(['resources']) }
@@ -57,7 +59,7 @@ subprojects {
         if (project.hasProperty('dockerApiVersion')) {
             systemProperty 'api.version', project.property('dockerApiVersion')
         }
-        if (name == 'integrationTest') {
+        if (name == 'integrationTest' || (name == 'test' && realGradingModule)) {
             Properties images = new Properties()
             if (!versions.isFile()) throw new GradleException('缺少共享镜像台账：' + versions)
             versions.withInputStream { images.load(it) }
@@ -78,6 +80,17 @@ subprojects {
                 println ''
             }
         }
+    }
+    tasks.register('unitTest', Test) {
+        description = '不依赖Docker的局部合同快测；不能代替06/07完整Check或真实服务验收'
+        testClassesDirs = sourceSets.test.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath
+    }
+    if (realGradingModule) tasks.named('test', Test) {
+        description = 'Academy完整判题：合同与真实服务一起执行；Docker不可用即失败'
+        dependsOn tasks.named('integrationTestClasses')
+        testClassesDirs = sourceSets.test.output.classesDirs + sourceSets.integrationTest.output.classesDirs
+        classpath = sourceSets.test.runtimeClasspath + sourceSets.integrationTest.runtimeClasspath
     }
     tasks.register('integrationTest', Test) {
         description = '必须在有Docker的隔离环境执行真实服务，缺失即失败，不静默跳过'
@@ -154,6 +167,7 @@ project(':08-capacity') {
         implementation project(':05-idempotency')
     }
 }
+tasks.register('unitTest') { dependsOn subprojects.collect { it.tasks.named('unitTest') } }
 tasks.register('test') { dependsOn subprojects.collect { it.tasks.named('test') } }
 tasks.register('integrationTest') { dependsOn subprojects.collect { it.tasks.named('integrationTest') } }
 tasks.named('check') { dependsOn tasks.named('test') }

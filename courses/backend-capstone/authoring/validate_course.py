@@ -22,7 +22,7 @@ for item in json.loads((root/'authoring/manifest.json').read_text()):
   if 'placeholders' in f:
    source=p.read_text();raw=source.encode('utf-16-le');last=0
    assert source in text,'完整公开答案与源码不一致：'+str(p)
-   assert source==(root/'reference/src/labs/capstone'/p.name).read_text(),'参考检查点漂移：'+str(p)
+   assert source==(root/'reference'/item['module']/'src/labs/capstone'/p.name).read_text(),'参考检查点漂移：'+str(p)
    for ph in f['placeholders']:
     begin,end=ph['offset']*2,(ph['offset']+ph['length'])*2
     assert 0<=last<=begin<end<=len(raw),ph

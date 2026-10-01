@@ -165,7 +165,7 @@ class WorkflowContractTests(unittest.TestCase):
                     if 'distributed_integration_audit.py' in step.get('run', ''))
         # Execute the actual workflow assertion against JSON fixtures; never invoke Java/Docker.
         assertion = step['run'].split("python - <<'PY'\n", 1)[1].rsplit('\nPY', 1)[0]
-        good = {'status': 'PASS', 'docker_integration': 'PASS',
+        good = {'status': 'PASS', 'docker_integration': 'PASS', 'grading_task': 'test',
                 'runtime': {'status': 'PASS', 'execution_requested': True, 'completed_runs': 8, 'planned_runs': 8},
                 'limits': {'gradle_process_seconds': 300, 'total_execution_seconds': 900},
                 'reference_runs': [{'module': module, 'status': 'PASS'} for module in ('06-transactions', '07-outbox-cache')],
@@ -179,6 +179,11 @@ class WorkflowContractTests(unittest.TestCase):
                 return subprocess.run([sys.executable, '-c', assertion], cwd=directory,
                                       capture_output=True, text=True, timeout=10).returncode == 0
             self.assertTrue(accepted(good))
+            for task in ('integrationTest', 'unitTest'):
+                bad = copy.deepcopy(good); bad['grading_task'] = task
+                self.assertFalse(accepted(bad), task)
+            bad = copy.deepcopy(good); del bad['grading_task']
+            self.assertFalse(accepted(bad), 'missing grading_task')
             bad = copy.deepcopy(good); bad['status'] = bad['docker_integration'] = bad['runtime']['status'] = 'NOT_RUN'
             self.assertFalse(accepted(bad))
             for key, value in (('execution_requested', False), ('execution_requested', 'true'),

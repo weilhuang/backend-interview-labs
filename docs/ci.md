@@ -1,5 +1,9 @@
 # CI：验收范围、成本与证据
 
+**2026-10-01更新：** 当前源码/验收范围见[制作与验证进度](curriculum/09-v1-progress.md)与[日期化质量摘要](quality/release-readiness-20261001.json)。本文保留旧提交的运行数字和失败历史；新提交以[PR #1](https://github.com/weilhuang/backend-interview-labs/pull/1)中对应真实运行/证据评论为准，不预写未来CI通过。C10的contract现在走 `unitTest`，DS-17/19/21/22标为 `INTEGRATION_REQUIRED`，只算局部证据；06/07默认 `test` / Academy Check必须包含真实Docker类，原完整集成和逐区真实门禁继续保留。
+
+本次发布源码修复与报告，不发布本地9份评审ZIP，也不启用 `official_release_gate` 的CI hook。交付方向已改为Actions打包产物、随后整合单一Academy总课与统一环境；官方自动export仍在研究、尚未实现。既有测试产物上传不代表课程官方导出自动化已完成。
+
 ## 当前策略
 
 统一入口为 [课程分层验收](../.github/workflows/ci.yml)，九个原课程工作流改为 `workflow_call`。原有真实 Gradle/JUnit、错误变体、真实数据库/broker、RPC、恢复和浏览器测试命令保留；Gradle 显式关闭构建输出缓存。此调整没有增加定时运行、付费 runner、写权限、凭据或仓库设置。

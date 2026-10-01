@@ -1,51 +1,44 @@
-# V1 制作与验证进度
+# V1制作与验证进度
 
-更新：2026-09-30。此表是阶段性工程证据，不是学习者已掌握或 V1 已发布的声明。完整范围仍以 [分版验收矩阵](08-release-plan.md) 为准，不因两周面试路线缩减。
+更新：2026-10-01（UTC）。**V1未完成；本表是工程/评审证据，不是学习者已掌握的声明。** 完整范围仍以[分版验收矩阵](08-release-plan.md)为准，两周路线只调整顺序。
 
-## 如何评审
+本地保留9份分课官方评审归档，离线完整性9/9通过；此前已交付7份，C10/C14两份待新提交CI。本次只发布已审源码修复和报告，不发布这9份ZIP或下载目录。分课证据合计84题/136区，不含内部12题试点，也不等同于规划中的16门/113个实验单元，详见[日期化摘要](../quality/release-readiness-20261001.json)。
 
-每门报告列出章节、讲解深度、完整调用方、测试、标准解、源码入口和已知边界。建议先看阶段报告，再抽读一节 task.md 和对应公开测试；对深度、节奏或案例提出调整。源码中的作者答案能通过测试，不代表学习者独立完成。
+## 交付方向调整
 
-| 课程 | 内容实现 | 已取得真实验证 | 仍需完成 |
+按最新需求，先通过GitHub Actions打包提供产物，不走聊天上传；随后将全部V1整合为单一Academy总课与统一环境。整合正在推进，CI调用Academy官方自动export仍在研究、尚未实现。当前9份分课归档仅保留为本地历史和验证证据，不能算单一总课已经完成；普通源码压缩包也不能冒充官方导出。离线归档守卫的代码和自测可独立发布，但本次不启用其CI hook。
+
+## 第二版已启动
+
+2026-10-01新增要求：第二版接入同一总课程，覆盖云原生、可观测、Go基础/核心/Gin/GORM、企业IAM/LDAP/Keycloak。当前开始细化课程与实验设计，尚无第二版完成或测试通过声明。第二版提高前置知识、图解、完整调用链、故障排查与真实依赖/端到端验收要求，不削减第一版范围。
+
+## 当前矩阵
+
+| 课程 | 内容 | 已实际取得的证据 | 剩余边界 |
 |---|---|---|---|
-| C00/C01 Java 基础与集合 | 16 单元，52 公开测试，16 调用端，16 替代解，33 错误变体 | 云端真实 JDK21/Gradle；HashMap JDI 分支；JMH 短探索 | CI 已通过；官方导出与干净导入，三类题 Check/Reset 抽检通过；其余逐题界面与独立试学未验 |
-| C02 JUC | 8 单元 | JDK21/Gradle 与 CI；38 测试、8 替代解、20 变体；官方导出、两次干净导入与首题 Check/Reset 抽检通过 | 其余逐题 GUI 与独立试学 |
-| C03 JVM/现代 Java | 7 单元 | JDK21/Gradle 与 CI；30 测试、7 替代解、19 变体；官方导出、两次干净导入与首题 Check/Reset 抽检通过 | 其余逐题 GUI 与独立试学 |
-| C04/C05 Spring/Boot | 14 阶段，预置中文页面 | 真实构建、MySQL 集成、14 调用端、32 负例 | 11 项真实浏览器断言与桌面/窄屏截图已通过；官方导出、干净导入及两题 Check/Reset 抽检通过；其余逐题 GUI 与独立试学待做 |
-| C06 MySQL | 7 单元 | 40 测试，其中 23 项真实服务测试，CI 通过 | 独立包同源台账已验证；Academy 发行验收待做 |
-| C07 Redis | 7 单元 | 36 测试，其中 19 项真实服务测试，CI 通过 | 独立包同源台账已验证；Academy 发行验收待做 |
-| C08 Kafka | 6 单元 | 真实 Broker/数据库、三副本故障路径；与 RocketMQ 合计 44 项测试全过，其中 17 项真实服务测试 | Academy 发行验收与独立试学 |
-| C09 RocketMQ | 6 单元 | QueryRoute、双组收发、重试/顺序/事务与已写段恢复全部通过；MQ 合计 44 项，零失败/错误/跳过 | Academy 发行验收与独立试学 |
-| C10 分布式 | 8 单元，真实 gRPC/Dubbo/注册发现 | 44 项本机/RPC、9 项真实服务测试全过；25 变体；8 CLI | 同键死锁、重启端口与XA恢复已在真实CI复验通过；Academy、macOS与独立试学待验 |
-| C14 综合项目 | 5 阶段已制作，完整订单/库存/outbox/inbox/缓存/RPC 与中文前端 | 35 快测＋5 真实服务测试；5 调用端、5 组正反解、11 脚本边界；Compose 独立进程恢复与 320/390/800/801/1440px 浏览器检查全过 | Academy 发行验收、macOS 与独立试学 |
+| C00/C01 Java基础与集合 | 16题 | 官方导出/导入；3类代表题Check/Reset；源码CI | 其余逐题原生、独立试学未验 |
+| C02 并发/JUC | 8题 | 修订公开并发测试后重新官方导出/导入；03 TODO失败→参考通过→Reset精确 | 旧包不代表新测试；其余逐题原生未验 |
+| C03 JVM/现代Java | 7题 | 官方导出/导入；首题Check/Reset；源码CI | 其余逐题原生未验 |
+| C04/C05 Java框架 | 14题 | 后端/浏览器CI；2题Check/Reset；文档-only修订重导入 | 修订包未重复Check，非全14题原生通过 |
+| C06 MySQL | 7题 | 官方导入；05纯Gradle合同负/正/Reset/再负；旧真实服务CI | 无Docker，默认Check未运行，进度0/7 |
+| C07 Redis | 7题 | 官方导入；02纯Gradle合同负/正/Reset/再负；旧真实服务CI | 默认Check未运行；纯输入分支不证明TTL/复制/一致性 |
+| C08/C09 Kafka/RocketMQ | 各6题，合包12题 | 两组首题Check/Reset；README-only重导出/导入；f5源码54项通过 | Check为既有纯层，其余10题原生/真实broker界面验收未完成 |
+| C10 分布式 | 8题 | 新包01/02 Check/Reset；06/07原生发现9/5项，纯项7/4通过，2/1 Docker环境失败，零跳过；137资产恢复0/8 | 新包已准备、尚未交付；真实新CI/服务正例仍NOT_RUN；contract的unitTest对四个真实区仅INTEGRATION_REQUIRED |
+| C14 综合项目 | 5阶段 | 修复后五个IDE模型/重载、五编辑器无重复类；01六错→六对→Reset；IDE Usage退出0；90资产恢复0/5 | 新包已准备、尚未交付；其他四题本轮原生Check/Reset、Docker与真实网页未验 |
 
-内部 12 题试点不计入上述完整课程数量。试点官方导出和两次干净导入、第 1 题错误/正确/重置已实测；不能外推到其他题和其他课程，详见 [界面验收报告](../界面验收报告.md)。
+导出未勾选Check all tasks，不能因ZIP存在而称全题通过。MySQL/Redis的纯任务不是Academy Check；C10的06/07默认test/Check需要Docker，不能用过滤测试代替。内部12题试点单列，见[界面报告](../界面验收报告.md)。
 
-C02 本轮改进了公开并发测试的异常传播，使学习者 TODO 失败能直接暴露而非被次生超时掩盖。已交付的官方 ZIP 保持原样；其 GUI 抽检记录仍只代表原包，新源码发行包需另行导出和比对，详见 [质量增强阶段报告](../quality/中文阶段报告.md)。
+## 各层结论分开记录
 
-## 当前可复核证据
+- **PASS，旧基线**：[f5b0d493573f241bf6ea2bad3318911debd7f74f / 36780139579](https://github.com/weilhuang/backend-interview-labs/actions/runs/36780139579)，12/12实际job、10课三阶段、分布式额外8次通过
+- **PASS，本地新证据**：C10纯参考48项；C14参考35项、学习者28个TODO失败、5个CLI Usage与集成源码编译；149项合并Python回归；9个官方归档离线完整性。这些不是新Docker CI
+- **FAIL，保留的缺陷/环境证据**：旧C10 XA仍TODO而原生Correct；旧C14重复类诊断。新C10原生06/07缺Docker时明确失败，不计作学习者拒绝或服务成功
+- **NOT_RUN**：C10/C14新构建真实CI、完整原生/真实服务范围、跨平台与独立试学。提交后以[PR #1](https://github.com/weilhuang/backend-interview-labs/pull/1)中对应运行和证据评论为准，不预写绿灯
 
-下面九条运行均对应提交 `1fb27d8885bf1eb62b112d2e15f5478becf697fa`，结论为成功。历史失败保留为排错记录，不表示修复后的版本仍失败。
+本地预检最终为149项质量工具、36项CI合同、99项环境脚本通过。首次CI自测因旧夹具缺新字段失败，补齐后复跑；环境脚本首次因未设JAVA_HOME出现setUp错误，配置JDK21后完整重跑99项。两次初始失败保留，不是产品或新CI通过证据。
 
-- [MySQL/Redis 全部真实服务 CI](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760864)
-- [Kafka/RocketMQ 完整 44 项与课程正反解通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760650)
-- [框架后端、MySQL、调用端、负例与真实中文浏览器通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760801)
-- [完整 Java 基础课程与 JDI 通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760767)
-- [JUC/JVM 构建、正反解及诊断通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760776)
-- [内部试点通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760613)
-- [C10 全部真实服务与正反解通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760872)
-- [C14 全部测试、独立进程恢复及五种视口通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760606)
-- [共享环境真实读写、Rocket 持久化与 JDK21 构建通过](https://github.com/weilhuang/backend-interview-labs/actions/runs/36746760630)
+C14新Gradle/IDE模型每阶段只包含当前学习者实现和其他四阶段完整参考，五阶段各27个唯一Java文件；原生重载后仍一致。其35项CLI快测不等于五题原生全验，已核对的两张PNG仍是历史网页证据。
 
-已有通过仅对应记录中的版本。新质量门禁和 CI 调度改动必须在新提交上验证，不能沿用旧提交的全绿结论；运行中、取消、未执行与失败分别记录，不视为成功。私人仓库的 Actions 计费与 ChatGPT 套餐不同，当前没有读取账户剩余额度；上述运行确实执行并通过，不能将先前测试失败归因于额度不足。
+当前快照见[精简机器摘要](../quality/release-readiness-20261001.json)。[质量阶段报告](../quality/中文阶段报告.md)与[界面报告](../界面验收报告.md)保留各版失败/修复；旧`1fb27d8`和`f5b0d49`不覆盖本次新C10/C14源码。离线归档守卫也不重新执行导入、Check或Reset。
 
-## 发布前重点
-
-测试层次见 [Academy 质量门禁说明](../quality/academy-quality-gates.md)，本轮实测与缺口见 [中文阶段报告](../quality/中文阶段报告.md)，执行策略见 [CI 使用指南](../ci.md)。新门禁的本地验证与 GitHub 运行结果分别记录，不互相代替。
-
-1. 补齐跨课程学习者生命周期、归档完整性与独立占位区测试，并验证新的 CI 调度不会漏验或产生假绿
-2. 各课程独立归档统一镜像台账和辅助镜像，提供可复建环境
-3. 按课程结构逐项做 Academy 官方导出、干净导入、Check、Reset 与可见性检查
-4. 交付源码、官方归档、版本/已知问题和中文操作文档，邀请实际试学反馈
-
-开发未使用用户 Mac；Linux 云端与 CI 通过不代表 macOS/Apple Silicon 已实测。JDK 主线固定 21，容器按需启动，不要求同时运行所有依赖。
+发布前仍需新提交真实CI与完整原生/真实服务验收，再收集实际试学反馈。已测Linux云端；macOS/Apple Silicon及其他系统未完成原生验收。未使用用户Mac，没有账户账单或余额证明。
