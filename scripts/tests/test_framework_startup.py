@@ -73,6 +73,9 @@ if ours and result.returncode==0:
   if n: result.stdout=result.stdout.replace('2026','2025')+' changed'
  if 'command=' in args:
   if mode=='wrong_identity': result.stdout='fixture-worker-without-course-identity\\n'
+  elif mode in ('transition_commands','empty_command_transition'):
+   count=root/'transition-observations';n=int(count.read_text()) if count.exists() else 0;count.write_text(str(n+1))
+   if n<2: result.stdout=('fixture-intermediate-exec-without-final-flags' if mode=='transition_commands' else '')+'\\n'
   elif mode=='startup_timeout':
    parent=subprocess.check_output([os.environ['FIXTURE_PS'],'-p',query,'-o','ppid='],text=True).strip()
    result.stdout=subprocess.check_output([os.environ['FIXTURE_PS'],'-ww','-p',parent,'-o','command='],text=True)
@@ -140,6 +143,24 @@ print('200',end='')
         self.assertIn('--max-time', self.calls()[0])
         self.run_course('stop')
 
+    def test_unknown_exec_transitions_wait_for_final_identity_without_http(self):
+        self.environment['FIXTURE_MODE']='transition_commands'
+        result=self.run_course('start')
+        self.assertGreaterEqual(int((self.root/'transition-observations').read_text()),3)
+        self.assertTrue((self.root/'exec-ready').exists())
+        self.assertLessEqual(result.stderr.count('启动过渡观察'),3)
+        self.assertNotIn((self.state/'token').read_text().strip(),result.stderr)
+        self.assertEqual(self.calls(),[])
+        self.run_course('check');self.assertEqual(len(self.calls()),1);self.run_course('stop')
+
+    def test_empty_exec_command_does_not_become_ready_until_final_identity(self):
+        self.environment['FIXTURE_MODE']='empty_command_transition'
+        result=self.run_course('start')
+        self.assertGreaterEqual(int((self.root/'transition-observations').read_text()),3)
+        self.assertIn('command_chars=0',result.stderr)
+        self.assertTrue((self.root/'exec-ready').exists())
+        self.assertEqual(self.calls(),[]);self.run_course('stop')
+
     def test_early_exit_fails_without_http(self):
         self.environment['FIXTURE_MODE'] = 'early_exit'
         self.run_course('start', 1)
@@ -147,7 +168,10 @@ print('200',end='')
 
     def test_wrong_identity_fails_without_http(self):
         self.environment['FIXTURE_MODE'] = 'wrong_identity'
-        self.assertIn('身份不匹配', self.run_course('start', 1).stdout)
+        result=self.run_course('start', 1)
+        self.assertIn('身份不匹配',result.stdout)
+        self.assertIn('超时',result.stdout)
+        self.assertLessEqual(result.stderr.count('启动过渡观察'),3)
         self.assertEqual(self.calls(), [])
 
     def test_changed_parent_start_time_fails_without_http(self):
@@ -158,7 +182,9 @@ print('200',end='')
     def test_startup_timeout_is_bounded_and_not_ready(self):
         self.environment['FIXTURE_MODE'] = 'startup_timeout'
         self.assertIn('超时', self.run_course('start', 1).stdout)
-        self.assertEqual((self.root / 'sleeps').read_text().splitlines(), ['0.1'] * 100)
+        sleeps=(self.root / 'sleeps').read_text().splitlines()
+        self.assertTrue(1<=len(sleeps)<=100)
+        self.assertTrue(all(value=='0.1' for value in sleeps))
         self.assertEqual(self.calls(), [])
 
     def test_http_retry_is_separate_from_process_start(self):

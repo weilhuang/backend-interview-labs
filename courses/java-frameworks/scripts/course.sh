@@ -58,17 +58,29 @@ case "$action" in
   launch_identity="$(LC_ALL=C ps -p "$pid" -o ppid= -o lstart= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
   read -r launch_parent launch_time <<< "$launch_identity"
   [[ "$launch_parent" == "$$" && -n "$launch_time" ]] || { echo '启动子进程身份不匹配';exit 1; }
-  for ((attempt=0; attempt<100; attempt++)); do
+  launch_deadline=$((SECONDS+10))
+  pending_samples=0
+  for ((attempt=0; attempt<100 && SECONDS<launch_deadline; attempt++)); do
    alive "$pid" || { echo '启动子进程已退出';exit 1; }
    current_identity="$(LC_ALL=C ps -p "$pid" -o ppid= -o lstart= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
    [[ "$current_identity" == "$launch_identity" ]] || { echo '启动子进程身份已改变';exit 1; }
    command="$(LC_ALL=C ps -ww -p "$pid" -o command= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
-   if [[ " $command " == *" -Dframework.lab.token=$token "* && " $command " == *" -Dframework.lab.instance=$ROOT "* && " $command " == *" labs.frameworks.Lab "* ]]; then break;fi
-   # 仅继承自本次启动脚本的命令行可以重试；其他身份立即失败，不做HTTP探测。
-   [[ "$command" == "$launch_command" ]] || { echo '启动子进程实例身份不匹配';exit 1; }
+   if [[ " $command " == *" -Dframework.lab.token=$token "* && " $command " == *" -Dframework.lab.instance=$ROOT "* && " $command " == *" labs.frameworks.Lab "* ]]; then
+    alive "$pid" || { echo '启动子进程已退出';exit 1; }
+    current_identity="$(LC_ALL=C ps -p "$pid" -o ppid= -o lstart= 2>/dev/null)" || { echo '启动子进程已退出';exit 1; }
+    [[ "$current_identity" == "$launch_identity" ]] || { echo '启动子进程身份已改变';exit 1; }
+    break
+   fi
+   # 自有直接孩子的稳定PID/PPID/start身份仅允许等待，不代表实例owned或HTTP已就绪。
+   # exec期间命令行可能暂不可用；未知中间态也绝不放宽最终nonce/path/mainclass要求。
+   if ((pending_samples<3)); then
+    inherited_launcher=no; [[ "$command" == "$launch_command" ]] && inherited_launcher=yes
+    printf '启动过渡观察：attempt=%s command_chars=%s inherited_launcher=%s；最终实例身份尚未匹配\n' "$attempt" "${#command}" "$inherited_launcher" >&2
+    pending_samples=$((pending_samples+1))
+   fi
    sleep 0.1
   done
-  ((attempt<100)) || { echo '等待启动子进程实例身份超时，请查看build/server/application.log';exit 1; }
+  ((attempt<100 && SECONDS<launch_deadline)) || { echo '等待启动子进程实例身份超时（最终身份不匹配），请查看build/server/application.log';exit 1; }
   echo '启动中；执行scripts/course.sh check验证就绪，再打开http://127.0.0.1:18084'
   ;;
  check)
