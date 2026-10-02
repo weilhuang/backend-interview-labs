@@ -1,0 +1,8 @@
+custom_name: C11 · Docker、Compose与Kubernetes基础
+content:
+- 01-images
+- 02-compose
+- 03-network
+- 04-kubernetes-basics
+- 05-kubernetes-config
+- 06-kubernetes-release

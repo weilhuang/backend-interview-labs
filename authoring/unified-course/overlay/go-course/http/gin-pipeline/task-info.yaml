@@ -1,0 +1,72 @@
+type: edu
+custom_name: Gin路由中间件与统一错误
+files:
+- name: build.gradle.fragment
+  visible: true
+- name: go/answers/reference.go.txt
+  visible: true
+- name: go/binding.go
+  visible: true
+- name: go/cmd/server/main.go
+  visible: true
+- name: go/cmd/server/main_test.go
+  visible: true
+- name: go/cmd/server/process_test.go
+  visible: true
+- name: go/contract_test.go
+  visible: true
+- name: go/diagrams/lifecycle.dot
+  visible: true
+- name: go/diagrams/lifecycle.png
+  visible: true
+- name: go/diagrams/lifecycle.svg
+  visible: true
+- name: go/docs/源码定位.md
+  visible: true
+- name: go/exercise.go
+  visible: true
+  placeholders:
+  - offset: 307
+    length: 179
+    placeholder_text: "\t\tc.Next() // starter deliberately bypasses the gate\n"
+  - offset: 670
+    length: 216
+    placeholder_text: "\t\tc.Next() // starter deliberately omits error rendering\n"
+  - offset: 1001
+    length: 588
+    placeholder_text: "\t_ = router\n\t_ = store\n\t_ = budget // starter deliberately\
+      \ registers no order route\n"
+- name: go/go.mod
+  visible: true
+- name: go/go.sum
+  visible: true
+- name: go/middleware_test.go
+  visible: true
+- name: go/model.go
+  visible: true
+- name: go/router.go
+  visible: true
+- name: go/stages/01-route-without-gate.go.txt
+  visible: true
+- name: go/starters/exercise.go.txt
+  visible: true
+- name: go/wrong-solutions/corrupt-input.go.txt
+  visible: true
+- name: go/wrong-solutions/errors-before-next.go.txt
+  visible: true
+- name: go/wrong-solutions/ignore-parent.go.txt
+  visible: true
+- name: go/wrong-solutions/missing-group-gate.go.txt
+  visible: true
+- name: go/wrong-solutions/omit-postcheck.go.txt
+  visible: true
+- name: go/wrong-solutions/overwrite-response.go.txt
+  visible: true
+- name: go/wrong-solutions/return-without-abort.go.txt
+  visible: true
+- name: src/GoTestBridge.java
+  visible: true
+- name: test/GoContractTest.java
+  visible: true
+- name: test/GoTestBridgeTest.java
+  visible: true

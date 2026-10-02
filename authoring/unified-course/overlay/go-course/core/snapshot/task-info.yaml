@@ -1,0 +1,74 @@
+type: edu
+custom_name: 切片map与订单快照所有权
+files:
+- name: build.gradle.fragment
+  visible: true
+- name: go/answers/explicit.go.txt
+  visible: true
+- name: go/answers/helpers.go.txt
+  visible: true
+- name: go/answers/local-helpers.go.txt
+  visible: true
+- name: go/answers/migration/view.go.txt
+  visible: true
+- name: go/answers/migration/view_test.go.txt
+  visible: true
+- name: go/cmd/demo/main.go
+  visible: true
+- name: go/cmd/demo/main_test.go
+  visible: true
+- name: go/cmd/observe/main.go
+  visible: true
+- name: go/cmd/observe/main_test.go
+  visible: true
+- name: go/demo.go
+  visible: true
+- name: go/diagrams/ownership.dot
+  visible: true
+- name: go/diagrams/ownership.png
+  visible: true
+- name: go/diagrams/ownership.svg
+  visible: true
+- name: go/docs/提示与答案.md
+  visible: true
+- name: go/docs/源码定位与官方来源.md
+  visible: true
+- name: go/docs/语法补课.md
+  visible: true
+- name: go/go.mod
+  visible: true
+- name: go/model.go
+  visible: true
+- name: go/snapshot.go
+  visible: true
+  placeholders:
+  - offset: 106
+    length: 614
+    placeholder_text: "\tif src == nil {\n\t\treturn nil\n\t}\n\tdst := make([]Order,\
+      \ len(src))\n\tcopy(dst, src)\n\treturn dst\n"
+- name: go/snapshot_test.go
+  visible: true
+- name: go/task.md
+  visible: true
+- name: go/wrong-solutions/drop-fields.go.txt
+  visible: true
+- name: go/wrong-solutions/empty-to-nil.go.txt
+  visible: true
+- name: go/wrong-solutions/missing-map.go.txt
+  visible: true
+- name: go/wrong-solutions/missing-tags.go.txt
+  visible: true
+- name: go/wrong-solutions/mutate-source.go.txt
+  visible: true
+- name: go/wrong-solutions/return-alias.go.txt
+  visible: true
+- name: go/wrong-solutions/reverse-order.go.txt
+  visible: true
+- name: go/wrong-solutions/shallow-only.go.txt
+  visible: true
+- name: src/GoTestBridge.java
+  visible: true
+- name: test/GoContractTest.java
+  visible: true
+- name: test/GoTestBridgeTest.java
+  visible: true

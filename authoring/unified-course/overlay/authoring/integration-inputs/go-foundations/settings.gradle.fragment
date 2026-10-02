@@ -1,0 +1,6 @@
+// 仅审阅提案：合并后重新验收，不覆盖现有课程根。
+['greeting','quantity','order-total'].each { slug ->
+    def name = ':go-course-core-' + slug
+    include name
+    project(name).projectDir = file('go-course/core/' + slug)
+}

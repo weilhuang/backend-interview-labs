@@ -58,4 +58,24 @@ class LabTest {
   void 中文页面可从真实端口使用() {
     assertThat(http.getForEntity("/", String.class).getBody()).contains("订单实验室");
   }
+
+  @Test
+  void 响应实例标记只来自合法启动token() throws Exception {
+    String previous = System.getProperty("framework.lab.token");
+    try {
+      for (String token : java.util.List.of("0123456789abcdef0123456789abcdef", "", "invalid")) {
+        System.setProperty("framework.lab.token", token);
+        var response = new org.springframework.mock.web.MockHttpServletResponse();
+        var chain = new org.springframework.mock.web.MockFilterChain();
+        new Lab().labInstanceHeader().doFilter(
+            new org.springframework.mock.web.MockHttpServletRequest(), response, chain);
+        assertThat(response.getHeader("X-Framework-Lab-Instance"))
+            .isEqualTo(token.length() == 32 ? token : null);
+        assertThat(chain.getRequest()).isNotNull();
+      }
+    } finally {
+      if (previous == null) System.clearProperty("framework.lab.token");
+      else System.setProperty("framework.lab.token", previous);
+    }
+  }
 }

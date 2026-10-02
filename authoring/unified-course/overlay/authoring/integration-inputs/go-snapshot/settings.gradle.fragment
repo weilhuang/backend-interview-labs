@@ -1,0 +1,3 @@
+// 由统一生成器显式选择时追加，不产生第二个course根。
+include('go-course-core-snapshot')
+project(':go-course-core-snapshot').projectDir = file('go-course/core/snapshot')

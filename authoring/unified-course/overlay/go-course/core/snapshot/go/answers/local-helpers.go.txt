@@ -1,0 +1,28 @@
+package ownership
+
+// SnapshotOrders 在每一层可变容器建立独立存储；字符串按值复制即可。
+func SnapshotOrders(src []Order) []Order {
+	if src == nil { return nil }
+	cloneTags := func(tags []string) []string {
+		if tags == nil { return nil }
+		result := make([]string, len(tags))
+		copy(result, tags)
+		return result
+	}
+	cloneOrder := func(order Order) Order {
+		result := order
+		if order.Lines != nil {
+			result.Lines = make([]Line, len(order.Lines))
+			copy(result.Lines, order.Lines)
+			for j := range order.Lines { result.Lines[j].Tags = cloneTags(order.Lines[j].Tags) }
+		}
+		if order.Metadata != nil {
+			result.Metadata = make(map[string]string, len(order.Metadata))
+			for key, value := range order.Metadata { result.Metadata[key] = value }
+		}
+		return result
+	}
+	dst := make([]Order, len(src))
+	for i := range src { dst[i] = cloneOrder(src[i]) }
+	return dst
+}

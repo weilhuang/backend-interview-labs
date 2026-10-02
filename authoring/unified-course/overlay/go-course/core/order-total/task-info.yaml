@@ -1,0 +1,49 @@
+type: edu
+custom_name: 结构体方法与值指针
+files:
+- name: go/exercise.go
+  visible: true
+  placeholders:
+  - offset: 345
+    length: 358
+    placeholder_text: "\treturn 0, nil\n"
+- name: build.gradle.fragment
+  visible: true
+- name: go/answers/checked.go.txt
+  visible: true
+- name: go/answers/explicit.go.txt
+  visible: true
+- name: go/cmd/order/main.go
+  visible: true
+- name: go/cmd/order/main_process_test.go
+  visible: true
+- name: go/cmd/order/main_test.go
+  visible: true
+- name: go/contract_test.go
+  visible: true
+- name: go/diagrams/flow.dot
+  visible: true
+- name: go/diagrams/flow.png
+  visible: true
+- name: go/diagrams/flow.svg
+  visible: true
+- name: go/go.mod
+  visible: true
+- name: go/wrong-solutions/copy-line-reset.go.txt
+  visible: true
+- name: go/wrong-solutions/float-money.go.txt
+  visible: true
+- name: go/wrong-solutions/mutate-shared.go.txt
+  visible: true
+- name: go/wrong-solutions/prevalidate-all-first.go.txt
+  visible: true
+- name: go/wrong-solutions/unchecked.go.txt
+  visible: true
+- name: src/GoTestBridge.java
+  visible: true
+- name: test/GoContractTest.java
+  visible: true
+- name: test/GoTestBridgeTest.java
+  visible: true
+- name: go/源码定位.md
+  visible: true

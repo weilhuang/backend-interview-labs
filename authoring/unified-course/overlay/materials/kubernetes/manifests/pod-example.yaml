@@ -1,0 +1,107 @@
+# 独立Pod对照：没有Deployment owner，删除后不会自动补回。由pod-demo受控创建。
+apiVersion: v1
+kind: Pod
+metadata:
+  name: solo-orders
+  labels:
+    app: solo-orders
+spec:
+  serviceAccountName: orders
+  automountServiceAccountToken: false
+  terminationGracePeriodSeconds: 10
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    fsGroup: 10001
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: api
+    image: ${APP_IMAGE}
+    imagePullPolicy: Never
+    ports:
+    - name: http
+      containerPort: 8080
+    securityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      capabilities:
+        drop:
+        - ALL
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+    - name: REDIS_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: orders-config
+          key: redis-host
+    - name: REDIS_PORT
+      value: '6379'
+    - name: REDIS_PASSWORD_FILE
+      value: /run/secrets/password
+    - name: GREETING
+      valueFrom:
+        configMapKeyRef:
+          name: orders-config
+          key: greeting
+    - name: STARTUP_DELAY_MS
+      value: '8000'
+    - name: LAB_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    startupProbe:
+      httpGet:
+        path: /startup
+        port: http
+      periodSeconds: 1
+      timeoutSeconds: 1
+      failureThreshold: 30
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: http
+      periodSeconds: 2
+      timeoutSeconds: 2
+      failureThreshold: 2
+    livenessProbe:
+      httpGet:
+        path: /live
+        port: http
+      periodSeconds: 2
+      timeoutSeconds: 1
+      failureThreshold: 3
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+    - name: secret
+      mountPath: /run/secrets
+      readOnly: true
+    - name: banner
+      mountPath: /etc/course
+      readOnly: true
+  volumes:
+  - name: tmp
+    emptyDir:
+      sizeLimit: 32Mi
+  - name: secret
+    secret:
+      secretName: redis-auth
+      defaultMode: 288
+      items:
+      - key: password
+        path: password
+  - name: banner
+    configMap:
+      name: orders-config
+      items:
+      - key: banner
+        path: banner
+  restartPolicy: Always

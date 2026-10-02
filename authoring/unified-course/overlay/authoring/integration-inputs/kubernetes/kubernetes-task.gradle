@@ -1,0 +1,36 @@
+// 适配片段，供唯一总课程生成器引入每个C11-04..06 task project。
+// 未接入、未跑Gradle、未生成strict locks，不能声称Academy原生Check通过。
+plugins.apply('java')
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+repositories { mavenCentral() }
+dependencies { testImplementation('org.junit.jupiter:junit-jupiter:5.11.4') }
+def materialDir = providers.gradleProperty('kubernetesMaterialsDir').map { file(it) }
+def pythonBin = providers.gradleProperty('coursePython').orElse('python3')
+def generated = layout.buildDirectory.dir('generated-kubernetes-src')
+def syncShared = tasks.register('prepareKubernetesSources', Sync) {
+    inputs.files(['ProbePolicy.java','AppConfig.java'].collect { file(it) }.findAll { it.isFile() })
+    from(materialDir.map { new File(it, 'src') })
+    into(generated)
+    doLast {
+        ['ProbePolicy.java','AppConfig.java'].each { name ->
+            if (file(name).isFile()) copy { from(file(name)); into(new File(generated.get().asFile,'labs')) }
+        }
+    }
+}
+sourceSets {
+    main { java { setSrcDirs([generated]); } }
+    test { java { setSrcDirs([file('test'),materialDir.map { new File(it,'test-java') }]); } }
+}
+tasks.named('compileJava') { dependsOn(syncShared); options.release = 21 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    workingDir = project.projectDir
+    systemProperty('course.taskDir',project.projectDir.absolutePath)
+    systemProperty('course.materialsDir',materialDir.get().absolutePath)
+    systemProperty('course.python',pythonBin.get())
+    maxParallelForks = 1
+    maxHeapSize = '192m'
+}
+dependencyLocking { lockAllConfigurations(); lockMode = LockMode.STRICT }
+// 作者在总根显式运行 --write-locks 并审计每module锁后才可启用完整Check。
+// 总根rootTest必须dependsOn这三个task的test；不得用onlyIf/ignoreFailures屏蔽失败。

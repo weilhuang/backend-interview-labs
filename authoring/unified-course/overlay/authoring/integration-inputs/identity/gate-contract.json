@@ -1,0 +1,52 @@
+{
+  "schema": 3,
+  "unit": {
+    "labs.identity.PolicyTest": [
+      "policyMatrixContract",
+      "unauthenticatedInputs",
+      "invalidSubjectId",
+      "missingResource",
+      "invalidResourceId",
+      "invalidSubjectTenant",
+      "invalidResourceTenant",
+      "denialPrecedence",
+      "fixedDecisionReasons",
+      "rolesAreEmptyOrImmutable",
+      "unknownActionsFailClosed"
+    ]
+  },
+  "http": {
+    "labs.identity.IdentityNetworkTest": [
+      "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+      "suppliedChineseFrontendIsServedWithoutSecrets"
+    ],
+    "labs.identity.ProductionPolicyOriginTest": [
+      "loadedPolicyComesFromExactlyTheLearnerJar",
+      "productionJarContainsNoReferenceAnswers"
+    ]
+  },
+  "counts": {
+    "unit_methods": 11,
+    "unit_matrix_inner_cases": 144,
+    "http_methods": 4
+  },
+  "negative": {
+    "suite": "labs.identity.IdentityNetworkTest",
+    "method": "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+    "marker": "C15_HTTP_OWN_ORDER_200",
+    "expected_status": 200,
+    "observed_status": 401,
+    "failure_type": "org.opentest4j.AssertionFailedError"
+  },
+  "xml_method_names": "exact static method or exact method followed by (); no substring matching",
+  "actual_java_xml_format": "Observed in actual Gradle 8.10.2 / JUnit 5.12.2 execution; schema 3 fixes the complete failure.message including the exception type prefix. Fresh three-scenario acceptance is required for this revision.",
+  "negative_failure": {
+    "type": "org.opentest4j.AssertionFailedError",
+    "message": "org.opentest4j.AssertionFailedError: C15_HTTP_OWN_ORDER_200 ==> expected: <200> but was: <401>",
+    "class": "labs.identity.IdentityNetworkTest",
+    "method": "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+    "expected": 200,
+    "observed": 401
+  },
+  "xml_serialization": "Gradle 8.10.2 / JUnit 5.12.2: failure.message is the exact exception class prefix, colon and space, then assertion message. No substring or arbitrary prefix normalization."
+}

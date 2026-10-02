@@ -1,0 +1,187 @@
+import java.security.MessageDigest
+plugins { id 'base' }
+// Native Check requires section-lesson-task project names, mapped by settings.gradle.
+def expectedJava = providers.gradleProperty('javaVersion').get().toInteger()
+if (JavaVersion.current().majorVersion.toInteger() != expectedJava) throw new GradleException('请使用 JDK ' + expectedJava + ' 导入统一课程')
+def courseMap = new groovy.json.JsonSlurper().parse(file('authoring/course-map.json'))
+apply from: 'materials/java-foundations/course.gradle'
+apply from: 'materials/java-concurrency/course.gradle'
+apply from: 'materials/java-jvm/course.gradle'
+apply from: 'materials/java-frameworks/course.gradle'
+apply from: 'materials/mysql-engineering/course.gradle'
+apply from: 'materials/redis-engineering/course.gradle'
+apply from: 'materials/distributed-systems/course.gradle'
+apply from: 'materials/messaging/course.gradle'
+apply from: 'materials/backend-capstone/course.gradle'
+apply from: 'materials/cloud-native/course.gradle'
+apply from: 'materials/kubernetes/course.gradle'
+apply from: 'materials/observability/course.gradle'
+apply from: 'materials/go/go-foundations.gradle'
+apply from: 'materials/go/go-snapshot.gradle'
+apply from: 'materials/go-http/course.gradle'
+apply from: 'materials/identity/course.gradle'
+project(':environment-ledger') {
+    apply plugin: 'java-library'
+    sourceSets.main.java.setSrcDirs(['src'])
+}
+Properties imageVersions = new Properties()
+def ledger = file('shared/versions.env')
+if (!ledger.isFile()) throw new GradleException('缺少统一镜像台账 shared/versions.env')
+ledger.withInputStream { imageVersions.load(it) }
+def ledgerSha = MessageDigest.getInstance('SHA-256').digest(ledger.bytes).encodeHex().toString()
+if (file('shared/versions.env.sha256').text.trim().split(/\s+/)[0] != ledgerSha) throw new GradleException('统一镜像台账 SHA256 不一致，请重新生成课程')
+def helperImages = [TESTCONTAINERS_RYUK_CONTAINER_IMAGE: imageVersions.getProperty('TESTCONTAINERS_RYUK_IMAGE'), TESTCONTAINERS_TINYIMAGE_CONTAINER_IMAGE: imageVersions.getProperty('TESTCONTAINERS_TINY_IMAGE')]
+subprojects {
+    plugins.withId('java') {
+        java { toolchain { languageVersion = JavaLanguageVersion.of(expectedJava) } }
+        if (project.name != 'environment-ledger') dependencies { implementation project(':environment-ledger') }
+        dependencyLocking { lockAllConfigurations(); lockFile = rootProject.file("dependency-locks/${project.name}.lockfile"); lockMode = LockMode.STRICT }
+        tasks.withType(JavaCompile).configureEach { options.release = expectedJava; options.encoding = 'UTF-8' }
+        tasks.withType(Test).configureEach {
+            systemProperty 'lab.versions', ledger.absolutePath
+            maxParallelForks = 1
+            jvmArgs '-XX:ActiveProcessorCount=2'
+            helperImages.each { key, value -> environment key, value }
+        }
+        tasks.withType(JavaExec).configureEach {
+            systemProperty 'lab.versions', ledger.absolutePath
+            helperImages.each { key, value -> environment key, value }
+        }
+    }
+}
+def taskProjects = courseMap.tasks.collect { project(it.gradle_project) }
+def supportTestTasks = { String aggregate ->
+    courseMap.support_projects.findAll { it.original_module != 'benchmark' }.collect { item ->
+        def target = item.test_tasks[aggregate]
+        if (!target) throw new GradleException('缺少支撑项目聚合测试合同：' + item.gradle_project + ':' + aggregate)
+        project(item.gradle_project).tasks.named(target)
+    }
+}
+tasks.register('test') {
+    description = '执行所有原生判题；数据库及分布式重点题要求真实 Docker'
+    dependsOn taskProjects.collect { it.tasks.named('test') }
+    dependsOn supportTestTasks('test')
+}
+tasks.register('unitTest') {
+    description = '低内存局部快测；不能代替完整判题或 Docker 验收'
+    dependsOn taskProjects.collect { it.tasks.findByName('unitTest') ?: it.tasks.named('test') }
+    dependsOn supportTestTasks('unitTest')
+}
+tasks.register('fullCheck') {
+    description = '完整验收：全部原生判题、框架与综合项目集成、消息真实服务'
+    if (!project.hasProperty('withDocker') && gradle.startParameter.taskNames.any { it in ['fullCheck', ':fullCheck', 'check', ':check'] }) throw new GradleException('完整验收须加 -PwithDocker，不能把消息快测算作服务验收')
+    dependsOn tasks.named('test')
+    dependsOn taskProjects.findAll { it.tasks.findByName('integrationTest') != null && !(it.name in ['distributed-course-services-06-transactions', 'distributed-course-services-07-outbox-cache']) }.collect { it.tasks.named('integrationTest') }
+}
+tasks.named('check') { dependsOn tasks.named('fullCheck') }
+tasks.register('verifyCourseVersions') {
+    description = '检查唯一镜像台账及所有 Java 测试的环境配置，不启动容器'
+    doLast {
+        println '镜像台账：' + ledger + '；SHA256：' + ledgerSha
+        imageVersions.each { key, value ->
+            if (key in ['KIND_VERSION','KUBECTL_VERSION','KUBERNETES_VERSION']) { if (!(value ==~ /v[0-9]+\.[0-9]+\.[0-9]+/)) throw new GradleException('非固定工具版本：' + key) } else if (!value || value.endsWith(':latest') || (!value.contains(':') && !value.contains('@'))) throw new GradleException('非固定镜像：' + key)
+        }
+        taskProjects.each { module -> module.tasks.withType(Test).each { test ->
+            if (test.systemProperties['lab.versions'] != ledger.absolutePath) throw new GradleException('镜像台账未统一：' + test.path)
+            helperImages.each { key, value -> if (test.environment[key] != value) throw new GradleException('辅助镜像未统一：' + test.path) }
+        } }
+    }
+}
+tasks.register('verifyDependencyLocks') {
+    description = '核对当前所有模块都有统一依赖锁，不联网、不运行容器'
+    doLast { subprojects.each { module ->
+        def lock = rootProject.file("dependency-locks/${module.name}.lockfile")
+        if (!lock.isFile()) throw new GradleException('缺少统一依赖锁：' + lock)
+    } }
+}
+tasks.register('resolveAndLockAll') {
+    description = '显式解析所有课程类路径；配合 --write-locks 生成完整锁，不运行测试/容器'
+    doLast { subprojects.each { module -> module.configurations.findAll { it.canBeResolved }.each { it.resolve() } } }
+}
+tasks.register('validateTeachingCommands') {
+    description = '按实际 Gradle 模型检查所有题面命令，不执行调用方或容器'
+    doLast {
+        def commands = new groovy.json.JsonSlurper().parse(file('authoring/teaching-command-map.json')).commands.values().flatten().unique()
+        commands.each { command ->
+            int separator = command.lastIndexOf(':')
+            def module = findProject(command.substring(0, separator))
+            if (module == null || module.tasks.findByName(command.substring(separator + 1)) == null) throw new GradleException('题面命令不存在：' + command)
+        }
+        println '已核对 ' + commands.size() + ' 条唯一题面 Gradle 命令；未执行运行目标'
+    }
+}
+tasks.register('writeCourseModel') {
+    description = '导出实际 Gradle 模型供路径、原生判题和重复类检查'
+    doLast {
+        def rows = courseMap.tasks.collect { item ->
+            def module = project(item.gradle_project)
+            def grading = module.tasks.named('test').get()
+            [path: item.path, gradle_project: module.path,
+             main_sources: module.sourceSets.main.java.files.collect { rootProject.relativePath(it) }.sort(),
+             test_sources: module.sourceSets.test.java.files.collect { rootProject.relativePath(it) }.sort(),
+             integration_sources: module.sourceSets.findByName('integrationTest')?.java?.files?.collect { rootProject.relativePath(it) }?.sort() ?: [],
+             grading_classes: grading.testClassesDirs.files.collect { rootProject.relativePath(it) }.sort(),
+             root: module.projectDir.absolutePath]
+        }
+        def destination = layout.buildDirectory.file('course-model.json').get().asFile
+        destination.parentFile.mkdirs()
+        destination.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(rows)) + System.lineSeparator()
+    }
+}
+tasks.named('wrapper') { gradleVersion = '8.10.2'; distributionType = Wrapper.DistributionType.BIN }
+defaultTasks 'help'
+
+// New native modules must never report zero or skipped grading as success.
+courseMap.tasks.findAll { it.integration_status }.collect { project(it.gradle_project) }.plus([project(':identity-resource-server')]).each { module ->
+    def nonempty = module.tasks.register('verifyExtensionTestClasses') {
+        dependsOn module.tasks.named('testClasses')
+        doLast {
+            if (module.sourceSets.test.output.classesDirs.asFileTree.matching { include '**/*.class' }.isEmpty())
+                throw new GradleException('No compiled extension tests; NO-SOURCE is not PASS: ' + module.path)
+        }
+    }
+    module.tasks.withType(Test).configureEach {
+        dependsOn nonempty
+        ignoreFailures = false
+        afterSuite { descriptor, result ->
+            if (descriptor.parent == null && (result.testCount == 0 || result.skippedTestCount != 0))
+                throw new GradleException('Extension grading requires nonzero tests without skips')
+        }
+    }
+}
+// Native bridge aggregates are not real infrastructure acceptance.
+tasks.register('rootTest') { dependsOn tasks.named('test') }
+tasks.register('verifyExtensionInfrastructure') {
+    doLast { throw new GradleException('NOT_RUN: extension Docker/Kubernetes/external observability lifecycle gates require separately validated adapters; native bridges do not replace them') }
+}
+tasks.named('fullCheck') { dependsOn tasks.named('verifyExtensionInfrastructure') }
+tasks.register('resolveExtensionLocks') {
+    description = 'Explicit author-only final-path dependency resolution; requires --write-locks; no test/container execution'
+    doLast {
+        if (!gradle.startParameter.writeDependencyLocks) throw new GradleException('Use --write-locks explicitly; acceptance never generates locks')
+        courseMap.tasks.findAll { it.integration_status }.collect { project(it.gradle_project) }.plus([project(':identity-resource-server')]).each { module ->
+            module.configurations.findAll { it.canBeResolved }.each { it.resolve() }
+        }
+    }
+}
+tasks.register('writeUnifiedIntegrationModel') {
+    dependsOn tasks.named('writeCourseModel')
+    doLast {
+        def projects = courseMap.tasks + courseMap.support_projects.findAll { it.original_module != 'benchmark' }
+        def rows = projects.collect { item ->
+            def module = project(item.gradle_project)
+            [project:module.path, path:rootProject.relativePath(module.projectDir),
+             sources:module.sourceSets.collectEntries { s -> [(s.name):s.allSource.files.collect { rootProject.relativePath(it) }.sort()] },
+             tests:module.tasks.withType(Test).toList().collect { t -> [path:t.path, ignoreFailures:t.ignoreFailures,
+                dependencies:t.taskDependencies.getDependencies(t).collect { it.path }.sort(),
+                finalizers:t.finalizedBy.getDependencies(t).collect { it.path }.sort()] },
+             lock:rootProject.relativePath(module.dependencyLocking.lockFile.get().asFile)]
+        }
+        def aggregate = ['test','rootTest','unitTest','fullCheck','identityCheck'].collectEntries { name ->
+            def task = tasks.named(name).get(); [(name):task.taskDependencies.getDependencies(task).collect { it.path }.sort()]
+        }
+        def target = layout.buildDirectory.file('unified-integration-model.json').get().asFile
+        target.parentFile.mkdirs()
+        target.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson([projects:rows, aggregates:aggregate])) + '\n'
+    }
+}

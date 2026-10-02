@@ -1,0 +1,17 @@
+['safe-events','metrics','trace-context'].each { leaf ->
+    configure(project(':observability-first-slice-' + leaf)) {
+        apply plugin: 'java'
+        repositories { mavenCentral() }
+        sourceSets { main.java.setSrcDirs(['src']); test.java.setSrcDirs(['test']) }
+        tasks.withType(JavaCompile).configureEach { options.compilerArgs += '-parameters' }
+        tasks.withType(Test).configureEach {
+            useJUnitPlatform(); maxParallelForks = 1; maxHeapSize = '384m'; ignoreFailures = false
+            afterSuite { descriptor, result ->
+                if (descriptor.parent == null && (result.testCount == 0 || result.skippedTestCount != 0))
+                    throw new GradleException('Observability grading requires nonzero tests without skips')
+            }
+        }
+        apply from: rootProject.file('materials/observability/course.gradle.fragment')
+        tasks.withType(JavaExec).configureEach { dependsOn tasks.named('classes') }
+    }
+}

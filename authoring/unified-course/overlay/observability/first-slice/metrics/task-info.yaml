@@ -1,0 +1,54 @@
+type: edu
+custom_name: C12-03 · 计数器直方图与基数
+files:
+- name: src/labs/observability/TelemetryFilter.java
+  visible: true
+- name: src/labs/observability/SafeEvents.java
+  visible: true
+- name: src/labs/observability/RequestMetrics.java
+  visible: true
+  placeholders:
+  - offset: 975
+    length: 279
+    placeholder_text: "\n        throw new UnsupportedOperationException(\"请按中文步骤完成此方法\"\
+      );\n    "
+- name: src/labs/observability/EventSink.java
+  visible: true
+- name: src/labs/observability/CheckoutController.java
+  visible: true
+- name: src/labs/observability/Routes.java
+  visible: true
+- name: src/labs/observability/ReadyController.java
+  visible: true
+- name: src/labs/observability/Usage.java
+  visible: true
+- name: src/labs/observability/Telemetry.java
+  visible: true
+- name: src/labs/observability/InventoryController.java
+  visible: true
+- name: src/labs/observability/TraceBridge.java
+  visible: true
+- name: src/labs/observability/ObservabilityApplication.java
+  visible: true
+- name: test/labs/observability/TelemetryEndpointTest.java
+  visible: true
+- name: test/labs/observability/RequestMetricsTest.java
+  visible: true
+- name: test/labs/observability/SafeEventsTest.java
+  visible: true
+- name: test/labs/observability/ExporterFailureTest.java
+  visible: true
+- name: test/labs/observability/TraceBridgeTest.java
+  visible: true
+- name: test/labs/observability/HttpCallChainTest.java
+  visible: true
+- name: answers/reference-map/RequestMetrics.java
+  visible: true
+- name: answers/reference-typed/RequestMetrics.java
+  visible: true
+- name: task.md
+  visible: true
+- name: solution.md
+  visible: true
+- name: source-guide.md
+  visible: true

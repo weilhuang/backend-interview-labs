@@ -1,0 +1,33 @@
+{
+  "target_course": "single-unified-backend-interview-academy-course",
+  "append_section": "c11-cloud-native",
+  "do_not_create_course_info": true,
+  "tasks": [
+    {
+      "id": "C11-04",
+      "path": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas",
+      "overlays": {
+        "ProbePolicy.java": "src/labs/ProbePolicy.java",
+        "deployment.yaml": "manifests/deployment.yaml"
+      }
+    },
+    {
+      "id": "C11-05",
+      "path": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets",
+      "overlays": {
+        "AppConfig.java": "src/labs/AppConfig.java",
+        "service.yaml": "manifests/service.yaml",
+        "config.yaml": "manifests/config.yaml",
+        "rbac.yaml": "manifests/rbac.yaml"
+      }
+    },
+    {
+      "id": "C11-06",
+      "path": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources",
+      "overlays": {
+        "deployment.yaml": "manifests/deployment.yaml"
+      }
+    }
+  ],
+  "native_check": "NOT_RUN"
+}

@@ -3,7 +3,8 @@
 from pathlib import Path
 import argparse,json,os,select,shutil,subprocess,time,sys
 ROOT=Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--java-home',type=Path,default=Path(os.environ.get('JAVA_HOME','/workspace/shared/toolchains/jdk-21')));a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--java-home',type=Path,default=Path(os.environ['JAVA_HOME']) if os.environ.get('JAVA_HOME') else None);a=p.parse_args()
+if a.java_home is None:p.error('请用 --java-home 或 JAVA_HOME 指定完整 JDK21')
 java=a.java_home/'bin/java';javac=a.java_home/'bin/javac';jcmd=a.java_home/'bin/jcmd';jfr=a.java_home/'bin/jfr'
 for tool in [java,javac,jcmd,jfr]:
  if not tool.is_file():raise SystemExit('BLOCKED：完整JDK缺少'+str(tool))

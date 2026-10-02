@@ -1048,9 +1048,9 @@ public final class VirtualGatewayUsage {
 
 import re, argparse, hashlib, os, subprocess
 parser=argparse.ArgumentParser(description="从单一作者源生成规范格式的课程")
-parser.add_argument('--formatter',type=Path,default=Path(os.environ.get('JAVA_FORMAT_JAR','/workspace/shared/academy-verification-deps/google-java-format-1.24.0-all-deps.jar')))
+parser.add_argument('--formatter',type=Path,default=Path(os.environ['JAVA_FORMAT_JAR']) if os.environ.get('JAVA_FORMAT_JAR') else None)
 args=parser.parse_args()
-if not args.formatter.is_file():raise SystemExit('缺少google-java-format1.24.0 all-deps.jar；请从官方Maven取得并用--formatter指定')
+if args.formatter is None or not args.formatter.is_file():raise SystemExit('缺少google-java-format1.24.0 all-deps.jar；请从官方Maven取得并用--formatter指定')
 assert hashlib.sha256(args.formatter.read_bytes()).hexdigest()=='812f805f58112460edf01bf202a8e61d0fd1f35c0d4fabd54220640776ec57a1'
 format_root=ROOT/'build/format-input';format_root.mkdir(parents=True,exist_ok=True)
 format_files=[]
