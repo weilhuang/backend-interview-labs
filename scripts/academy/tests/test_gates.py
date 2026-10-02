@@ -162,8 +162,20 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(w['on']['workflow_dispatch']['inputs']['phase']['default'],'export-import-smoke')
     def test_final_artifact_has_all_gates_and_short_retention(self):
         workflow=self.workflow();package=workflow['jobs']['package'];environment=workflow['jobs']['environment']
-        uploads=[s for s in package['steps'] if s.get('uses')=='actions/upload-artifact@v4']
+        all_uploads=[s for s in package['steps'] if s.get('uses')=='actions/upload-artifact@v4']
+        ui=[s for s in all_uploads if s['with']['name'].startswith('academy-ui-')]
+        uploads=[s for s in all_uploads if not s['with']['name'].startswith('academy-ui-')]
         self.assertEqual(len(uploads),2)
+        self.assertEqual(len(ui),4)
+        for step in ui:
+            self.assertIn("inputs.phase == 'full-validation'",step['if'])
+            self.assertEqual(step['with']['retention-days'],'1')
+            for path in step['with']['path'].splitlines():
+                self.assertTrue(path.startswith('${{ env.UI_RUN }}/stage-'))
+                for forbidden in ('profile','token','.zip','/home/'):
+                    self.assertNotIn(forbidden,path.lower())
+        self.assertEqual({x['with']['name'].split('${{')[0] for x in ui},
+                         {'academy-ui-stage-1-','academy-ui-stage-2-','academy-ui-stage-3-','academy-ui-receipts-'})
         self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outcome == 'success'")
         self.assertIn("steps.handoff.outcome == 'success'",uploads[1]['if'])
         self.assertEqual(uploads[1]['with']['retention-days'],'1');self.assertIn('NOT-A-RELEASE',uploads[1]['with']['name'])
@@ -405,12 +417,29 @@ class ReleaseBoundaryTests(unittest.TestCase):
         with self.assertRaises(GateError):evaluate({'status':'SMOKE_PASS_NOT_RELEASE'})
     def test_job_has_explicit_evidence_margin(self):
         w=WorkflowTests().workflow();steps=w['jobs']['package']['steps'];full=0;smoke=0
-        for step in steps:
-            timeout=step['timeout-minutes']
-            if step.get('id')=='official':full+=60;smoke+=8;continue
-            full+=int(timeout)
+        first=next(i for i,step in enumerate(steps) if step.get('id')=='official')
+        last=next(i for i,step in enumerate(steps) if step.get('run')=='python scripts/academy/ui_session.py finish --root "$UI_RUN"')
+        group=steps[first:last+1]
+        self.assertEqual(len(group),9)
+        self.assertIn('ui_session.py launch --root "$UI_RUN"',group[0]['run'])
+        self.assertEqual(sum('ui_control.py' in x.get('run','') for x in group),3)
+        self.assertEqual(sum(x.get('uses')=='actions/upload-artifact@v4' for x in group),4)
+        for step in group[1:]:self.assertIn("inputs.phase == 'full-validation'",step['if'])
+        # 三阶段共享同一已启动进程的kernel-start绝对截止，不按每个等待步骤重新发放60分钟。
+        source=(Path(__file__).resolve().parents[1]/'ui_session.py').read_text()
+        control=(Path(__file__).resolve().parents[1]/'ui_control.py').read_text()
+        self.assertEqual(source.count("put(root/'state.json',budget_record(owner,3600))"),1)
+        self.assertIn("deadline=read_outer_deadline(root)",source)
+        self.assertIn("int(owner['start_time'])/os.sysconf('SC_CLK_TCK')+seconds",control)
+        self.assertIn("if record['monotonic_deadline']!=deadline",control)
+        self.assertIn("record=budget_record(ide_meta,300)",source)
+        self.assertIn("ui_session.py cleanup --root",steps[last+2]['run'])
+        for index,step in enumerate(steps):
+            if index==first:full+=60;smoke+=8;continue
+            if first<index<=last:continue
+            full+=int(step['timeout-minutes'])
             if step.get('id')=='handoff' or step.get('name','').startswith('传递验收'):continue
-            smoke+=int(timeout)
+            smoke+=int(step['timeout-minutes'])
         self.assertLessEqual(full,78);self.assertLessEqual(smoke,24)
     def test_final_upload_requires_release_gate(self):
         upload=WorkflowTests().workflow()['jobs']['environment']['steps'][-1]

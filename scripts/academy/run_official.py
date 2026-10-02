@@ -105,12 +105,12 @@ def sanitized_environment():
     # Hosted runner process environment is an explicit minimal allowlist. No
     # GitHub/runtime/OIDC credential or language-injection variable is inherited.
     names={'PATH','HOME','USER','LOGNAME','LANG','LC_ALL','LC_CTYPE','LANGUAGE','TZ','TERM',
-           'TMPDIR','JAVA_HOME','CI','GITHUB_ACTIONS','GITHUB_WORKSPACE','DISPLAY','XAUTHORITY'}
+           'TMPDIR','JAVA_HOME','CI','GITHUB_ACTIONS','GITHUB_WORKSPACE','DISPLAY','XAUTHORITY','RUNNER_TRACKING_ID'}
     return {k:v for k,v in os.environ.items() if k in names}
 
 def cli_environment(idea,plugins,root,phase):
     profile=root/(phase+'-profile');profile.mkdir()
-    for name in ('config','system','log','tmp'): (profile/name).mkdir()
+    for name in ('config','system','log','tmp','home'): (profile/name).mkdir()
     # Core Java remains free in the unified IDEA distribution. No account,
     # license key, agreement acceptance, trust override or telemetry flag copied.
     write_new(profile/'config/disabled_plugins.txt',b'com.intellij.modules.ultimate\n')
@@ -118,18 +118,18 @@ def cli_environment(idea,plugins,root,phase):
     write_new(properties,('\n'.join(f'idea.{key}.path={value}' for key,value in {
         'config':profile/'config','system':profile/'system','log':profile/'log','plugins':plugins}.items())+'\n').encode())
     original=(idea/'bin/idea64.vmoptions').read_text()
-    lines=[line for line in original.splitlines() if not line.startswith(('-Xmx','-Djava.io.tmpdir='))]
+    lines=[line for line in original.splitlines() if not line.startswith(('-Xmx','-Djava.io.tmpdir=','-Duser.home='))]
     options=profile/'idea.vmoptions'
     java_home=Path(os.environ['JAVA_HOME']).resolve()
     require((java_home/'bin/java').is_file(), 'JAVA_HOME has no Java executable')
     release=(java_home/'release').read_text()
     require(re.search(r'^JAVA_VERSION="21(?:[."+])',release,re.M), 'project JDK must be Java 21')
     write_new(options,('\n'.join([*lines,'-Xmx1536m','-XX:ActiveProcessorCount=2',f'-Djava.io.tmpdir={profile/"tmp"}',
-        f'-Dproject.jdk={java_home}','-Dproject.jdk.name=academy-ci-jdk21'])+'\n').encode())
+        f'-Duser.home={profile/"home"}',f'-Dproject.jdk={java_home}','-Dproject.jdk.name=academy-ci-jdk21'])+'\n').encode())
     env=sanitized_environment()
     # Token is only used by the preceding read-only GitHub gate; never pass it
     # to the IDE or processes belonging to a course.
-    env.update({'IDEA_PROPERTIES':str(properties),'IDEA_VM_OPTIONS':str(options),'IDEA_JDK':str(idea/'jbr'),
+    env.update({'HOME':str(profile/'home'),'IDEA_PROPERTIES':str(properties),'IDEA_VM_OPTIONS':str(options),'IDEA_JDK':str(idea/'jbr'),
                 'GRADLE_USER_HOME':str(root/'gradle-home'),'ORG_GRADLE_PROJECT_withDocker':'true',
                 'ORG_GRADLE_PROJECT_dockerApiVersion':'1.44'})
     return env,profile
@@ -244,8 +244,18 @@ def execute(a):
         require(not report.exists() and not report.is_symlink(),'validation output already exists or is linked')
         command=[str(idea/'bin/idea'),'validateCourse',str(validation),'--archive',str(archive),
                  '--tests','true','--links','true','--output-format','json','--output',str(report)]
+        if getattr(a,'ui_root',None):
+            require(a.phase=='full-validation' and a.display=='xvfb','正常UI辅助仅适用完整Xvfb验收')
+            validate_directory(a.ui_root)
+            expected_ui=Path(os.environ['RUNNER_TEMP'])/('academy-ui-'+os.environ['GITHUB_RUN_ID']+'-'+os.environ['GITHUB_RUN_ATTEMPT'])
+            require(a.ui_root.resolve()==expected_ui.resolve(),'UI目录必须属于本次run/attempt')
+            command=[os.sys.executable,str(Path(__file__).with_name('ui_session.py')),'display',
+                     '--root',str(a.ui_root),'--idea',str(idea),'--',*command]
+            env.update({key:os.environ[key] for key in ('GITHUB_RUN_ID','GITHUB_RUN_ATTEMPT')})
         if a.display=='xvfb':command=['xvfb-run','-a','--server-args=-screen 0 1280x900x24',*command]
         else:env.pop('DISPLAY',None)
+        if getattr(a,'ui_root',None):
+            command=[os.sys.executable,str(Path(__file__).with_name('ui_session.py')),'server','--root',str(a.ui_root),'--',*command]
         run=capture(command,env,repo,evidence/'validate.stdout.log',evidence/'validate.stderr.log',2700,root,phase='validate')
         result['stages']['official_validate_process']=run;dump(evidence/'summary.json',result)
         # Parse available failure reports even when process failed/timed out.
@@ -284,6 +294,7 @@ if __name__=='__main__':
     p.add_argument('--idea-home',type=Path,required=True);p.add_argument('--plugins-home',type=Path,required=True)
     p.add_argument('--source-ci-report',type=Path,required=True)
     p.add_argument('--phase',choices=['export-import-smoke','full-validation'],default='export-import-smoke')
+    p.add_argument('--ui-root',type=Path)
     p.add_argument('--display',choices=['headless','xvfb'],default='headless');a=p.parse_args()
     result=execute(a);print(json.dumps({'status':result['status'],'native_tests':result['native_tests']},ensure_ascii=False))
     raise SystemExit(0 if result['status'] in ('PASS','SMOKE_PASS_NOT_RELEASE') else 1)

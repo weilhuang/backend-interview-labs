@@ -93,3 +93,16 @@ JDK21 路径通过 Academy 官方 `project.jdk` 属性指定；IDEA 自身仍运
 ### 私有无压缩交接候选的验证范围
 
 ZIP_STORED 简化移除了自定义 gzip/tar/PAX 处理。旧 R2 的压缩/PAX 独立审查仍未完成，不能据此改标通过。适用范围仅限同一受信任工作流生产、经同 run/attempt 输出 SHA256 绑定的中间产物；不接受任意外部 ZIP。当前仅验证正常受信任生产者到消费者的合成文件往返、身份不匹配、普通内容意外变化及模式丢失；不代表异常容器/元数据、资源耗尽、竞态或全面安全验证。真实官方双导入、native84 与真实环境验收仍须同次受控运行证据。保留标准 runner 80+65 分钟上限、NOT-A-RELEASE 标识、仓库 Actions 读者可见和一天留存；不提前发布。
+
+
+## 同一验收会话内的正常协议界面
+
+运行 `36930053754` 的官方导出、967 文件严格学生导入及 Gradle/JDK 检查通过，但原生验证在初始化阶段超时。独立截图与线程证据确认它等待 JetBrains User Agreement 2.0（2025 年 4 月 10 日）正常界面，84 题与后续真实环境并未执行。用户已阅读该固定安装包的完整协议并授权正常界面接受。云桌面实测完成了勾选、Continue 和拒绝可选遥测；同 profile 的缺失归档输入在 4 秒内得到官方导入错误及退出码 1，只证明官方 starter 已越过协议界面，不代表课程通过。
+
+完整 Actions 使用同一个 fresh runner/profile/Xvfb/官方 validateCourse 进程逐阶段观察，不写入接受偏好、不复制任何旧 profile。固定内置 HTML SHA256 为 `96530426ef62cd0eca629350c3ab5afb552c518868a0edbbce85ea5e0f713516`。每个阶段先保存本次专用显示器截图到 `academy-ui-stage-阶段-运行-尝试` artifact，维护者实际看图确认同一协议与控件后，才在专用 `academy-control/eua-ui` ref 写入该次运行、尝试、阶段对应的小 JSON。ref 不触发工作流，runner 只读；不得提前写动作。
+
+机械记录仅含 schema、run_id、run_attempt、stage、screenshot_sha256、eua_sha256、action。允许动作只有 `CHECK_EUA`、`CONTINUE_EUA`、明确拒绝遥测的 `DECLINE_USAGE`，不接受坐标、文本、shell 命令或其他按钮。本次Xvfb wrapper/server与IDE的PID、start ticks、UID、session/pgrp，以及专用socket和Xauthority文件inode分别建立身份记录。每次截图或动作前复核；已核pidfd传入JBR并在实际点击前再次核其对应进程未退出。实际动作前再次核对完整截图字节；不一致、过期、重放或错误身份均失败。固定图形布局的动作点必须在当次图中确实位于对应控件内，布局变动时停报，不自动猜测适配。协议摘要与截图核对是本次受信任固定工具链的操作边界，不是面向任意恶意桌面的全面安全保证；图像校验与点击之间仍有极短的不可原子化窗口。
+
+UI 总子预算 300 秒（包括图像交接和批准等待）绑定本次IDE进程的kernel start ticks并计入原 validateCourse 2700 秒；官方全阶段的唯一 60 分钟绝对截止绑定已启动监督进程的kernel start ticks，跨步骤不重置；native job 80 分钟、environment job 65 分钟和真实环境 50 分钟预算不变。单个 workflow 等待步骤的取消上限不能用于延长这些合并预算。新协议、商业许可、账号或 Trust 不在动作集合内，必须停止并单独确认。只清理本轮登记的 pidfd 所代表进程，不接管 PID 重用后的其他进程。登记仅沿已核验父进程的当次 task/children 子链，打开句柄前后复核 start ticks、UID、PPID、session/pgrp 及父句柄；不扫描全局进程表，不补收养身份不明对象。清理证明仅限已登记集合，未登记或脱离子链的后代由 fresh runner 生命周期收尾，不能宣称整棵派生树已清空。
+
+`academy-ui-receipts-运行-尝试` 在第三阶段后及时提供前后截图、拒绝遥测后的画面、显示器身份和执行回执，一天后过期。它们不含 profile、环境变量、token 或课程 ZIP；硬取消仍可能来不及上传。UI 操作成功不替代 source CI、84 个 Tests、链接、严格导入、61 个真实环境检查或最终 hash/清理门禁。任何辅助代码变更均先进入 PR 的新 source CI，通过后才以新 `tested_sha` 启动完整验证，不沿用旧提交绿灯。

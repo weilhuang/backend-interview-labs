@@ -45,6 +45,7 @@ jobs:
           ACADEMY_RUN="$RUNNER_TEMP/academy-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           EVIDENCE_DIR="$RUNNER_TEMP/academy-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           printf 'TOOLCHAIN_DIR=%s\nACADEMY_RUN=%s\nEVIDENCE_DIR=%s\n' "$TOOLCHAIN_DIR" "$ACADEMY_RUN" "$EVIDENCE_DIR" >> "$GITHUB_ENV"
+          printf 'UI_RUN=%s\n' "$RUNNER_TEMP/academy-ui-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
           mkdir "$EVIDENCE_DIR"
           printf '{"status":"NOT_RUN","reason":"pipeline initialization"}\n' > "$EVIDENCE_DIR/bootstrap.json"
           python -m pip install -r scripts/quality/requirements.txt
@@ -86,11 +87,86 @@ jobs:
           PHASE: ${{ github.ref == 'refs/heads/academy-validation/full' && 'full-validation' || (github.ref == 'refs/heads/academy-validation/smoke' && 'export-import-smoke' || inputs.phase) }}
           DISPLAY_MODE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/academy-validation/full') && 'xvfb' || (github.event_name == 'workflow_dispatch' && inputs.display || 'headless') }}
         run: |
-          python scripts/academy/run_official.py \
-            --repo "$GITHUB_WORKSPACE" --run-root "$ACADEMY_RUN" \
-            --idea-home "$TOOLCHAIN_DIR/idea" --plugins-home "$TOOLCHAIN_DIR/plugins" \
-            --source-ci-report "$EVIDENCE_DIR/source-ci.json" \
-            --phase "$PHASE" --display "$DISPLAY_MODE"
+          command=(python scripts/academy/run_official.py
+            --repo "$GITHUB_WORKSPACE" --run-root "$ACADEMY_RUN"
+            --idea-home "$TOOLCHAIN_DIR/idea" --plugins-home "$TOOLCHAIN_DIR/plugins"
+            --source-ci-report "$EVIDENCE_DIR/source-ci.json"
+            --phase "$PHASE" --display "$DISPLAY_MODE")
+          if [ "$PHASE" = full-validation ]; then
+            test "$DISPLAY_MODE" = xvfb
+            python scripts/academy/ui_session.py launch --root "$UI_RUN" -- "${command[@]}" --ui-root "$UI_RUN"
+          else
+            "${command[@]}"
+          fi
+      - name: 保存第1阶段当前画面与机械请求（非课程验收）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-stage-1-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: ${{ env.UI_RUN }}/stage-1/
+      - name: 第1阶段等待精确截图绑定的限定UI动作
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/ui_control.py --root "$UI_RUN" --stage 1
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 2
+      - name: 保存第2阶段当前画面与机械请求（非课程验收）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-stage-2-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: ${{ env.UI_RUN }}/stage-2/
+      - name: 第2阶段等待精确截图绑定的限定UI动作
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/ui_control.py --root "$UI_RUN" --stage 2
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 3
+      - name: 保存第3阶段当前画面与机械请求（非课程验收）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-stage-3-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: ${{ env.UI_RUN }}/stage-3/
+      - name: 第3阶段等待精确截图绑定的限定UI动作
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/ui_control.py --root "$UI_RUN" --stage 3
+          python scripts/academy/ui_session.py complete --root "$UI_RUN"
+      - name: 立即保存本次UI前后图与receipt供检查
+        if: always() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: warn
+          path: |
+            ${{ env.UI_RUN }}/stage-*/*.png
+            ${{ env.UI_RUN }}/stage-*/request.json
+            ${{ env.UI_RUN }}/stage-*/review-target.json
+            ${{ env.UI_RUN }}/stage-*/display-identity.json
+            ${{ env.UI_RUN }}/stage-*/receipt.json
+      - name: 等待同一官方进程完成全部原生门禁（原60分钟总界限不变）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 60
+        run: python scripts/academy/ui_session.py finish --root "$UI_RUN"
       - name: 封装同次官方导入快照与原字节ZIP（验收中间产物，非发行包）
         id: handoff
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
@@ -110,6 +186,10 @@ jobs:
         if: always()
         timeout-minutes: 1
         run: |
+          cleanup_status=0
+          if [ -n "${UI_RUN:-}" ] && [ -d "$UI_RUN" ]; then
+            python scripts/academy/ui_session.py cleanup --root "$UI_RUN" || cleanup_status=$?
+          fi
           ACADEMY_RUN="$RUNNER_TEMP/academy-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           EVIDENCE_DIR="$RUNNER_TEMP/academy-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           ARTIFACT_EVIDENCE_DIR="$RUNNER_TEMP/academy-artifact-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
@@ -120,6 +200,7 @@ jobs:
             mkdir "$ARTIFACT_EVIDENCE_DIR"
             printf '{"status":"NOT_RUN","reason":"checkout or setup failed"}\n' > "$ARTIFACT_EVIDENCE_DIR/summary.json"
           fi
+          exit "$cleanup_status"
       - name: 保存小型验收证据
         timeout-minutes: 1
         if: always() && steps.evidence.outcome == 'success'
@@ -238,3 +319,4 @@ jobs:
           path: |
             ${{ env.ENV_RUN }}/release/backend-interview-academy.zip
             ${{ env.ENV_RUN }}/release/SHA256SUMS
+
