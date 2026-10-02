@@ -188,6 +188,59 @@ jobs:
           path: |
             ${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.json
             ${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.png
+      - name: 等待本次已核验validation项目的正常信任画面
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        run: python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 4
+      - name: 严格投影本次项目范围与待审信任画面
+        id: trust_review
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/project_trust.py stage-artifact --root "$UI_RUN" --phase review --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 保存已验证的本次项目范围与待审信任画面
+        if: success() && steps.trust_review.outputs.collected == 'true' && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-ui-stage-4-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/trust-review-artifact/project-trust-before.png
+            ${{ env.UI_RUN }}/trust-review-artifact/project-trust-request.json
+            ${{ env.UI_RUN }}/trust-review-artifact/project-trust-images.json
+            ${{ env.UI_RUN }}/trust-review-artifact/project-trust-review-target.json
+      - name: 等待新审图批准后仅点击本次项目Trust Project
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/project_trust.py receive --root "$UI_RUN"
+          python scripts/academy/ui_session.py trust-complete --root "$UI_RUN"
+      - name: 严格投影本次项目正常信任回执
+        id: trust_receipt
+        if: always() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/project_trust.py stage-artifact --root "$UI_RUN" --phase receipt --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 保存已验证的本次项目正常信任前后图与限定动作回执
+        if: always() && steps.trust_receipt.outputs.collected == 'true' && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-ui-project-trust-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: warn
+          path: |
+            ${{ env.UI_RUN }}/trust-receipt-artifact/project-trust-before.png
+            ${{ env.UI_RUN }}/trust-receipt-artifact/project-trust-after.png
+            ${{ env.UI_RUN }}/trust-receipt-artifact/project-trust-request.json
+            ${{ env.UI_RUN }}/trust-receipt-artifact/project-trust-receipt.json
+            ${{ env.UI_RUN }}/trust-receipt-artifact/project-trust-images.json
       - name: 立即保存本次UI前后图与receipt供检查
         if: always() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
         timeout-minutes: 1

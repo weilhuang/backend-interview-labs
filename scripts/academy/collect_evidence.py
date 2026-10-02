@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 from thread_diagnostics import NAME as THREAD_NAME, MAX_OUTPUT as THREAD_LIMIT, strict_json as thread_json, validate_document as thread_document
 from display_diagnostic import collect as collect_display, REPORT_NAME as DISPLAY_REPORT
+from project_trust import collect as collect_project_trust
 from safe_io import absolute, new_directory, read_regular, validate_directory, write_new
 NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','source-contract.json',
        'archive.json','author-changes.json','student-import.json','educator-import.json',
@@ -199,6 +200,11 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
                 output[name]=data;hashes[name]={'uploaded_sha256':sha256(data).hexdigest()}
         except FileNotFoundError:omitted.append({'name':DISPLAY_REPORT,'reason':'MISSING'})
         except Exception:omitted.append({'name':DISPLAY_REPORT,'reason':'INVALID_OR_UNAVAILABLE'})
+        try:
+            for name,data in collect_project_trust(absolute(ui_root),current.get('run_id'),current.get('run_attempt')).items():
+                output[name]=data;hashes[name]={'uploaded_sha256':sha256(data).hexdigest()}
+        except FileNotFoundError:omitted.append({'name':'project-trust-request.json','reason':'MISSING'})
+        except Exception:omitted.append({'name':'project-trust-request.json','reason':'INVALID_OR_UNAVAILABLE'})
     if 'summary.json' not in output:
         output['summary.json']=(json.dumps({'status':'NOT_RUN','reason':'official command not reached'})+'\n').encode()
     summary=json.loads(output['summary.json'])

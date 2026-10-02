@@ -210,7 +210,7 @@ class OwnershipRevisionTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);proc=Mock();owned=Mock();owned.register_root.return_value=self.child
             identity=Mock();jar=MagicMock();jar.__enter__.return_value=jar;jar.getinfo.return_value.file_size=7;jar.read.return_value=b'fixture'
-            with patch.object(session.zipfile,'ZipFile',return_value=jar),patch.object(session,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(session,'Owned',return_value=owned),patch.object(session,'DisplayIdentity',return_value=identity),patch.object(session.subprocess,'Popen',return_value=proc),patch.object(session,'put',side_effect=OSError('fixture')),patch.object(session.signal,'signal'):
+            with patch.object(session,'trust_context'),patch.object(session.zipfile,'ZipFile',return_value=jar),patch.object(session,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(session,'Owned',return_value=owned),patch.object(session,'DisplayIdentity',return_value=identity),patch.object(session.subprocess,'Popen',return_value=proc),patch.object(session,'put',side_effect=OSError('fixture')),patch.object(session.signal,'signal'):
                 with self.assertRaises(OSError):session.display_session(root,root,['fixture'])
             owned.stop.assert_called_once();identity.close.assert_called_once();proc.wait.assert_called_once()
 

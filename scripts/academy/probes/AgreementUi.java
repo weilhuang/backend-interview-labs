@@ -9,10 +9,19 @@ import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.util.HexFormat;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 /** 仅供本次专用 Xvfb；动作不接受坐标、文本或任意命令。 */
 class AgreementUi {
+    interface CheckedStep { void run() throws Exception; }
+    interface Snapshot { byte[] read() throws Exception; }
+    static void finalTrustClick(CheckedStep finalProbe, Snapshot image, String approvedSha, CheckedStep click) throws Exception {
+        finalProbe.run();
+        // No blocking metadata probe may follow this final whole-image comparison.
+        if (!sha(image.read()).equals(approvedSha)) throw new IllegalStateException("信任画面在最后核验期间变化");
+        click.run();
+    }
     private static byte[] capture(Robot robot, Rectangle bounds) throws Exception {
         var output = new ByteArrayOutputStream();
         if (!ImageIO.write(robot.createScreenCapture(bounds), "png", output)) {
@@ -54,8 +63,20 @@ class AgreementUi {
             }
         }
     }
+    private static void verifyTrustWindow(String[] args) throws Exception {
+        // A fixed read-only companion checks only the current owned-display window.
+        // The path/arguments are generated locally, never taken from a control record.
+        Process probe = new ProcessBuilder(args[4], args[5], "verify-window", "--expected", args[6], "--root", args[7])
+            .redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+        try {
+            if (!probe.waitFor(3, TimeUnit.SECONDS) || probe.exitValue()!=0) throw new IllegalStateException("窗口或本次信任绑定变化");
+        } finally {
+            // This handle is solely the directly spawned read-only probe, never a PID lookup.
+            if (probe.isAlive()) { probe.destroyForcibly(); probe.waitFor(1, TimeUnit.SECONDS); }
+        }
+    }
     public static void main(String[] args) throws Exception {
-        if (args.length != 3 && args.length != 5) throw new IllegalArgumentException("参数数量不符");
+        if (args.length != 3 && args.length != 5 && args.length != 9) throw new IllegalArgumentException("参数数量不符");
         Path binding=Path.of(args[args.length-1]);
         verifyOwned(binding);
         var device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -67,23 +88,34 @@ class AgreementUi {
             Files.write(Path.of(args[1]),data,StandardOpenOption.CREATE_NEW);
             return;
         }
-        if (args.length != 5 || !args[2].matches("[0-9a-f]{64}")) throw new IllegalArgumentException("截图摘要不符");
+        boolean trust=args[0].equals("TRUST_VALIDATION_PROJECT");
+        if (args.length != (trust ? 9 : 5) || !args[2].matches("[0-9a-f]{64}")) throw new IllegalArgumentException("截图摘要不符");
         // 固定 SDK、1280x900 无窗口管理器的已观察布局；审图人员须确认目标点确在相应控件内。
         int x, y;
         switch(args[0]) {
             case "CHECK_EUA": x=382; y=612; break;
             case "CONTINUE_EUA": x=879; y=651; break;
             case "DECLINE_USAGE": x=663; y=651; break;
+            case "TRUST_VALIDATION_PROJECT": x=596; y=517; break;
             default: throw new IllegalArgumentException("不支持的动作");
         }
         // 同一调用中再次全图比对；任何动态变化均拒绝，不做坐标猜测或自动适配。
         if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("当前画面与批准画面不同");
         if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("再次采集画面不同");
         verifyOwned(binding);
-        robot.mouseMove(x,y);
-        verifyOwned(binding);
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        CheckedStep click = () -> {
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        };
+        if (trust) {
+            verifyTrustWindow(args);
+            finalTrustClick(() -> { verifyTrustWindow(args); verifyOwned(binding); },
+                () -> capture(robot,bounds),args[2],() -> {
+                    robot.mouseMove(x,y); verifyOwned(binding); click.run();
+                });
+        } else {
+            robot.mouseMove(x,y); verifyOwned(binding); click.run();
+        }
         robot.delay(500);
         verifyOwned(binding);
         Files.write(Path.of(args[1]),capture(robot,bounds),StandardOpenOption.CREATE_NEW);

@@ -6,6 +6,7 @@ from pathlib import Path
 from safe_io import replace_regular
 from go_environment import validated_go_environment
 from display_diagnostic import capture as capture_display_diagnostic
+from project_trust import checkpoint as trust_checkpoint, context as trust_context, ACTION as TRUST_ACTION
 from ui_control import ACTIONS, EUA_SHA256, FIELDS, UI_BUDGET_SECONDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
 
 
@@ -244,7 +245,7 @@ def launch(root,command):
 
 
 def await_stage(root,stage):
-    deadline=read_outer_deadline(root)
+    deadline=read_ui_deadline(root) if stage==4 else read_outer_deadline(root)
     # 首次还包含官方export，仍受其原600秒与原60分钟总界限，不延长。
     while time.monotonic()<deadline:
         if (root/f'stage-{stage}'/'request.json').is_file():return
@@ -409,6 +410,9 @@ def display_session(root,idea,command):
         identity.verify()
         args=[java,'-Xmx96m','-XX:ActiveProcessorCount=1',f'-Duser.home={os.environ["HOME"]}',str(helper),action,str(destination)]
         if expected is not None:args.extend([expected,str(receipt)])
+        if action==TRUST_ACTION:
+            args.extend([sys.executable,str(Path(__file__).with_name('project_trust.py')),
+                         str(root/'stage-4/window-identity.json'),str(root)])
         args.append(str(identity.binding))
         subprocess.run(args,check=True,timeout=min(15,max(.1,ui_deadline-time.monotonic())),env=clean_env(),
                        pass_fds=tuple(fd for _,fd in identity.handles.values()))
@@ -418,6 +422,7 @@ def display_session(root,idea,command):
     def terminate(*_):raise InterruptedError('本次UI会话取消')
     signal.signal(signal.SIGTERM,terminate);signal.signal(signal.SIGINT,terminate)
     try:
+        trust_context(root,command,idea)  # Exact current100 source/archive/CLI target; never a generic trust grant.
         proc=subprocess.Popen(command,env=os.environ.copy(),start_new_session=True)
         ide_meta=owned.register_root(proc)
         record=budget_record(ide_meta,UI_BUDGET_SECONDS);ui_deadline=record['monotonic_deadline']
@@ -453,6 +458,7 @@ def display_session(root,idea,command):
             if not diagnostic_done and time.monotonic()>=diagnostic_due:
                 diagnostic_done=True
                 optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
+                trust_checkpoint(root,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())
             time.sleep(.25)
         if not diagnostic_done:
             optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
@@ -467,8 +473,8 @@ def display_session(root,idea,command):
 
 
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('mode',choices=['launch','worker','await','complete','finish','cleanup','display','server'])
-    p.add_argument('--root',type=Path,required=True);p.add_argument('--stage',type=int,choices=[1,2,3])
+    p=argparse.ArgumentParser();p.add_argument('mode',choices=['launch','worker','await','complete','trust-complete','finish','cleanup','display','server'])
+    p.add_argument('--root',type=Path,required=True);p.add_argument('--stage',type=int,choices=[1,2,3,4])
     p.add_argument('--idea',type=Path)
     argv=sys.argv[1:];index=argv.index('--') if '--' in argv else len(argv)
     a=p.parse_args(argv[:index]);command=argv[index+1:]
@@ -479,6 +485,11 @@ if __name__=='__main__':
         deadline=read_ui_deadline(a.root)
         while not (a.root/'ui-complete.json').exists():
             if time.monotonic()>=deadline or (a.root/'result.json').exists():raise RuntimeError('UI未完成')
+            time.sleep(.2)
+    elif a.mode=='trust-complete':
+        deadline=read_ui_deadline(a.root)
+        while not (a.root/'stage-4/receipt.json').exists():
+            if time.monotonic()>=deadline or (a.root/'result.json').exists():raise RuntimeError('本次项目UI信任未完成')
             time.sleep(.2)
     elif a.mode=='finish':finish(a.root)
     elif a.mode=='cleanup':cleanup(a.root)
