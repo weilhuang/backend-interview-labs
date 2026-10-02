@@ -33,6 +33,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: 准备证据目录
         run: mkdir -p courses/go-foundations/evidence
       - name: 安装固定静态依赖
@@ -72,7 +76,7 @@ jobs:
           rows = []
           final_exit = 0
           started = time.time()
-          for script, budget in [('test_static.py', 30), ('verify.py', 240)]:
+          for script, budget in [('test_static.py', 30), ('test_public_bridges.py', 30), ('verify.py', 240)]:
               command = [sys.executable, str(root / 'scripts' / script)]
               tick = time.time()
               try:
@@ -102,6 +106,44 @@ jobs:
           PY
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: 准备固定JUnit控制台
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          exec > >(tee courses/go-foundations/evidence/junit-dependency.log) 2>&1
+          jar="$RUNNER_TEMP/junit-platform-console-standalone-1.11.4.jar"
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            --connect-timeout 15 --max-time 60 --retry 1 \
+            https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$jar"
+          echo "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc  $jar" | sha256sum --check --strict
+          echo "JUNIT_CONSOLE_JAR=$jar" >> "$GITHUB_ENV"
+      - name: 公开JUnit桥27场景实测
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          python - <<'PYTHON'
+          import json, pathlib, subprocess, sys, time
+          root = pathlib.Path('courses/go-foundations')
+          start = time.monotonic()
+          try:
+              result = subprocess.run([sys.executable, str(root / 'scripts/verify_public_bridges.py')],
+                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=240)
+              output, code = result.stdout, result.returncode
+          except subprocess.TimeoutExpired as exc:
+              output, code = (exc.stdout or b'') + b'\nBRIDGE_CI_TIMEOUT\n', 124
+          except OSError as exc:
+              output, code = str(exc).encode(), 125
+          (root / 'evidence/bridge-runner.log').write_bytes(output)
+          (root / 'evidence/bridge-runner.json').write_text(json.dumps({
+              'exit_code': code, 'seconds': round(time.monotonic() - start, 3),
+              'tested_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'status': 'PASSED' if code == 0 else 'FAILED',
+              'scope': '独立公开JUnit桥；不代表Gradle集成或原生Academy'
+          }, ensure_ascii=False, indent=2) + '\n')
+          print(output.decode(errors='replace'))
+          sys.exit(code)
+          PYTHON
       - name: 记录包括环境准备失败的job状态
         if: always()
         shell: bash
@@ -127,7 +169,7 @@ jobs:
         with:
           name: go-foundations-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
-            courses/go-foundations/evidence/*.log
-            courses/go-foundations/evidence/*.json
+            courses/go-foundations/evidence/**/*.log
+            courses/go-foundations/evidence/**/*.json
           retention-days: 7
           if-no-files-found: warn
