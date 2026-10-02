@@ -1,7 +1,0 @@
-rootProject.name = 'mysql-engineering'
-file('mysql').eachDir { lesson -> lesson.eachDir { task ->
-    if (new File(task, 'task-info.yaml').isFile()) {
-        def name = "mysql-${lesson.name}-${task.name}"
-        include(name); project(":${name}").projectDir = task
-    }
-} }

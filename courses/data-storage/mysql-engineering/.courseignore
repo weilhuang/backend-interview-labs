@@ -1,4 +1,0 @@
-.gradle/**
-**/build/**
-**/__pycache__/**
-*.log

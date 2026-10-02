@@ -1,9 +1,0 @@
-rootProject.name='java-jvm'
-file('jvm').eachDir { lesson ->
- lesson.eachDir { task ->
-  if(new File(task,'task-info.yaml').isFile()) {
-   def name="jvm-${lesson.name}-${task.name}"
-   include(name);project(":${name}").projectDir=task
-  }
- }
-}

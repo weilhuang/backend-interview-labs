@@ -1,6 +1,0 @@
-rootProject.name = 'distributed-systems'
-include 'support'
-file('distributed-course/services').eachDir { task ->
-    include task.name
-    project(":${task.name}").projectDir = task
-}

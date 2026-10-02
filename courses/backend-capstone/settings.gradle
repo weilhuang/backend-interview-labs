@@ -1,5 +1,0 @@
-rootProject.name = 'backend-capstone'
-file('capstone/stages').eachDir { stage ->
-    include stage.name
-    project(":${stage.name}").projectDir = stage
-}

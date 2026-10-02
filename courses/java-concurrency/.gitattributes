@@ -1,8 +1,0 @@
-*.java text eol=lf
-*.yaml text eol=lf
-*.md text eol=lf
-*.gradle text eol=lf
-*.properties text eol=lf
-*.py text eol=lf
-gradlew text eol=lf
-gradle/wrapper/gradle-wrapper.jar binary

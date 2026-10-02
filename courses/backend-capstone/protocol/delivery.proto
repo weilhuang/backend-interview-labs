@@ -1,9 +1,0 @@
-syntax = "proto3";
-package capstone.v1;
-option java_package = "labs.capstone.protocol";
-option java_multiple_files = true;
-// 字段编号是线上的兼容契约；变更语义时新增字段，不能复用旧编号。
-service Delivery { rpc Apply(OrderEvent) returns (Receipt); rpc Probe(ProbeRequest) returns (Receipt); }
-message OrderEvent { string event_id = 1; string request_id = 2; string sku = 3; int32 quantity = 4; int64 version = 5; string status = 6; }
-message Receipt { string event_id = 1; bool duplicate = 2; string status = 3; }
-message ProbeRequest {}

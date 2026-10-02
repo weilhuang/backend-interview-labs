@@ -1,4 +1,0 @@
-A|张三|120|PAID
-B|李四|100|PAID
-A|张三|999|PAID
-C|张三|20|PENDING
