@@ -1,0 +1,43 @@
+{
+  "schema_version": "go-foundations-source-candidate-v1",
+  "source_root": "overlay",
+  "canonical_modified": false,
+  "frozen_eight_modified": false,
+  "base_v1": {
+    "tasks": 84,
+    "placeholders": 136,
+    "status": "UNCHANGED_PROPOSAL_ONLY"
+  },
+  "base_v2_first_slice": {
+    "tasks": 92,
+    "placeholders": 144,
+    "status": "UNCHANGED_PROPOSAL_ONLY"
+  },
+  "additional_tasks": 3,
+  "additional_placeholders": 3,
+  "proposed_v2_next_total": {
+    "tasks": 95,
+    "placeholders": 147,
+    "status": "PROPOSAL_NOT_INTEGRATED"
+  },
+  "lesson_order_proposal": [
+    "greeting",
+    "quantity",
+    "order-total",
+    "snapshot"
+  ],
+  "academy_type": "Java course with visible Go source and public JUnit process bridge",
+  "native_go_course": false,
+  "go_version": "1.27.1",
+  "go_external_dependencies": [],
+  "java_bridge_versions": {
+    "jdk": "21",
+    "junit": "5.11.4",
+    "junit_platform": "1.11.4"
+  },
+  "go_runtime_tests": "NOT_RUN",
+  "java_junit": "NOT_RUN",
+  "native_import_and_check": "NOT_RUN",
+  "go_ide_editor_and_debugger": "NOT_RUN",
+  "github_actions": "NOT_RUN"
+}

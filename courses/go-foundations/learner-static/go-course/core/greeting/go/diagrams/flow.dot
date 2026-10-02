@@ -1,0 +1,1 @@
+digraph G { rankdir=LR; graph [bgcolor="white"]; node [shape=box, fontname="Noto Sans CJK SC", fontsize=16]; edge [fontname="Noto Sans CJK SC"]; caller [label="完整调用方 main"]; exercise [label="练习函数 Greeting"]; checks [label="可见表驱动测试"]; result [label="返回值 / 错误"]; caller -> exercise; checks -> exercise; exercise -> result; }
