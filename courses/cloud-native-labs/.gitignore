@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+local-runs/
+course/materials/cloud-native/build/

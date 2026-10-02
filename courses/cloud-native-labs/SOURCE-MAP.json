@@ -1,0 +1,376 @@
+{
+  "scope": "C11 first three lessons only; learner source draft, not complete cloud-native course",
+  "source_files": 51,
+  "mapping": [
+    {
+      "source_path": "c11-cloud-native/01-images/01-build-and-stop/Dockerfile",
+      "target_path": "course/c11-cloud-native/01-images/01-build-and-stop/Dockerfile",
+      "source_sha256": "76164820acfcbfb7e59f51f82a8633bcdd653ac7a10a117bbedf9d7fd2cc6c64",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "76164820acfcbfb7e59f51f82a8633bcdd653ac7a10a117bbedf9d7fd2cc6c64"
+    },
+    {
+      "source_path": "c11-cloud-native/01-images/01-build-and-stop/observations.md",
+      "target_path": "course/c11-cloud-native/01-images/01-build-and-stop/observations.md",
+      "source_sha256": "b479a9481a14a786b6da96c32efe88412d551751e3cd2c1171b0222f3aff71fa",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "b479a9481a14a786b6da96c32efe88412d551751e3cd2c1171b0222f3aff71fa"
+    },
+    {
+      "source_path": "c11-cloud-native/01-images/01-build-and-stop/solution.md",
+      "target_path": "course/c11-cloud-native/01-images/01-build-and-stop/solution.md",
+      "source_sha256": "e39aba18cc36115556659090abe73b2925b5e85dd02b4ad956ac190fe392b27b",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "e39aba18cc36115556659090abe73b2925b5e85dd02b4ad956ac190fe392b27b"
+    },
+    {
+      "source_path": "c11-cloud-native/01-images/01-build-and-stop/task.md",
+      "target_path": "course/c11-cloud-native/01-images/01-build-and-stop/task.md",
+      "source_sha256": "c7a3323d74409fa951355a6a536475747ce85dd7d5a692a78df7fdd9d69ea92e",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "4fa07ed9809ae415851c704679d75dfeb82af68db9f0e2eea6cec8c11de7a1b9"
+    },
+    {
+      "source_path": "c11-cloud-native/02-compose/01-ready-and-seed/CloudPolicy.java",
+      "target_path": "course/c11-cloud-native/02-compose/01-ready-and-seed/CloudPolicy.java",
+      "source_sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e"
+    },
+    {
+      "source_path": "c11-cloud-native/02-compose/01-ready-and-seed/observations.md",
+      "target_path": "course/c11-cloud-native/02-compose/01-ready-and-seed/observations.md",
+      "source_sha256": "76b4a7b3ad8d037e19538a8c59205f676ccfd320eeee301f2b74b13d3472443b",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "76b4a7b3ad8d037e19538a8c59205f676ccfd320eeee301f2b74b13d3472443b"
+    },
+    {
+      "source_path": "c11-cloud-native/02-compose/01-ready-and-seed/solution.md",
+      "target_path": "course/c11-cloud-native/02-compose/01-ready-and-seed/solution.md",
+      "source_sha256": "21923ef4f2f4466c69c8cbed038ad022b9b6589f59ee2d2590b1c8d22c1d17d1",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "21923ef4f2f4466c69c8cbed038ad022b9b6589f59ee2d2590b1c8d22c1d17d1"
+    },
+    {
+      "source_path": "c11-cloud-native/02-compose/01-ready-and-seed/task.md",
+      "target_path": "course/c11-cloud-native/02-compose/01-ready-and-seed/task.md",
+      "source_sha256": "6dacf1cda9244d034bf474fc5f867f49b672fd86f56abd751fe2045d5c518000",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "ed268b21308de4497fcbb0b4a84abf58531c90309ca4303fea74add9ee350c4a"
+    },
+    {
+      "source_path": "c11-cloud-native/03-network/01-service-discovery/AddressPolicy.java",
+      "target_path": "course/c11-cloud-native/03-network/01-service-discovery/AddressPolicy.java",
+      "source_sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a"
+    },
+    {
+      "source_path": "c11-cloud-native/03-network/01-service-discovery/observations.md",
+      "target_path": "course/c11-cloud-native/03-network/01-service-discovery/observations.md",
+      "source_sha256": "616d89ed5cc670b9aedaf0960286411fc67f0ab961c2879f9a0994c38f950df0",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "616d89ed5cc670b9aedaf0960286411fc67f0ab961c2879f9a0994c38f950df0"
+    },
+    {
+      "source_path": "c11-cloud-native/03-network/01-service-discovery/solution.md",
+      "target_path": "course/c11-cloud-native/03-network/01-service-discovery/solution.md",
+      "source_sha256": "7fd8c66e2a2e8be4a14ae0ca799e07e6c7e82336f24a183321d7668b2f4e5fb6",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "7fd8c66e2a2e8be4a14ae0ca799e07e6c7e82336f24a183321d7668b2f4e5fb6"
+    },
+    {
+      "source_path": "c11-cloud-native/03-network/01-service-discovery/task.md",
+      "target_path": "course/c11-cloud-native/03-network/01-service-discovery/task.md",
+      "source_sha256": "96ee21560485dda4e1b6eb93bbd2ac195659733ac61e48525d273e0896625545",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "0dde648f904ebb1fa94d37d673b11172faf3618910ca0f73dcfcb58135d3dd63"
+    },
+    {
+      "source_path": "infra/cloudnative.compose.yaml",
+      "target_path": "course/infra/cloudnative.compose.yaml",
+      "source_sha256": "0aff297f27ea0ff3d236ca3a898a577047e96cbaa1f0c1f1a5f9ee72b9f5f557",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "0aff297f27ea0ff3d236ca3a898a577047e96cbaa1f0c1f1a5f9ee72b9f5f557"
+    },
+    {
+      "source_path": "materials/cloud-native/.dockerignore",
+      "target_path": "course/materials/cloud-native/.dockerignore",
+      "source_sha256": "7616396f3a03176bcb2c2172db4113d28b0d6524b018769194401210c60ea9c4",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "7616396f3a03176bcb2c2172db4113d28b0d6524b018769194401210c60ea9c4"
+    },
+    {
+      "source_path": "materials/cloud-native/README.md",
+      "target_path": "course/materials/cloud-native/README.md",
+      "source_sha256": "86cdf65efb0ae3551546420b6fece10220e3d981224296acca99623711c5872e",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "088ea6beb815f745a66fcca1dd23cfb5fb2518d89d628bc0d9638116489c7155"
+    },
+    {
+      "source_path": "materials/cloud-native/answers/AddressPolicy-explicit.java.txt",
+      "target_path": "course/materials/cloud-native/answers/AddressPolicy-explicit.java.txt",
+      "source_sha256": "2fbde365ab7a6ae4f0bf82251f703768a27d88bcf2e4d91c19d226e545f1ba4b",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "2fbde365ab7a6ae4f0bf82251f703768a27d88bcf2e4d91c19d226e545f1ba4b"
+    },
+    {
+      "source_path": "materials/cloud-native/answers/CloudPolicy-explicit.java.txt",
+      "target_path": "course/materials/cloud-native/answers/CloudPolicy-explicit.java.txt",
+      "source_sha256": "ab3a3fa3a90dc5c7a1d04230486891b08382144f897fe1d95aa0b0f3bd372be7",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "ab3a3fa3a90dc5c7a1d04230486891b08382144f897fe1d95aa0b0f3bd372be7"
+    },
+    {
+      "source_path": "materials/cloud-native/answers/Dockerfile.exec",
+      "target_path": "course/materials/cloud-native/answers/Dockerfile.exec",
+      "source_sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca"
+    },
+    {
+      "source_path": "materials/cloud-native/answers/Dockerfile.exec-script",
+      "target_path": "course/materials/cloud-native/answers/Dockerfile.exec-script",
+      "source_sha256": "f080af93ee001103bd830907ba039b01aebd7930cf7241657f749e66e9fd6df0",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "f080af93ee001103bd830907ba039b01aebd7930cf7241657f749e66e9fd6df0"
+    },
+    {
+      "source_path": "materials/cloud-native/bin/call.py",
+      "target_path": "course/materials/cloud-native/bin/call.py",
+      "source_sha256": "aadac381fcd1f78f5221242b298205ade7195fed4a3d67533f76248918c8739d",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "aadac381fcd1f78f5221242b298205ade7195fed4a3d67533f76248918c8739d"
+    },
+    {
+      "source_path": "materials/cloud-native/bin/compile.sh",
+      "target_path": "course/materials/cloud-native/bin/compile.sh",
+      "source_sha256": "5a8fbac1d5581eb48518a0a909a911b8193e7f306c9520dd6bc16411e980266a",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "3a3b3362feef0e028ae334d2ea97259b1c3e7ea57b578d5e23b701a6ff6b9e26"
+    },
+    {
+      "source_path": "materials/cloud-native/bin/run.sh",
+      "target_path": "course/materials/cloud-native/bin/run.sh",
+      "source_sha256": "f8080e3da90bd85a1f0f6bc330066475b93cac890c747c65179aefca7d17cf52",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "f8080e3da90bd85a1f0f6bc330066475b93cac890c747c65179aefca7d17cf52"
+    },
+    {
+      "source_path": "materials/cloud-native/container/Dockerfile",
+      "target_path": "course/materials/cloud-native/container/Dockerfile",
+      "source_sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca"
+    },
+    {
+      "source_path": "materials/cloud-native/container/entrypoint.sh",
+      "target_path": "course/materials/cloud-native/container/entrypoint.sh",
+      "source_sha256": "e852f6fa131206b216e97f37bf77c0118fbf573989d1b1b583e6cf900e4e3976",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "e852f6fa131206b216e97f37bf77c0118fbf573989d1b1b583e6cf900e4e3976"
+    },
+    {
+      "source_path": "materials/cloud-native/diagrams/build-runtime.svg",
+      "target_path": "course/materials/cloud-native/diagrams/build-runtime.svg",
+      "source_sha256": "2c309bef707daba5f07785171e257c426ed8f3d6861ff250be26eda593a1dde0",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "2c309bef707daba5f07785171e257c426ed8f3d6861ff250be26eda593a1dde0"
+    },
+    {
+      "source_path": "materials/cloud-native/diagrams/network-path.svg",
+      "target_path": "course/materials/cloud-native/diagrams/network-path.svg",
+      "source_sha256": "4875e27f9a85fc21e374ca547c8e301d5529ac109a6aaca1c7871f5021d14c2e",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "4875e27f9a85fc21e374ca547c8e301d5529ac109a6aaca1c7871f5021d14c2e"
+    },
+    {
+      "source_path": "materials/cloud-native/diagrams/readiness.svg",
+      "target_path": "course/materials/cloud-native/diagrams/readiness.svg",
+      "source_sha256": "f5cd7eb0b344163621543b5e6770a282293910554cdcceeb18f713c56f945b04",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "f5cd7eb0b344163621543b5e6770a282293910554cdcceeb18f713c56f945b04"
+    },
+    {
+      "source_path": "materials/cloud-native/docs/kubernetes-istio-next.md",
+      "target_path": "course/materials/cloud-native/docs/kubernetes-istio-next.md",
+      "source_sha256": "8565fe3ad8991a395769430b1232e4f0f64179723964dec814184ac076bc846c",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "1c9172ab14ddf84bd5293431cf78ab96cbd07daa3bfeec52a1d65b4b465cd559"
+    },
+    {
+      "source_path": "materials/cloud-native/docs/source-anchors.md",
+      "target_path": "course/materials/cloud-native/docs/source-anchors.md",
+      "source_sha256": "aba29fd230ad02f934866f7dd02ff87e01fd33916fc8c047d56796230e5580a6",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "37df6f088eeb378ded9c2d06c5e6911d30fae9d34d4b24a4885508597808ed31"
+    },
+    {
+      "source_path": "materials/cloud-native/src/labs/AddressPolicy.java",
+      "target_path": "course/materials/cloud-native/src/labs/AddressPolicy.java",
+      "source_sha256": "69802654cb3d5027299e5a573626de670e39d8d9ddfc0d913cece0be31d71827",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "69802654cb3d5027299e5a573626de670e39d8d9ddfc0d913cece0be31d71827"
+    },
+    {
+      "source_path": "materials/cloud-native/src/labs/CloudNativeApp.java",
+      "target_path": "course/materials/cloud-native/src/labs/CloudNativeApp.java",
+      "source_sha256": "28a4160157273b5143e7b245f70f1984bb001af45e8bdfac34b3589d057a91cc",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "28a4160157273b5143e7b245f70f1984bb001af45e8bdfac34b3589d057a91cc"
+    },
+    {
+      "source_path": "materials/cloud-native/src/labs/CloudPolicy.java",
+      "target_path": "course/materials/cloud-native/src/labs/CloudPolicy.java",
+      "source_sha256": "8494de65fd65c15e96b931698efb8c566687aa2391ec7fbcd67562a630c093ac",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "8494de65fd65c15e96b931698efb8c566687aa2391ec7fbcd67562a630c093ac"
+    },
+    {
+      "source_path": "materials/cloud-native/src/labs/Inventory.java",
+      "target_path": "course/materials/cloud-native/src/labs/Inventory.java",
+      "source_sha256": "0daf4fa688febda37685d14775a6647389f06551f368c45946e0c41318dd9739",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "0daf4fa688febda37685d14775a6647389f06551f368c45946e0c41318dd9739"
+    },
+    {
+      "source_path": "materials/cloud-native/src/labs/RedisClient.java",
+      "target_path": "course/materials/cloud-native/src/labs/RedisClient.java",
+      "source_sha256": "215fd5ebaa9a96d0fe9c3a3243e8b76f2f6d5a5e630cb9fd5288f738563db587",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "215fd5ebaa9a96d0fe9c3a3243e8b76f2f6d5a5e630cb9fd5288f738563db587"
+    },
+    {
+      "source_path": "materials/cloud-native/src/labs/RedisDiagnostic.java",
+      "target_path": "course/materials/cloud-native/src/labs/RedisDiagnostic.java",
+      "source_sha256": "48ae8dae6c4e777957a66c1f09996573a18733092a72c51cb05549a88cc2157c",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "48ae8dae6c4e777957a66c1f09996573a18733092a72c51cb05549a88cc2157c"
+    },
+    {
+      "source_path": "materials/cloud-native/starter/AddressPolicy.java.txt",
+      "target_path": "course/materials/cloud-native/starter/AddressPolicy.java.txt",
+      "source_sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a"
+    },
+    {
+      "source_path": "materials/cloud-native/starter/CloudPolicy.java.txt",
+      "target_path": "course/materials/cloud-native/starter/CloudPolicy.java.txt",
+      "source_sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e"
+    },
+    {
+      "source_path": "materials/cloud-native/starter/Dockerfile",
+      "target_path": "course/materials/cloud-native/starter/Dockerfile",
+      "source_sha256": "76164820acfcbfb7e59f51f82a8633bcdd653ac7a10a117bbedf9d7fd2cc6c64",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "76164820acfcbfb7e59f51f82a8633bcdd653ac7a10a117bbedf9d7fd2cc6c64"
+    },
+    {
+      "source_path": "materials/cloud-native/test-java/labs/PolicyContractTest.java",
+      "target_path": "course/materials/cloud-native/test-java/labs/PolicyContractTest.java",
+      "source_sha256": "784a7524c24e0c76c2ea74064b5dc26c326dd015454bf5582546631fd7cea111",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "784a7524c24e0c76c2ea74064b5dc26c326dd015454bf5582546631fd7cea111"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/compose_policy.py",
+      "target_path": "course/materials/cloud-native/tests/compose_policy.py",
+      "source_sha256": "276a454f51ddd740b4b53d6a48a84e7ff67e709eea7ff78b9c3aa9623cde2282",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "276a454f51ddd740b4b53d6a48a84e7ff67e709eea7ff78b9c3aa9623cde2282"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/contract.py",
+      "target_path": "course/materials/cloud-native/tests/contract.py",
+      "source_sha256": "8ebecbb3936bcb7ff9d26005ef7d13a594718354c13b6cd7b94e91f4855e7811",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "e23eb007db7c409335069e9ec760b14bbbd5b9aa9c454738e5c1b7902fff4c33"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/docker_variant_verify.py",
+      "target_path": "course/materials/cloud-native/tests/docker_variant_verify.py",
+      "source_sha256": "8940136e6149df5e9ea5ad355f8de202aa6a0a559a07df61e36d66b91ad97a1c",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "35f62593396b7ec83024d5c9cc8a4b5bb651038964c81d3ff5eaba097455c223"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/docker_verify.py",
+      "target_path": "course/materials/cloud-native/tests/docker_verify.py",
+      "source_sha256": "186623dc76d6281e8ffdb1f388f90323b8c210bbe980e4f089cbbf97e894c54c",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "b89334f28e39e8b5dd05234f94e19b6ce5923c31e61bbeab1cb8a958db574e0a"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/fake_redis.py",
+      "target_path": "course/materials/cloud-native/tests/fake_redis.py",
+      "source_sha256": "0e3501228d0a44aeded8d0d7392b6247c14f97bde90a10ee24b8b4f50f9cc872",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "0e3501228d0a44aeded8d0d7392b6247c14f97bde90a10ee24b8b4f50f9cc872"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/native_verify.py",
+      "target_path": "course/materials/cloud-native/tests/native_verify.py",
+      "source_sha256": "3d21237a2a3fbd527c5172e9e06cf1e8855fe5714a7b7acdac204be1e13cfded",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "99f0c86db7dd18b76477e1dcb149909f12410fc9a93cfc700f9deab4675316dc"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/test_offline.py",
+      "target_path": "course/materials/cloud-native/tests/test_offline.py",
+      "source_sha256": "45adcd686da0c36c28034e287132e7f264085a6939469025793af9ce0d5a2f8e",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "3ecb4c7c2657a997fc7827ddc865038aed41425b72a2c0bbb89457052b065421"
+    },
+    {
+      "source_path": "materials/cloud-native/tests/variant_verify.py",
+      "target_path": "course/materials/cloud-native/tests/variant_verify.py",
+      "source_sha256": "a3c11b30b3bf5aa3954a56103a1574512e73f43ca6391515d1747108d435045f",
+      "state": "CLEANED_DOCUMENTATION_OR_VERIFICATION_GUARD",
+      "target_sha256": "bbb7f94c6d314871dfa30bd56ce1f7452e8f2da34cd55c04775a198d4a8499ae"
+    },
+    {
+      "source_path": "materials/cloud-native/web/index.html",
+      "target_path": "course/materials/cloud-native/web/index.html",
+      "source_sha256": "5b0cd8dffe6b24a401dc35576885a006ff949340e22a6b377e0b3ae6fa2e7ff8",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "5b0cd8dffe6b24a401dc35576885a006ff949340e22a6b377e0b3ae6fa2e7ff8"
+    },
+    {
+      "source_path": "materials/cloud-native/wrong/AddressPolicy-localhost.java.txt",
+      "target_path": "course/materials/cloud-native/wrong/AddressPolicy-localhost.java.txt",
+      "source_sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a"
+    },
+    {
+      "source_path": "materials/cloud-native/wrong/CloudPolicy-always-ready.java.txt",
+      "target_path": "course/materials/cloud-native/wrong/CloudPolicy-always-ready.java.txt",
+      "source_sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e"
+    },
+    {
+      "source_path": "materials/cloud-native/wrong/entrypoint-swallow-term.sh",
+      "target_path": "course/materials/cloud-native/wrong/entrypoint-swallow-term.sh",
+      "source_sha256": "8c07c5af558bb8b7ccfbad6fbc119829145d4b208025759ebd785a6cb4ee1336",
+      "state": "UNCHANGED_SOURCE",
+      "target_sha256": "8c07c5af558bb8b7ccfbad6fbc119829145d4b208025759ebd785a6cb4ee1336"
+    }
+  ],
+  "missing": [
+    "Visible JUnit bridge into the total course Gradle model",
+    "Total-course Gradle integration and strict dependency lockfiles",
+    "Bounded environment lifecycle adapter",
+    "Current JDK compilation and process verification",
+    "Actual Docker, Redis/Lua and negative-matrix execution",
+    "Academy native Check execution",
+    "Kubernetes and Istio runnable implementations",
+    "Go static runtime image comparison"
+  ],
+  "runtime_status": "NOT_RUN",
+  "publication_status": "SOURCE_DRAFT_NOT_PUBLISHED",
+  "academy_metadata": "THREE_TASKS_STATIC_UTF16_CHECKED_RUNTIME_NOT_RUN"
+}

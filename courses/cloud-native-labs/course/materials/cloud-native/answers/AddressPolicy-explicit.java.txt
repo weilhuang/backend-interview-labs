@@ -1,0 +1,17 @@
+package labs;
+import java.util.Map;
+public final class AddressPolicy {
+    public static String host(Map<String,String> env) {
+        String host=env.get("REDIS_HOST");
+        if(host==null || host.isBlank() || host.contains("/") || host.contains(":"))
+            throw new IllegalArgumentException("Set REDIS_HOST to service DNS explicitly");
+        return host;
+    }
+    public static int port(Map<String,String> env) {
+        String value=env.get("REDIS_PORT");
+        if(value==null) throw new IllegalArgumentException("Set REDIS_PORT explicitly");
+        int port=Integer.parseInt(value);
+        if(port<1 || port>65535) throw new IllegalArgumentException("REDIS_PORT range");
+        return port;
+    }
+}
