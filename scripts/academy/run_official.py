@@ -229,6 +229,8 @@ def execute(a):
         if a.display=='xvfb':command=['xvfb-run','-a','--server-args=-screen 0 1280x900x24',*command]
         else:env.pop('DISPLAY',None)
         require(not list((profile/'tmp').iterdir()),'export temp directory was not empty')
+        result['stages']['official_export_process']={'status':'START_REQUESTED_OUTCOME_UNKNOWN','attempted_at_utc':utc_now(),'exit_code':None}
+        dump(evidence/'summary.json',result)
         run=capture(command,env,repo,evidence/'export.stdout.log',evidence/'export.stderr.log',300 if a.phase=='export-import-smoke' else 600,root,phase='export')
         result['stages']['official_export_process']=run;dump(evidence/'summary.json',result)
         require(run['exit_code']==0 and not run['timed_out'] and not run['disk_low'],'official createCourse failed or resource budget exceeded')
@@ -265,6 +267,8 @@ def execute(a):
         else:env.pop('DISPLAY',None)
         if getattr(a,'ui_root',None):
             command=[os.sys.executable,str(Path(__file__).with_name('ui_session.py')),'server','--root',str(a.ui_root),'--',*command]
+        result['stages']['official_validate_process']={'status':'START_REQUESTED_OUTCOME_UNKNOWN','attempted_at_utc':utc_now(),'exit_code':None}
+        dump(evidence/'summary.json',result)
         run=capture(command,env,repo,evidence/'validate.stdout.log',evidence/'validate.stderr.log',2700,root,phase='validate')
         result['stages']['official_validate_process']=run;dump(evidence/'summary.json',result)
         # Parse available failure reports even when process failed/timed out.
@@ -290,6 +294,8 @@ def execute(a):
         write_new(evidence/'failure.log',traceback.format_exc().encode())
         return result
     finally:
+        if result['status']=='RUNNING':
+            result.update(status='FAIL',observed_status='RUNNING',terminal_reason='OFFICIAL_EXECUTION_INTERRUPTED',initiating_cause='UNKNOWN')
         try:small_logs(root,evidence)
         except Exception as exc:
             result['status']='FAIL';result['log_collection_error']=type(exc).__name__

@@ -226,15 +226,18 @@ jobs:
           ARTIFACT_EVIDENCE_DIR="$RUNNER_TEMP/academy-artifact-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
           printf 'ARTIFACT_EVIDENCE_DIR=%s\n' "$ARTIFACT_EVIDENCE_DIR" >> "$GITHUB_ENV"
           if [ -f scripts/academy/collect_evidence.py ]; then
-            python scripts/academy/collect_evidence.py --run "$ACADEMY_RUN" --bootstrap "$EVIDENCE_DIR" --evidence "$ARTIFACT_EVIDENCE_DIR"
+            ui_args=()
+            if [ -n "${UI_RUN:-}" ] && [ -d "$UI_RUN" ]; then ui_args=(--ui-root "$UI_RUN"); fi
+            python scripts/academy/collect_evidence.py --run "$ACADEMY_RUN" --bootstrap "$EVIDENCE_DIR" --evidence "$ARTIFACT_EVIDENCE_DIR" "${ui_args[@]}" --job-status '${{ job.status }}' --cleanup-exit "$cleanup_status"
           else
             mkdir "$ARTIFACT_EVIDENCE_DIR"
             printf '{"status":"NOT_RUN","reason":"checkout or setup failed"}\n' > "$ARTIFACT_EVIDENCE_DIR/summary.json"
           fi
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
           exit "$cleanup_status"
       - name: 保存小型验收证据
         timeout-minutes: 1
-        if: always() && steps.evidence.outcome == 'success'
+        if: always() && steps.evidence.outputs.collected == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: academy-evidence-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
@@ -350,4 +353,3 @@ jobs:
           path: |
             ${{ env.ENV_RUN }}/release/backend-interview-academy.zip
             ${{ env.ENV_RUN }}/release/SHA256SUMS
-

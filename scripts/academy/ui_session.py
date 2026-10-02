@@ -3,12 +3,34 @@
 from __future__ import annotations
 import argparse, hashlib, json, os, select, signal, stat, subprocess, sys, time, zipfile, re, shutil
 from pathlib import Path
+from safe_io import replace_regular
 from go_environment import validated_go_environment
 from ui_control import ACTIONS, EUA_SHA256, FIELDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
 
 
 def put(path, value):
     atomic_json(path,value)
+
+def exception_diagnostic(exc, operation):
+    """Typed facts only: exception text can contain commands, paths or secrets."""
+    name=type(exc).__name__
+    if not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]{0,63}',name):name='UnknownException'
+    result={'operation':operation,'exception_type':name}
+    if isinstance(exc,OSError) and type(exc.errno) is int:result['errno']=exc.errno
+    codes={'OWNERSHIP_UNVERIFIED':'OWNERSHIP_UNVERIFIED',
+           '进程元数据过大':'PROCESS_METADATA_LIMIT',
+           '进程登记预算耗尽':'REGISTRATION_DEADLINE',
+           '子进程登记预算耗尽':'REGISTRATION_DEADLINE',
+           '自有子链枚举预算耗尽':'CHILD_ENUMERATION_BUDGET',
+           '自有子链元数据过大':'CHILD_METADATA_LIMIT',
+           '自有子链数量上限':'CHILD_COUNT_LIMIT',
+           '已登记进程上限':'REGISTERED_COUNT_LIMIT',
+           '已登记进程未全部退出':'REGISTERED_CLEANUP_INCOMPLETE',
+           '当前运行取消':'CANCELLED',
+           '原官方执行60分钟总预算耗尽':'OUTER_DEADLINE',
+           '监督预算未初始化':'INITIALIZATION_DEADLINE'}
+    result['code']=codes.get(exc.args[0] if exc.args and isinstance(exc.args[0],str) else '', 'UNCLASSIFIED_EXCEPTION')
+    return result
 
 
 def process_info(pid):
@@ -140,34 +162,50 @@ def read_outer_deadline(root):
 
 
 def worker(root,command):
-    initialization_deadline=time.monotonic()+2
-    while not (root/'state.json').exists():
-        if time.monotonic()>=initialization_deadline:raise RuntimeError('监督预算未初始化')
-        time.sleep(.01)
-    deadline=read_outer_deadline(root)
-    result={'status':'FAILED','exit_code':None,'cleanup_verified':False}
-    owned=Owned(deadline);proc=None
+    result={'schema_version':1,'status':'FAILED','exit_code':None,'cleanup_verified':None,
+            'termination':'UNKNOWN','operation':'INITIALIZE'}
+    owned=None;proc=None
     def stop_signal(*_):raise InterruptedError('当前运行取消')
     signal.signal(signal.SIGTERM,stop_signal);signal.signal(signal.SIGINT,stop_signal)
     try:
+        initialization_deadline=time.monotonic()+2
+        while not (root/'state.json').exists():
+            if time.monotonic()>=initialization_deadline:raise RuntimeError('监督预算未初始化')
+            time.sleep(.01)
+        deadline=read_outer_deadline(root);owned=Owned(deadline)
+        result['operation']='OPEN_WORKER_STREAMS'
         with (root/'worker.stdout.log').open('xb') as out,(root/'worker.stderr.log').open('xb') as err:
+            result['operation']='SPAWN_CHILD'
             proc=subprocess.Popen(command,stdout=out,stderr=err,env=clean_env(),start_new_session=True)
+            result['operation']='REGISTER_ROOT'
             owned.register_root(proc)
-            while proc.poll() is None:
+            while True:
+                result['operation']='POLL_CHILD'
+                if proc.poll() is not None:break
+                result['operation']='SCAN_OWNED'
                 owned.scan()
+                result['operation']='CHECK_DEADLINE'
                 if time.monotonic()>=deadline:raise TimeoutError('原官方执行60分钟总预算耗尽')
                 time.sleep(.25)
-            result['exit_code']=proc.returncode
+            result['exit_code']=proc.returncode if type(proc.returncode) is int else None
+            result['termination']='CHILD_EXIT';result['operation']='CHILD_EXIT_OBSERVED'
             if proc.returncode==0:result['status']='PASS'
-    except BaseException as exc:result['error']=type(exc).__name__
+    except BaseException as exc:
+        result['termination']='SUPERVISOR_EXCEPTION';result['error']=type(exc).__name__
+        result['error_details']=exception_diagnostic(exc,result['operation'])
     finally:
+        result['registered_process_count']=len(owned.members) if owned is not None and isinstance(owned.members,dict) else None
         if proc is not None:
             try:owned.stop();result['cleanup_verified']=True;result['cleanup_scope']='REGISTERED_SET_ONLY'
-            except Exception as exc:result['status']='FAILED';result['cleanup_error']=type(exc).__name__
+            except Exception as exc:
+                result['status']='FAILED';result['cleanup_verified']=False;result['cleanup_error']=type(exc).__name__
+                result['cleanup_error_details']=exception_diagnostic(exc,'STOP_REGISTERED_SET')
         if proc:
             try:
-                result['exit_code']=proc.wait(timeout=1)
-            except subprocess.TimeoutExpired:result['status']='FAILED';result['cleanup_error']='OWNERSHIP_UNVERIFIED'
+                code=proc.wait(timeout=1);result['exit_code']=code if type(code) is int else None
+            except subprocess.TimeoutExpired as exc:
+                result['status']='FAILED';result['cleanup_verified']=False;result['cleanup_error']='OWNERSHIP_UNVERIFIED'
+                result['cleanup_error_details']=exception_diagnostic(exc,'REAP_CHILD')
         put(root/'result.json',result)
     return 0 if result['status']=='PASS' else 1
 
@@ -175,24 +213,33 @@ def worker(root,command):
 def launch(root,command):
     root.mkdir();deadline=time.monotonic()+3600
     owned=Owned(deadline);proc=None;handed_off=False
+    result={'schema_version':1,'status':'FAILED','operation':'SPAWN_SUPERVISOR','exit_code':None,'cleanup_verified':None}
     try:
         with (root/'supervisor.log').open('xb') as output:
             proc=subprocess.Popen([sys.executable,__file__,'worker','--root',str(root),'--',*command],
                                   stdout=output,stderr=subprocess.STDOUT,env=clean_env(),start_new_session=True)
-            meta=owned.register_root(proc)
+            result['operation']='REGISTER_SUPERVISOR';meta=owned.register_root(proc)
             owner={key:meta[key] for key in ('pid','start_time','uid','session','pgrp')}
-            put(root/'supervisor.json',owner)
+            result['operation']='WRITE_BUDGET';put(root/'supervisor.json',owner)
             put(root/'state.json',budget_record(owner,3600))
-        await_stage(root,1);handed_off=True
+        result['operation']='AWAIT_STAGE_1';await_stage(root,1);handed_off=True
+        result['status']='CHECKPOINT_REACHED_NOT_ACCEPTANCE'
+    except BaseException as exc:
+        result['error_details']=exception_diagnostic(exc,result['operation']);raise
     finally:
         if handed_off:
             for _,fd in owned.members.values():os.close(fd)
             owned.members.clear()
         elif proc is not None:
-            try:owned.stop()
+            try:owned.stop();result['cleanup_verified']=True;result['cleanup_scope']='REGISTERED_SET_ONLY'
+            except BaseException as exc:
+                result['cleanup_verified']=False;result['cleanup_error_details']=exception_diagnostic(exc,'STOP_REGISTERED_SET');raise
             finally:
-                try:proc.wait(timeout=1)
-                except subprocess.TimeoutExpired:pass
+                try:
+                    code=proc.wait(timeout=1);result['exit_code']=code if type(code) is int else None
+                except subprocess.TimeoutExpired:result['exit_code']=None
+                put(root/'launch-result.json',result)
+        if proc is None or handed_off:put(root/'launch-result.json',result)
 
 
 def await_stage(root,stage):
@@ -218,24 +265,37 @@ def finish(root):
     raise TimeoutError('原执行总预算耗尽')
 
 
-def cleanup(root):
+def _cleanup(root):
     path=root/'supervisor.json'
-    if not path.exists():return
+    if not path.exists():return 'NO_SUPERVISOR_IDENTITY'
     info=json.loads(path.read_bytes())
     def same():
         try:
             current=process_info(info['pid'])
             return all(current[key]==value for key,value in info.items())
         except (FileNotFoundError,ProcessLookupError):return False
-    if not same():return
+    if not same():return 'SUPERVISOR_IDENTITY_NOT_LIVE'
     try:fd=os.pidfd_open(info['pid'])
-    except ProcessLookupError:return
+    except ProcessLookupError:return 'SUPERVISOR_IDENTITY_NOT_LIVE'
     try:
-        if not live(fd):return
+        if not live(fd):return 'SUPERVISOR_EXIT_OBSERVED'
         if not same():raise RuntimeError('监督进程身份变化')
         signal.pidfd_send_signal(fd,signal.SIGTERM)
         if not select.select([fd],[],[],8)[0]:raise RuntimeError('监督进程未正常清理退出')
+        return 'SUPERVISOR_EXIT_OBSERVED'
     finally:os.close(fd)
+
+def cleanup(root):
+    # The cleanup command can observe the supervisor only. Its child-set
+    # cleanup verdict comes exclusively from worker result.json, never inferred.
+    result={'schema_version':1,'status':'UNKNOWN','cleanup_verified':None,
+            'cleanup_scope':'SUPERVISOR_ONLY','observation':'UNKNOWN'}
+    try:
+        result['observation']=_cleanup(root);result['status']='COMMAND_COMPLETED_NOT_CHILD_CLEANUP_PROOF'
+    except BaseException as exc:
+        result['status']='FAILED';result['error_details']=exception_diagnostic(exc,'CLEANUP_SUPERVISOR');raise
+    finally:
+        replace_regular(root/'cleanup-result.json',(json.dumps(result,ensure_ascii=False,indent=2)+'\n').encode())
 
 
 def server_session(root,command):

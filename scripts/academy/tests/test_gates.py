@@ -178,7 +178,7 @@ class WorkflowTests(unittest.TestCase):
                     self.assertNotIn(forbidden,path.lower())
         self.assertEqual({x['with']['name'].split('${{')[0] for x in ui},
                          {'academy-ui-stage-1-','academy-ui-stage-2-','academy-ui-stage-3-','academy-ui-receipts-'})
-        self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outcome == 'success'")
+        self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outputs.collected == 'true'")
         self.assertIn("steps.handoff.outcome == 'success'",uploads[1]['if'])
         self.assertEqual(uploads[1]['with']['retention-days'],'1');self.assertIn('NOT-A-RELEASE',uploads[1]['with']['name'])
         final=environment['steps'][-1]
