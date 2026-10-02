@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "overlay_version": "v2-observability-overlay-1",
+  "target_course": "courses/backend-interview",
+  "approved_for_merge": false,
+  "replaces_v1_counts": false,
+  "source_courses": [
+    "observability"
+  ],
+  "sections": [
+    {
+      "source_course": "observability",
+      "source_section": "observability",
+      "path": "observability"
+    }
+  ],
+  "tasks": [
+    {
+      "source_course": "observability",
+      "source_task": "first-slice/safe-events",
+      "path": "observability/first-slice/safe-events",
+      "gradle_project": ":observability-first-slice-safe-events",
+      "original_module": "observability-lab",
+      "placeholders": 1,
+      "status": "IMPLEMENTED_UNTESTED"
+    },
+    {
+      "source_course": "observability",
+      "source_task": "first-slice/metrics",
+      "path": "observability/first-slice/metrics",
+      "gradle_project": ":observability-first-slice-metrics",
+      "original_module": "observability-lab",
+      "placeholders": 1,
+      "status": "IMPLEMENTED_UNTESTED"
+    },
+    {
+      "source_course": "observability",
+      "source_task": "first-slice/trace-context",
+      "path": "observability/first-slice/trace-context",
+      "gradle_project": ":observability-first-slice-trace-context",
+      "original_module": "observability-lab",
+      "placeholders": 1,
+      "status": "IMPLEMENTED_UNTESTED"
+    }
+  ],
+  "additional_files_policy": "owner enumerates materials/**, does not hide learner resources",
+  "native_status": "NOT_RUN"
+}
