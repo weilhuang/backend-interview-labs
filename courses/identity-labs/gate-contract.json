@@ -1,0 +1,43 @@
+{
+  "schema": 2,
+  "unit": {
+    "labs.identity.PolicyTest": [
+      "policyMatrixContract",
+      "unauthenticatedInputs",
+      "invalidSubjectId",
+      "missingResource",
+      "invalidResourceId",
+      "invalidSubjectTenant",
+      "invalidResourceTenant",
+      "denialPrecedence",
+      "fixedDecisionReasons",
+      "rolesAreEmptyOrImmutable",
+      "unknownActionsFailClosed"
+    ]
+  },
+  "http": {
+    "labs.identity.IdentityNetworkTest": [
+      "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+      "suppliedChineseFrontendIsServedWithoutSecrets"
+    ],
+    "labs.identity.ProductionPolicyOriginTest": [
+      "loadedPolicyComesFromExactlyTheLearnerJar",
+      "productionJarContainsNoReferenceAnswers"
+    ]
+  },
+  "counts": {
+    "unit_methods": 11,
+    "unit_matrix_inner_cases": 144,
+    "http_methods": 4
+  },
+  "negative": {
+    "suite": "labs.identity.IdentityNetworkTest",
+    "method": "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+    "marker": "C15_HTTP_OWN_ORDER_200",
+    "expected_status": 200,
+    "observed_status": 401,
+    "failure_type": "org.opentest4j.AssertionFailedError"
+  },
+  "xml_method_names": "exact static method or exact method followed by (); no substring matching",
+  "actual_java_xml_format": "NOT_RUN; first approved run must confirm or block this versioned format"
+}

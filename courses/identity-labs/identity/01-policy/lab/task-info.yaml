@@ -1,0 +1,85 @@
+{
+  "type": "edu",
+  "custom_name": "01 用唯一学员策略保护租户订单",
+  "files": [
+    {
+      "name": "mutants/admin-any-action/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "mutants/empty-identifiers/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "mutants/missing-tenant-check/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "mutants/token-means-admin/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "mutants/wrong-precedence/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "mutants/wrong-reasons/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "reference/explicit/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "reference/table/Policy.java",
+      "visible": true
+    },
+    {
+      "name": "src/labs/identity/Policy.java",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 802,
+          "length": 67,
+          "placeholder_text": "        throw new UnsupportedOperationException(\"请实现默认拒绝与租户角色授权\");\n"
+        }
+      ]
+    },
+    {
+      "name": "src/labs/identity/Usage.java",
+      "visible": true
+    },
+    {
+      "name": "task.md",
+      "visible": true
+    },
+    {
+      "name": "test/labs/identity/PolicyTest.java",
+      "visible": true
+    },
+    {
+      "name": "答案.md",
+      "visible": true
+    },
+    {
+      "name": "资料/identity-call-chain.svg",
+      "visible": true
+    },
+    {
+      "name": "资料/先修与身份概念卡.md",
+      "visible": true
+    },
+    {
+      "name": "资料/协议与版本核查.md",
+      "visible": true
+    },
+    {
+      "name": "资料/源码锚点与面试迁移.md",
+      "visible": true
+    },
+    {
+      "name": "资料/调用链与排错.md",
+      "visible": true
+    }
+  ]
+}

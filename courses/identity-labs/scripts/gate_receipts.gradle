@@ -1,0 +1,56 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonOutput
+import java.security.MessageDigest
+// 仅在严格门禁runner提供输入时启用；普通课堂命令不伪造执行回执。
+if (rootProject.hasProperty('identityGateInput')) {
+    def inputFile=rootProject.file(rootProject.property('identityGateInput'))
+    def gate=new JsonSlurper().parse(inputFile)
+    if(gate.schema!=2) throw new GradleException('unsupported gate input')
+    def receipt=new File(gate.receipt as String)
+    def expectedTasks=[':identity-01-policy-lab:test',':identity-resource-server:httpAcceptance'] as Set
+    def guard=new Object()
+    def fileSha={ File f -> MessageDigest.getInstance('SHA-256').digest(f.bytes).encodeHex().toString() }
+    def verifySources={
+        def root=rootProject.projectDir.canonicalFile.toPath()
+        gate.sources.each { name,expected ->
+            def f=new File(rootProject.projectDir,name as String).canonicalFile
+            if(!f.toPath().startsWith(root)||!f.isFile()||fileSha(f)!=expected)
+                throw new GradleException('gate source/lock/config mismatch: '+name)
+        }
+    }
+    def emit={ Map payload ->
+        def event=[run_id:gate.run_id,binding_sha256:gate.binding_sha256,source_sha256:gate.source_sha256,
+            config_sha256:gate.config_sha256,locks_sha256:gate.locks_sha256,time_ms:System.currentTimeMillis()]+payload
+        synchronized(guard) { receipt.parentFile.mkdirs(); receipt.append(JsonOutput.toJson(event)+'\n','UTF-8') }
+    }
+    subprojects { module ->
+        module.tasks.withType(Test).configureEach { tested ->
+            if(expectedTasks.contains(tested.path)) {
+                // 禁止从缓存/增量结果冒充本次实际执行。
+                outputs.upToDateWhen { false }
+                outputs.cacheIf { false }
+                systemProperty 'user.timezone','UTC'
+                systemProperty 'identity.gate.runId',gate.run_id
+                systemProperty 'identity.gate.bindingHash',gate.binding_sha256
+                systemProperty 'identity.gate.httpTrace',gate.http_trace
+                doFirst {
+                    verifySources()
+                    emit([kind:'start',task:tested.path,gradle_version:gradle.gradleVersion,
+                        java_major:tested.javaLauncher.get().metadata.languageVersion.asInt().toString()])
+                }
+                afterTest { descriptor,result ->
+                    emit([kind:'case',task:tested.path,'class':descriptor.className,method:descriptor.name,
+                        result:result.resultType.toString()])
+                }
+                afterSuite { descriptor,result ->
+                    if(descriptor.parent==null) emit([kind:'finish',task:tested.path,tests:result.testCount,
+                        successful:result.successfulTestCount,failed:result.failedTestCount,skipped:result.skippedTestCount])
+                }
+            }
+        }
+    }
+    gradle.taskGraph.afterTask { executed,state ->
+        emit([kind:'task',task:executed.path,executed:state.executed,skipped:state.skipped,
+            up_to_date:state.upToDate,no_source:state.noSource,skip_message:state.skipMessage,failed:state.failure!=null])
+    }
+}

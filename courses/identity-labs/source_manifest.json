@@ -1,0 +1,451 @@
+{
+  "schema": 1,
+  "repository_root": "courses/identity-labs",
+  "status": "IMPLEMENTED_UNTESTED",
+  "review_scope": "source Draft only; no Java runtime acceptance",
+  "reviewed_snapshot_manifest_sha256": "0bf37621a4a867cdcb5e10246e87fd2b110f645272e6d54085fd1f1d259c072e",
+  "file_count": 47,
+  "files": [
+    {
+      "path": "courses/identity-labs/.gitignore",
+      "relative_path": ".gitignore",
+      "bytes": 107,
+      "sha256": "21992aeb6353f0f4ee96f9cdb8d21a99df6a3825e23970eea9f40971cf9c8805",
+      "git_blob_sha1": "337a87e3070c7fd0a97291cce1339c7d01204f9a",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/README.md",
+      "relative_path": "README.md",
+      "bytes": 3323,
+      "sha256": "cddd68ae2a6609846e28deb65ca3f115e450714cba9cbbfce126c9b2369b1f1b",
+      "git_blob_sha1": "fc4401f0ab9cad185cfe107cc28c598363296701",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/build.gradle",
+      "relative_path": "build.gradle",
+      "bytes": 5662,
+      "sha256": "f5b78cafcfd66f11508c06c70f9e43fc8d6e70a8d749be3c84b2933ab054a34d",
+      "git_blob_sha1": "11d911cec8d0ef8b8daa0cd78536dcc616f71c84",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/gate-contract.json",
+      "relative_path": "gate-contract.json",
+      "bytes": 1340,
+      "sha256": "ace202b3bf525d69e18b835c29e4358f92090fed1d73fd699c8ed34d21f098a2",
+      "git_blob_sha1": "3edc874d1f1954cbc8f6e6068f8c67cb9a8d3cb8",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/gradle.properties",
+      "relative_path": "gradle.properties",
+      "bytes": 144,
+      "sha256": "b671b03f1330489649048ef9b39d2b650cecc24c470f84d5743a4c98c0df468e",
+      "git_blob_sha1": "6034c89dba18ef2a43848ff529852667590cdfcb",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/mutants/admin-any-action/Policy.java",
+      "relative_path": "identity/01-policy/lab/mutants/admin-any-action/Policy.java",
+      "bytes": 1803,
+      "sha256": "35788a894ab965a9302321a4e57870d75c1f1c86d78d8f2b989229f273d61385",
+      "git_blob_sha1": "87d15b8b7db48c3668caecc243ba7ae6860e9f65",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/mutants/empty-identifiers/Policy.java",
+      "relative_path": "identity/01-policy/lab/mutants/empty-identifiers/Policy.java",
+      "bytes": 1692,
+      "sha256": "527a74569b5cec59ab776f20aadd034ebfa8215a047d2bb83f7ddcfaf9858160",
+      "git_blob_sha1": "f27822b52b6f9a67576654a6a960cb000ae690fe",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/mutants/missing-tenant-check/Policy.java",
+      "relative_path": "identity/01-policy/lab/mutants/missing-tenant-check/Policy.java",
+      "bytes": 1650,
+      "sha256": "d74e83bf7d998fc619cfd83f199631e66c47cbeea5fbb9c22e085953be299a4f",
+      "git_blob_sha1": "4ffb8048bfba8a69816f1243abcd7486b7e309c5",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/mutants/token-means-admin/Policy.java",
+      "relative_path": "identity/01-policy/lab/mutants/token-means-admin/Policy.java",
+      "bytes": 1051,
+      "sha256": "8b1cc4b9e5245dbe3b19577d69e23ee16722e603510cbb74558d3b88cab9eb85",
+      "git_blob_sha1": "d35783b79867de34ddb39aa39751d54da1a5059a",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/mutants/wrong-precedence/Policy.java",
+      "relative_path": "identity/01-policy/lab/mutants/wrong-precedence/Policy.java",
+      "bytes": 1726,
+      "sha256": "b4ffc07212fc8685f85905cac2602e7e135930e00662adf36cb875d667765fd7",
+      "git_blob_sha1": "a812e26a929b792629be5175b0338fee71352f26",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/mutants/wrong-reasons/Policy.java",
+      "relative_path": "identity/01-policy/lab/mutants/wrong-reasons/Policy.java",
+      "bytes": 1727,
+      "sha256": "1353d26fd49aec3672d040c776fd1cb337a75aeffbd7879fb9218846b6b3a2fe",
+      "git_blob_sha1": "18f9cb7263ff794565039a553033070f37e16f8a",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/reference/explicit/Policy.java",
+      "relative_path": "identity/01-policy/lab/reference/explicit/Policy.java",
+      "bytes": 1402,
+      "sha256": "5fa2f6ec17cfe81551cb575da7667c34a4392367bc9387a5379c2a840ad974da",
+      "git_blob_sha1": "87d083408b87b5a8ae605501917fe7b9d5238d5e",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/reference/table/Policy.java",
+      "relative_path": "identity/01-policy/lab/reference/table/Policy.java",
+      "bytes": 1726,
+      "sha256": "50529a83ee26f43589238846126be0e3606da733e9648c05f3684e232207987d",
+      "git_blob_sha1": "f524a69f64bfdc2ff3a3308cb90b3af7b573eb68",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/src/labs/identity/Policy.java",
+      "relative_path": "identity/01-policy/lab/src/labs/identity/Policy.java",
+      "bytes": 1215,
+      "sha256": "4ff71da32fa7a38e225849646a887249870ea34a0a89778d1eb5742dc6741e33",
+      "git_blob_sha1": "c285862eb666b7ae53396a8e5bac6b01ab0edd84",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/src/labs/identity/Usage.java",
+      "relative_path": "identity/01-policy/lab/src/labs/identity/Usage.java",
+      "bytes": 558,
+      "sha256": "7d0a70b41f635e049bc9166d6f0557bfdf6ddb05b4955a4aec0f0251e8921097",
+      "git_blob_sha1": "1bb86ba6d036eeeb6030d01ccd33a0b3a529c45f",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/task-info.yaml",
+      "relative_path": "identity/01-policy/lab/task-info.yaml",
+      "bytes": 1830,
+      "sha256": "22d9febf1bd083e2cff4e8cd505949c5a7b259ec0219029f572049ba3b39b7da",
+      "git_blob_sha1": "cd11cb1acd4bc5795a3b6990424303c75f55c018",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/task.md",
+      "relative_path": "identity/01-policy/lab/task.md",
+      "bytes": 3960,
+      "sha256": "7f2cc5415e092ec4730f023cc09fb6f1160b1d79cd6d2814ee1851a343de6ae5",
+      "git_blob_sha1": "fefa2d7405cc9c4b068cd506a1a5359439137a3b",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/test/labs/identity/PolicyTest.java",
+      "relative_path": "identity/01-policy/lab/test/labs/identity/PolicyTest.java",
+      "bytes": 5080,
+      "sha256": "57dcb3003112a55f8540a1f13f3c0e68fb1daee2540e051c8f687da2b9dab736",
+      "git_blob_sha1": "14fe6c4ddc3658b2fe79be70125c91e0175f8bed",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/答案.md",
+      "relative_path": "identity/01-policy/lab/答案.md",
+      "bytes": 2284,
+      "sha256": "39b7bf49c78dc423585c6ee73dc5b5b08538e0870f39b44b4e7446aaadb1bae0",
+      "git_blob_sha1": "d9dbacc3761dcac9228b305a5c2e068279f23fa1",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/资料/identity-call-chain.svg",
+      "relative_path": "identity/01-policy/lab/资料/identity-call-chain.svg",
+      "bytes": 2730,
+      "sha256": "98470136dcfd9a5df18693e950f400ac22e2d55cdfafa2a44c21e4a874a7fefa",
+      "git_blob_sha1": "525b3472a54be47319157cb0e5f52e6c04ebb633",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/资料/先修与身份概念卡.md",
+      "relative_path": "identity/01-policy/lab/资料/先修与身份概念卡.md",
+      "bytes": 9302,
+      "sha256": "2338af50df94ba9f9cca28f9988ba12971f68b8140f4b2d79c8485e5fd933ad6",
+      "git_blob_sha1": "1b38a5fa99cc79e6ab354a657bb0590e3a7d151d",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/资料/协议与版本核查.md",
+      "relative_path": "identity/01-policy/lab/资料/协议与版本核查.md",
+      "bytes": 1882,
+      "sha256": "beb6eb5569fb625b4437a3d8745899d75dd60932681e4ce47fa3741c9b78e48d",
+      "git_blob_sha1": "39d02266ca7dbc13778a8591c60e12b5fbd2a127",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/资料/源码锚点与面试迁移.md",
+      "relative_path": "identity/01-policy/lab/资料/源码锚点与面试迁移.md",
+      "bytes": 3388,
+      "sha256": "794b6fac8d0bd521e85210724982fa046282d5ac880c9b89cd91cbd9492adc69",
+      "git_blob_sha1": "a20ddfacad3f89c9f782a6650e8241a30ee4d362",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/identity/01-policy/lab/资料/调用链与排错.md",
+      "relative_path": "identity/01-policy/lab/资料/调用链与排错.md",
+      "bytes": 2699,
+      "sha256": "6ac5907bbaa3a161100019ab83fee8a0aa235126a6d646f1e2f7c3668651e5c2",
+      "git_blob_sha1": "c09f8ec3fea944e6caa9e58bebdc4a75eb76ab35",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/java/labs/identity/IdentityApplication.java",
+      "relative_path": "materials/identity/identity-lab/src/main/java/labs/identity/IdentityApplication.java",
+      "bytes": 306,
+      "sha256": "8d4ed86cf3248adebeef63dcb68b69baf6d49c699ca025ba68b23da61eb0038b",
+      "git_blob_sha1": "3e3dadf2507976f6cd654c3bcd42958c832c305b",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/java/labs/identity/IdentityTokenDecoder.java",
+      "relative_path": "materials/identity/identity-lab/src/main/java/labs/identity/IdentityTokenDecoder.java",
+      "bytes": 3991,
+      "sha256": "8ed9c0ca0c7bc6eadac7dc396abfe9edea0bfb3b2a206e5f5dca8bc5a0953231",
+      "git_blob_sha1": "f7c31fa0c326184e373a1c4d0bca9e98af9d1e61",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/java/labs/identity/LdapSafety.java",
+      "relative_path": "materials/identity/identity-lab/src/main/java/labs/identity/LdapSafety.java",
+      "bytes": 1114,
+      "sha256": "6427ed4f9b117ebd60177d3c8cff7ef6a19d1691d1cf743391d6182b48a486c1",
+      "git_blob_sha1": "88a57b453ce73b2506a852e4ee96f4dc32c0a3ee",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/java/labs/identity/OrderController.java",
+      "relative_path": "materials/identity/identity-lab/src/main/java/labs/identity/OrderController.java",
+      "bytes": 1871,
+      "sha256": "e8e3088d1120bb0137d826c4763f0edd32ffe03b7a8ee92030d26769e07257df",
+      "git_blob_sha1": "94225ef1a1205bb9e9250a27088b98a6f44c28c7",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/java/labs/identity/SecurityConfig.java",
+      "relative_path": "materials/identity/identity-lab/src/main/java/labs/identity/SecurityConfig.java",
+      "bytes": 1518,
+      "sha256": "fe7173ed561fa50d291ff619ee67f4285b5e12744fd28e16cba41db6a0ef4726",
+      "git_blob_sha1": "3be39ba76d84ad8f074a7cfacb52a05e7aeb6adb",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/java/labs/identity/TrustedSubject.java",
+      "relative_path": "materials/identity/identity-lab/src/main/java/labs/identity/TrustedSubject.java",
+      "bytes": 834,
+      "sha256": "cd610ff6f313a0ef3f30ef11130b1063f254d67fd94c823f0a1cafbfb273a0f1",
+      "git_blob_sha1": "db04458e341a159d402f2ecf209de3d7f95b7b65",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/resources/application-fixture.properties",
+      "relative_path": "materials/identity/identity-lab/src/main/resources/application-fixture.properties",
+      "bytes": 270,
+      "sha256": "d5cba8a0bd6e073bb1bced0a3ea3ef868d7aeb5d86a5debe9d19b38d5ad162c0",
+      "git_blob_sha1": "374274208e074e9513a0d94e3a63ad6c9cf55bda",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/resources/application.properties",
+      "relative_path": "materials/identity/identity-lab/src/main/resources/application.properties",
+      "bytes": 384,
+      "sha256": "637e25d9e3da48c602125df376d9849643e62471d6248cc0fc841284d49b4d40",
+      "git_blob_sha1": "ad3731d7d981e07ab4e58d75a973c7408e99c954",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/resources/static/app.js",
+      "relative_path": "materials/identity/identity-lab/src/main/resources/static/app.js",
+      "bytes": 1227,
+      "sha256": "79a49fbc8253cf3667e0bc2fcadec9fe38541fd1fbbd0befb47238d5f59b15d1",
+      "git_blob_sha1": "33073665366bbf7ccb8fdbbe52a48eba5c90cb7d",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/resources/static/index.html",
+      "relative_path": "materials/identity/identity-lab/src/main/resources/static/index.html",
+      "bytes": 1419,
+      "sha256": "b86e163a426141520e2f63995032d8d826b8046257cdd573ec94b83e7b21f989",
+      "git_blob_sha1": "eadfaadbba2fe5c27d2f85705bba1e6b8d04ed60",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/main/resources/static/style.css",
+      "relative_path": "materials/identity/identity-lab/src/main/resources/static/style.css",
+      "bytes": 888,
+      "sha256": "c07f2af0c4e895cfb9df50f7a0cf1f19f7680ec38b96228f0d105a1314090fd6",
+      "git_blob_sha1": "2dbe5c2ee796f924f6d676dcdd5d9572ae35f04a",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/java/labs/identity/IdentityHttpTest.java",
+      "relative_path": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityHttpTest.java",
+      "bytes": 3637,
+      "sha256": "4ab3d45bb2f065efd872a98f1be3f15f0310d8251e472e256afd21620e0d99fc",
+      "git_blob_sha1": "b2d231fe2a9242b80d19baebb706ecbcda2c4d6f",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/java/labs/identity/IdentityNetworkTest.java",
+      "relative_path": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityNetworkTest.java",
+      "bytes": 3933,
+      "sha256": "40ba2af502c5c9efa5431ae9e9d0dd3467e79b747fd0311624ac2ba89af816f2",
+      "git_blob_sha1": "41b2efa9dfcfb3069f7913af831a960d2929902a",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/java/labs/identity/IdentityTokenDecoderTest.java",
+      "relative_path": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityTokenDecoderTest.java",
+      "bytes": 4745,
+      "sha256": "9f3423b837aef06d40eb57dbec5c87bae954cdd557c4b97497eb7a0b3559ed0d",
+      "git_blob_sha1": "94bd1b944174cf11d06209c887f6cd096b77489b",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/java/labs/identity/LdapSafetyTest.java",
+      "relative_path": "materials/identity/identity-lab/src/test/java/labs/identity/LdapSafetyTest.java",
+      "bytes": 617,
+      "sha256": "f0be5412e2fb9e1fa4ea52fa028215dc78b1792780bace123ffee007e91ad045",
+      "git_blob_sha1": "2a2e4a20ac5cc525423901744c51b0eeedf56ad7",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/java/labs/identity/ProductionPolicyOriginTest.java",
+      "relative_path": "materials/identity/identity-lab/src/test/java/labs/identity/ProductionPolicyOriginTest.java",
+      "bytes": 1841,
+      "sha256": "2ee05e84b0d6f81b71391a53ebb3f43d565a88b666c32f27285aa54807d7cf7b",
+      "git_blob_sha1": "7aabe436d20c979d93b8227f0aaaf1f9d9a0829d",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/java/labs/identity/TokenFixture.java",
+      "relative_path": "materials/identity/identity-lab/src/test/java/labs/identity/TokenFixture.java",
+      "bytes": 2880,
+      "sha256": "063a98eb3602e4d12ad2dd06fc1ab932e7f83253b293730adf68ccd8c9d1284b",
+      "git_blob_sha1": "62106f4539707d2ec78da8ce4e1fee0820f8cbc6",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/materials/identity/identity-lab/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker",
+      "relative_path": "materials/identity/identity-lab/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker",
+      "bytes": 20,
+      "sha256": "8eca853a5a457f17e0479b71dfbe95f2a13aff9eeff250261ecdc8ca9b847a6a",
+      "git_blob_sha1": "fdbd0b1579e5da5a08aea2fbed29e65c1c8f3088",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/scripts/gate_receipts.gradle",
+      "relative_path": "scripts/gate_receipts.gradle",
+      "bytes": 3203,
+      "sha256": "4abc0403fb360304c81222cab4d128002d0b26a3b44694b88310189cb51bafd8",
+      "git_blob_sha1": "7fc724cb8c9155e842b2728fa7985f7fb0ade0ba",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/scripts/verify_finalizedby_gate.py",
+      "relative_path": "scripts/verify_finalizedby_gate.py",
+      "bytes": 15670,
+      "sha256": "1aeaa8f5799087afaf594e4d1c05727bfa76b81d064620ef8324ebd881f56055",
+      "git_blob_sha1": "d57b7631146bf24057bddba54cf05ad7d731c1c2",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/settings.gradle",
+      "relative_path": "settings.gradle",
+      "bytes": 265,
+      "sha256": "23bb384dd34d8f7814b5df26626338d6ae23336a0238c3dd67828c2d6b7480e0",
+      "git_blob_sha1": "97352f4982dced5c5fca695c8afcbc79f902236f",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/tests/test_gate_mock.py",
+      "relative_path": "tests/test_gate_mock.py",
+      "bytes": 9945,
+      "sha256": "ceb0887c9ed398a9ab7d1be056ce02dddf4c6536279f0c4b50b235ccc90c35f0",
+      "git_blob_sha1": "cd92e6c1fd6ba18b7422a42ed006e8a29def927c",
+      "mode": "100644",
+      "type": "blob"
+    },
+    {
+      "path": "courses/identity-labs/tests/test_source_contracts.py",
+      "relative_path": "tests/test_source_contracts.py",
+      "bytes": 4786,
+      "sha256": "112b6a33f0ea203c1278f1118eea25a91ca9819316e22a4aacdbef551a6870c4",
+      "git_blob_sha1": "dc0d0b8a6c293ae4bf7103cc83b170ae97261ba6",
+      "mode": "100644",
+      "type": "blob"
+    }
+  ],
+  "checks": {
+    "kind": "Python/static/mock only",
+    "python_top_level_tests": 11,
+    "mock_control_accepted": 1,
+    "mock_negative_probes_rejected": 38,
+    "independent_original_nine_rejected": true,
+    "independent_stale_receipt_probes_rejected": 2
+  },
+  "runtime": {
+    "java_compile": "NOT_RUN",
+    "gradle_model": "NOT_RUN",
+    "real_http": "NOT_RUN",
+    "class_origin": "NOT_RUN",
+    "native_academy": "NOT_RUN",
+    "docker": "NOT_RUN"
+  },
+  "dependency_locks": "NOT_GENERATED; fixed lock set required before real execution",
+  "scope_note": "This manifest lists only the 47 reviewed implementation files. This manifest and 阶段报告.md are separate documentation additions."
+}
