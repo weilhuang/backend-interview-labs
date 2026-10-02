@@ -1,0 +1,25 @@
+package lab
+
+import (
+ "strings"
+ "strconv"
+ "errors"
+)
+
+// 错误哨兵：调用方用errors.Is辨认类别，不比较易变化的文案。
+var ErrInvalidQuantity = errors.New("数量格式错误")
+var ErrQuantityRange = errors.New("数量必须在1到1000之间")
+const MaxQuantity = 1000
+var _ = strings.TrimSpace
+var _ = strconv.Atoi
+
+func ParseQuantity(raw string) (int, error) {
+	// 练习区开始：只替换下方函数体片段 🧪
+	s := strings.TrimSpace(raw)
+	if s == "" { return 0, ErrInvalidQuantity }
+	for i:=0; i<len(s); i++ { if s[i]<'0' || s[i]>'9' { return 0, ErrInvalidQuantity } }
+	n, err := strconv.Atoi(s)
+	if err != nil || n < 1 || n > MaxQuantity { return 0, ErrQuantityRange }
+	return n, nil
+	// 练习区结束
+}

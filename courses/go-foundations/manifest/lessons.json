@@ -1,0 +1,130 @@
+[
+  {
+    "id": "C13-01",
+    "slug": "greeting",
+    "title": "第一次Go构建测试和调试",
+    "cmd": "hello",
+    "function": "Greeting",
+    "module": "academy.example/go-greeting",
+    "cases": [
+      "中文",
+      "空串",
+      "空白",
+      "英文",
+      "保留内部空格",
+      "去除边缘空白",
+      "标点",
+      "重复调用"
+    ],
+    "required_tests": [
+      "TestContract",
+      "TestDemoOutput",
+      "TestOutputFailure",
+      "TestMainProcess"
+    ],
+    "output": "你好，小林！\n你好，访客！\n你好，Ada！\n",
+    "variants": [
+      "explicit",
+      "helpers"
+    ],
+    "mutants": [
+      "constant",
+      "no-trim",
+      "empty-not-guest"
+    ]
+  },
+  {
+    "id": "C13-02",
+    "slug": "quantity",
+    "title": "变量控制流与可靠输入",
+    "cmd": "quantity",
+    "function": "ParseQuantity",
+    "module": "academy.example/go-quantity",
+    "cases": [
+      "最小值",
+      "普通值",
+      "上限",
+      "前导零",
+      "边缘空白",
+      "空串",
+      "空白",
+      "字母",
+      "小数",
+      "正号",
+      "负数",
+      "零",
+      "超上限",
+      "溢出",
+      "内部空格",
+      "非ASCII数字"
+    ],
+    "required_tests": [
+      "TestContract",
+      "TestDemoOutput",
+      "TestOutputFailure",
+      "TestFailureRecovery",
+      "TestMainProcess"
+    ],
+    "output": "输入\" 12 \"：数量=12\n输入\"abc\"：数量格式错误\n输入\"1001\"：数量必须在1到1000之间\n",
+    "variants": [
+      "stdlib",
+      "manual"
+    ],
+    "mutants": [
+      "ignore-error",
+      "empty-is-one",
+      "overflow-zero",
+      "accept-plus"
+    ]
+  },
+  {
+    "id": "C13-03",
+    "slug": "order-total",
+    "title": "结构体方法与值指针",
+    "cmd": "order",
+    "function": "TotalCents",
+    "module": "academy.example/go-order-total",
+    "cases": [
+      "零值",
+      "空非nil",
+      "一行",
+      "多行",
+      "免费商品",
+      "负单价",
+      "零数量",
+      "负数量",
+      "精确大整数",
+      "最大值",
+      "乘法溢出",
+      "加法溢出",
+      "刚好边界",
+      "错误不返回部分和",
+      "输入不改写",
+      "共享切片不改写",
+      "重复调用",
+      "指针也能调用",
+      "乘溢出先于后行非法",
+      "加溢出先于后行非法",
+      "非法先于后行溢出"
+    ],
+    "required_tests": [
+      "TestContract",
+      "TestDemoOutput",
+      "TestOutputFailure",
+      "TestFailureRecovery",
+      "TestMainProcess"
+    ],
+    "output": "订单总额=548分\n原数量=2\n",
+    "variants": [
+      "explicit",
+      "checked"
+    ],
+    "mutants": [
+      "unchecked",
+      "float-money",
+      "mutate-shared",
+      "copy-line-reset",
+      "prevalidate-all-first"
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+// 本文件需要主课程显式apply独立Go基础adapter；本身不是整课配置。
+def goExecutable = providers.gradleProperty('goExecutable').orElse(providers.environmentVariable('GO_EXECUTABLE')).getOrElse('')
+tasks.withType(Test).configureEach {
+ inputs.files(fileTree('go') { include '**/*.go', 'go.mod', 'go.sum' })
+ inputs.files(fileTree('src') { include '**/*.java' }, fileTree('test') { include '**/*.java' })
+ inputs.file(rootProject.file('materials/go/go-foundations.gradle'))
+ inputs.file(project.file('build.gradle.fragment'))
+ inputs.property('requiredGoVersion', '1.27.1'); inputs.property('goExecutable', goExecutable)
+ if (goExecutable) inputs.file(file(goExecutable)).optional()
+ outputs.upToDateWhen { false }; outputs.doNotCacheIf('Go外部合同必须每次执行') { true }
+ systemProperty 'go.project', project.file('go').absolutePath
+ systemProperty 'go.work', layout.buildDirectory.dir('go-check').get().asFile.absolutePath
+ if (goExecutable) systemProperty 'go.executable', file(goExecutable).absolutePath
+ timeout = java.time.Duration.ofSeconds(120)
+}

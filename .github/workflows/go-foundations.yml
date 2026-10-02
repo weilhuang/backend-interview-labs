@@ -1,0 +1,175 @@
+name: Go基础三课独立验收
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'courses/go-foundations/**'
+      - '.github/workflows/go-foundations.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'courses/go-foundations/**'
+      - '.github/workflows/go-foundations.yml'
+permissions:
+  contents: read
+concurrency:
+  group: go-foundations-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    name: Go正解、race与业务反例
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GOTOOLCHAIN: local
+      GOWORK: 'off'
+      GOENV: 'off'
+      CGO_ENABLED: '1'
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: 准备证据目录
+        run: mkdir -p courses/go-foundations/evidence
+      - name: 安装固定静态依赖
+        timeout-minutes: 2
+        run: python -m pip install --disable-pip-version-check --timeout 30 --retries 1 'PyYAML==6.0.2'
+      - name: 校验并准备官方Go1.27.1
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$GITHUB_WORKSPACE/courses/go-foundations/evidence"
+          exec > >(tee "$evidence/toolchain.log") 2>&1
+          archive="$RUNNER_TEMP/go1.27.1.linux-amd64.tar.gz"
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            --connect-timeout 15 --max-time 90 --retry 1 \
+            https://go.dev/dl/go1.27.1.linux-amd64.tar.gz -o "$archive"
+          echo "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445  $archive" | sha256sum --check --strict
+          mkdir -p "$RUNNER_TEMP/go-foundations-sdk"
+          tar -xzf "$archive" -C "$RUNNER_TEMP/go-foundations-sdk"
+          go="$RUNNER_TEMP/go-foundations-sdk/go/bin/go"
+          test "$("$go" version)" = 'go version go1.27.1 linux/amd64'
+          "$go" version
+          gcc --version
+          echo "GO_EXECUTABLE=$go" >> "$GITHUB_ENV"
+      - name: 原样运行静态检查与Go实测并保存退出码
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, pathlib, subprocess, sys, time
+          root = pathlib.Path('courses/go-foundations')
+          evidence = root / 'evidence'
+          def source_hashes():
+              paths = subprocess.check_output(['git', 'ls-files', '-z', '--', str(root)]).decode().split('\0')
+              return {p: hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest() for p in paths if p}
+          before = source_hashes()
+          rows = []
+          final_exit = 0
+          started = time.time()
+          for script, budget in [('test_static.py', 30), ('test_public_bridges.py', 30), ('verify.py', 240)]:
+              command = [sys.executable, str(root / 'scripts' / script)]
+              tick = time.time()
+              try:
+                  result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=budget)
+                  output, code = result.stdout, result.returncode
+              except subprocess.TimeoutExpired as exc:
+                  output, code = (exc.stdout or b'') + b'\nCI_RUNNER_TIMEOUT\n', 124
+              except OSError as exc:
+                  output, code = str(exc).encode(), 125
+              (evidence / (script + '.log')).write_bytes(output)
+              print(output.decode(errors='replace'))
+              rows.append({'script': script, 'exit_code': code, 'seconds': round(time.time() - tick, 3)})
+              if code:
+                  final_exit = code
+                  break
+          unchanged = before == source_hashes()
+          if not unchanged:
+              final_exit = 1
+          result = {'status': 'PASSED' if final_exit == 0 else 'FAILED', 'exit_code': final_exit,
+                    'tested_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+                    'pr_head_sha': os.environ.get('PR_HEAD_SHA', ''), 'source_sha256': before,
+                    'source_unchanged': unchanged, 'seconds': round(time.time() - started, 3), 'commands': rows,
+                    'go_junit_bridge': 'NOT_RUN', 'main_course_integration': 'NOT_RUN', 'native_academy': 'NOT_RUN',
+                    'note': 'verification.json保留原验证器的本地语义；Actions状态以本文件和本次job结论为准。'}
+          (evidence / 'ci-execution.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+          sys.exit(final_exit)
+          PY
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      - name: 准备固定JUnit控制台
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          exec > >(tee courses/go-foundations/evidence/junit-dependency.log) 2>&1
+          jar="$RUNNER_TEMP/junit-platform-console-standalone-1.11.4.jar"
+          curl --fail --location --proto '=https' --tlsv1.2 \
+            --connect-timeout 15 --max-time 60 --retry 1 \
+            https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-console-standalone/1.11.4/junit-platform-console-standalone-1.11.4.jar -o "$jar"
+          echo "b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc  $jar" | sha256sum --check --strict
+          echo "JUNIT_CONSOLE_JAR=$jar" >> "$GITHUB_ENV"
+      - name: 公开JUnit桥27场景实测
+        timeout-minutes: 5
+        shell: bash
+        run: |
+          python - <<'PYTHON'
+          import json, pathlib, subprocess, sys, time
+          root = pathlib.Path('courses/go-foundations')
+          start = time.monotonic()
+          try:
+              result = subprocess.run([sys.executable, str(root / 'scripts/verify_public_bridges.py')],
+                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=240)
+              output, code = result.stdout, result.returncode
+          except subprocess.TimeoutExpired as exc:
+              output, code = (exc.stdout or b'') + b'\nBRIDGE_CI_TIMEOUT\n', 124
+          except OSError as exc:
+              output, code = str(exc).encode(), 125
+          (root / 'evidence/bridge-runner.log').write_bytes(output)
+          (root / 'evidence/bridge-runner.json').write_text(json.dumps({
+              'exit_code': code, 'seconds': round(time.monotonic() - start, 3),
+              'tested_sha': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+              'status': 'PASSED' if code == 0 else 'FAILED',
+              'scope': '独立公开JUnit桥；不代表Gradle集成或原生Academy'
+          }, ensure_ascii=False, indent=2) + '\n')
+          print(output.decode(errors='replace'))
+          sys.exit(code)
+          PYTHON
+      - name: 记录包括环境准备失败的job状态
+        if: always()
+        shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: |
+          python - <<'PYTHON'
+          import json, os, pathlib
+          evidence = pathlib.Path('courses/go-foundations/evidence')
+          evidence.mkdir(parents=True, exist_ok=True)
+          (evidence / 'job-status.json').write_text(json.dumps({
+              'status_before_upload': os.environ['JOB_STATUS'],
+              'run_id': os.environ['GITHUB_RUN_ID'],
+              'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
+              'github_sha': os.environ['GITHUB_SHA'],
+              'go_archive_sha256': '63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445',
+              'scope': 'Go独立源码；不是主课程或原生Academy验收'
+          }, ensure_ascii=False, indent=2) + '\n')
+          PYTHON
+      - name: 保存成功或失败的验收日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-foundations-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            courses/go-foundations/evidence/**/*.log
+            courses/go-foundations/evidence/**/*.json
+          retention-days: 7
+          if-no-files-found: warn
