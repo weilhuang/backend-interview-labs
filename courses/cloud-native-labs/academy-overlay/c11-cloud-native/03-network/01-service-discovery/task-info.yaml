@@ -1,0 +1,42 @@
+{
+  "type": "edu",
+  "custom_name": "C11-03 · 容器网络与服务发现",
+  "files": [
+    {
+      "name": "AddressPolicy.java",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 205,
+          "length": 265,
+          "placeholder_text": "        return \"localhost\";\n"
+        },
+        {
+          "offset": 530,
+          "length": 192,
+          "placeholder_text": "        return 6379;\n"
+        }
+      ]
+    },
+    {
+      "name": "solution.md",
+      "visible": true
+    },
+    {
+      "name": "observations.md",
+      "visible": true
+    },
+    {
+      "name": "visible-test-contract.md",
+      "visible": true
+    },
+    {
+      "name": "answers/AddressPolicy.defaults.java.txt",
+      "visible": true
+    },
+    {
+      "name": "answers/AddressPolicy.explicit.java.txt",
+      "visible": true
+    }
+  ]
+}
