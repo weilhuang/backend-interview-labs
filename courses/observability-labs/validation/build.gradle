@@ -1,0 +1,23 @@
+plugins { id 'java' }
+repositories { mavenCentral() }
+java { toolchain { languageVersion=JavaLanguageVersion.of(21) } }
+sourceSets {
+ main { java.srcDirs=[providers.gradleProperty('sourceRoot').getOrElse('../observability-lab/src/main/java')]; resources.srcDirs=['../observability-lab/src/main/resources'] }
+ test { java.srcDirs=[providers.gradleProperty('testSourceRoot').getOrElse('../observability-lab/src/test/java')] }
+}
+dependencies {
+ implementation platform('org.springframework.boot:spring-boot-dependencies:3.5.16')
+ implementation 'org.springframework.boot:spring-boot-starter-web'
+ implementation 'io.opentelemetry:opentelemetry-api'
+ implementation 'io.opentelemetry:opentelemetry-sdk'
+ implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+ testImplementation 'org.springframework.boot:spring-boot-starter-test'
+ testImplementation 'io.opentelemetry:opentelemetry-sdk-testing'
+ testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21; options.compilerArgs += '-parameters' }
+tasks.withType(Test).configureEach { useJUnitPlatform(); maxParallelForks=1; maxHeapSize='384m'; jvmArgs '-XX:ActiveProcessorCount=2'; testLogging { events 'failed','skipped'; exceptionFormat='full' } }
+tasks.register('usage',JavaExec) { classpath=sourceSets.main.runtimeClasspath;mainClass='labs.observability.Usage' }
+tasks.register('run',JavaExec) { classpath=sourceSets.main.runtimeClasspath;mainClass='labs.observability.ObservabilityApplication'; args (project.findProperty('appArgs') ?: '').split(' ').findAll { it } }
+dependencyLocking { lockAllConfigurations() }
+if(project.hasProperty('variantBuild')) layout.buildDirectory=file(project.property('variantBuild'))

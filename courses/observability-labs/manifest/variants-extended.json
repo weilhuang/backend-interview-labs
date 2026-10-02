@@ -1,0 +1,347 @@
+{
+  "reference-map": {
+    "path": "variants/reference-map/src",
+    "tests": [
+      "labs.observability.*"
+    ],
+    "expected": "PASS",
+    "expected_test_cases": [
+      "labs.observability.ExporterFailureTest#exporterOutageCannotBlockRequestThreadAtQueueCapacity",
+      "labs.observability.ExporterFailureTest#unwritableLogDestinationHasVisibleFailureCounter",
+      "labs.observability.HttpCallChainTest#badJsonIs400WithoutInventoryAttempt",
+      "labs.observability.HttpCallChainTest#boundedReadRetryIsTwoAttemptsButOneCheckout",
+      "labs.observability.HttpCallChainTest#failedInventoryMarksRealServerAndClientErrors",
+      "labs.observability.HttpCallChainTest#malformedHeaderDoesNotBreakBusinessRequest",
+      "labs.observability.HttpCallChainTest#traceHeaderAloneCannotMakeInvalidBusinessInputValid",
+      "labs.observability.HttpCallChainTest#twoRealHttpServicesProduceConnectedThreeSpanTraceAndSafeLogs",
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries",
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent",
+      "labs.observability.TelemetryEndpointTest#normalizesOnlyAnOptionalTrailingSlash",
+      "labs.observability.TelemetryEndpointTest#rejectsUserInfoQueryFragmentAndNonBasePaths",
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ],
+    "expected_failure_cases": []
+  },
+  "reference-typed": {
+    "path": "variants/reference-typed/src",
+    "tests": [
+      "labs.observability.*"
+    ],
+    "expected": "PASS",
+    "expected_test_cases": [
+      "labs.observability.ExporterFailureTest#exporterOutageCannotBlockRequestThreadAtQueueCapacity",
+      "labs.observability.ExporterFailureTest#unwritableLogDestinationHasVisibleFailureCounter",
+      "labs.observability.HttpCallChainTest#badJsonIs400WithoutInventoryAttempt",
+      "labs.observability.HttpCallChainTest#boundedReadRetryIsTwoAttemptsButOneCheckout",
+      "labs.observability.HttpCallChainTest#failedInventoryMarksRealServerAndClientErrors",
+      "labs.observability.HttpCallChainTest#malformedHeaderDoesNotBreakBusinessRequest",
+      "labs.observability.HttpCallChainTest#traceHeaderAloneCannotMakeInvalidBusinessInputValid",
+      "labs.observability.HttpCallChainTest#twoRealHttpServicesProduceConnectedThreeSpanTraceAndSafeLogs",
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries",
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent",
+      "labs.observability.TelemetryEndpointTest#normalizesOnlyAnOptionalTrailingSlash",
+      "labs.observability.TelemetryEndpointTest#rejectsUserInfoQueryFragmentAndNonBasePaths",
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ],
+    "expected_failure_cases": []
+  },
+  "starter": {
+    "path": "variants/starter/src",
+    "tests": [
+      "labs.observability.SafeEventsTest",
+      "labs.observability.RequestMetricsTest",
+      "labs.observability.TraceBridgeTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries",
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent",
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries",
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent",
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ]
+  },
+  "wrong-header-leak": {
+    "path": "variants/wrong-header-leak/src",
+    "tests": [
+      "labs.observability.SafeEventsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock"
+    ]
+  },
+  "wrong-json-concatenation": {
+    "path": "variants/wrong-json-concatenation/src",
+    "tests": [
+      "labs.observability.SafeEventsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock"
+    ]
+  },
+  "wrong-high-cardinality": {
+    "path": "variants/wrong-high-cardinality/src",
+    "tests": [
+      "labs.observability.RequestMetricsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ]
+  },
+  "wrong-millisecond-unit": {
+    "path": "variants/wrong-millisecond-unit/src",
+    "tests": [
+      "labs.observability.RequestMetricsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram"
+    ]
+  },
+  "wrong-double-count": {
+    "path": "variants/wrong-double-count/src",
+    "tests": [
+      "labs.observability.RequestMetricsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ]
+  },
+  "wrong-new-trace-every-hop": {
+    "path": "variants/wrong-new-trace-every-hop/src",
+    "tests": [
+      "labs.observability.TraceBridgeTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector"
+    ]
+  },
+  "wrong-baggage-leak": {
+    "path": "variants/wrong-baggage-leak/src",
+    "tests": [
+      "labs.observability.TraceBridgeTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates"
+    ]
+  },
+  "wrong-retry-all-failures": {
+    "path": "variants/wrong-retry-all-failures/src",
+    "tests": [
+      "labs.observability.HttpCallChainTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.HttpCallChainTest#badJsonIs400WithoutInventoryAttempt",
+      "labs.observability.HttpCallChainTest#boundedReadRetryIsTwoAttemptsButOneCheckout",
+      "labs.observability.HttpCallChainTest#failedInventoryMarksRealServerAndClientErrors",
+      "labs.observability.HttpCallChainTest#malformedHeaderDoesNotBreakBusinessRequest",
+      "labs.observability.HttpCallChainTest#traceHeaderAloneCannotMakeInvalidBusinessInputValid",
+      "labs.observability.HttpCallChainTest#twoRealHttpServicesProduceConnectedThreeSpanTraceAndSafeLogs"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.HttpCallChainTest#failedInventoryMarksRealServerAndClientErrors"
+    ]
+  },
+  "native-starter-safe-events": {
+    "path": "academy-learner-variants/safe-events/src",
+    "tests": [
+      "labs.observability.SafeEventsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.SafeEventsTest#dropsAllHeadersIncludingPiiAndMixedCaseNames",
+      "labs.observability.SafeEventsTest#durationIsNotComputedFromWallClock",
+      "labs.observability.SafeEventsTest#eventIdStableWithinALineAndDistinctAcrossEvents",
+      "labs.observability.SafeEventsTest#invalidMetadataFailsExplicitly",
+      "labs.observability.SafeEventsTest#invalidTraceIdsCannotInjectJson",
+      "labs.observability.SafeEventsTest#jsonHasTypedFieldsAndUtcTime",
+      "labs.observability.SafeEventsTest#rejectsDynamicPathAndCrlfDoesNotCreateAnEvent"
+    ]
+  },
+  "native-starter-metrics": {
+    "path": "academy-learner-variants/metrics/src",
+    "tests": [
+      "labs.observability.RequestMetricsTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#onlyAllowlistedAttributesAndUnknownMethod",
+      "labs.observability.RequestMetricsTest#successfulResponseHasNoErrorType",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.RequestMetricsTest#exactCountAndSecondsHistogram",
+      "labs.observability.RequestMetricsTest#invalidObservationDoesNotIncrement",
+      "labs.observability.RequestMetricsTest#tenThousandIdsCannotCreateTenThousandSeries"
+    ]
+  },
+  "native-starter-trace-context": {
+    "path": "academy-learner-variants/trace-context/src",
+    "tests": [
+      "labs.observability.TraceBridgeTest"
+    ],
+    "expected": "EXPECTED_TEST_FAILURE",
+    "expected_test_cases": [
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ],
+    "expected_failure_cases": [
+      "labs.observability.TraceBridgeTest#explicitContextWrapCrossesExecutorAndScopeIsCleaned",
+      "labs.observability.TraceBridgeTest#headerNamesAreCanonicalAndBaggageNeverPropagates",
+      "labs.observability.TraceBridgeTest#malformedTraceparentStartsSafeNewRoot",
+      "labs.observability.TraceBridgeTest#parentBasedSamplingLossCannotBeRecoveredByCollector",
+      "labs.observability.TraceBridgeTest#propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary",
+      "labs.observability.TraceBridgeTest#validTraceContextIsNotAnAuthorizationDecision"
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+# IMAGE values must come from the one approved repo ledger, never this file.
+# This is an opt-in private candidate, not included in the V1 profile/CI.
+services:
+  collector:
+    profiles: [otel]
+    image: ${OTEL_COLLECTOR_IMAGE:?V2 image approval and ledger entry required}
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes: ["./collector.yaml:/etc/otelcol/config.yaml:ro"]
+    ports: ["127.0.0.1:4318:4318", "127.0.0.1:13133:13133", "127.0.0.1:18889:8889"]
+    mem_limit: 256m
+    cpus: 0.5
+    networks: [observability]
+  jaeger:
+    profiles: [otel]
+    image: ${JAEGER_IMAGE:?V2 image approval and ledger entry required}
+    ports: ["127.0.0.1:16686:16686"]
+    mem_limit: 512m
+    cpus: 0.5
+    networks: [observability]
+  prometheus:
+    profiles: [otel]
+    image: ${PROMETHEUS_IMAGE:?V2 image approval and ledger entry required}
+    command: ["--config.file=/etc/prometheus/prometheus.yaml", "--storage.tsdb.retention.time=1h", "--storage.tsdb.retention.size=128MB"]
+    volumes: ["./prometheus.yaml:/etc/prometheus/prometheus.yaml:ro"]
+    ports: ["127.0.0.1:19090:9090"]
+    mem_limit: 256m
+    cpus: 0.5
+    networks: [observability]
+networks:
+  observability:
+    internal: true

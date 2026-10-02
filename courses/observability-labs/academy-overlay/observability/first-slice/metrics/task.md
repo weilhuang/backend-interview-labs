@@ -1,0 +1,43 @@
+# C12-03 从三个请求理解指标
+
+## 只新增 Counter 与 Histogram
+
+`RequestMetrics.observe(method, route, status, elapsedNanos)` 是完成一次 HTTP 请求后调用的函数。
+
+固定输入：5ms、10ms、250ms，全部 POST /checkout、状态 200。运行：`bash scripts/gradle.sh :observability-first-slice-metrics:test --tests labs.observability.RequestMetricsTest`。
+
+预期观察：`lab.http.requests` 增量 3；`http.server.request.duration` 单位 s，count=3、sum=0.265。OTEL SDK 的显式桶是**各区间计数**，前三次数据落入 .005、.01、.25 上界对应的三个桶；Prometheus 的 `_bucket{le=...}` 是**累积**计数，转换后 le=.01 为2，le=.25为3，+Inf为3。
+
+## 编码小步
+
+1. 先调用 counter.add(1, attributes)，不要把当前并发塞进 counter
+2. 用纳秒除以 1,000,000,000.0 转为秒，再 record 一次
+3. attributes 只含规范方法、框架路由模板、状态、http scheme，以及错误时才有的 error.type
+4. 用一万个不同 `/inventory/123` 原始路径攻击输入；它们不能变成一万个 series。未知路由不填 http.route，日志里的 UNMATCHED 只是本课日志值，不是标准路由值
+
+## H1—H4
+
+- H1：先分清“累计多少次”和“每次花多久”
+- H2：两种 instrument 应共享同一组受控 attributes
+- H3：Java 整数除法会截断；这里用 double 除数
+- H4：`observe` 先验证 → `attributes` → counter.add → histogram.record；参考解与 switch 版方法归一化均提供
+
+## 基数预算，亲手算一次
+
+本课固定路由两种、方法两种、状态三种，粗略上界 2×2×3=12 组；真实只有出现过的组合。若再加一百万个 user_id，可能变成千万级组合。trace_id、订单号、邮件地址都不作指标标签。`service.name` 是资源属性，不等于把所有 resource 属性自动复制成 label。
+
+## 面试题及答案
+
+1. 能平均两个实例的 p99 吗？不能。分位数不是可线性组合的数据；应合并同一窗口的直方图桶，再求分位数
+2. 直方图给的是精确 p99 吗？显式桶只保留分桶分布，估计受桶边界影响；本课不把样本少或不同窗口的结果包装成精确结论
+3. 5xx 都是服务端错误吗？本课服务器 span 对 5xx 标 ERROR；HTTP 客户端 span 对 4xx/5xx 标 ERROR，角色不同。指标的业务 SLI 还要另定义合格请求
+4. Collector 断了，指标归零代表没有请求吗？不代表。先看抓取/导出失败与时间窗缺口，不能把缺测当零
+5. 0 请求时成功率是多少？本课 SLO 设计标为无数据，不写 100%；低流量也需要单独策略
+
+## SLI/SLO 先修算例（设计练习，尚非告警实现）
+
+100 次合格结账、99 次成功，SLI=99%。若目标99.9%，这一窗口允许失败0.1次的比例预算，实际失败1次，消耗约10倍预算。真正告警需固定窗口、多窗口、最小流量、负责人、动作和恢复条件；C12-04 将另做 rules 测试，不靠 CPU 高猜用户受损。
+
+## 参考类与练习区的范围
+
+本题只有标出的一个方法可编辑。reference-map是当前支架的直接方法参考；reference-typed目录是只读的完整类对照材料，可能包含record、方法归一化或getter的区外修改，不能只截取其中一个方法体粘贴到本题。它的正确性按整棵源码单独构建验证；本地reference-map与reference-typed各自28项公开测试已通过，新Actions尚未运行。answers目录不参与src/test编译。详见[参考实现范围与验证器契约](../../../materials/observability/docs/06-参考实现范围与验证器契约.md)。

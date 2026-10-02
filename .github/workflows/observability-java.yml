@@ -1,0 +1,99 @@
+name: C12 observability Java contracts
+
+on:
+  pull_request:
+    paths:
+      - 'courses/observability-labs/**'
+      - '.github/workflows/observability-java.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'courses/observability-labs/**'
+      - '.github/workflows/observability-java.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: c12-java-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  java-contracts:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GRADLE_USER_HOME: ${{ runner.temp }}/c12-gradle-user-home
+      PYTHONDONTWRITEBYTECODE: '1'
+      C12_PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        timeout-minutes: 1
+        with:
+          persist-credentials: false
+      - name: Install checksum-pinned official toolchains
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence="$GITHUB_WORKSPACE/courses/observability-labs/evidence/ci"
+          mkdir -p "$evidence"
+          python3 - "$evidence" <<'PY'
+          import json,os,sys
+          from pathlib import Path
+          p=Path(sys.argv[1])
+          (p/'receipt.json').write_text(json.dumps({'status':'TOOLCHAIN_PREPARING','java_matrix':'NOT_RUN','github_sha':os.environ['GITHUB_SHA']})+'\n')
+          PY
+          exec > >(tee -a "$evidence/toolchain-install.log") 2>&1
+          tools_dir="$RUNNER_TEMP/c12-toolchains"
+          mkdir -p "$tools_dir"
+          curl --fail --location --connect-timeout 20 --max-time 70 --retry 0 \
+            'https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.12.1%2B1/OpenJDK21U-jdk_x64_linux_hotspot_21.0.12.1_1.tar.gz' \
+            -o "$tools_dir/jdk.tar.gz"
+          printf '%s  %s\n' 'ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94' "$tools_dir/jdk.tar.gz" | sha256sum --check --strict
+          curl --fail --location --connect-timeout 20 --max-time 70 --retry 0 \
+            'https://downloads.gradle.org/distributions/gradle-8.10.2-bin.zip' \
+            -o "$tools_dir/gradle.zip"
+          printf '%s  %s\n' '31c55713e40233a8303827ceb42ca48a47267a0ad4bab9177123121e71524c26' "$tools_dir/gradle.zip" | sha256sum --check --strict
+          tar -xzf "$tools_dir/jdk.tar.gz" -C "$tools_dir"
+          unzip -q "$tools_dir/gradle.zip" -d "$tools_dir"
+          printf 'JAVA_HOME=%s\nGRADLE_HOME=%s\n' "$tools_dir/jdk-21.0.12.1+1" "$tools_dir/gradle-8.10.2" >> "$GITHUB_ENV"
+      - name: Main and complete 14-variant strict matrix
+        timeout-minutes: 9
+        working-directory: courses/observability-labs
+        shell: bash
+        run: |
+          set -euo pipefail
+          exec > >(tee -a evidence/ci/matrix-launch.log) 2>&1
+          python3 -m unittest discover -s scripts/tests -p test_ci_contract.py
+          python3 scripts/verify_ci.py
+      - name: Preserve current failure status if verification did not finish
+        if: ${{ always() }}
+        timeout-minutes: 1
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path('courses/observability-labs/evidence/ci/receipt.json')
+          p.parent.mkdir(parents=True,exist_ok=True)
+          d=json.loads(p.read_text()) if p.exists() else {'github_sha':os.environ['GITHUB_SHA']}
+          if d.get('status') not in ('PASS','FAIL'):
+              d['status']='FAIL'
+              d['reason']='Toolchain preparation or matrix did not finish; inspect this run logs'
+              p.write_text(json.dumps(d,indent=2)+'\n')
+          PY
+      - name: Save JUnit XML, logs, hashes and receipt
+        if: ${{ always() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        timeout-minutes: 1
+        with:
+          name: c12-java-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            courses/observability-labs/evidence/ci/
+            courses/observability-labs/validation-runs/**/compile.log
+            courses/observability-labs/validation-runs/**/test.log
+            courses/observability-labs/validation-runs/**/build/test-results/test/TEST-*.xml
+          if-no-files-found: error
+          retention-days: 7

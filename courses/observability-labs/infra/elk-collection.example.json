@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "run_id": "replace-with-this-run-id",
+  "collection_started_at": "REPLACE_WITH_UTC_TIMESTAMP",
+  "collection_finished_at": "REPLACE_WITH_UTC_TIMESTAMP",
+  "stdout_stderr_captured": true,
+  "log_files_complete": true,
+  "rotation_gap": false,
+  "logger_levels": {
+    "root": "INFO",
+    "logstash.filters.json": "INFO",
+    "logstash.filters.ruby": "INFO"
+  },
+  "config_debug": false,
+  "query": {
+    "index": "course-observability-fixture",
+    "body": {
+      "query": {
+        "match_all": {}
+      },
+      "track_total_hits": true,
+      "size": 10,
+      "sort": [
+        {
+          "@timestamp": "asc"
+        }
+      ]
+    }
+  },
+  "files": {
+    "search": {
+      "name": "es-search.json",
+      "sha256": "REPLACE_WITH_ACTUAL_FILE_SHA256"
+    },
+    "mapping": {
+      "name": "es-mapping.json",
+      "sha256": "REPLACE_WITH_ACTUAL_FILE_SHA256"
+    },
+    "quarantine": {
+      "name": "quarantine-empty.ndjson",
+      "sha256": "REPLACE_WITH_ACTUAL_FILE_SHA256"
+    },
+    "logstash_stdout": {
+      "name": "logstash-stdout.log",
+      "sha256": "REPLACE_WITH_ACTUAL_FILE_SHA256"
+    },
+    "logstash_stderr": {
+      "name": "logstash-stderr.log",
+      "sha256": "REPLACE_WITH_ACTUAL_FILE_SHA256"
+    },
+    "logstash_log_0": {
+      "name": "logstash-self.log",
+      "sha256": "REPLACE_WITH_ACTUAL_FILE_SHA256"
+    }
+  }
+}
