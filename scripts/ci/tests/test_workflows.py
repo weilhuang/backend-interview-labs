@@ -159,7 +159,11 @@ class WorkflowContractTests(unittest.TestCase):
                     self.assertNotIn('continue-on-error', job)
                     self.assertTrue(all(value == 'read' for value in job.get('permissions', {}).values()))
                     for step in job['steps']:
-                        self.assertNotIn('continue-on-error', step)
+                        optional_diagnostic = path.stem == 'academy-official' and step.get('id') in {'ui_diagnostic','ui_diagnostic_upload'}
+                        if optional_diagnostic:
+                            self.assertEqual(step.get('continue-on-error'),'true')
+                            self.assertEqual(step['timeout-minutes'],'1')
+                        else:self.assertNotIn('continue-on-error',step)
                         if 'uses' not in step:
                             continue
                         self.assertIn(step['uses'], ACTION_REFS.values())

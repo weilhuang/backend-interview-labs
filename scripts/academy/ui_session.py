@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, select, signal, stat, subprocess, sys, time,
 from pathlib import Path
 from safe_io import replace_regular
 from go_environment import validated_go_environment
+from display_diagnostic import capture as capture_display_diagnostic
 from ui_control import ACTIONS, EUA_SHA256, FIELDS, UI_BUDGET_SECONDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
 
 
@@ -389,6 +390,12 @@ class DisplayIdentity:
         self.handles.clear()
 
 
+def optional_display_diagnostic(root,proc,screen,identity,ui_deadline):
+    try:return capture_display_diagnostic(root,proc,screen,identity,ui_deadline)
+    except InterruptedError:raise  # Preserve the existing cancellation handler/cleanup path.
+    except Exception:return None  # Optional I/O cannot grant acceptance or extend execution.
+
+
 def display_session(root,idea,command):
     """由原 capture 在自有 xvfb-run 内调用；原2700秒包含全部UI等待。"""
     # 固定官方配置元数据只核实际内置协议，不更改vendor jar。
@@ -440,7 +447,15 @@ def display_session(root,idea,command):
             put(stage_dir/'receipt.json',{**expected,'after_sha256':hashlib.sha256((stage_dir/'after.png').read_bytes()).hexdigest(),
                                          'status':'UI_ACTION_PERFORMED_NOT_ACCEPTANCE'})
         put(root/'ui-complete.json',{'status':'NORMAL_UI_COMPLETED_NOT_COURSE_ACCEPTANCE'})
-        while proc.poll() is None:owned.scan();time.sleep(.25)
+        diagnostic_due=time.monotonic()+30;diagnostic_done=False
+        while proc.poll() is None:
+            owned.scan()
+            if not diagnostic_done and time.monotonic()>=diagnostic_due:
+                diagnostic_done=True
+                optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
+            time.sleep(.25)
+        if not diagnostic_done:
+            optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
         return proc.returncode
     finally:
         identity.close()

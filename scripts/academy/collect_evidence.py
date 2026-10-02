@@ -5,6 +5,8 @@ import builtins
 import json
 from pathlib import Path
 import re
+from thread_diagnostics import NAME as THREAD_NAME, MAX_OUTPUT as THREAD_LIMIT, strict_json as thread_json, validate_document as thread_document
+from display_diagnostic import collect as collect_display, REPORT_NAME as DISPLAY_REPORT
 from safe_io import absolute, new_directory, read_regular, validate_directory, write_new
 NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','source-contract.json',
        'archive.json','author-changes.json','student-import.json','educator-import.json',
@@ -12,6 +14,7 @@ NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','sourc
        'official-validation.json','validation-gate.json','SHA256SUMS','generation.log','failure.log',
        'export.stdout.log','export.stderr.log','validate.stdout.log','validate.stderr.log',
        'export-idea.log','validate-idea.log','export-idea-pretermination.log','validate-idea-pretermination.log','gradle-jvm.jsonl','gradle-jvm-gate.json','unified-source-validation.json','release-gate.json'}
+NAMES.add(THREAD_NAME)
 BOOTSTRAP_NAMES={'source-ci.json','bootstrap.json','install.log','go-bootstrap.json'}
 SUPERVISOR_NAMES={'result.json':'supervisor-result.json','launch-result.json':'supervisor-launch.json',
                   'cleanup-result.json':'supervisor-cleanup.json','worker.stdout.log':'supervisor-worker.stdout.log',
@@ -134,14 +137,17 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
     for index,src in enumerate(sources):
         if ui_root is not None and src==absolute(ui_root):continue
         for name in sorted(NAMES if index==0 else BOOTSTRAP_NAMES):
-            try:data=read_regular(src/name,limit=MAX_FILE)
+            try:data=read_regular(src/name,limit=THREAD_LIMIT if name==THREAD_NAME else MAX_FILE)
             except FileNotFoundError:continue
             except Exception as exc:
                 omitted.append({'name':name,'reason':type(exc).__name__});continue
             from hashlib import sha256
             original_sha=sha256(data).hexdigest()
             try:
-                if name.endswith('.log'):
+                if name==THREAD_NAME:
+                    data=(json.dumps(thread_document(thread_json(data)),ensure_ascii=True,indent=2)+'\n').encode()
+                    if len(data)>THREAD_LIMIT:raise ValueError('thread diagnostic output limit')
+                elif name.endswith('.log'):
                     log_limit=256*1024
                     if name in {'export-idea-pretermination.log','validate-idea-pretermination.log'}:
                         log_limit=128*1024
@@ -186,6 +192,13 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
             except FileNotFoundError:supervisor_availability[name]='MISSING'
             except Exception as exc:
                 supervisor_availability[name]='UNAVAILABLE';omitted.append({'name':name,'reason':type(exc).__name__})
+    if ui_root is not None:
+        try:
+            current=json.loads(output.get('summary.json',b'{}'))
+            for name,data in collect_display(absolute(ui_root),current.get('run_id'),current.get('run_attempt')).items():
+                output[name]=data;hashes[name]={'uploaded_sha256':sha256(data).hexdigest()}
+        except FileNotFoundError:omitted.append({'name':DISPLAY_REPORT,'reason':'MISSING'})
+        except Exception:omitted.append({'name':DISPLAY_REPORT,'reason':'INVALID_OR_UNAVAILABLE'})
     if 'summary.json' not in output:
         output['summary.json']=(json.dumps({'status':'NOT_RUN','reason':'official command not reached'})+'\n').encode()
     summary=json.loads(output['summary.json'])

@@ -167,6 +167,27 @@ jobs:
         run: |
           python scripts/academy/ui_control.py --root "$UI_RUN" --stage 3
           python scripts/academy/ui_session.py complete --root "$UI_RUN"
+      - name: 可选读取初始化后的本次显示器画面（不阻断原生继续）
+        id: ui_diagnostic
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        continue-on-error: true
+        run: |
+          python scripts/academy/display_diagnostic.py --root "$UI_RUN" --output "$UI_RUN/diagnostic-artifact" --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 保存可选初始化画面诊断（失败不阻断原生继续）
+        id: ui_diagnostic_upload
+        if: always() && steps.ui_diagnostic.outputs.collected == 'true' && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-ui-diagnostic-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.json
+            ${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.png
       - name: 立即保存本次UI前后图与receipt供检查
         if: always() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
         timeout-minutes: 1

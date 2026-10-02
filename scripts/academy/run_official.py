@@ -14,6 +14,7 @@ import time
 import traceback
 import re
 from wrapper_diagnostic import compare_wrapper
+from thread_diagnostics import snapshot as snapshot_threads, NAME as THREAD_DIAGNOSTIC_NAME
 from go_environment import validated_go_environment
 from safe_io import absolute, read_regular, write_new, replace_regular, validate_directory, exclusive_writer, directory_fd
 from gates import (GateError, require, read_json, dump, sha, build_contract, redact_contract,
@@ -55,6 +56,9 @@ def snapshot_before_stop(root, phase):
     result={"status":"NOT_RUN","at_utc":utc_now()}
     if phase is None:return result
     result["intermediate_archives"]=intermediate_archives(root,phase)
+    if phase=='validate':
+        try:result['thread_diagnostics']=snapshot_threads(root,'BEFORE_TERMINATION')
+        except Exception:result['thread_diagnostics']={'status':'UNAVAILABLE','samples':0,'capture_phase':'BEFORE_TERMINATION'}
     try:
         data=read_regular(root/(phase+"-profile")/"log/idea.log",limit=IDE_SPLIT_BYTES,tail=True)
         write_new(root/"evidence"/(phase+"-idea-pretermination.log"),data)
@@ -174,6 +178,9 @@ def inspect_gradle_evidence(root, expected_roots):
 
 def small_logs(root,evidence):
     validate_directory(root);validate_directory(evidence)
+    if not (evidence/THREAD_DIAGNOSTIC_NAME).exists():
+        try:snapshot_threads(root,'FINALIZATION')
+        except Exception:pass
     for phase in ('export','validate'):
         path=root/(phase+'-profile')/'log/idea.log'
         try:
