@@ -92,22 +92,38 @@ def prepare_xml_dir(path):
     path.mkdir(parents=True)
     require(not list(path.iterdir()), 'STALE_XML')
 
-def validate_junit(xml, expectation):
+def validate_junit(xml, expectation, evidence_path=None):
+    suites = [(report.name, ET.parse(report).getroot()) for report in xml.glob('TEST-*.xml')]
+    if evidence_path is not None:
+        snapshot = [{'report': name, 'suite': suite.attrib, 'cases': [
+            {'class': c.get('classname'), 'method': c.get('name'), 'problems': [
+                {'kind': p.tag, 'type': p.get('type'), 'message': p.get('message', ''), 'text': ''.join(p.itertext())}
+                for p in c if p.tag in {'failure', 'error', 'skipped'}]}
+            for c in suite.findall('.//testcase')]} for name, suite in suites]
+        evidence_path.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + '\n')
     cases = []
-    for report in xml.glob('TEST-*.xml'):
-        suite = ET.parse(report).getroot()
+    for _, suite in suites:
         require(suite.tag == 'testsuite', 'JUNIT_WRONG_REPORT_ROOT')
-        require(int(suite.get('errors', '0')) == 0 and int(suite.get('skipped', '0')) == 0, 'JUNIT_SUITE_SKIP_OR_ERROR')
+        require(int(suite.get('skipped', '0')) == 0, 'JUNIT_SUITE_SKIP')
+        if expectation != 'ENVIRONMENT_REJECTED':
+            require(int(suite.get('errors', '0')) == 0, 'JUNIT_SUITE_ERROR')
         cases.extend(suite.findall('.//testcase'))
     exact([(c.get('classname'), c.get('name')) for c in cases], EXPECTED_JUNIT, 'JUnit class/methods')
-    require(all(c.find('skipped') is None and c.find('error') is None for c in cases), 'JUNIT_SKIP_OR_ERROR')
-    failures = [(c, c.find('failure')) for c in cases if c.find('failure') is not None]
+    require(all(c.find('skipped') is None for c in cases), 'JUNIT_SKIP')
+    if expectation != 'ENVIRONMENT_REJECTED':
+        require(all(c.find('error') is None for c in cases), 'JUNIT_ERROR')
+    failures = [(c, problem) for c in cases for problem in list(c) if problem.tag in {'failure', 'error'}]
     if expectation == 'CORRECT':
         require(not failures, 'JUNIT_UNEXPECTED_FAILURE')
     else:
         require(len(failures) == 1, 'JUNIT_FAILURE_COUNT')
         case, failure = failures[0]
         require((case.get('classname'), case.get('name')) == CONTRACT_TEST, 'JUNIT_WRONG_FAILURE_TARGET')
+        if expectation == 'ENVIRONMENT_REJECTED':
+            message = ''.join(failure.itertext()) + failure.get('message', '')
+            require(failure.tag == 'error' and failure.get('type') == 'java.lang.IllegalStateException' and failure.get('message', '').startswith('INVALID_ENV:'), 'JUNIT_WRONG_ENVIRONMENT_REJECTION')
+        if expectation == 'COMPILE_REJECTED':
+            require(failure.tag == 'failure' and failure.get('type') == 'java.lang.AssertionError' and '[build failed]' in failure.get('message', '') and '=== RUN   TestContract' not in failure.get('message', ''), 'JUNIT_WRONG_COMPILE_REJECTION')
         if expectation == 'BUSINESS_RED':
             require(failure.get('type') == 'java.lang.AssertionError', 'JUNIT_NON_BUSINESS_FAILURE')
             message = ''.join(failure.itertext()) + failure.get('message', '')
@@ -151,7 +167,7 @@ def verify():
       tag=l['id']+'-'+label;xml=work/(tag+'-xml');prepare_xml_dir(xml)
       command=[java,'-XX:ActiveProcessorCount=2','-Xmx384m','-Dgo.executable='+ (str(work/'missing-go') if expect=='ENVIRONMENT_REJECTED' else go),'-Dgo.project='+str(project),'-Dgo.work='+str(bridgework),'-jar',str(jar),'execute','--class-path',str(classes),'--scan-class-path','--disable-ansi-colors','--reports-dir',str(xml)]
       p=run(command,task,tag);out=p.stdout+p.stderr
-      cases,fails=validate_junit(xml,expect);skips=0
+      cases,fails=validate_junit(xml,expect,E/(tag+'-junit.json'));skips=0
       testlog=bridgework/'go-tests.log';gout=testlog.read_text() if testlog.exists() else None
       if expect=='CORRECT':
        ok=p.returncode==0 and fails==0 and gout is not None

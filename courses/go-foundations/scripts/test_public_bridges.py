@@ -128,6 +128,67 @@ class ValidatorTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     bridge.validate_junit(self.root, 'BUSINESS_RED')
 
+    def test_expected_missing_go_error_is_classified_as_environment(self):
+        suite = self.xml()
+        case = next(c for c in suite if c.get('classname') == 'GoContractTest')
+        ET.SubElement(case, 'error', type='java.lang.IllegalStateException', message='INVALID_ENV: missing Go')
+        suite.set('errors', '1')
+        self.save(suite)
+        _, failures = bridge.validate_junit(self.root, 'ENVIRONMENT_REJECTED')
+        self.assertEqual(failures, 1)
+        with self.assertRaises(ValueError):
+            bridge.validate_junit(self.root, 'BUSINESS_RED')
+
+    def test_wrong_environment_error_rejected(self):
+        for target, exception, message in [
+            ('GoTestBridgeTest', 'java.lang.IllegalStateException', 'INVALID_ENV'),
+            ('GoContractTest', 'java.lang.NullPointerException', 'INVALID_ENV'),
+            ('GoContractTest', 'java.lang.IllegalStateException', 'unrelated'),
+            ('GoContractTest', 'java.lang.IllegalStateException', 'prefix INVALID_ENV: fake'),
+            ('GoContractTest', 'java.lang.IllegalStateException', 'INVALID_ENV without colon')]:
+            with self.subTest(target=target, exception=exception, message=message):
+                suite = self.xml()
+                case = next(c for c in suite if c.get('classname') == target)
+                ET.SubElement(case, 'error', type=exception, message=message)
+                suite.set('errors', '1')
+                self.save(suite)
+                with self.assertRaises(ValueError):
+                    bridge.validate_junit(self.root, 'ENVIRONMENT_REJECTED')
+
+    def test_extra_environment_error_rejected(self):
+        suite = self.xml()
+        for case in suite[:2]:
+            ET.SubElement(case, 'error', type='java.lang.IllegalStateException', message='INVALID_ENV')
+        suite.set('errors', '2')
+        self.save(suite)
+        with self.assertRaises(ValueError):
+            bridge.validate_junit(self.root, 'ENVIRONMENT_REJECTED')
+
+    def test_failure_cannot_replace_expected_environment_error(self):
+        self.xml(bridge.CONTRACT_TEST, 'java.lang.IllegalStateException', 'INVALID_ENV: missing Go')
+        with self.assertRaises(ValueError):
+            bridge.validate_junit(self.root, 'ENVIRONMENT_REJECTED')
+
+    def test_environment_fail_plus_error_rejected(self):
+        suite = self.xml(bridge.CONTRACT_TEST)
+        case = next(c for c in suite if c.get('classname') == 'GoContractTest')
+        ET.SubElement(case, 'error', type='java.lang.IllegalStateException', message='INVALID_ENV: missing Go')
+        suite.set('errors', '1')
+        self.save(suite)
+        with self.assertRaises(ValueError):
+            bridge.validate_junit(self.root, 'ENVIRONMENT_REJECTED')
+
+    def test_exact_compile_failure_and_wrong_error(self):
+        self.xml(bridge.CONTRACT_TEST, failure_text='compiler feedback [build failed]')
+        bridge.validate_junit(self.root, 'COMPILE_REJECTED')
+        suite = self.xml(bridge.CONTRACT_TEST, failure_text='compiler feedback [build failed]')
+        problem = suite.find('testcase/failure')
+        problem.tag = 'error'
+        suite.set('errors', '1')
+        self.save(suite)
+        with self.assertRaises(ValueError):
+            bridge.validate_junit(self.root, 'COMPILE_REJECTED')
+
     def test_old_xml_removed_and_cannot_pass_without_fresh_suite(self):
         self.xml()
         bridge.prepare_xml_dir(self.root)
