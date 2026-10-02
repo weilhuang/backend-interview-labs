@@ -25,6 +25,7 @@ files:
   visible: true
 - name: go/diagrams/flow.png
   visible: true
+  is_binary: true
 - name: go/diagrams/flow.svg
   visible: true
 - name: go/go.mod

@@ -70,11 +70,36 @@ def load_inputs(repo):
         require(value['expected_manifest'].get(name) == sha, 'Overlay/output hash mismatch: ' + name)
     return root, value
 
+def validate_task_binary_assets(output, read_yaml):
+    """Academy defaults absent is_binary to false; inspect bytes, not suffixes."""
+    signatures = (b'\x89PNG\r\n\x1a\n', b'\xff\xd8\xff', b'GIF87a', b'GIF89a',
+                  b'PK\x03\x04', b'PK\x05\x06', b'%PDF-')
+    binary_assets = []
+    for metadata in sorted(output.rglob('task-info.yaml')):
+        for entry in read_yaml(metadata)['files']:
+            path = metadata.parent / safe_name(entry['name'])
+            raw = read_regular(path)
+            binary = raw.startswith(signatures) or b'\x00' in raw
+            try:
+                raw.decode('utf-8')
+            except UnicodeDecodeError:
+                binary = True
+            name = path.relative_to(output).as_posix()
+            if 'is_binary' in entry:
+                require(type(entry['is_binary']) is bool, 'is_binary must be a YAML boolean: ' + name)
+            if binary:
+                require(entry.get('is_binary') is True, 'Binary task asset requires is_binary: true: ' + name)
+                binary_assets.append(name)
+            if entry.get('is_binary') is True:
+                require(not entry.get('placeholders'), 'Binary task asset cannot contain editable regions: ' + name)
+    return binary_assets
+
 def validate_metadata(output):
     # Reuse the original public metadata/UTF-16 gate; independently compare task map.
     sys.path.insert(0, str(output / 'authoring/quality'))
     spec = importlib.util.spec_from_file_location('public_course_metadata_gate', output / 'authoring/quality/academy_gate.py')
     academy_gate = importlib.util.module_from_spec(spec); spec.loader.exec_module(academy_gate)
+    validate_task_binary_assets(output, academy_gate.read_yaml)
     model = academy_gate.inspect_course(output)
     mapping = json.loads(read_regular(output / 'authoring/course-map.json'))
     tasks = mapping['tasks']; support = mapping['support_projects']

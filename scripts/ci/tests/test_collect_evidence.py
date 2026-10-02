@@ -99,8 +99,8 @@ class EvidenceFixtures(unittest.TestCase):
         for profile, (course, key) in COURSES.items():
             with self.subTest(profile=profile):
                 prefix = f'courses/{course}/'
-                self.assertEqual(collector.allowed(profile, prefix + 'build/verification/report.json'), 'json')
-                self.assertEqual(collector.allowed(profile, prefix + 'module/build/test-results/test/TEST-Example$Nested.xml'), 'xml')
+                self.assertEqual(collector.allowed(profile, prefix + 'build/verification/report.json'), None if profile == 'java-frameworks-ui' else 'json')
+                self.assertEqual(collector.allowed(profile, prefix + 'module/build/test-results/test/TEST-Example$Nested.xml'), None if profile == 'java-frameworks-ui' else 'xml')
                 for name in ('arbitrary-report.json', 'private.json', 'report.json.bak'):
                     self.assertIsNone(collector.allowed(profile, prefix + 'authoring/' + name))
                 self.assertIsNone(collector.allowed(profile, 'courses/unrelated/build/verification/report.json'))
@@ -122,13 +122,26 @@ class EvidenceFixtures(unittest.TestCase):
             self.write(name, '{"status":"FAIL"}')
         for course, _ in COURSES.values():
             self.write(f'courses/{course}/build/verification/report.json', '{"status":"FAIL"}')
+        self.write('courses/java-frameworks/authoring/ui-verification.json', '{"status":"FAIL"}')
         for profile in list(CI_NAMES) + list(COURSES):
             with self.subTest(profile=profile):
                 result = self.collect(profile)
                 expected = CI_NAMES[profile] if profile in CI_NAMES else {f'courses/{COURSES[profile][0]}/build/verification/report.json'}
+                if profile == 'java-frameworks-ui': expected = {'courses/java-frameworks/authoring/ui-verification.json'}
+                if profile == 'java-frameworks-backend': expected.add('courses/java-frameworks/authoring/ui-verification.json')
                 self.assertEqual({item['path'] for item in result['copied']}, expected)
                 self.assertEqual(result['collection_status'], 'COMPLETE')
                 self.assertEqual(result['job_status'], 'failure')
+
+    def test_framework_ui_excludes_committed_historical_pass_reports(self):
+        prefix = 'courses/java-frameworks/'
+        for name in ('callers-report.json', 'metadata-report.json', 'negative-report.json', 'source-verification.json'):
+            self.write(prefix + 'authoring/' + name, '{"status":"passed","scope":"old committed evidence"}')
+        self.write(prefix + 'authoring/ui-verification.json', '{"status":"passed","scope":"current UI producer"}')
+        self.write(prefix + 'build/server/application.log', 'current synthetic server')
+        result = self.collect('java-frameworks-ui', status='success')
+        self.assertEqual({row['path'] for row in result['copied']}, {
+            prefix + 'authoring/ui-verification.json', prefix + 'build/server/application.log'})
 
     def test_unsupported_profiles_and_statuses_fail_before_creating_output(self):
         output = self.root / 'rejected'

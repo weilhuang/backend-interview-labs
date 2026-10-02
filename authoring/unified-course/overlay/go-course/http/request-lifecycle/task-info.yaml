@@ -17,6 +17,7 @@ files:
   visible: true
 - name: go/diagrams/lifecycle.png
   visible: true
+  is_binary: true
 - name: go/diagrams/lifecycle.svg
   visible: true
 - name: go/docs/源码定位.md

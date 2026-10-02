@@ -17,7 +17,8 @@ PYTHONDONTWRITEBYTECODE=1 python scripts/build_unified_course.py \
 2. 要求完整 V1 输出与 `manifest.json` 的 `base_generated_manifest` 逐路径、逐字节一致
 3. 只应用 `overlay_manifest` 声明的文件；缺文件、多文件、改动、符号链接或不安全路径均拒绝
 4. 要求完整结果与 `expected_manifest` 一致，验证 15 章节、100 题、159 区、107 份最终模块锁
-5. 校验 `authoring/public-build-contract.json` 的全部源码、课程映射和 110 个可编辑文件绑定；原生验收再独立消费这一合同
+5. 按实际文件签名/字节检查任务二进制资产，要求显式布尔值 `is_binary: true`，拒绝二进制练习区
+6. 校验 `authoring/public-build-contract.json` 的全部源码、课程映射和 110 个可编辑文件绑定；原生验收再独立消费这一合同
 
 `overlay/` 是扩展课文、答案、代码、可见测试、桥接适配器、锁、地图和公开整合文档的维护源。原来的九份 V1 源仍在 `courses/`；不要在生成目录修改后忘记更新作者输入。Java、Go、Dockerfile 和 YAML 的练习区按相同 UTF-16 合同投影，除此之外的字节不变。
 
@@ -25,7 +26,7 @@ PYTHONDONTWRITEBYTECODE=1 python scripts/build_unified_course.py \
 
 编辑源后，先在独立新目录重新组装和评审变化，再更新 manifest 的输入与输出 hash。清单不是签名，也不是运行证据。不要仅为绕过 drift 检查而重算清单，不要让 CI 自动接纳新清单或在普通验收中写依赖锁。
 
-原始整合输入封存清单 SHA256 为 `4bf64648e4cfe1d022fe58d6773900dbb5f32b2c92cc33edf49a021573a29be2`。公开版本的明确变化列在 `public_transformations`：移除机器路径和私有标题、明确范围、修复多语言 learner 投影、为16道扩展题补充官方参考链接。旧运行证据只绑定旧全树；本版业务源码和测试保真不等于本版重新执行通过。
+原始整合输入封存清单 SHA256 为 `4bf64648e4cfe1d022fe58d6773900dbb5f32b2c92cc33edf49a021573a29be2`。公开版本的明确变化列在 `public_transformations`：移除机器路径和私有标题、明确范围、修复多语言 learner 投影、为16道扩展题补充官方参考链接，以及依据真实导出失败为六个Go任务PNG补上显式二进制标记。旧运行证据只绑定旧全树；本版业务源码和测试保真不等于本版重新执行通过。
 
 ## 依赖与运行边界
 

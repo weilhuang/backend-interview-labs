@@ -131,6 +131,51 @@ class PublicUnifiedCourseTests(unittest.TestCase):
             text=re.sub(r'```.*?```','',(self.output/task['path']/'task.md').read_text(),flags=re.S)
             self.assertTrue(re.findall(r'!?\[[^\]\n]*\]\((https?://[^\s)]+)\)',text),task['path'])
 
+    def test_all_binary_task_assets_have_explicit_boolean_metadata(self):
+        assets = builder.validate_task_binary_assets(self.output, self.gate.read_yaml)
+        expected = {
+            'go-course/core/greeting/go/diagrams/flow.png',
+            'go-course/core/quantity/go/diagrams/flow.png',
+            'go-course/core/order-total/go/diagrams/flow.png',
+            'go-course/core/snapshot/go/diagrams/ownership.png',
+            'go-course/http/request-lifecycle/go/diagrams/lifecycle.png',
+            'go-course/http/gin-pipeline/go/diagrams/lifecycle.png',
+        }
+        self.assertEqual(set(assets), expected)
+        for name in assets:
+            self.assertTrue((self.output / name).read_bytes().startswith(b'\x89PNG\r\n\x1a\n'))
+
+    def test_each_png_rejects_absent_false_string_or_numeric_binary_flag(self):
+        root = self.clone()
+        for metadata in sorted(root.glob('go-course/*/*/task-info.yaml')):
+            original = metadata.read_text()
+            self.assertEqual(original.count('  is_binary: true\n'), 1)
+            for replacement in ('', '  is_binary: false\n', '  is_binary: "true"\n', '  is_binary: 1\n'):
+                with self.subTest(path=metadata.relative_to(root), replacement=replacement):
+                    metadata.write_text(original.replace('  is_binary: true\n', replacement))
+                    with self.assertRaisesRegex(ValueError, 'is_binary'):
+                        builder.validate_metadata(root)
+            metadata.write_text(original)
+
+    def test_binary_detection_uses_content_even_with_text_extension(self):
+        root = self.root / self._testMethodName
+        root.mkdir()
+        metadata = root / 'task-info.yaml'
+        metadata.write_text('files:\n- name: asset.txt\n  visible: true\n')
+        for raw in (b'\x89PNG\r\n\x1a\n', b'%PDF-1.7\n', b'abc\x00def', b'\xff\xfe'):
+            with self.subTest(raw=raw):
+                (root / 'asset.txt').write_bytes(raw)
+                with self.assertRaisesRegex(ValueError, 'Binary task asset requires'):
+                    builder.validate_task_binary_assets(root, self.gate.read_yaml)
+
+    def test_binary_task_asset_cannot_have_editable_regions(self):
+        root = self.root / self._testMethodName
+        root.mkdir()
+        (root / 'task-info.yaml').write_text('files:\n- name: asset.png\n  visible: true\n  is_binary: true\n  placeholders:\n  - offset: 0\n    length: 1\n    placeholder_text: x\n')
+        (root / 'asset.png').write_bytes(b'\x89PNG\r\n\x1a\n')
+        with self.assertRaisesRegex(ValueError, 'cannot contain editable regions'):
+            builder.validate_task_binary_assets(root, self.gate.read_yaml)
+
     def test_no_private_machine_paths_in_generated_source(self):
         for p in self.output.rglob('*'):
             if p.is_file():

@@ -333,5 +333,16 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertEqual(acceptance['timeout-minutes'], '50')
 
 
+    def test_framework_ui_clears_only_old_ui_receipt_before_runtime_setup(self):
+        job = self.workflow('java-frameworks')['jobs']['ui']
+        steps = job['steps']
+        self.assertEqual(steps[0]['uses'], ACTION_REFS['checkout'])
+        self.assertEqual(steps[1]['run'], 'rm -f -- authoring/ui-verification.json')
+        self.assertEqual(steps[1]['timeout-minutes'], '1')
+        self.assertEqual(job['defaults']['run']['working-directory'], 'courses/java-frameworks')
+        self.assertNotIn('if', steps[1])
+        self.assertTrue(any('node authoring/verify_frontend.cjs' in step.get('run', '') for step in steps[2:]))
+
+
 if __name__=='__main__':
     unittest.main()

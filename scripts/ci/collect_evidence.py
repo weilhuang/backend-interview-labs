@@ -64,6 +64,16 @@ def allowed(profile, relative):
           'ci-result': {'build/ci/evidence.json'}}
     if profile in ci:
         return 'json' if relative in ci[profile] else None
+    if profile == 'java-frameworks-ui':
+        # Only this job's producers. Historical committed authoring verdicts
+        # belong to source history, never to the current browser run.
+        return {
+            'courses/java-frameworks/authoring/ui-verification.json': 'json',
+            'courses/java-frameworks/build/server/application.log': 'log',
+            'courses/java-frameworks/build/ui/mobile.png': 'png',
+            'courses/java-frameworks/build/ui/desktop.png': 'png',
+            'courses/java-frameworks/build/ui/failure.png': 'png',
+        }.get(relative)
     course, key = COURSES[profile]
     prefix = 'courses/' + course + '/'
     keys = ([key] if key else []) + (['distributed-region-audit'] if profile == 'distributed' else [])

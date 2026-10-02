@@ -27,6 +27,7 @@ files:
   visible: true
 - name: go/diagrams/ownership.png
   visible: true
+  is_binary: true
 - name: go/diagrams/ownership.svg
   visible: true
 - name: go/docs/提示与答案.md
