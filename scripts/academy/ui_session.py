@@ -5,7 +5,7 @@ import argparse, hashlib, json, os, select, signal, stat, subprocess, sys, time,
 from pathlib import Path
 from safe_io import replace_regular
 from go_environment import validated_go_environment
-from ui_control import ACTIONS, EUA_SHA256, FIELDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
+from ui_control import ACTIONS, EUA_SHA256, FIELDS, UI_BUDGET_SECONDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
 
 
 def put(path, value):
@@ -406,14 +406,14 @@ def display_session(root,idea,command):
         subprocess.run(args,check=True,timeout=min(15,max(.1,ui_deadline-time.monotonic())),env=clean_env(),
                        pass_fds=tuple(fd for _,fd in identity.handles.values()))
         identity.verify()
-    started=time.monotonic();ui_deadline=started+300
+    started=time.monotonic();ui_deadline=started+UI_BUDGET_SECONDS
     owned=Owned(started+2700);identity=DisplayIdentity();proc=None
     def terminate(*_):raise InterruptedError('本次UI会话取消')
     signal.signal(signal.SIGTERM,terminate);signal.signal(signal.SIGINT,terminate)
     try:
         proc=subprocess.Popen(command,env=os.environ.copy(),start_new_session=True)
         ide_meta=owned.register_root(proc)
-        record=budget_record(ide_meta,300);ui_deadline=record['monotonic_deadline']
+        record=budget_record(ide_meta,UI_BUDGET_SECONDS);ui_deadline=record['monotonic_deadline']
         put(root/'ui-deadline.json',record)
         identity.establish(root,ide_meta,owned.members[proc.pid][1],ui_deadline)
         # 仅给正常窗口初始化留时间；这不是正确状态判定，真正动作必须经本次画面人工核对。
@@ -432,7 +432,7 @@ def display_session(root,idea,command):
             put(stage_dir/'request.json',expected)
             while not (stage_dir/'control.json').exists():
                 if proc.poll() is not None:raise RuntimeError('IDE已退出')
-                if time.monotonic()>=ui_deadline:raise TimeoutError('300秒UI预算耗尽')
+                if time.monotonic()>=ui_deadline:raise TimeoutError('900秒UI总预算耗尽')
                 owned.scan();time.sleep(.2)
             validate_control(strict_json((stage_dir/'control.json').read_bytes()),expected)
             if time.monotonic()>=ui_deadline or proc.poll() is not None:raise RuntimeError('动作已过期')

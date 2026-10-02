@@ -1,6 +1,7 @@
 """普通机械字段/预算/发布链回归；不把 fixture 当作真实 UI 验收。"""
 from pathlib import Path
-import importlib.util, json, os, sys, tempfile, unittest, time
+import importlib.util, io, json, os, sys, tempfile, unittest, time
+from contextlib import redirect_stdout
 from unittest.mock import patch, Mock, MagicMock
 BASE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(BASE))
@@ -50,7 +51,7 @@ class ControlTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);stage=root/'stage-1';stage.mkdir()
             session.put(stage/'request.json',self.request);session.put(stage/'control.json',self.request)
-            session.put(root/'ui-deadline.json',session.budget_record(session.process_info(os.getpid()),300))
+            session.put(root/'ui-deadline.json',session.budget_record(session.process_info(os.getpid()),control.UI_BUDGET_SECONDS))
             with self.assertRaises(ValueError):control.receive(root,1)
     def test_request_is_not_preapproval(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -97,7 +98,7 @@ class SessionTest(unittest.TestCase):
         request=ControlTest();request.setUp()
         with tempfile.TemporaryDirectory() as tmp:
             r=Path(tmp);s=r/'stage-1';s.mkdir();session.put(s/'request.json',request.request)
-            session.put(r/'ui-deadline.json',session.budget_record(session.process_info(os.getpid()),300))
+            session.put(r/'ui-deadline.json',session.budget_record(session.process_info(os.getpid()),control.UI_BUDGET_SECONDS))
             with patch.object(control,'fetch_control',return_value=request.request),patch.dict(os.environ,{'GH_TOKEN':'fixture','GITHUB_REPOSITORY':'owner/repo'}):control.receive(r,1)
             self.assertEqual(json.loads((s/'control.json').read_bytes()),request.request)
 
@@ -279,19 +280,97 @@ class AbsoluteBudgetRevisionTest(unittest.TestCase):
         with self.assertRaises(ValueError):control.checked_budget(value,3600,self.owner)
     def test_child_stage_cannot_expand_budget(self):
         value=session.budget_record(self.owner,3600)
-        with self.assertRaises(ValueError):control.checked_budget(value,300,self.owner)
+        with self.assertRaises(ValueError):control.checked_budget(value,control.UI_BUDGET_SECONDS,self.owner)
     def test_ui_stage_cannot_reset_deadline(self):
-        value=session.budget_record(self.owner,300);value['monotonic_deadline']+=1
-        with self.assertRaises(ValueError):control.checked_budget(value,300,self.owner)
+        value=session.budget_record(self.owner,control.UI_BUDGET_SECONDS);value['monotonic_deadline']+=1
+        with self.assertRaises(ValueError):control.checked_budget(value,control.UI_BUDGET_SECONDS,self.owner)
     def test_boolean_or_unknown_budget_rejected(self):
-        value=session.budget_record(self.owner,300);value['budget_seconds']=True
-        with self.assertRaises(ValueError):control.checked_budget(value,300,self.owner)
+        value=session.budget_record(self.owner,control.UI_BUDGET_SECONDS);value['budget_seconds']=True
+        with self.assertRaises(ValueError):control.checked_budget(value,control.UI_BUDGET_SECONDS,self.owner)
     def test_repeated_phase_read_is_same_absolute_deadline(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);owner=session.process_info(os.getpid());session.put(root/'state.json',session.budget_record(owner,3600))
             before=session.read_outer_deadline(root)
             with patch.object(session.time,'monotonic',return_value=999999999999):after=session.read_outer_deadline(root)
             self.assertEqual(before,after)
+
+
+class SharedUiDeadlineTest(unittest.TestCase):
+    def setUp(self):
+        self.owner={'pid':100,'uid':1000,'pgrp':100,'session':100,
+                    'start_time':str(100*os.sysconf('SC_CLK_TCK'))}
+        self.record=session.budget_record(self.owner,control.UI_BUDGET_SECONDS)
+    def prepare(self,root,stage):
+        folder=root/f'stage-{stage}';folder.mkdir()
+        request={'schema':1,'run_id':'123','run_attempt':'1','stage':stage,
+                 'screenshot_sha256':'a'*64,'eua_sha256':control.EUA_SHA256,'action':control.ACTIONS[stage]}
+        session.put(folder/'request.json',request)
+        return request
+    def receive(self,root,stage,now,value):
+        output=io.StringIO()
+        with patch.object(session,'process_info',return_value=self.owner),patch.object(control.time,'monotonic',return_value=now),patch.object(control,'fetch_control',return_value=value) as fetch,patch.dict(os.environ,{'GH_TOKEN':'PRIVATE_FIXTURE','GITHUB_REPOSITORY':'owner/repo'}),redirect_stdout(output):
+            control.receive(root,stage)
+        return fetch,json.loads(output.getvalue())
+    def test_exact_total_is_900_seconds_from_original_kernel_start(self):
+        self.assertEqual(control.UI_BUDGET_SECONDS,900)
+        self.assertEqual(control.checked_budget(self.record,900,self.owner),1000)
+    def test_old_expanded_or_wrong_typed_budget_is_rejected(self):
+        for seconds in (300,901,1800,3600,True,'900',900.0):
+            with self.subTest(seconds=seconds):
+                record={**self.record,'budget_seconds':seconds}
+                with self.assertRaises(ValueError):control.checked_budget(record,900,self.owner)
+    def test_three_stages_share_original_deadline_past_old_300_seconds(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);session.put(root/'ui-deadline.json',self.record)
+            original=(root/'ui-deadline.json').read_bytes()
+            for stage,now in ((1,350),(2,700),(3,999)):
+                request=self.prepare(root,stage);fetch,diagnostic=self.receive(root,stage,now,request)
+                self.assertEqual(json.loads((root/f'stage-{stage}/control.json').read_bytes()),request)
+                self.assertEqual(diagnostic,{'event':'UI_APPROVAL_WAIT','stage':stage,'budget_seconds':900,'remaining_seconds':1000-now})
+                self.assertNotIn('PRIVATE_FIXTURE',json.dumps(diagnostic))
+                self.assertEqual((root/'ui-deadline.json').read_bytes(),original)
+                self.assertLessEqual(fetch.call_args.args[-1],1000-now)
+    def test_exact_and_later_deadline_never_fetches_or_writes(self):
+        for now in (1000,1001):
+            with self.subTest(now=now),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);session.put(root/'ui-deadline.json',self.record);self.prepare(root,2)
+                with patch.object(session,'process_info',return_value=self.owner),patch.object(control.time,'monotonic',return_value=now),patch.object(control,'fetch_control') as fetch,redirect_stdout(io.StringIO()):
+                    with self.assertRaises(TimeoutError):control.receive(root,2)
+                fetch.assert_not_called();self.assertFalse((root/'stage-2/control.json').exists())
+    def test_control_returning_at_deadline_is_not_consumed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);session.put(root/'ui-deadline.json',self.record);request=self.prepare(root,2)
+            clock=[999.0]
+            def late(*_):clock[0]=1000.0;return request
+            with patch.object(session,'process_info',return_value=self.owner),patch.object(control.time,'monotonic',side_effect=lambda:clock[0]),patch.object(control,'fetch_control',side_effect=late),patch.dict(os.environ,{'GH_TOKEN':'fixture','GITHUB_REPOSITORY':'owner/repo'}),redirect_stdout(io.StringIO()):
+                with self.assertRaises(TimeoutError):control.receive(root,2)
+            self.assertFalse((root/'stage-2/control.json').exists())
+    def test_absent_control_expires_without_stage_reset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);session.put(root/'ui-deadline.json',self.record);self.prepare(root,3)
+            clock=[998.0]
+            def advance(seconds):clock[0]+=seconds
+            with patch.object(session,'process_info',return_value=self.owner),patch.object(control.time,'monotonic',side_effect=lambda:clock[0]),patch.object(control.time,'sleep',side_effect=advance),patch.object(control,'fetch_control',return_value=None) as fetch,patch.dict(os.environ,{'GH_TOKEN':'fixture','GITHUB_REPOSITORY':'owner/repo'}),redirect_stdout(io.StringIO()):
+                with self.assertRaises(TimeoutError):control.receive(root,3)
+            self.assertEqual(clock[0],1000);fetch.assert_called_once()
+            self.assertFalse((root/'stage-3/control.json').exists())
+    def test_repeated_ui_reads_cannot_refresh_original_deadline(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);session.put(root/'ui-deadline.json',self.record)
+            with patch.object(session,'process_info',return_value=self.owner):
+                for now in (100,450,999,1001):
+                    with patch.object(control.time,'monotonic',return_value=now):self.assertEqual(control.read_ui_deadline(root),1000)
+    def test_initial_wait_and_enclosing_and_individual_limits_are_preserved(self):
+        import yaml
+        workflow=yaml.safe_load((BASE.parents[1]/'.github/workflows/academy-official.yml').read_text())
+        waits=[step for step in workflow['jobs']['package']['steps'] if 'ui_control.py' in step.get('run','')]
+        self.assertEqual(len(waits),3);self.assertTrue(all(step['timeout-minutes']==5 for step in waits))
+        source=(BASE/'ui_session.py').read_text()
+        self.assertIn('while time.monotonic()<started+30:',source)
+        self.assertIn('owned=Owned(started+2700)',source)
+        self.assertEqual(source.count("put(root/'ui-deadline.json',record)"),1)
+        self.assertIn("put(root/'state.json',budget_record(owner,3600))",source)
+        self.assertIn("2700,root,phase='validate'",(BASE/'run_official.py').read_text())
 
 class WorkflowTest(unittest.TestCase):
     def setUp(self):
@@ -301,7 +380,7 @@ class WorkflowTest(unittest.TestCase):
     def test_original_budgets(self):
         self.assertIn('&& 85 || 30',self.workflow);self.assertIn('timeout-minutes: 65',self.workflow)
         self.assertIn("2700,root,phase='validate'",self.runner)
-        self.assertIn('ui_deadline=started+300',(BASE/'ui_session.py').read_text())
+        self.assertIn('ui_deadline=started+UI_BUDGET_SECONDS',(BASE/'ui_session.py').read_text())
     def test_source_gate_still_exact(self):
         self.assertIn('check_source_ci.py --report',self.workflow)
         self.assertIn("ci.get('sha')==os.environ.get('GITHUB_SHA')",self.runner)

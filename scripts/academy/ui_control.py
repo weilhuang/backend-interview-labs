@@ -6,6 +6,7 @@ from pathlib import Path
 
 EUA_SHA256 = '96530426ef62cd0eca629350c3ab5afb552c518868a0edbbce85ea5e0f713516'
 CONTROL_REF = 'academy-control/eua-ui'
+UI_BUDGET_SECONDS = 900  # One kernel-start-bound total, shared by all three approvals.
 ACTIONS = {1: 'CHECK_EUA', 2: 'CONTINUE_EUA', 3: 'DECLINE_USAGE'}
 FIELDS = {'schema', 'run_id', 'run_attempt', 'stage', 'screenshot_sha256', 'eua_sha256', 'action'}
 
@@ -52,7 +53,7 @@ def validate_control(value, expected):
 
 
 def checked_budget(record,seconds,observed):
-    if seconds not in (300,3600) or set(record)!={'monotonic_deadline','budget_seconds','owner'}:
+    if seconds not in (UI_BUDGET_SECONDS,3600) or set(record)!={'monotonic_deadline','budget_seconds','owner'}:
         raise ValueError('预算记录结构不符')
     if type(record['budget_seconds']) is not int or record['budget_seconds']!=seconds:
         raise ValueError('子阶段预算不得延长')
@@ -72,7 +73,7 @@ def checked_budget(record,seconds,observed):
 def read_ui_deadline(root):
     from ui_session import process_info
     value=strict_json((root/'ui-deadline.json').read_bytes())
-    return checked_budget(value,300,process_info(value['owner']['pid']))
+    return checked_budget(value,UI_BUDGET_SECONDS,process_info(value['owner']['pid']))
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -109,6 +110,8 @@ def receive(root, stage):
     deadline = read_ui_deadline(root)
     output = stage_dir/'control.json'
     if output.exists(): raise ValueError('动作已经提交，不重复执行')
+    print(json.dumps({'event':'UI_APPROVAL_WAIT','stage':stage,'budget_seconds':UI_BUDGET_SECONDS,
+                      'remaining_seconds':max(0,min(UI_BUDGET_SECONDS,int(deadline-time.monotonic())))}),flush=True)
     while time.monotonic() < deadline:
         remaining = deadline-time.monotonic()
         value = fetch_control(os.environ['GITHUB_REPOSITORY'], expected['run_id'], expected['run_attempt'],

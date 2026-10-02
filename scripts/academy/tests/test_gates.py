@@ -434,7 +434,7 @@ class ReleaseBoundaryTests(unittest.TestCase):
         self.assertIn("deadline=read_outer_deadline(root)",source)
         self.assertIn("int(owner['start_time'])/os.sysconf('SC_CLK_TCK')+seconds",control)
         self.assertIn("if record['monotonic_deadline']!=deadline",control)
-        self.assertIn("record=budget_record(ide_meta,300)",source)
+        self.assertIn("record=budget_record(ide_meta,UI_BUDGET_SECONDS)",source)
         self.assertIn("ui_session.py cleanup --root",steps[last+2]['run'])
         for index,step in enumerate(steps):
             if index==first:full+=60;smoke+=8;continue
