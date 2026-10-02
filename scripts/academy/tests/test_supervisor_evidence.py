@@ -278,7 +278,7 @@ class WorkflowEvidenceTests(unittest.TestCase):
         return next(s for s in workflow['jobs']['package']['steps'] if s.get('id')=='evidence')
     def shell_fixture(self,root):
         scripts=root/'scripts/academy';scripts.mkdir(parents=True)
-        for name in ('collect_evidence.py','safe_io.py','thread_diagnostics.py','display_diagnostic.py','project_trust.py','trust_window.py','ui_control.py'):shutil.copyfile(BASE/name,scripts/name)
+        for name in ('collect_evidence.py','safe_io.py','thread_diagnostics.py','display_diagnostic.py','project_trust.py','trust_window.py','ui_control.py','post_trust_diagnostic.py','post_trust_stacks.py'):shutil.copyfile(BASE/name,scripts/name)
         (scripts/'ui_session.py').write_text('raise SystemExit(3)\n')
         temporary=root/'temporary';temporary.mkdir();ui=temporary/'ui';ui.mkdir()
         run=temporary/'academy-run-123-1';(run/'evidence').mkdir(parents=True)

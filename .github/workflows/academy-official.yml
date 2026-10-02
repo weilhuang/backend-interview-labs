@@ -268,6 +268,26 @@ jobs:
             ${{ env.UI_RUN }}/stage-3/review-target.json
             ${{ env.UI_RUN }}/stage-3/display-identity.json
             ${{ env.UI_RUN }}/stage-3/receipt.json
+      - name: 等待并严格投影Trust后的短只读诊断（非课程验收）
+        id: post_trust_diagnostic
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 2
+        run: |
+          python scripts/academy/post_trust_diagnostic.py --root "$UI_RUN" --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 保存Trust后当前画面与有界线程投影（非课程验收）
+        id: post_trust_upload
+        if: always() && steps.post_trust_diagnostic.outputs.collected == 'true' && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-ui-post-trust-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/post-trust-artifact/post-trust-diagnostic.json
+            ${{ env.UI_RUN }}/post-trust-artifact/post-trust-diagnostic.png
+            ${{ env.UI_RUN }}/post-trust-artifact/post-trust-images.json
       - name: 等待同一官方进程完成全部原生门禁（原60分钟总界限不变）
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
         timeout-minutes: 60

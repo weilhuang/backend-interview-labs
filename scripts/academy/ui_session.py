@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """同一 runner 的有限 UI 检查点；独立图像，不导出 profile 或秘密。"""
 from __future__ import annotations
-import argparse, hashlib, json, os, select, signal, stat, subprocess, sys, time, zipfile, re, shutil
+import argparse, hashlib, json, os, select, signal, stat, subprocess, sys, time, zipfile, re, shutil, math
 from pathlib import Path
 from safe_io import replace_regular
 from go_environment import validated_go_environment
 from display_diagnostic import capture as capture_display_diagnostic
 from project_trust import checkpoint as trust_checkpoint, context as trust_context, ACTION as TRUST_ACTION
+from post_trust_diagnostic import Observer as PostTrustObserver
 from ui_control import ACTIONS, EUA_SHA256, FIELDS, UI_BUDGET_SECONDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
 
 
@@ -396,6 +397,14 @@ def optional_display_diagnostic(root,proc,screen,identity,ui_deadline):
     except InterruptedError:raise  # Preserve the existing cancellation handler/cleanup path.
     except Exception:return None  # Optional I/O cannot grant acceptance or extend execution.
 
+def snapshot_timeout(ui_deadline,diagnostic_deadline=None):
+    if diagnostic_deadline is None:return min(15,max(.1,ui_deadline-time.monotonic()))
+    if type(diagnostic_deadline) not in (int,float) or not math.isfinite(diagnostic_deadline) or diagnostic_deadline>ui_deadline:
+        raise ValueError('诊断不能延长原UI截止')
+    remaining=diagnostic_deadline-time.monotonic()
+    if remaining<=0:raise TimeoutError('本次只读截图诊断截止已到')
+    return min(15,remaining)
+
 
 def display_session(root,idea,command):
     """由原 capture 在自有 xvfb-run 内调用；原2700秒包含全部UI等待。"""
@@ -406,7 +415,8 @@ def display_session(root,idea,command):
         if hashlib.sha256(jar.read(info)).hexdigest()!=EUA_SHA256:raise ValueError('内置协议不符')
     helper=Path(__file__).with_name('probes')/'AgreementUi.java'
     java=str(idea/'jbr/bin/java')
-    def screen(action,destination,expected=None,receipt=None):
+    def screen(action,destination,expected=None,receipt=None,diagnostic_deadline=None):
+        if diagnostic_deadline is not None and action!='SNAPSHOT':raise ValueError('诊断仅允许只读截图')
         identity.verify()
         args=[java,'-Xmx96m','-XX:ActiveProcessorCount=1',f'-Duser.home={os.environ["HOME"]}',str(helper),action,str(destination)]
         if expected is not None:args.extend([expected,str(receipt)])
@@ -414,7 +424,7 @@ def display_session(root,idea,command):
             args.extend([sys.executable,str(Path(__file__).with_name('project_trust.py')),
                          str(root/'stage-4/window-identity.json'),str(root)])
         args.append(str(identity.binding))
-        subprocess.run(args,check=True,timeout=min(15,max(.1,ui_deadline-time.monotonic())),env=clean_env(),
+        subprocess.run(args,check=True,timeout=snapshot_timeout(ui_deadline,diagnostic_deadline),env=clean_env(),
                        pass_fds=tuple(fd for _,fd in identity.handles.values()))
         identity.verify()
     started=time.monotonic();ui_deadline=started+UI_BUDGET_SECONDS
@@ -452,14 +462,17 @@ def display_session(root,idea,command):
             put(stage_dir/'receipt.json',{**expected,'after_sha256':hashlib.sha256((stage_dir/'after.png').read_bytes()).hexdigest(),
                                          'status':'UI_ACTION_PERFORMED_NOT_ACCEPTANCE'})
         put(root/'ui-complete.json',{'status':'NORMAL_UI_COMPLETED_NOT_COURSE_ACCEPTANCE'})
-        diagnostic_due=time.monotonic()+30;diagnostic_done=False
+        diagnostic_due=time.monotonic()+30;diagnostic_done=False;post_trust_observer=None
         while proc.poll() is None:
             owned.scan()
             if not diagnostic_done and time.monotonic()>=diagnostic_due:
                 diagnostic_done=True
                 optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
                 trust_checkpoint(root,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())
+                post_trust_observer=PostTrustObserver(root,identity,ui_deadline)
+            if post_trust_observer is not None:post_trust_observer.tick(proc,screen,identity)
             time.sleep(.25)
+        if post_trust_observer is not None:post_trust_observer.tick(proc,screen,identity)
         if not diagnostic_done:
             optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
         return proc.returncode
