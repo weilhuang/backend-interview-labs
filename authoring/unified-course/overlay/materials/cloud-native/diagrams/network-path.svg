@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 310" role="img" aria-labelledby="title desc">
+<title id="title">一笔请求的三段地址</title>
+<desc id="desc">localhost指当前网络空间；服务发现使用名字，不固定容器IP</desc>
+<rect width="1060" height="310" fill="#f7f5ed"/>
+<style>text{font-family:system-ui,sans-serif;fill:#20382c}.title{font-size:28px;font-weight:700}.box{font-size:22px;font-weight:600}.sub{font-size:16px}</style>
+<text class="title" x="40" y="50">一笔请求的三段地址</text>
+<rect x="40" y="94" width="300" height="110" rx="14" fill="#fff" stroke="#79a18c" stroke-width="2"/>
+<text class="box" x="58" y="132">宿主浏览器</text>
+<text class="sub" x="58" y="171">127.0.0.1:18085</text>
+<path d="M346 149h24m-9-8 9 8-9 8" fill="none" stroke="#3d7059" stroke-width="3"/>
+<rect x="380" y="94" width="300" height="110" rx="14" fill="#fff" stroke="#79a18c" stroke-width="2"/>
+<text class="box" x="398" y="132">API容器</text>
+<text class="sub" x="398" y="171">监听8080；发起Redis连接</text>
+<path d="M686 149h24m-9-8 9 8-9 8" fill="none" stroke="#3d7059" stroke-width="3"/>
+<rect x="720" y="94" width="300" height="110" rx="14" fill="#fff" stroke="#79a18c" stroke-width="2"/>
+<text class="box" x="738" y="132">Redis容器</text>
+<text class="sub" x="738" y="171">redis:6379；不发布宿主端口</text>
+<text class="sub" x="40" y="263">localhost指当前网络空间；服务发现使用名字，不固定容器IP</text>
+</svg>

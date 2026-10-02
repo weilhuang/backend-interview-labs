@@ -1,0 +1,20 @@
+// 统一课程适配：真实 Go 合同每次执行；缓存仅由准备步骤提供。
+def goExecutable = providers.gradleProperty('goExecutable').orElse(providers.environmentVariable('GO_EXECUTABLE')).getOrElse('')
+def goModuleCache = providers.gradleProperty('goModuleCache').orElse(providers.environmentVariable('GO_MODULE_CACHE')).getOrElse('')
+tasks.withType(Test).configureEach {
+    inputs.files(fileTree('go') { include '**/*.go', 'go.mod', 'go.sum' })
+    inputs.files(fileTree('src') { include '**/*.java' }, fileTree('test') { include '**/*.java' })
+    inputs.file(rootProject.file('materials/go-http/course.gradle'))
+    inputs.file(project.file('build.gradle.fragment'))
+    inputs.property('requiredGoVersion', '1.27.1')
+    inputs.property('goExecutable', goExecutable)
+    inputs.property('goModuleCache', goModuleCache)
+    if (goExecutable) inputs.file(file(goExecutable)).optional()
+    systemProperty 'go.project', project.file('go').absolutePath
+    systemProperty 'go.work', layout.buildDirectory.dir('go-check').get().asFile.absolutePath
+    if (goExecutable) systemProperty 'go.executable', file(goExecutable).absolutePath
+    if (goModuleCache) systemProperty 'go.moduleCache', goModuleCache
+    outputs.upToDateWhen { false }
+    outputs.doNotCacheIf('Go外部合同必须每次执行；不能复用旧绿灯') { true }
+    timeout = java.time.Duration.ofSeconds(120)
+}

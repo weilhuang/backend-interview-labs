@@ -177,6 +177,20 @@ public class Lab {
     }
   }
 
+  // 仅供loopback演示启动器关联本地实例，不是生产鉴权凭据。
+  // 普通IDE/测试运行未设置token时不添加标记；请求不需要携带token。
+  @Bean
+  jakarta.servlet.Filter labInstanceHeader() {
+    String token = System.getProperty("framework.lab.token", "");
+    return (request, response, chain) -> {
+      if (token.matches("[0-9a-f]{32}")) {
+        ((jakarta.servlet.http.HttpServletResponse) response)
+            .setHeader("X-Framework-Lab-Instance", token);
+      }
+      chain.doFilter(request, response);
+    };
+  }
+
   public static void main(String[] args) {
     SpringApplication app = new SpringApplication(Lab.class);
     app.setDefaultProperties(Map.of("server.address", "127.0.0.1", "server.port", "18084"));

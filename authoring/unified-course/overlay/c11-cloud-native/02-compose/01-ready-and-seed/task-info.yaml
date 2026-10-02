@@ -1,0 +1,21 @@
+type: edu
+custom_name: C11-02 · Compose就绪与幂等初始化
+files:
+- name: CloudPolicy.java
+  visible: true
+  placeholders:
+  - offset: 217
+    length: 48
+    placeholder_text: return true;
+- name: solution.md
+  visible: true
+- name: observations.md
+  visible: true
+- name: visible-test-contract.md
+  visible: true
+- name: answers/CloudPolicy.explicit.java.txt
+  visible: true
+- name: answers/CloudPolicy.expression.java.txt
+  visible: true
+- name: test/LabCheckTest.java
+  visible: true

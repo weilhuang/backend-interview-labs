@@ -1,0 +1,8 @@
+package labs;
+public final class CloudPolicy {
+    public static boolean ready(boolean dependencyHealthy, boolean seeded, boolean draining) {
+        if (draining) return false;
+        if (!dependencyHealthy) return false;
+        return seeded;
+    }
+}

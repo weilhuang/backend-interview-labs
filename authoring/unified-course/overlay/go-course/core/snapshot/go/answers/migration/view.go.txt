@@ -1,0 +1,23 @@
+package shipping
+
+import ownership "academy.example/go-ownership"
+
+// Line 只含发货真正需要的不可变值；没有标签或元数据的可变共享路径。
+type Line struct {
+	OrderID string
+	SKU string
+	Quantity int
+}
+
+// View 按订单和明细顺序摊平，不含明细的订单不产生发货行。
+// nil输入返回nil；其他输入即使没有发货行，也返回非nil空切片。
+func View(src []ownership.Order) []Line {
+	if src == nil { return nil }
+	dst := make([]Line, 0)
+	for _, order := range src {
+		for _, item := range order.Lines {
+			dst = append(dst, Line{OrderID:order.ID,SKU:item.SKU,Quantity:item.Quantity})
+		}
+	}
+	return dst
+}

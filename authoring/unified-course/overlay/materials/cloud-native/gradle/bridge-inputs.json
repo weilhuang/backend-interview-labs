@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "shared_main_files": ["AddressPolicy.java", "CloudNativeApp.java", "CloudPolicy.java", "Inventory.java", "RedisClient.java", "RedisDiagnostic.java"],
+  "tasks": [
+    {
+      "task_id": "C11-01",
+      "gradle_project": ":c11-cloud-native-01-images-01-build-and-stop",
+      "task_path": "c11-cloud-native/01-images/01-build-and-stop",
+      "learner_java": null,
+      "check_scope": "Dockerfile source structure only; Docker runtime NOT_RUN"
+    },
+    {
+      "task_id": "C11-02",
+      "gradle_project": ":c11-cloud-native-02-compose-01-ready-and-seed",
+      "task_path": "c11-cloud-native/02-compose/01-ready-and-seed",
+      "learner_java": "CloudPolicy.java",
+      "check_scope": "Shared PolicyContractTest with learner readiness policy; Redis/HTTP/Docker NOT_RUN"
+    },
+    {
+      "task_id": "C11-03",
+      "gradle_project": ":c11-cloud-native-03-network-01-service-discovery",
+      "task_path": "c11-cloud-native/03-network/01-service-discovery",
+      "learner_java": "AddressPolicy.java",
+      "check_scope": "Shared PolicyContractTest with learner address policy; real DNS/TCP/Docker NOT_RUN"
+    }
+  ]
+}

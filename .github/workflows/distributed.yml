@@ -15,22 +15,22 @@ jobs:
       run:
         working-directory: courses/distributed-systems
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: '21'
       - name: 缓存依赖下载（不缓存测试结果或构建输出）
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
             ~/.gradle/caches/modules-2
             ~/.gradle/wrapper
           key: ${{ runner.os }}-jdk21-deps-v1-distributed-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-jdk21-deps-v1-distributed-${{ github.job }}-
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - name: 核实工具链与Docker守护进程
@@ -97,23 +97,23 @@ jobs:
               require(len(rows) == len(identities) and {row[key] for row in rows} == identities
                       and all(row['status'] == 'PASS' for row in rows), 'Incomplete or failed ' + section)
           PY
-      - name: 保存完整测试与负例证据
+      - name: 收集有界脱敏CI证据
+        id: collect_evidence
+        env:
+          EVIDENCE_JOB_STATUS: ${{ job.status }}
         if: always()
-        uses: actions/upload-artifact@v4
+        timeout-minutes: 1
+        working-directory: ${{ github.workspace }}
+        run: |
+          python scripts/ci/collect_evidence.py --repo "$GITHUB_WORKSPACE" \
+            --job-status "$EVIDENCE_JOB_STATUS" \
+            --profile "distributed" \
+            --output "$RUNNER_TEMP/ci-evidence-distributed-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      - name: 保存完整测试与负例证据
+        if: always() && steps.collect_evidence.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: 分布式课程验证报告-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            build/quality/distributed-region-audit.json
-            build/quality/distributed-region-audit/**/source-manifest.json
-            build/quality/distributed-region-audit/**/*.log
-            build/quality/distributed-region-audit/**/build/test-results/
-            build/quality/distributed-systems-roundtrip.json
-            build/quality/distributed-systems-roundtrip/**/source-manifest.json
-            build/quality/distributed-systems-roundtrip/**/*.log
-            build/quality/distributed-systems-roundtrip/**/build/test-results/
-            courses/distributed-systems/**/build/reports/tests/
-            courses/distributed-systems/**/build/test-results/
-            courses/distributed-systems/build/variants/
-            courses/distributed-systems/authoring/*report.json
+          path: ${{ runner.temp }}/ci-evidence-distributed-${{ github.run_id }}-${{ github.run_attempt }}/
           retention-days: 7
           if-no-files-found: error

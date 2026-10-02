@@ -1,0 +1,8 @@
+*
+!src/
+!src/**
+!web/
+!web/**
+!container/
+!container/Dockerfile
+!container/entrypoint.sh

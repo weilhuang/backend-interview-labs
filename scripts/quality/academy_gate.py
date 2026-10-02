@@ -356,7 +356,8 @@ def inspect_todo_chain(evidence, file, task_path):
 def inspect_junit_failures(root, file, task_path=""):
     """Require actual test failures; dependency/runner/container errors fail closed."""
     attributed = 0
-    blocked = ('NoClassDefFoundError', 'ClassNotFoundException', 'UnsupportedClassVersionError',
+    blocked = ('labs.support.RedisLab$FixtureReadinessException',
+               'NoClassDefFoundError', 'ClassNotFoundException', 'UnsupportedClassVersionError',
                'ContainerLaunchException', 'Could not find a valid Docker environment',
                'DockerClientProviderStrategy', 'TestEngine with ID', 'Gradle Test Executor',
                'OutOfMemoryError', 'unable to create native thread', 'java.net.BindException', 'PortInUseException')

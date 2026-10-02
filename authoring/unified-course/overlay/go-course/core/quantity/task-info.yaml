@@ -1,0 +1,48 @@
+type: edu
+custom_name: 变量控制流与可靠输入
+files:
+- name: go/exercise.go
+  visible: true
+  placeholders:
+  - offset: 334
+    length: 276
+    placeholder_text: "\treturn 0, nil\n"
+- name: build.gradle.fragment
+  visible: true
+- name: go/answers/manual.go.txt
+  visible: true
+- name: go/answers/stdlib.go.txt
+  visible: true
+- name: go/cmd/quantity/main.go
+  visible: true
+- name: go/cmd/quantity/main_process_test.go
+  visible: true
+- name: go/cmd/quantity/main_test.go
+  visible: true
+- name: go/contract_test.go
+  visible: true
+- name: go/diagrams/flow.dot
+  visible: true
+- name: go/diagrams/flow.png
+  visible: true
+  is_binary: true
+- name: go/diagrams/flow.svg
+  visible: true
+- name: go/go.mod
+  visible: true
+- name: go/wrong-solutions/accept-plus.go.txt
+  visible: true
+- name: go/wrong-solutions/empty-is-one.go.txt
+  visible: true
+- name: go/wrong-solutions/ignore-error.go.txt
+  visible: true
+- name: go/wrong-solutions/overflow-zero.go.txt
+  visible: true
+- name: src/GoTestBridge.java
+  visible: true
+- name: test/GoContractTest.java
+  visible: true
+- name: test/GoTestBridgeTest.java
+  visible: true
+- name: go/源码定位.md
+  visible: true

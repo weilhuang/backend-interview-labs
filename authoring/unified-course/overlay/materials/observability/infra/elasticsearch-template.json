@@ -1,0 +1,11 @@
+{
+ "index_patterns":["course-observability-fixture"],
+ "template":{
+  "settings":{"number_of_shards":1,"number_of_replicas":0},
+  "mappings":{"dynamic":"strict","properties":{
+   "@timestamp":{"type":"date"},"event_id":{"type":"keyword"},"event":{"type":"keyword"},
+   "service":{"type":"keyword"},"route":{"type":"keyword"},"status":{"type":"integer"},
+   "trace_id":{"type":"keyword"},"span_id":{"type":"keyword"},"duration_ms":{"type":"double"}
+  }}
+ }
+}

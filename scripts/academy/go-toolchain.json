@@ -1,0 +1,7 @@
+{
+  "version": "1.27.1",
+  "url": "https://go.dev/dl/go1.27.1.linux-amd64.tar.gz",
+  "sha256": "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445",
+  "size_bytes": 70553950,
+  "platform": "linux/amd64"
+}

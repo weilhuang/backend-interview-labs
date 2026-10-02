@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "jdk": "/workspace/shared/toolchains/jdk-21",
+  "jdk": "JDK21",
   "compiler": "--release 21 -parameters",
   "cases": [
     {
@@ -221,5 +221,6 @@
       "status": "rejected"
     }
   ],
-  "note": "只验证本课程公开测试的已知负例，不能证明不存在其他缺陷"
+  "note": "只验证本课程公开测试的已知负例，不能证明不存在其他缺陷",
+  "evidence_scope": "Historical standalone authoring results; not acceptance of the current unified source"
 }

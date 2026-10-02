@@ -1,0 +1,21 @@
+// Owner merges into materials/observability/course.gradle; no nested course or duplicate version truth.
+// Each native task maps to :observability-first-slice-{safe-events|metrics|trace-context}.
+// Dependencies resolve using root springBootVersion, frozen at 3.5.16 in the unified ledger.
+dependencies {
+ implementation platform("org.springframework.boot:spring-boot-dependencies:${rootProject.property('springBootVersion')}")
+ implementation 'org.springframework.boot:spring-boot-starter-web'
+ implementation 'io.opentelemetry:opentelemetry-api'
+ implementation 'io.opentelemetry:opentelemetry-sdk'
+ implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+ testImplementation 'org.springframework.boot:spring-boot-starter-test'
+ testImplementation 'io.opentelemetry:opentelemetry-sdk-testing'
+ testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+sourceSets.main.resources.srcDir(rootProject.file('materials/observability/resources'))
+tasks.register('usage', JavaExec) {
+ classpath=sourceSets.main.runtimeClasspath; mainClass='labs.observability.Usage'
+}
+tasks.register('run', JavaExec) {
+ classpath=sourceSets.main.runtimeClasspath; mainClass='labs.observability.ObservabilityApplication'
+ args((project.findProperty('appArgs') ?: '').split(' ').findAll { it })
+}

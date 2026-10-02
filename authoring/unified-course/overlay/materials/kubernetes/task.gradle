@@ -1,0 +1,44 @@
+// 适配片段，供唯一总课程生成器引入每个C11-04..06 task project。
+// 未接入、未跑Gradle、未生成strict locks，不能声称Academy原生Check通过。
+plugins.apply('java')
+java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+repositories { mavenCentral() }
+dependencies { testImplementation platform('org.junit:junit-bom:5.11.4'); testImplementation 'org.junit.jupiter:junit-jupiter'; testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4' }
+def materialDir = providers.provider { rootProject.file('materials/kubernetes') }
+def pythonBin = providers.gradleProperty('coursePython').orElse('python3')
+def generated = layout.buildDirectory.dir('generated-kubernetes-src')
+def expectedOverlay = project.name.contains('-04-') ? 'ProbePolicy.java' : project.name.contains('-05-') ? 'AppConfig.java' : null
+if (expectedOverlay != null && !file(expectedOverlay).isFile()) throw new GradleException('Missing learner Kubernetes source; reference fallback is forbidden')
+def syncShared = tasks.register('prepareKubernetesSources', Sync) {
+    from(materialDir.map { new File(it, 'src') }) {
+        if (expectedOverlay != null) exclude('labs/' + expectedOverlay)
+    }
+    if (expectedOverlay != null) from(file(expectedOverlay)) { into('labs') }
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+    into(generated)
+    doFirst {
+        if (expectedOverlay != null && !file(expectedOverlay).isFile()) throw new GradleException('Missing learner source; INVALID_ENV')
+    }
+}
+sourceSets {
+    main { java { setSrcDirs([generated]); } }
+    test { java { setSrcDirs([file('test'),materialDir.map { new File(it,'test-java') }]); } }
+}
+tasks.named('compileJava') { dependsOn(syncShared); options.release = 21 }
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    inputs.files(fileTree(project.projectDir) { include '*.yaml', '*.yml' })
+    inputs.files(fileTree(rootProject.file('materials/kubernetes/tests')) { include '**/*.py' })
+    inputs.property('course.python', pythonBin)
+    outputs.upToDateWhen { false }
+    outputs.cacheIf { false }
+    workingDir = project.projectDir
+    systemProperty('course.taskDir',project.projectDir.absolutePath)
+    systemProperty('course.materialsDir',materialDir.get().absolutePath)
+    systemProperty('course.python',pythonBin.get())
+    maxParallelForks = 1
+    maxHeapSize = '192m'
+}
+dependencyLocking { lockAllConfigurations(); lockMode = LockMode.STRICT }
+// 作者在总根显式运行 --write-locks 并审计每module锁后才可启用完整Check。
+// 总根rootTest必须dependsOn这三个task的test；不得用onlyIf/ignoreFailures屏蔽失败。

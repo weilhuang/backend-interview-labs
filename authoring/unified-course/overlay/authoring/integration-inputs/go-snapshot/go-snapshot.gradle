@@ -1,0 +1,32 @@
+// 接入提案：尚未进行本候选的Java/Gradle/Academy运行验收。
+def module = rootProject.findProject(':go-course-core-snapshot')
+if (module == null || module.projectDir.canonicalFile != rootProject.file('go-course/core/snapshot').canonicalFile)
+    throw new GradleException('Go snapshot 项目映射不符合合同')
+configure(module) {
+    apply plugin: 'java'
+    repositories { mavenCentral() }
+    java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+    sourceSets {
+        main { java.setSrcDirs(['src']); resources.setSrcDirs([]) }
+        test { java.setSrcDirs(['test']); resources.setSrcDirs([]) }
+    }
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.11.4')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+    }
+    dependencyLocking { lockAllConfigurations() }
+    tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+        maxParallelForks = 1
+        maxHeapSize = '256m'
+        jvmArgs '-XX:ActiveProcessorCount=2'
+        outputs.upToDateWhen { false }
+        afterSuite { descriptor, result ->
+            if (descriptor.parent == null && (result.testCount != 6 || result.skippedTestCount != 0))
+                throw new GradleException('NOT_RUN: snapshot必须完整执行6项JUnit，且不得跳过')
+        }
+    }
+    apply from: project.file('build.gradle.fragment')
+}

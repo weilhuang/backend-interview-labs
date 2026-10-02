@@ -11,6 +11,30 @@ from plan import SUITES, REAL_JOBS
 
 ROOT = Path(__file__).resolve().parents[3]
 
+# Resolved against the official actions repositories; comments in YAML retain major versions.
+ACTION_REFS = {
+    'checkout': 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262',
+    'setup-python': 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065',
+    'setup-java': 'actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3',
+    'setup-node': 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020',
+    'cache': 'actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830',
+    'upload-artifact': 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02',
+    'download-artifact': 'actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093',
+}
+LEGACY_PROFILES = {
+    'ci': {'plan': 'ci-plan', 'static': 'ci-static', 'result': 'ci-result'},
+    'java-pilot': {'check': 'java-pilot'},
+    'java-foundations': {'check': 'java-foundations'},
+    'java-advanced': {'check': '${{ matrix.course }}'},
+    'java-frameworks': {'verify': 'java-frameworks-backend', 'ui': 'java-frameworks-ui'},
+    'data-storage': {'mysql': 'mysql', 'redis': 'redis'},
+    'messaging': {'verify': 'messaging'},
+    'distributed': {'verify': 'distributed'},
+    'backend-capstone': {'verify': 'backend-capstone'},
+    'lab-environment': {'real-lab': 'lab-environment'},
+}
+COLLECTOR_SUCCESS = "always() && steps.collect_evidence.outcome == 'success'"
+
 
 class WorkflowContractTests(unittest.TestCase):
     def workflow(self, name):
@@ -53,10 +77,10 @@ class WorkflowContractTests(unittest.TestCase):
                     names.append(job['name'])
                 for step in job['steps']:
                     self.assertNotIn('continue-on-error',step)
-                    if step.get('uses')=='actions/checkout@v4':
+                    if step.get('uses')==ACTION_REFS['checkout']:
                         self.assertEqual(step['with']['persist-credentials'],'false')
-                    if step.get('uses')=='actions/upload-artifact@v4':
-                        self.assertEqual(step['if'],'always()')
+                    if step.get('uses')==ACTION_REFS['upload-artifact']:
+                        self.assertEqual(step['if'],COLLECTOR_SUCCESS)
                         self.assertEqual(step['with']['retention-days'],'7')
                         self.assertIn('github.run_id',step['with']['name'])
                         self.assertIn('github.run_attempt',step['with']['name'])
@@ -67,7 +91,7 @@ class WorkflowContractTests(unittest.TestCase):
         for suite in SUITES:
             for job in self.workflow(suite)['jobs'].values():
                 for step in job['steps']:
-                    if step.get('uses')=='actions/cache@v4':
+                    if step.get('uses')==ACTION_REFS['cache']:
                         paths=step['with']['path'].splitlines()
                         self.assertTrue(all(p.endswith('/caches/modules-2') or p.endswith('/wrapper') for p in paths))
                         self.assertIn('gradle-wrapper.properties',step['with']['key'])
@@ -119,21 +143,78 @@ class WorkflowContractTests(unittest.TestCase):
                 self.assertGreaterEqual(int(job['timeout-minutes'])*60,seconds+35*60+extra+120)
                 self.assertLessEqual(int(job['timeout-minutes']),60)
 
-    def test_three_phase_evidence_is_always_preserved_without_entire_fixture(self):
-        for suite in SUITES:
-            for job in self.workflow(suite)['jobs'].values():
-                if not any('academy_gate.py roundtrip' in step.get('run','') for step in job['steps']):
-                    continue
-                uploads=[step for step in job['steps'] if step.get('uses')=='actions/upload-artifact@v4']
-                self.assertEqual(len(uploads),1)
-                artifact=uploads[0]
-                self.assertEqual(artifact['if'],'always()')
-                paths=artifact['with']['path']
-                self.assertIn('-roundtrip.json',paths)
-                self.assertIn('source-manifest.json',paths)
-                self.assertIn('**/*.log',paths)
-                self.assertIn('**/build/test-results/',paths)
-                self.assertNotIn('source-fixture.zip',paths)
+    def test_all_external_actions_are_official_pins_and_runners_read_only(self):
+        for path in sorted((ROOT / '.github/workflows').glob('*.yml')):
+            with self.subTest(workflow=path.name):
+                workflow = self.workflow(path.stem)
+                self.assertNotIn('pull_request_target', workflow['on'])
+                self.assertNotIn('secrets', workflow)
+                self.assertTrue(all(value == 'read' for value in workflow['permissions'].values()))
+                for job in workflow['jobs'].values():
+                    self.assertNotIn('secrets', job)
+                    if 'uses' in job:
+                        self.assertTrue(job['uses'].startswith('./.github/workflows/'))
+                        continue
+                    self.assertEqual(job['runs-on'], 'ubuntu-24.04')
+                    self.assertNotIn('continue-on-error', job)
+                    self.assertTrue(all(value == 'read' for value in job.get('permissions', {}).values()))
+                    for step in job['steps']:
+                        self.assertNotIn('continue-on-error', step)
+                        if 'uses' not in step:
+                            continue
+                        self.assertIn(step['uses'], ACTION_REFS.values())
+                        if step['uses'] == ACTION_REFS['checkout']:
+                            self.assertEqual(step['with']['persist-credentials'], 'false')
+
+    def test_legacy_uploads_only_use_their_successful_bounded_collector(self):
+        for suite, profiles in LEGACY_PROFILES.items():
+            for key, profile in profiles.items():
+                with self.subTest(workflow=suite, job=key):
+                    steps = self.workflow(suite)['jobs'][key]['steps']
+                    collectors = [(i, step) for i, step in enumerate(steps)
+                                  if step.get('id') == 'collect_evidence']
+                    uploads = [(i, step) for i, step in enumerate(steps)
+                               if step.get('uses') == ACTION_REFS['upload-artifact']]
+                    self.assertEqual(len(collectors), 1)
+                    self.assertEqual(len(uploads), 1)
+                    collector_index, collector = collectors[0]
+                    upload_index, upload = uploads[0]
+                    self.assertEqual(collector_index + 1, upload_index)
+                    is_plan = suite == 'ci' and key == 'plan'
+                    self.assertEqual(collector.get('if', 'success()'), 'success()' if is_plan else 'always()')
+                    expected_if = "success() && steps.collect_evidence.outcome == 'success'" if is_plan else COLLECTOR_SUCCESS
+                    self.assertEqual(upload['if'], expected_if)
+                    self.assertEqual(collector['working-directory'], '${{ github.workspace }}')
+                    self.assertEqual(collector['timeout-minutes'], '1')
+                    self.assertEqual(collector['env']['EVIDENCE_JOB_STATUS'], '${{ job.status }}')
+                    command = collector['run']
+                    self.assertIn('python scripts/ci/collect_evidence.py --repo "$GITHUB_WORKSPACE"', command)
+                    self.assertIn('--profile "' + profile + '"', command)
+                    self.assertIn('--job-status "$EVIDENCE_JOB_STATUS"', command)
+                    self.assertIn('--output "$RUNNER_TEMP/ci-evidence-' + profile + '-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"', command)
+                    self.assertNotIn('||', command)
+                    self.assertNotIn('continue-on-error', collector)
+                    self.assertEqual(upload['with']['path'], '${{ runner.temp }}/ci-evidence-' + profile + '-${{ github.run_id }}-${{ github.run_attempt }}/')
+                    self.assertEqual(upload['with']['retention-days'], '7')
+                    self.assertEqual(upload['with']['if-no-files-found'], 'error')
+                    self.assertNotIn('include-hidden-files', upload['with'])
+        matrix = self.workflow('java-advanced')['jobs']['check']['strategy']['matrix']['course']
+        self.assertEqual(matrix, ['java-concurrency', 'java-jvm'])
+
+    def test_native_ui_initial_uploads_use_exact_generated_filenames(self):
+        steps = self.workflow('academy-official')['jobs']['package']['steps']
+        for stage in (1, 2, 3):
+            upload = next(step for step in steps
+                          if step.get('with', {}).get('name', '').startswith(f'academy-ui-stage-{stage}-'))
+            prefix = '${{ env.UI_RUN }}/stage-' + str(stage) + '/'
+            self.assertEqual(upload['with']['path'].splitlines(),
+                             [prefix + name for name in ('before.png', 'request.json', 'review-target.json', 'display-identity.json')])
+            self.assertEqual(upload['with']['retention-days'], '1')
+        receipts = next(step for step in steps
+                        if step.get('with', {}).get('name', '').startswith('academy-ui-receipts-'))
+        self.assertEqual(receipts['with']['path'].splitlines(),
+                         ['${{ env.UI_RUN }}/stage-'+str(stage)+'/'+name for stage in (1,2,3)
+                          for name in ('before.png','after.png','request.json','review-target.json','display-identity.json','receipt.json')])
 
     def test_distributed_region_gate_executes_and_retains_real_evidence(self):
         job = self.workflow('distributed')['jobs']['verify']
@@ -151,14 +232,12 @@ class WorkflowContractTests(unittest.TestCase):
         for token in ('--execute', '--xa-commit-controls', '--timeout 300', '--total-timeout 900'):
             self.assertIn(token, gate['run'])
         self.assertNotIn('continue-on-error', gate)
-        artifact = next(step for step in steps if step.get('uses') == 'actions/upload-artifact@v4')
-        self.assertEqual(artifact['if'], 'always()')
-        for path in ('build/quality/distributed-region-audit.json',
-                     'build/quality/distributed-region-audit/**/source-manifest.json',
-                     'build/quality/distributed-region-audit/**/*.log',
-                     'build/quality/distributed-region-audit/**/build/test-results/'):
-            self.assertIn(path, artifact['with']['path'].splitlines())
-        self.assertNotIn('build/quality/distributed-region-audit/', artifact['with']['path'].splitlines())
+        artifact = next(step for step in steps if step.get('uses') == ACTION_REFS['upload-artifact'])
+        self.assertEqual(artifact['if'], COLLECTOR_SUCCESS)
+        self.assertEqual(artifact['with']['path'], '${{ runner.temp }}/ci-evidence-distributed-${{ github.run_id }}-${{ github.run_attempt }}/')
+        collector = next(step for step in steps if step.get('id') == 'collect_evidence')
+        self.assertIn('--profile "distributed"', collector['run'])
+        self.assertNotIn('build/quality/distributed-region-audit/', artifact['with']['path'])
 
     def test_distributed_runtime_assertion_rejects_preparation_partial_and_wrong_scope(self):
         step = next(step for step in self.workflow('distributed')['jobs']['verify']['steps']
@@ -201,15 +280,68 @@ class WorkflowContractTests(unittest.TestCase):
             self.assertFalse(accepted(bad))
             self.assertFalse(accepted({'status': 'PASS'}))
 
+    def test_lab_discovery_installs_pinned_generator_dependencies_first(self):
+        steps = self.workflow('lab-environment')['jobs']['real-lab']['steps']
+        install = next(i for i, step in enumerate(steps)
+                       if step.get('run') == 'python3 -m pip install -r scripts/quality/requirements.txt')
+        discovery = next(i for i, step in enumerate(steps)
+                         if 'python3 -m unittest discover -s scripts/tests -v' in step.get('run', ''))
+        self.assertLess(install, discovery)
+        self.assertNotIn('if', steps[install])
+        self.assertNotIn('continue-on-error', steps[install])
+        self.assertEqual((ROOT / 'scripts/quality/requirements.txt').read_text().strip(), 'PyYAML==6.0.2')
+
     def test_static_checks_have_jdk_and_do_not_run_docker(self):
         steps=self.workflow('ci')['jobs']['static']['steps']
-        self.assertTrue(any(s.get('uses')=='actions/setup-java@v4' and s['with']['java-version']=='21' for s in steps))
+        self.assertTrue(any(s.get('uses')==ACTION_REFS['setup-java'] and s['with']['java-version']=='21' for s in steps))
         commands='\n'.join(s.get('run','') for s in steps)
         self.assertNotIn('docker run',commands)
         self.assertIn('academy_gate.py metadata',commands)
         self.assertIn('academy_gate.py legacy-metadata',commands)
         self.assertIn('plan.py --check-inventory',commands)
         self.assertIn('validate_docs.py',commands)
+
+    def test_font_setup_has_bounded_network_retries_and_unchanged_budgets(self):
+        targets = [
+            ('java-frameworks', 'ui', '安装发行版中文字体以核验中文排版', '3', '12'),
+            ('backend-capstone', 'verify', '工具链与中文字体', '5', '50'),
+            ('academy-official', 'environment', '浏览器中文字体和标准runner资源检查', '3', '65'),
+        ]
+        for suite, key, title, step_budget, job_budget in targets:
+            with self.subTest(workflow=suite, job=key):
+                job = self.workflow(suite)['jobs'][key]
+                steps = [step for step in job['steps'] if step.get('name') == title]
+                self.assertEqual(len(steps), 1)
+                step = steps[0]
+                self.assertEqual(job['runs-on'], 'ubuntu-24.04')
+                self.assertEqual(job['timeout-minutes'], job_budget)
+                self.assertEqual(step['timeout-minutes'], step_budget)
+                self.assertNotIn('continue-on-error', step)
+                run = step['run']
+                self.assertIn('set -euo pipefail', run)
+                self.assertIn('apt_network=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)', run)
+                self.assertIn('sudo apt-get "${apt_network[@]}" update --error-on=any', run)
+                self.assertIn('sudo apt-get "${apt_network[@]}" install -y fonts-noto-cjk', run)
+                self.assertEqual(run.count('sudo apt-get'), 2)
+                self.assertIn("echo 'APT 更新索引：连接/数据超时 20 秒；每个失败文件最多重试 2 次'", run)
+                self.assertIn("echo 'APT 安装 fonts-noto-cjk：沿用相同网络限制和原步骤总时限'", run)
+                for forbidden in ('-qq', '|| true', '--ignore-missing', '--allow-unauthenticated', 'AllowInsecure', 'Verify-Peer', 'sources.list', 'apt.conf.d'):
+                    self.assertNotIn(forbidden, run)
+        environment = self.workflow('academy-official')['jobs']['environment']
+        self.assertEqual(sum(int(step['timeout-minutes']) for step in environment['steps']), 63)
+        acceptance = next(step for step in environment['steps'] if step.get('id') == 'environment')
+        self.assertEqual(acceptance['timeout-minutes'], '50')
+
+
+    def test_framework_ui_clears_only_old_ui_receipt_before_runtime_setup(self):
+        job = self.workflow('java-frameworks')['jobs']['ui']
+        steps = job['steps']
+        self.assertEqual(steps[0]['uses'], ACTION_REFS['checkout'])
+        self.assertEqual(steps[1]['run'], 'rm -f -- authoring/ui-verification.json')
+        self.assertEqual(steps[1]['timeout-minutes'], '1')
+        self.assertEqual(job['defaults']['run']['working-directory'], 'courses/java-frameworks')
+        self.assertNotIn('if', steps[1])
+        self.assertTrue(any('node authoring/verify_frontend.cjs' in step.get('run', '') for step in steps[2:]))
 
 
 if __name__=='__main__':

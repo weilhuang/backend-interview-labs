@@ -1,0 +1,14 @@
+// 按统一generator模块约定接入；不是独立课程根，不修改根programming_language。
+// sourceSets main=src, test=test，JUnit5/JDK21沿用根配置。
+tasks.withType(Test).configureEach {
+    // Go代码也必须参与输入变更判定；根若禁用了up-to-date可保持该约定。
+    inputs.files(fileTree('go') { include '**/*.go', 'go.mod' })
+    systemProperty 'go.project', project.file('go').absolutePath
+    systemProperty 'go.work', layout.buildDirectory.dir('go-check').get().asFile.absolutePath
+    if (providers.gradleProperty('goExecutable').isPresent()) {
+        systemProperty 'go.executable', providers.gradleProperty('goExecutable').get()
+    }
+    // GO_EXECUTABLE环境变量作为第二入口；缺失必须INVALID_ENV，不能JUnit assume/skip。
+}
+// 原生check外层超时需大于Go进程90秒上界，且仍由CI总超时兜底。
+tasks.withType(Test).configureEach { timeout = java.time.Duration.ofSeconds(120) }
