@@ -1,0 +1,322 @@
+name: 单一课程官方 Academy 打包
+on:
+  push:
+    branches: [academy-validation/smoke, academy-validation/full]
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 首次先做官方导出与干净导入；只有完整验收通过才发布 ZIP
+        type: choice
+        options: [export-import-smoke, full-validation]
+        default: export-import-smoke
+        required: true
+      display:
+        description: 首次用 headless；只有确认图形初始化阻塞后再选 xvfb
+        type: choice
+        options: [headless, xvfb]
+        default: headless
+        required: true
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: academy-official-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    name: official-one-course
+    runs-on: ubuntu-24.04
+    timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 80 || 25 }}
+    outputs:
+      handoff_sha256: ${{ steps.handoff.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        timeout-minutes: 1
+        with:
+          python-version: '3.12'
+      - name: 初始化小型证据目录并安装固定 Python 依赖
+        timeout-minutes: 1
+        run: |
+          TOOLCHAIN_DIR="$RUNNER_TEMP/academy-tools-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ACADEMY_RUN="$RUNNER_TEMP/academy-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          EVIDENCE_DIR="$RUNNER_TEMP/academy-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          printf 'TOOLCHAIN_DIR=%s\nACADEMY_RUN=%s\nEVIDENCE_DIR=%s\n' "$TOOLCHAIN_DIR" "$ACADEMY_RUN" "$EVIDENCE_DIR" >> "$GITHUB_ENV"
+          printf 'UI_RUN=%s\n' "$RUNNER_TEMP/academy-ui-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          mkdir "$EVIDENCE_DIR"
+          printf '{"status":"NOT_RUN","reason":"pipeline initialization"}\n' > "$EVIDENCE_DIR/bootstrap.json"
+          python -m pip install -r scripts/quality/requirements.txt
+      - name: 检查当前提交完整源码 CI，复用已有结果而不重跑 15 个任务
+        timeout-minutes: 1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/academy/check_source_ci.py --report "$EVIDENCE_DIR/source-ci.json"
+      - name: 解析器与安全边界静态回归
+        timeout-minutes: 1
+        run: |
+          python -m unittest discover -s scripts/academy/tests -v
+          bash -n scripts/academy/install_toolchain.sh
+      - uses: actions/setup-java@v4
+        timeout-minutes: 1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: 标准 runner 容量与 Docker 预检
+        timeout-minutes: 1
+        run: |
+          df -h "$RUNNER_TEMP"
+          free -m
+          docker version
+          docker compose version
+          python - <<'PY'
+          import os, shutil
+          # 1.58 GB tar + 4.2 GB IDE briefly coexist; retain room for runtime.
+          assert shutil.disk_usage(os.environ['RUNNER_TEMP']).free >= 10*1024**3, 'Less than 10 GiB free before install'
+          PY
+          if [ '${{ (github.event_name == 'push' && github.ref == 'refs/heads/academy-validation/full') || inputs.display == 'xvfb' }}' = true ]; then command -v xvfb-run; fi
+      - name: 下载固定官方 IDEA 和 Academy 并校验 SHA256
+        timeout-minutes: 7
+        run: bash scripts/academy/install_toolchain.sh "$TOOLCHAIN_DIR" > "$EVIDENCE_DIR/install.log" 2>&1
+      - name: 官方 CLI 导出、原字节捕获与按所选阶段验收
+        id: official
+        timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 60 || 8 }}
+        env:
+          PHASE: ${{ github.ref == 'refs/heads/academy-validation/full' && 'full-validation' || (github.ref == 'refs/heads/academy-validation/smoke' && 'export-import-smoke' || inputs.phase) }}
+          DISPLAY_MODE: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/academy-validation/full') && 'xvfb' || (github.event_name == 'workflow_dispatch' && inputs.display || 'headless') }}
+        run: |
+          command=(python scripts/academy/run_official.py
+            --repo "$GITHUB_WORKSPACE" --run-root "$ACADEMY_RUN"
+            --idea-home "$TOOLCHAIN_DIR/idea" --plugins-home "$TOOLCHAIN_DIR/plugins"
+            --source-ci-report "$EVIDENCE_DIR/source-ci.json"
+            --phase "$PHASE" --display "$DISPLAY_MODE")
+          if [ "$PHASE" = full-validation ]; then
+            test "$DISPLAY_MODE" = xvfb
+            python scripts/academy/ui_session.py launch --root "$UI_RUN" -- "${command[@]}" --ui-root "$UI_RUN"
+          else
+            "${command[@]}"
+          fi
+      - name: 保存第1阶段当前画面与机械请求（非课程验收）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-stage-1-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: ${{ env.UI_RUN }}/stage-1/
+      - name: 第1阶段等待精确截图绑定的限定UI动作
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/ui_control.py --root "$UI_RUN" --stage 1
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 2
+      - name: 保存第2阶段当前画面与机械请求（非课程验收）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-stage-2-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: ${{ env.UI_RUN }}/stage-2/
+      - name: 第2阶段等待精确截图绑定的限定UI动作
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/ui_control.py --root "$UI_RUN" --stage 2
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 3
+      - name: 保存第3阶段当前画面与机械请求（非课程验收）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-stage-3-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: ${{ env.UI_RUN }}/stage-3/
+      - name: 第3阶段等待精确截图绑定的限定UI动作
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/ui_control.py --root "$UI_RUN" --stage 3
+          python scripts/academy/ui_session.py complete --root "$UI_RUN"
+      - name: 立即保存本次UI前后图与receipt供检查
+        if: always() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-ui-receipts-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: warn
+          path: |
+            ${{ env.UI_RUN }}/stage-*/*.png
+            ${{ env.UI_RUN }}/stage-*/request.json
+            ${{ env.UI_RUN }}/stage-*/review-target.json
+            ${{ env.UI_RUN }}/stage-*/display-identity.json
+            ${{ env.UI_RUN }}/stage-*/receipt.json
+      - name: 等待同一官方进程完成全部原生门禁（原60分钟总界限不变）
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 60
+        run: python scripts/academy/ui_session.py finish --root "$UI_RUN"
+      - name: 封装同次官方导入快照与原字节ZIP（验收中间产物，非发行包）
+        id: handoff
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/native_handoff.py --run "$ACADEMY_RUN" --output "$RUNNER_TEMP/academy-import-handoff.stored.zip" > "$EVIDENCE_DIR/handoff.json"
+          python - <<'PYTHON'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts/academy')
+          from safe_io import read_regular
+          value=json.loads(read_regular(Path(os.environ['EVIDENCE_DIR'])/'handoff.json', limit=65536))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as stream: stream.write('sha256='+value['handoff_sha256']+'\n')
+          PYTHON
+      - name: 汇总失败或成功的小型证据（绝不复制 ZIP、配置或缓存）
+        id: evidence
+        if: always()
+        timeout-minutes: 1
+        run: |
+          cleanup_status=0
+          if [ -n "${UI_RUN:-}" ] && [ -d "$UI_RUN" ]; then
+            python scripts/academy/ui_session.py cleanup --root "$UI_RUN" || cleanup_status=$?
+          fi
+          ACADEMY_RUN="$RUNNER_TEMP/academy-run-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          EVIDENCE_DIR="$RUNNER_TEMP/academy-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ARTIFACT_EVIDENCE_DIR="$RUNNER_TEMP/academy-artifact-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          printf 'ARTIFACT_EVIDENCE_DIR=%s\n' "$ARTIFACT_EVIDENCE_DIR" >> "$GITHUB_ENV"
+          if [ -f scripts/academy/collect_evidence.py ]; then
+            python scripts/academy/collect_evidence.py --run "$ACADEMY_RUN" --bootstrap "$EVIDENCE_DIR" --evidence "$ARTIFACT_EVIDENCE_DIR"
+          else
+            mkdir "$ARTIFACT_EVIDENCE_DIR"
+            printf '{"status":"NOT_RUN","reason":"checkout or setup failed"}\n' > "$ARTIFACT_EVIDENCE_DIR/summary.json"
+          fi
+          exit "$cleanup_status"
+      - name: 保存小型验收证据
+        timeout-minutes: 1
+        if: always() && steps.evidence.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-evidence-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: error
+          path: ${{ env.ARTIFACT_EVIDENCE_DIR }}/
+      - name: 传递验收中间产物（含ZIP与导入快照，非发行包）
+        timeout-minutes: 1
+        if: success() && steps.handoff.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-intermediate-NOT-A-RELEASE-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          compression-level: 0
+          path: ${{ runner.temp }}/academy-import-handoff.stored.zip
+
+  environment:
+    name: official-import-real-environment
+    needs: package
+    if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        timeout-minutes: 1
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        timeout-minutes: 1
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-node@v4
+        timeout-minutes: 1
+        with:
+          node-version: '22'
+      - name: 准备独立环境证据目录和已固定Python依赖
+        timeout-minutes: 1
+        run: |
+          printf 'ENV_RUN=%s\n' "$RUNNER_TEMP/unified-environment-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          python -m pip install -r scripts/quality/requirements.txt
+      - name: 浏览器中文字体和标准runner资源检查
+        timeout-minutes: 3
+        run: |
+          set -euo pipefail
+          apt_network=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
+          echo 'APT 更新索引：连接/数据超时 20 秒；每个失败文件最多重试 2 次'
+          sudo apt-get "${apt_network[@]}" update --error-on=any
+          echo 'APT 安装 fonts-noto-cjk：沿用相同网络限制和原步骤总时限'
+          sudo apt-get "${apt_network[@]}" install -y fonts-noto-cjk
+          fc-match sans:lang=zh-cn
+          google-chrome --version
+          docker version
+          docker compose version
+          python - <<'PYTHON'
+          import os, shutil
+          assert shutil.disk_usage(os.environ['RUNNER_TEMP']).free >= 10*1024**3, 'Less than 10 GiB free before real environment acceptance'
+          PYTHON
+      - name: 下载同一run/attempt的唯一官方中间产物
+        timeout-minutes: 1
+        uses: actions/download-artifact@v4
+        with:
+          name: academy-intermediate-NOT-A-RELEASE-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/academy-handoff-download
+      - name: 执行同归档真实环境验收（顺序profile及C14前端恢复）
+        id: environment
+        timeout-minutes: 50
+        env:
+          HANDOFF_SHA256: ${{ needs.package.outputs.handoff_sha256 }}
+        run: |
+          python scripts/academy/run_environment.py --repo "$GITHUB_WORKSPACE" --run-root "$ENV_RUN" \
+            --handoff "$RUNNER_TEMP/academy-handoff-download/academy-import-handoff.stored.zip" \
+            --handoff-sha256 "$HANDOFF_SHA256"
+      - name: 严格联合官方原生与同归档真实环境发布门禁
+        id: release_gate
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/release_gate.py --native-summary "$ENV_RUN/handoff/native-summary.json" \
+            --environment-summary "$ENV_RUN/evidence/summary.json" --identity "$ENV_RUN/handoff/identity.json" \
+            --archive "$ENV_RUN/handoff/backend-interview-academy.zip" --release-dir "$ENV_RUN/release" \
+            --report "$ENV_RUN/evidence/release-gate.json"
+      - name: 收集有界脱敏环境证据
+        id: environment_evidence
+        if: always()
+        timeout-minutes: 1
+        run: |
+          python scripts/academy/collect_environment_evidence.py \
+            --run "$RUNNER_TEMP/unified-environment-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            --output "$RUNNER_TEMP/unified-environment-evidence-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+      - name: 保存环境验收证据与提供前端的真实浏览器截图
+        if: always() && steps.environment_evidence.outcome == 'success'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: academy-environment-evidence-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: error
+          path: ${{ runner.temp }}/unified-environment-evidence-${{ github.run_id }}-${{ github.run_attempt }}/
+      - name: 仅完整必需门禁全绿后保存可导入官方 ZIP
+        timeout-minutes: 1
+        if: success() && steps.environment.outcome == 'success' && steps.release_gate.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-interview-academy-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: error
+          compression-level: 0
+          path: |
+            ${{ env.ENV_RUN }}/release/backend-interview-academy.zip
+            ${{ env.ENV_RUN }}/release/SHA256SUMS
+

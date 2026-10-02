@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "idea": {
+    "version": "2026.1.5",
+    "build": "261.27258.48",
+    "url": "https://download.jetbrains.com/idea/idea-2026.1.5.tar.gz",
+    "sha256_url": "https://download.jetbrains.com/idea/idea-2026.1.5.tar.gz.sha256",
+    "sha256": "b60483784c4051e72f852529d40bc7ab6c52e5fd791a088dea455a254473e4ce"
+  },
+  "academy": {
+    "version": "2026.9-2026.1-1070",
+    "url": "https://plugins.jetbrains.com/files/10081/1178720/JetBrainsAcademy-2026.9-2026.1-1070.zip",
+    "sha256": "8cb4dbc2bb86533f2417a5f3b8ae9c46eb34651fdb8099a502fd13b69dfe81e3",
+    "hash_provenance": "SHA256 measured from the official Marketplace download, 2026-09-30; Marketplace did not provide an independently signed checksum",
+    "metadata_url": "https://plugins.jetbrains.com/api/plugins/10081/updates?size=30",
+    "compatibility": "261.22158 through 261.*",
+    "archive_schema_version": 23
+  },
+  "source_reference": {
+    "repository": "https://github.com/JetBrains/educational-plugin",
+    "commit": "6b77322dcfc0fbab8c3e94ab5055b3f72d74460c",
+    "authority": "Installed 2026.9-2026.1-1070 command-line.jar bytecode corroborates createCourse --local and validateCourse behavior; source master snapshot is explanatory, not a claim to the exact release source revision"
+  }
+}

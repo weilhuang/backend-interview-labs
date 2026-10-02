@@ -40,8 +40,12 @@ jobs:
           java -version
           docker version
           docker compose version
-          sudo apt-get update
-          sudo apt-get install -y fonts-noto-cjk
+          set -euo pipefail
+          apt_network=(-o Acquire::Retries=2 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20)
+          echo 'APT 更新索引：连接/数据超时 20 秒；每个失败文件最多重试 2 次'
+          sudo apt-get "${apt_network[@]}" update --error-on=any
+          echo 'APT 安装 fonts-noto-cjk：沿用相同网络限制和原步骤总时限'
+          sudo apt-get "${apt_network[@]}" install -y fonts-noto-cjk
           fc-match sans:lang=zh-cn
           google-chrome --version
           node --version
