@@ -1,0 +1,8 @@
+**/.gradle/
+**/build/
+**/__pycache__/
+*.pyc
+gate-runs/
+proposal-evidence/
+PROPOSAL_MANIFEST.json
+.runtime/
