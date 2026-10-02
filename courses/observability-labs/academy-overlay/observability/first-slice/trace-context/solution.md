@@ -6,7 +6,7 @@ reference-map对应方法练习；reference-typed是只读完整类对照，含�
 
 ## 第一步：父子关系，不急着装后台
 
-先读 `TraceBridgeTest.propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary`。手工创建 checkout SERVER → inventory CLIENT → inventory SERVER。三个 span 的 trace ID 相同，span ID 不同；库存 SERVER 的 parent 是 CLIENT，不直接跳到 checkout。
+先读 `TraceBridgeTest.propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary`。手工创建 checkout SERVER → checkout CLIENT → inventory SERVER。三个 span 的 trace ID 相同，span ID 不同；库存 SERVER 的 parent 是 CLIENT，不直接跳到 checkout。
 
 运行 `bash scripts/gradle.sh :observability-first-slice-trace-context:test --tests labs.observability.TraceBridgeTest`。这里使用真实 OpenTelemetry SDK + 内存 exporter，只证明 SDK 行为，没有证明 Collector 或数据库。
 
@@ -18,11 +18,11 @@ H1：上下文不是字符串 trace ID。H2：TextMapGetter 只是告诉 SDK 怎
 
 ## 第三步：真实回环 HTTP 验证
 
-运行 `bash scripts/gradle.sh :observability-first-slice-trace-context:test --tests labs.observability.HttpCallChainTest`。测试在同一个测试JVM中启动两个独立Spring Web context和真实HTTP server，使用各自SDK与动态端口；测试结束关闭并验证端口拒绝连接。它不等于两个独立OS进程的部署验收。不是 MockMvc、不是模拟 HTTP 响应。SDK 导出仍在内存中，因此必须分别记录HTTP和后端的实际状态，不能用预期替代执行证据；本轮两者均为NOT_RUN。
+运行 `bash scripts/gradle.sh :observability-first-slice-trace-context:test --tests labs.observability.HttpCallChainTest`。测试在同一个测试JVM中启动两个独立Spring Web context和真实HTTP server，使用各自SDK与动态端口；测试结束关闭并验证端口拒绝连接。它不等于两个独立OS进程的部署验收。不是 MockMvc、不是模拟 HTTP 响应。SDK 导出仍在内存中，因此必须分别记录HTTP和后端的实际状态，不能用预期替代执行证据；2026-10-02本地HTTP实测已通过，真实Collector和后端仍为NOT_RUN。
 
 正常请求：HTTP200，3 spans。库存失败：HTTP503，3 spans 正确标错。只读库存第一次503后第二次200：HTTP200，5 spans；两次库存尝试与一次 checkout 要分清。坏 JSON：HTTP400，库存零调用。合法 traceparent 不会让未知商品变合法，trace ID 不是授权凭证。
 
-## 第四步：现成前端（后端集成获准后）
+## 第四步：运行现成前端与两个本地服务
 
 启动 inventory 的 appArgs：`--lab.role=inventory --server.port=18082`；checkout：`--lab.role=checkout --server.port=18081 --lab.inventory=http://127.0.0.1:18082`。两个服务默认只绑定回环。用浏览器打开 checkout 的 `/`，按钮已写好。启动命令形如 `bash scripts/gradle.sh :observability-first-slice-trace-context:run -PappArgs='...'`，分别在两个终端运行，退出各终端进程即可；不要使用全局 pkill。
 
@@ -42,4 +42,4 @@ H1：上下文不是字符串 trace ID。H2：TextMapGetter 只是告诉 SDK 怎
 
 ## 参考类与练习区的范围
 
-本题只有标出的一个方法可编辑。reference-map是当前支架的直接方法参考；reference-typed目录是只读的完整类对照材料，可能包含record、方法归一化或getter的区外修改，不能只截取其中一个方法体粘贴到本题。它的正确性必须通过整棵源码单独构建验证，当前为NOT_RUN。answers目录不参与src/test编译。详见[参考实现范围与验证器契约](../../../materials/observability/docs/06-参考实现范围与验证器契约.md)。
+本题只有标出的一个方法可编辑。reference-map是当前支架的直接方法参考；reference-typed目录是只读的完整类对照材料，可能包含record、方法归一化或getter的区外修改，不能只截取其中一个方法体粘贴到本题。它的正确性按整棵源码单独构建验证；本地reference-map与reference-typed各自28项公开测试已通过，新Actions尚未运行。answers目录不参与src/test编译。详见[参考实现范围与验证器契约](../../../materials/observability/docs/06-参考实现范围与验证器契约.md)。

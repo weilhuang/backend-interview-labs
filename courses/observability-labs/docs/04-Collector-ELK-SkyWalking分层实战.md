@@ -2,7 +2,7 @@
 
 ## 当前实现的层次
 
-已提供Java API/SDK、两个HTTP服务、公开测试和真实后端查询脚本的源代码；本轮未编译或运行Java，也未启动Collector、Jaeger、Prometheus、ELK、SkyWalking。没有 Docker daemon、安装、真实账号或付费服务操作。配置存在不等于配置被真实二进制接受。
+已提供Java API/SDK、两个HTTP服务、公开测试和真实后端查询脚本。2026-10-02本地完整JDK21编译、公开JUnit和真实回环HTTP已通过；Collector、Jaeger、Prometheus、ELK、SkyWalking仍未启动，均为NOT_RUN。配置存在不等于配置被真实二进制接受。
 
 ## Profile A：OTEL 指标与链路
 

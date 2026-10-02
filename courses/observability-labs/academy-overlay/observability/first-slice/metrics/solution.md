@@ -44,4 +44,4 @@ reference-map对应方法练习；reference-typed是只读完整类对照，含�
 
 ## 参考类与练习区的范围
 
-本题只有标出的一个方法可编辑。reference-map是当前支架的直接方法参考；reference-typed目录是只读的完整类对照材料，可能包含record、方法归一化或getter的区外修改，不能只截取其中一个方法体粘贴到本题。它的正确性必须通过整棵源码单独构建验证，当前为NOT_RUN。answers目录不参与src/test编译。详见[参考实现范围与验证器契约](../../../materials/observability/docs/06-参考实现范围与验证器契约.md)。
+本题只有标出的一个方法可编辑。reference-map是当前支架的直接方法参考；reference-typed目录是只读的完整类对照材料，可能包含record、方法归一化或getter的区外修改，不能只截取其中一个方法体粘贴到本题。它的正确性按整棵源码单独构建验证；本地reference-map与reference-typed各自28项公开测试已通过，新Actions尚未运行。answers目录不参与src/test编译。详见[参考实现范围与验证器契约](../../../materials/observability/docs/06-参考实现范围与验证器契约.md)。

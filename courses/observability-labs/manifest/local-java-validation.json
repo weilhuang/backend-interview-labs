@@ -1,0 +1,128 @@
+{
+  "source_publication_sha256": "829c8a0ff77415d9f1792ac5b9bc25294da5280efa31cc9cbdeed09c3f513fc2",
+  "archive_sha256": "c72af9811f7321b4aca48ef26e97ef33c0d3af1da77d2dbc99e1dd133158f589",
+  "lock_candidate_sha256": "2611d79b87d12f38f946cdb657302c75cd0cf95b191872f6cbe43a4a7662b7a9",
+  "test_executions_total": 167,
+  "ordinary_passes": 115,
+  "expected_business_failures": 52,
+  "unexpected_failures": 0,
+  "skipped": 0,
+  "port_count": 8,
+  "date": "2026-10-02",
+  "validated_source_commit": "15cff6c103bc5f9dbde108a04f1482a37780997e",
+  "environment": "Linux x86_64; Temurin full JDK21.0.12.1+1; Gradle8.10.2",
+  "boot": "3.5.16",
+  "otel": "1.49.0",
+  "lock_origin": "NEW_OFFICIAL_MAVEN_RESOLUTION_FROM_FIXED_DECLARATIONS_NOT_RECOVERED_ORIGINAL_LOCK",
+  "local_java_status": "PASS",
+  "new_actions_status": "NOT_RUN",
+  "real_backends_and_native_status": "NOT_RUN",
+  "http_process_model": "two independent Spring contexts and real loopback HTTP inside one JVM",
+  "scenarios": [
+    {
+      "scenario": "current-main",
+      "methods": 28,
+      "passes": 28,
+      "expected_failures": 0,
+      "skipped": 0
+    },
+    {
+      "scenario": "reference-map",
+      "methods": 28,
+      "passes": 28,
+      "expected_failures": 0,
+      "skipped": 0
+    },
+    {
+      "scenario": "reference-typed",
+      "methods": 28,
+      "passes": 28,
+      "expected_failures": 0,
+      "skipped": 0
+    },
+    {
+      "scenario": "starter",
+      "methods": 18,
+      "passes": 2,
+      "expected_failures": 16,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-header-leak",
+      "methods": 7,
+      "passes": 1,
+      "expected_failures": 6,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-json-concatenation",
+      "methods": 7,
+      "passes": 1,
+      "expected_failures": 6,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-high-cardinality",
+      "methods": 5,
+      "passes": 4,
+      "expected_failures": 1,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-millisecond-unit",
+      "methods": 5,
+      "passes": 4,
+      "expected_failures": 1,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-double-count",
+      "methods": 5,
+      "passes": 3,
+      "expected_failures": 2,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-new-trace-every-hop",
+      "methods": 6,
+      "passes": 4,
+      "expected_failures": 2,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-baggage-leak",
+      "methods": 6,
+      "passes": 5,
+      "expected_failures": 1,
+      "skipped": 0
+    },
+    {
+      "scenario": "wrong-retry-all-failures",
+      "methods": 6,
+      "passes": 5,
+      "expected_failures": 1,
+      "skipped": 0
+    },
+    {
+      "scenario": "native-starter-safe-events",
+      "methods": 7,
+      "passes": 0,
+      "expected_failures": 7,
+      "skipped": 0
+    },
+    {
+      "scenario": "native-starter-metrics",
+      "methods": 5,
+      "passes": 2,
+      "expected_failures": 3,
+      "skipped": 0
+    },
+    {
+      "scenario": "native-starter-trace-context",
+      "methods": 6,
+      "passes": 0,
+      "expected_failures": 6,
+      "skipped": 0
+    }
+  ]
+}
