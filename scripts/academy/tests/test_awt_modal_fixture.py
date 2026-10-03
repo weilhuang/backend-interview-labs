@@ -31,9 +31,9 @@ def modal_cases(count=1):
             for action in fixture.MODAL_ACTIONS]
 
 
-def modal_response(action, pid=102):
+def modal_response(action, pid=102, count=1):
     return {'schema': 1, 'status': 'PASS', 'action': action,
-            'proof': modal_proof(action, pid), 'error': None, 'diagnosis': None}
+            'proof': modal_proof(action, pid, count), 'error': None, 'diagnosis': None}
 
 
 def response(value, code=0):
@@ -90,14 +90,32 @@ class FullModalProbe(unittest.TestCase):
         self.assertEqual(result['diagnosis'], modal_window.failure_from_exception(error))
         self.assertIsNone(result['proof'])
 
-    def test_missing_actual_record_has_fixed_failure_without_synthetic_repair(self):
-        proof = modal_proof(count=0)
-        result = self.probe(proof=proof)
-        self.assertEqual(result['status'], 'FAIL')
-        self.assertEqual(result['error'], 'MODAL_REGRESSION_CASE_MISSING')
-        self.assertIsNone(result['diagnosis'])
-        self.assertIsNone(result['proof'])
-        self.assertEqual(len(proof['root_children']), 1)
+    def test_zero_incidental_roots_pass_both_proofs_without_synthetic_repair(self):
+        for action in fixture.MODAL_ACTIONS:
+            proof = modal_proof(action, count=0)
+            result = self.probe(action, proof=proof)
+            self.assertEqual(result['status'], 'PASS')
+            self.assertIsNone(result['error'])
+            self.assertIsNone(result['diagnosis'])
+            self.assertEqual(result['proof'], proof)
+            projected = fixture._modal_case(result['proof'], 102, action)
+            self.assertEqual(projected['root_count'], 1)
+            self.assertEqual(projected['unmapped_inputonly_total'], 0)
+            self.assertEqual(projected['unmapped_inputonly'], [])
+            self.assertEqual(projected['unmapped_inputonly_omitted'], 0)
+            self.assertEqual(len(proof['root_children']), 1)
+
+    def test_zero_incidental_roots_still_use_two_complete_production_samples(self):
+        for action in fixture.MODAL_ACTIONS:
+            proof = modal_proof(action, count=0)
+            x = FakeX(proof)
+            with patch.dict(os.environ, {'DISPLAY': fixture.DISPLAY}), patch.object(modal_window, '_X11', return_value=x):
+                result = fixture._modal_probe(102, action)
+            self.assertEqual(result['status'], 'PASS')
+            self.assertEqual(result['proof'], proof)
+            self.assertEqual(x.root_calls, 2)
+            self.assertEqual(x.tree_calls, [10, 56, 10, 56])
+            self.assertTrue(x.closed)
 
     def test_valid_but_foreign_pid_title_or_geometry_has_fixed_failure(self):
         for field, value in (('pid', 103), ('title_sha256', 'f' * 64), ('x', 381),
@@ -130,6 +148,25 @@ class ModalProjection(unittest.TestCase):
     def reject_case(self, value):
         with self.assertRaises(ValueError):
             fixture._modal_case_document(value, fixture.MODAL_ACTIONS[0])
+
+    def test_zero_projection_requires_empty_facts_and_exact_zero_omission(self):
+        zero = modal_cases(0)[0]
+        self.assertEqual(fixture._modal_case_document(zero, fixture.MODAL_ACTIONS[0]), zero)
+        for mutation in ({'unmapped_inputonly_total': False}, {'unmapped_inputonly_total': -1},
+                         {'unmapped_inputonly_omitted': False}, {'unmapped_inputonly_omitted': 1},
+                         {'unmapped_inputonly': modal_cases()[0]['unmapped_inputonly']},
+                         {'root_count': 0}, {'unmapped_inputonly_total': 1}):
+            with self.subTest(mutation=mutation):
+                self.reject_case({**zero, **mutation})
+
+    def test_zero_and_positive_observations_are_distinct_and_both_bounded(self):
+        for count in (0, 1, 8, 9, 31):
+            value = title_tests.report()
+            value['modal_cases'] = modal_cases(count)
+            actual = fixture.report_document(value)
+            self.assertEqual([c['unmapped_inputonly_total'] for c in actual['modal_cases']], [count, count])
+            self.assertLessEqual(len(encode(actual)), 8192)
+        self.assertNotEqual(modal_cases(0)[0]['proof_sha256'], modal_cases(1)[0]['proof_sha256'])
 
     def test_first_eight_matching_original_indexes_and_omitted_count(self):
         proof = modal_proof(count=12)
@@ -218,6 +255,37 @@ class ModalCoordinator(unittest.TestCase):
     def execute(self, **kwargs):
         return title_tests.CoordinatorLifecycle().execute(**kwargs)
 
+    def test_both_genuine_zero_count_proofs_are_mandatory_before_pass(self):
+        replies = [title_response(), *(response(modal_response(action, count=0))
+                                      for action in fixture.MODAL_ACTIONS)]
+        value, failed, _, _, _, run, _ = self.execute(probe_results=replies)
+        self.assertFalse(failed)
+        self.assertEqual(run.call_count, 3)
+        self.assertEqual(value['modal_cases'], modal_cases(0))
+        self.assertEqual(value['status'], 'PASS')
+
+    def test_second_failure_retains_first_safe_zero_projection(self):
+        error = modal_window.ProofError('INPUT_ROUTE_CHANGED', 'SHAPE_INPUT', {'node_index': 1})
+        failure = {'schema': 1, 'status': 'FAIL', 'action': fixture.MODAL_ACTIONS[1],
+                   'proof': None, 'error': 'PROBE_FAILED', 'diagnosis': modal_window.failure_from_exception(error)}
+        for last in (response(failure, 1), subprocess.TimeoutExpired('private', 2), InterruptedError('private')):
+            value, failed, _, _, _, run, _ = self.execute(probe_results=[title_response(),
+                response(modal_response(fixture.MODAL_ACTIONS[0], count=0)), last])
+            self.assertTrue(failed)
+            self.assertEqual(run.call_count, 3)
+            self.assertEqual(value['modal_cases'], modal_cases(0)[:1])
+            self.assertEqual(value['cleanup'], {'jvm': 'REAPED', 'xvfb': 'REAPED'})
+            self.assertNotIn(b'private', encode(value))
+
+    def test_cleanup_failure_retains_both_zero_count_projections_without_pass(self):
+        replies = [title_response(), *(response(modal_response(action, count=0))
+                                      for action in fixture.MODAL_ACTIONS)]
+        value, failed, server, _, _, _, _ = self.execute(probe_results=replies, cleanup_failure=True)
+        self.assertTrue(failed)
+        self.assertEqual(value['error'], 'CLEANUP_UNVERIFIED')
+        self.assertEqual(value['modal_cases'], modal_cases(0))
+        self.assertEqual(server.wait_calls, [2])
+
     def test_three_ordered_hard_two_second_children_share_original_deadline(self):
         with patch.object(fixture.time, 'monotonic', return_value=100.0), patch.object(
                 fixture, '_remaining', wraps=fixture._remaining) as remaining:
@@ -262,8 +330,8 @@ class ModalCoordinator(unittest.TestCase):
                 self.assertEqual(value['cleanup'], {'jvm': 'REAPED', 'xvfb': 'REAPED'})
                 self.assertNotIn(b'private', encode(value))
 
-    def test_fixed_missing_and_identity_failure_reach_public_report_without_raw_proof(self):
-        for code in ('MODAL_REGRESSION_CASE_MISSING', 'MODAL_IDENTITY_MISMATCH'):
+    def test_identity_failure_reaches_public_report_without_raw_proof(self):
+        for code in ('MODAL_IDENTITY_MISMATCH',):
             failure = {'schema': 1, 'status': 'FAIL', 'action': fixture.MODAL_ACTIONS[0],
                        'proof': None, 'error': code, 'diagnosis': None}
             value, failed, _, _, _, run, _ = self.execute(probe_results=[title_response(), response(failure, 1)])

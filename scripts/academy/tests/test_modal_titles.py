@@ -214,6 +214,20 @@ class AwtArtifactBoundary(unittest.TestCase):
             self.assertEqual(len(case['unmapped_inputonly']),8)
             self.assertEqual(case['unmapped_inputonly_omitted'],23)
 
+    def test_zero_observations_and_safe_partial_projection_are_collected_honestly(self):
+        import awt_title_fixture as fixture
+        report=self.report();report['modal_cases']=self.modal_cases(0)
+        out=self.collected(report);value=json.loads((out/fixture.NAME).read_text())
+        self.assertEqual(value['status'],'PASS')
+        for case in value['modal_cases']:
+            self.assertEqual((case['unmapped_inputonly_total'],case['unmapped_inputonly_omitted'],case['unmapped_inputonly']),(0,0,[]))
+        report.update(status='FAIL',error='PROBE_FAILED',modal_cases=report['modal_cases'][:1],
+            diagnosis=modal.failure_from_exception(modal.ProofError('INPUT_ROUTE_CHANGED','SHAPE_INPUT',{'node_index':1})))
+        out=self.collected(report);value=json.loads((out/fixture.NAME).read_text())
+        self.assertEqual(value['status'],'FAIL')
+        self.assertEqual(value['modal_cases'],report['modal_cases'])
+        self.assertEqual(value['diagnosis']['call_site'],'SHAPE_INPUT')
+
     def test_prior_title_only_pass_is_omitted_with_safe_logs_retained(self):
         import awt_title_fixture as fixture
         report=self.report();report.pop('modal_cases');report['schema']=1

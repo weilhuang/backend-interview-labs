@@ -8,7 +8,21 @@ from display_diagnostic import encode
 
 class FixtureEvidence(unittest.TestCase):
     def report(self):
-        return {'schema':1,'status':'PASS','kind':'PRIVATE_SYNTHETIC_X11_NOT_IDE_OR_ACCEPTANCE','cases':[{'case':name,'status':'PASS' if i in (0,4) else 'REJECTED'} for i,name in enumerate(fixture.CASE_NAMES)],'cleanup':'REAPED','error':None,'run_id':'123','run_attempt':'1','tested_sha':'a'*40,'elapsed_milliseconds':100}
+        return {'schema':1,'status':'PASS','kind':'PRIVATE_SYNTHETIC_X11_NOT_IDE_OR_ACCEPTANCE','cases':[{'case':name,'status':'PASS' if i in (0,1,5) else 'REJECTED'} for i,name in enumerate(fixture.CASE_NAMES)],'cleanup':'REAPED','error':None,'run_id':'123','run_attempt':'1','tested_sha':'a'*40,'elapsed_milliseconds':100}
+    def test_seven_ordered_cases_and_all_existing_negatives_are_mandatory(self):
+        expected=('complete_dialog_signed_focus_proxy_shape_input','negative_unmapped_input_only_root',
+                  'higher_root_overlay','input_only_interception','foreign_focus',
+                  'descendant_restack_changes_proof','nondefault_shape_input')
+        self.assertEqual(fixture.CASE_NAMES,expected)
+        value=self.report()
+        self.assertEqual([item['status'] for item in value['cases']],
+                         ['PASS','PASS','REJECTED','REJECTED','REJECTED','PASS','REJECTED'])
+        for index in range(7):
+            with self.subTest(missing=index),self.assertRaises(ValueError):
+                fixture.report_document({**value,'cases':value['cases'][:index]+value['cases'][index+1:]})
+            changed=copy.deepcopy(value)
+            changed['cases'][index]['status']='REJECTED' if index in (0,1,5) else 'PASS'
+            with self.subTest(wrong_status=index),self.assertRaises(ValueError):fixture.report_document(changed)
     def test_exact_success_requires_all_cases_and_cleanup(self):
         value=self.report();self.assertEqual(fixture.report_document(value),value)
         for changes in ({'cases':value['cases'][:-1]},{'cleanup':'UNVERIFIED'},{'error':'CANCELLED'},{'elapsed_milliseconds':True},{'run_id':{'private':'payload'}},{'schema':True},{'status':'RUNNING'},{'environment':{'secret':'PRIVATE'}}):

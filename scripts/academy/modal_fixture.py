@@ -8,7 +8,7 @@ BINARY=Path('/usr/bin/Xvfb')
 NAME='modal-window-fixture.json'
 def require(ok):
     if not ok:raise ValueError('synthetic modal fixture boundary')
-CASE_NAMES=('complete_dialog_signed_focus_proxy_shape_input','higher_root_overlay','input_only_interception','foreign_focus','descendant_restack_changes_proof','nondefault_shape_input')
+CASE_NAMES=('complete_dialog_signed_focus_proxy_shape_input','negative_unmapped_input_only_root','higher_root_overlay','input_only_interception','foreign_focus','descendant_restack_changes_proof','nondefault_shape_input')
 def report_document(value):
     import re
     fields={'schema','status','kind','cases','cleanup','error','run_id','run_attempt','tested_sha','elapsed_milliseconds'}
@@ -23,10 +23,40 @@ def report_document(value):
     require(type(value['cases']) is list and len(value['cases'])<=len(CASE_NAMES))
     for index,item in enumerate(value['cases']):
         require(type(item) is dict and set(item)=={'case','status'} and item['case']==CASE_NAMES[index])
-        require(item['status']==('PASS' if index in (0,4) else 'REJECTED'))
+        require(item['status']==('PASS' if index in (0,1,5) else 'REJECTED'))
     if value['status']=='PASS':require(len(value['cases'])==len(CASE_NAMES) and value['cleanup']=='REAPED' and value['error'] is None)
     else:require(value['error'] is not None)
     return value
+
+def negative_unmapped_root_case(x,connection,root,observe,action,cases,start):
+    """Check one exact owned synthetic XID; cleanup roundtrips need live budget."""
+    def live():require(time.monotonic()-start<45)
+    def destroy():
+        live();x.XDestroyWindow(connection,window)
+        live();x.XSync(connection,False)
+    live()
+    window=x.XCreateWindow(connection,root,-100,-100,10,10,0,0,2,None,0,None)
+    require(type(window) is int and 1<=window<=0xffffffff)
+    try:
+        live();x.XSync(connection,False)
+        proof=modal_window.validate(observe(),action)
+        live()
+        require(proof['root_id']==root)
+        records=[record for record in proof['root_children'] if record['window_id']==window]
+        require(len(records)==1)
+        require(all(records[0][key]==value for key,value in {
+            'x':-100,'y':-100,'width':10,'height':10,'border':0,
+            'window_class':2,'map_state':0}.items()))
+        cases.append({'case':'negative_unmapped_input_only_root','status':'PASS'})
+    except InterruptedError:
+        # A delivered cancellation/alarm must never start another Xlib call.
+        raise
+    except Exception:
+        if time.monotonic()-start<45:destroy()
+        raise
+    # Not a finally: on cancellation/exhaustion the owned-Xvfb reap below is
+    # the cleanup, without a potentially blocking Xlib request after the alarm.
+    destroy()
 
 def main(output):
     # Existing workflow owns a one-minute step; local signal adds a50-second bound.
@@ -78,6 +108,7 @@ def main(output):
       except ValueError:report['cases'].append({'case':name,'status':'REJECTED'})
       finally:restore();x.XSync(connection,False)
      proof=observe();report['cases'].append({'case':'complete_dialog_signed_focus_proxy_shape_input','status':'PASS'})
+     negative_unmapped_root_case(x,connection,root,observe,action,report['cases'],start)
      # An unchanged metadata observation must reproduce the same structural proof.
      x.XStoreName(connection,background,b'synthetic owned background');x.XSync(connection,False);require(observe()==proof)
      overlay=create(root,400,400,30,30,'synthetic overlay');x.XSync(connection,False)
