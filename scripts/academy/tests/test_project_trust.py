@@ -101,25 +101,33 @@ class ContextTests(TrustFixture):
             with self.assertRaises(ValueError):trust.context(self.root,bad,idea)
 
 class ReceiverTests(TrustFixture):
+    def test_real_owner_exit_during_fetch_cannot_publish_control(self):
+        from test_ui_session import real_budget_owner
+        self.stage()
+        with real_budget_owner(self.root) as (_,_,exit_unreaped):
+            def fetch(*args):exit_unreaped();return self.approval
+            with patch.object(trust,'fetch_control',side_effect=fetch),self.assertRaises(ValueError):trust.receive(self.root)
+            self.assertFalse((self.root/'stage-4/control.json').exists())
+
     def test_valid_record_written_once(self):
         self.stage()
-        with patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',return_value=50),patch.object(trust,'fetch_control',return_value=self.approval):trust.receive(self.root)
+        with patch.object(trust,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',return_value=50),patch.object(trust,'fetch_control',return_value=self.approval):trust.receive(self.root)
         self.assertEqual(trust.read_json(self.root/'stage-4/control.json'),self.approval)
-        with patch.object(trust,'read_ui_deadline',return_value=100),self.assertRaises(ValueError):trust.receive(self.root)
+        with patch.object(trust,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(trust,'read_ui_deadline',return_value=100),self.assertRaises(ValueError):trust.receive(self.root)
     def test_expired_total_budget_does_not_fetch_or_write(self):
         self.stage()
-        with patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',return_value=100),patch.object(trust,'fetch_control') as fetch:
+        with patch.object(trust,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',return_value=100),patch.object(trust,'fetch_control') as fetch:
             with self.assertRaises(TimeoutError):trust.receive(self.root)
             fetch.assert_not_called()
         self.assertFalse((self.root/'stage-4/control.json').exists())
     def test_control_arriving_after_deadline_is_refused(self):
         self.stage()
-        with patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',side_effect=[98,99,100]),patch.object(trust,'fetch_control',return_value=self.approval):
+        with patch.object(trust,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',side_effect=[98,99,100]),patch.object(trust,'fetch_control',return_value=self.approval):
             with self.assertRaises(ValueError):trust.receive(self.root)
         self.assertFalse((self.root/'stage-4/control.json').exists())
     def test_cancellation_propagates_without_control(self):
         self.stage()
-        with patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',return_value=50),patch.object(trust,'fetch_control',side_effect=InterruptedError):
+        with patch.object(trust,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(trust,'read_ui_deadline',return_value=100),patch.object(trust.time,'monotonic',return_value=50),patch.object(trust,'fetch_control',side_effect=InterruptedError):
             with self.assertRaises(InterruptedError):trust.receive(self.root)
         self.assertFalse((self.root/'stage-4/control.json').exists())
 

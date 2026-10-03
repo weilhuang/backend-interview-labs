@@ -9,7 +9,7 @@ import sys
 import time
 from display_diagnostic import clean_png, digest, encode, json_read, publish
 from safe_io import read_regular, new_directory
-from ui_control import read_ui_deadline, fetch_control
+from ui_control import read_ui_budget, read_ui_deadline, fetch_control
 import project_trust as trust
 import plugin_agreement as plugin
 import profile_window as window
@@ -283,12 +283,12 @@ def receive(root,stage):
     require(expected['stage']==stage and trust.context(root)=={k:expected[k] for k in trust.CONTEXT_FIELDS})
     require(preceding(root,stage)==expected['preceding_receipt_sha256'])
     output=root/f'stage-{stage}/control.json';require(not output.exists() and not output.is_symlink())
-    deadline=read_ui_deadline(root)
+    budget,deadline=read_ui_budget(root)
     while time.monotonic()<deadline:
         cancelled(root)
         value=fetch_control(os.environ['GITHUB_REPOSITORY'],expected['run_id'],expected['run_attempt'],stage,os.environ['GH_TOKEN'],min(5,deadline-time.monotonic()))
         if value is not None:
-            validate_control(value,expected);cancelled(root);require(time.monotonic()<deadline)
+            validate_control(value,expected);cancelled(root);read_ui_deadline(root,expected=budget);require(time.monotonic()<deadline)
             publish(output,encode(value));return
         time.sleep(min(2,max(0,deadline-time.monotonic())))
     raise TimeoutError('PROFILE_CONTROL_DEADLINE')

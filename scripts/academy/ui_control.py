@@ -70,10 +70,28 @@ def checked_budget(record,seconds,observed):
     return deadline
 
 
-def read_ui_deadline(root):
-    from ui_session import process_info
-    value=strict_json((root/'ui-deadline.json').read_bytes())
-    return checked_budget(value,UI_BUDGET_SECONDS,process_info(value['owner']['pid']))
+def checked_live_budget(record,seconds):
+    """A matching unreaped PID is insufficient: hold a live pidfd across the birth check."""
+    from ui_session import process_info, live
+    checked_budget(record,seconds,record['owner'])
+    fd=os.pidfd_open(record['owner']['pid'])
+    try:
+        if not live(fd):raise ValueError('预算拥有者已退出')
+        deadline=checked_budget(record,seconds,process_info(record['owner']['pid']))
+        if not live(fd):raise ValueError('预算拥有者已退出')
+        return deadline
+    finally:os.close(fd)
+
+
+def read_ui_budget(root,*,expected=None):
+    from safe_io import read_regular
+    value=strict_json(read_regular(root/'ui-deadline.json',limit=4096))
+    if expected is not None and value!=expected:raise ValueError('原始预算记录已变化')
+    return value,checked_live_budget(value,UI_BUDGET_SECONDS)
+
+
+def read_ui_deadline(root,*,expected=None):
+    return read_ui_budget(root,expected=expected)[1]
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -107,7 +125,7 @@ def fetch_control(repository, run_id, attempt, stage, token, timeout):
 def receive(root, stage):
     stage_dir = root / f'stage-{stage}'
     expected = json.loads((stage_dir / 'request.json').read_bytes())
-    deadline = read_ui_deadline(root)
+    budget, deadline = read_ui_budget(root)
     output = stage_dir/'control.json'
     if output.exists(): raise ValueError('动作已经提交，不重复执行')
     print(json.dumps({'event':'UI_APPROVAL_WAIT','stage':stage,'budget_seconds':UI_BUDGET_SECONDS,
@@ -118,6 +136,7 @@ def receive(root, stage):
                               stage, os.environ['GH_TOKEN'], min(5, remaining))
         if value is not None:
             validate_control(value, expected)
+            read_ui_deadline(root,expected=budget)
             if time.monotonic() >= deadline: raise TimeoutError('UI 总预算耗尽')
             atomic_json(output,value)
             return

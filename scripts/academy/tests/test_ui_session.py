@@ -1,12 +1,39 @@
 """普通机械字段/预算/发布链回归；不把 fixture 当作真实 UI 验收。"""
 from pathlib import Path
 import importlib.util, io, json, os, sys, tempfile, unittest, time
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, contextmanager
 from unittest.mock import patch, Mock, MagicMock
 BASE=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(BASE))
 import ui_control as control
 import ui_session as session
+
+
+@contextmanager
+def real_budget_owner(root,*,bind_receipt=False):
+    """Harmless direct child, retained until assertions finish; no UI or native workload."""
+    import subprocess,select
+    code="import sys,os;from pathlib import Path;sys.path.insert(0,sys.argv[1]);import ui_session as u;r=Path(sys.argv[2]);u.put(r/'ui-deadline.json',u.budget_record(u.process_info(os.getpid()),900));"
+    if bind_receipt:code+="import post_trust_diagnostic as d;d.bind_budget_owner(r);"
+    code+="print('ready',flush=True);sys.stdin.buffer.read()"
+    child=subprocess.Popen([sys.executable,'-B','-c',code,str(BASE),str(root)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL)
+    fd=None
+    try:
+        if not select.select([child.stdout],[],[],3)[0] or child.stdout.readline()!=b'ready\n':raise AssertionError('fixture owner did not initialize')
+        fd=os.pidfd_open(child.pid)
+        def exit_unreaped():
+            child.stdin.close()
+            if not select.select([fd],[],[],3)[0]:raise AssertionError('fixture owner did not exit')
+            event=os.waitid(os.P_PID,child.pid,os.WEXITED|os.WNOHANG|os.WNOWAIT)
+            if event is None or event.si_status!=0:raise AssertionError('fixture exit not observed')
+        yield child,fd,exit_unreaped
+    finally:
+        if not child.stdin.closed:child.stdin.close()
+        try:child.wait(timeout=3)
+        except subprocess.TimeoutExpired:
+            child.kill();child.wait(timeout=3);raise
+        if fd is not None:os.close(fd)
+        child.stdout.close()
 
 class ControlTest(unittest.TestCase):
     def setUp(self):
@@ -44,7 +71,7 @@ class ControlTest(unittest.TestCase):
             root=Path(tmp);stage=root/'stage-1';stage.mkdir()
             session.put(stage/'request.json',self.request)
             session.put(root/'ui-deadline.json',{'monotonic_deadline':0})
-            with patch.object(control,'read_ui_deadline',return_value=0):
+            with patch.object(control,'read_ui_budget',return_value=({'monotonic_deadline':0},0)):
                 with self.assertRaises(TimeoutError):control.receive(root,1)
             self.assertFalse((stage/'control.json').exists())
     def test_consumed_action_refused(self):
@@ -57,6 +84,66 @@ class ControlTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);session.put(root/'request.json',self.request)
             self.assertFalse((root/'control.json').exists())
+
+
+class LiveBudgetTest(unittest.TestCase):
+    def test_real_zombie_and_reaped_owner_are_not_live(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            with real_budget_owner(root) as (child,fd,exit_unreaped):
+                before=(root/'ui-deadline.json').read_bytes()
+                expected=control.read_ui_deadline(root);exit_unreaped()
+                self.assertFalse(session.live(fd))
+                self.assertEqual(Path(f'/proc/{child.pid}/stat').read_text().rsplit(')',1)[1].split()[0],'Z')
+                with self.assertRaises(ValueError):control.read_ui_deadline(root)
+                self.assertEqual(child.wait(timeout=3),0)
+                with self.assertRaises(ProcessLookupError):control.read_ui_deadline(root)
+                self.assertEqual((root/'ui-deadline.json').read_bytes(),before)
+                self.assertEqual(json.loads(before)['monotonic_deadline'],expected)
+
+    def test_death_during_identity_read_rejects_and_closes_handle(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            with real_budget_owner(root) as (_,_,exit_unreaped):
+                record=json.loads((root/'ui-deadline.json').read_bytes())
+                def identity(pid):exit_unreaped();return record['owner']
+                with patch.object(session,'process_info',side_effect=identity),patch.object(control.os,'close',wraps=os.close) as close:
+                    with self.assertRaises(ValueError):control.checked_live_budget(record,900)
+                    close.assert_called_once()
+
+    def test_wrong_birth_missing_identity_or_permission_error_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            with real_budget_owner(root):
+                record=json.loads((root/'ui-deadline.json').read_bytes());bad=json.loads(json.dumps(record))
+                bad['owner']['start_time']=str(int(record['owner']['start_time'])+1)
+                bad['monotonic_deadline']=int(bad['owner']['start_time'])/os.sysconf('SC_CLK_TCK')+900
+                with self.assertRaises(ValueError):control.checked_live_budget(bad,900)
+                for error in (ProcessLookupError,PermissionError):
+                    with patch.object(session,'process_info',side_effect=error),self.assertRaises(error):control.checked_live_budget(record,900)
+
+    def test_each_initial_control_refuses_owner_death_during_fetch(self):
+        request=ControlTest();request.setUp()
+        for stage in (1,2,3):
+            with self.subTest(stage=stage),tempfile.TemporaryDirectory() as tmp:
+                root=Path(tmp);folder=root/f'stage-{stage}';folder.mkdir()
+                approved={**request.request,'stage':stage,'action':control.ACTIONS[stage]};session.put(folder/'request.json',approved)
+                with real_budget_owner(root) as (_,_,exit_unreaped):
+                    def fetch(*args):exit_unreaped();return approved
+                    with patch.object(control,'fetch_control',side_effect=fetch),patch.dict(os.environ,{'GH_TOKEN':'fixture','GITHUB_REPOSITORY':'owner/repo'}),self.assertRaises(ValueError):control.receive(root,stage)
+                    self.assertFalse((folder/'control.json').exists())
+
+    def test_changed_original_owner_during_fetch_is_not_rebound(self):
+        request=ControlTest();request.setUp()
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);folder=root/'stage-1';folder.mkdir();session.put(folder/'request.json',request.request)
+            with real_budget_owner(root):
+                original=(root/'ui-deadline.json').read_bytes()
+                def fetch(*args):
+                    (root/'ui-deadline.json').write_text(json.dumps(session.budget_record(session.process_info(os.getpid()),900)))
+                    return request.request
+                with patch.object(control,'fetch_control',side_effect=fetch),patch.dict(os.environ,{'GH_TOKEN':'fixture','GITHUB_REPOSITORY':'owner/repo'}),self.assertRaises(ValueError):control.receive(root,1)
+                self.assertFalse((folder/'control.json').exists());self.assertNotEqual((root/'ui-deadline.json').read_bytes(),original)
 
 class SessionTest(unittest.TestCase):
     def test_environment_excludes_credentials(self):
@@ -298,6 +385,7 @@ class SharedUiDeadlineTest(unittest.TestCase):
         self.owner={'pid':100,'uid':1000,'pgrp':100,'session':100,
                     'start_time':str(100*os.sysconf('SC_CLK_TCK'))}
         self.record=session.budget_record(self.owner,control.UI_BUDGET_SECONDS)
+        self.live_probe=patch.object(control,'checked_live_budget',side_effect=lambda record,seconds:control.checked_budget(record,seconds,session.process_info(record['owner']['pid'])));self.live_probe.start();self.addCleanup(self.live_probe.stop)
     def prepare(self,root,stage):
         folder=root/f'stage-{stage}';folder.mkdir()
         request={'schema':1,'run_id':'123','run_attempt':'1','stage':stage,

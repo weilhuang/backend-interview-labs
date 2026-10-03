@@ -42,6 +42,14 @@ class ProfileControlFixture(TrustFixture):
 
 
 class ProfileControlTests(ProfileControlFixture):
+    def test_real_owner_exit_during_fetch_cannot_publish_control(self):
+        from test_ui_session import real_budget_owner
+        self.staged()
+        with real_budget_owner(self.root) as (_,_,exit_unreaped):
+            def fetch(*args):exit_unreaped();return self.approval
+            with patch.object(control,'fetch_control',side_effect=fetch),self.assertRaises(ValueError):control.receive(self.root,7)
+            self.assertFalse((self.root/'stage-7/control.json').exists())
+
     def test_current_bounded_point_requires_full_control(self):
         self.assertEqual(control.validate_control(self.approval,self.request),self.approval)
         with self.assertRaises(ValueError):control.validate_control(self.request,self.request)

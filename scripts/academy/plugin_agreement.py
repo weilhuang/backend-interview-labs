@@ -11,7 +11,7 @@ import time
 import urllib.request
 from display_diagnostic import clean_png, digest, encode, json_read, publish
 from safe_io import read_regular, validate_directory, new_directory
-from ui_control import fetch_control, read_ui_deadline, NoRedirect
+from ui_control import read_ui_budget, fetch_control, read_ui_deadline, NoRedirect
 import project_trust as trust
 import trust_window as window
 
@@ -165,12 +165,12 @@ def receive(root,stage):
     stage_number(stage);expected=request_document(trust.read_json(root/f'stage-{stage}/request.json',4096))
     require(expected['stage']==stage and trust.context(root)=={k:expected[k] for k in trust.CONTEXT_FIELDS})
     require(preceding(root,stage,{k:expected[k] for k in trust.CONTEXT_FIELDS})==expected['preceding_receipt_sha256'])
-    deadline=read_ui_deadline(root);output=root/f'stage-{stage}/control.json'
+    budget,deadline=read_ui_budget(root);output=root/f'stage-{stage}/control.json'
     require(not output.exists() and not output.is_symlink())
     while time.monotonic()<deadline:
         value=fetch_control(os.environ['GITHUB_REPOSITORY'],expected['run_id'],expected['run_attempt'],stage,os.environ['GH_TOKEN'],min(5,deadline-time.monotonic()))
         if value is not None:
-            validate_control(value,expected);require(time.monotonic()<deadline);publish(output,encode(value));return
+            validate_control(value,expected);read_ui_deadline(root,expected=budget);require(time.monotonic()<deadline);publish(output,encode(value));return
         time.sleep(min(2,max(0,deadline-time.monotonic())))
     raise TimeoutError('UI总预算耗尽；未写插件协议动作记录')
 

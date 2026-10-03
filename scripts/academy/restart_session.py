@@ -17,6 +17,7 @@ import profile_control as control
 import project_trust as trust
 import plugin_agreement as plugin
 from ui_control import ACTIONS, EUA_SHA256, UI_BUDGET_SECONDS, validate_control, strict_json
+from post_trust_diagnostic import bind_budget_owner
 
 PROTOCOL=control.PROTOCOL
 RESULT='restart-result.json'
@@ -168,6 +169,7 @@ def display_session(root,idea,command):
             item=jar.getinfo('eua.html');require(item.file_size<=512*1024 and hashlib.sha256(jar.read(item)).hexdigest()==EUA_SHA256)
         trust.context(root,command,idea)
         ui.put(root/'ui-deadline.json',ui_record)
+        bind_budget_owner(root)
         family=Family(deadline,cancellation)
         result['operation']='PREPARATION'
         current=family.spawn(command,environment,role='PREPARATION_IDE');bind(current,0);wait_window(current)

@@ -100,15 +100,23 @@ class LegalTests(unittest.TestCase):
         with patch.object(plugin,'read_regular',return_value=b'{"secret":{}}'),self.assertRaises(ValueError):plugin.pins()
 
 class ReceiverTests(PluginFixture):
+    def test_real_owner_exit_during_fetch_cannot_publish_control(self):
+        from test_ui_session import real_budget_owner
+        self.stage()
+        with real_budget_owner(self.root) as (_,_,exit_unreaped):
+            def fetch(*args):exit_unreaped();return self.approval
+            with patch.object(plugin,'fetch_control',side_effect=fetch),self.assertRaises(ValueError):plugin.receive(self.root,5)
+            self.assertFalse((self.root/'stage-5/control.json').exists())
+
     def test_current_control_only_once(self):
         self.stage()
-        with patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin,'fetch_control',return_value=self.approval):plugin.receive(self.root,5)
-        with patch.object(plugin,'read_ui_deadline',return_value=100),self.assertRaises(ValueError):plugin.receive(self.root,5)
+        with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin,'fetch_control',return_value=self.approval):plugin.receive(self.root,5)
+        with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),self.assertRaises(ValueError):plugin.receive(self.root,5)
     def test_late_control_cancel_and_expired_budget_do_not_write(self):
         self.stage()
         for error in (InterruptedError(),ValueError('stale')):
-            with patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin,'fetch_control',side_effect=error),self.assertRaises(type(error)):plugin.receive(self.root,5)
-        with patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',side_effect=[98,99,100]),patch.object(plugin,'fetch_control',return_value=self.approval),self.assertRaises(ValueError):plugin.receive(self.root,5)
+            with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin,'fetch_control',side_effect=error),self.assertRaises(type(error)):plugin.receive(self.root,5)
+        with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',side_effect=[98,99,100]),patch.object(plugin,'fetch_control',return_value=self.approval),self.assertRaises(ValueError):plugin.receive(self.root,5)
         self.assertFalse((self.root/'stage-5/control.json').exists())
 
 class ArtifactTests(PluginFixture):

@@ -11,7 +11,7 @@ from project_trust import collect as collect_project_trust
 from plugin_agreement import collect as collect_plugin_agreement
 from profile_control import collect as collect_profile_control
 from restart_session import collect as collect_restart_result
-from post_trust_diagnostic import collect as collect_post_trust, REPORT as POST_TRUST_REPORT
+from post_trust_diagnostic import collect as collect_post_trust, REPORT as POST_TRUST_REPORT, collect_budget_owner, BUDGET_OWNER
 from safe_io import absolute, new_directory, read_regular, validate_directory, write_new
 NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','source-contract.json',
        'archive.json','author-changes.json','student-import.json','educator-import.json',
@@ -198,6 +198,13 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
             except Exception as exc:
                 supervisor_availability[name]='UNAVAILABLE';omitted.append({'name':name,'reason':type(exc).__name__})
     if ui_root is not None:
+        current=json.loads(output.get('summary.json',b'{}'))
+        try:
+            data=collect_budget_owner(absolute(ui_root),current.get('run_id'),current.get('run_attempt'))
+            output[BUDGET_OWNER]=data;hashes[BUDGET_OWNER]={'uploaded_sha256':sha256(data).hexdigest()}
+        except InterruptedError:raise
+        except FileNotFoundError:omitted.append({'name':BUDGET_OWNER,'reason':'MISSING'})
+        except Exception:omitted.append({'name':BUDGET_OWNER,'reason':'INVALID_OR_UNAVAILABLE'})
         try:
             current=json.loads(output.get('summary.json',b'{}'))
             for name,data in collect_display(absolute(ui_root),current.get('run_id'),current.get('run_attempt')).items():

@@ -14,6 +14,7 @@ REPORT='post-trust-diagnostic.json'
 PNG='post-trust-diagnostic.png'
 MAPPING='post-trust-images.json'
 ANCHOR='post-trust-anchor.json'
+BUDGET_OWNER='ui-budget-owner.json'
 MAX_REPORT=256*1024
 LIMIT_SECONDS=90
 FALLBACK_SECONDS=60
@@ -34,14 +35,66 @@ def enum(value,choices):
 def raw_json(path,limit=MAX_REPORT):return json_read(read_regular(path,limit=limit))
 def utc():return datetime.now(timezone.utc).isoformat(timespec='milliseconds')
 
+def budget_document(value):
+    """Original fixed supervisor budget; this is not GUI-process authority."""
+    from project_trust import validate_context
+    from ui_control import checked_budget, UI_BUDGET_SECONDS
+    require(type(value) is dict and set(value)=={'schema_version','kind','context','record','record_sha256'})
+    integer(value['schema_version'],1,1);require(value['kind']=='DISPLAY_SUPERVISOR_UI_BUDGET_NOT_ACCEPTANCE')
+    validate_context(value['context']);token(value['record_sha256'],r'[0-9a-f]{64}')
+    record=value['record'];require(type(record) is dict and type(record.get('owner')) is dict)
+    owner=record['owner'];require(set(owner)=={'pid','ppid','uid','pgrp','session','start_time'})
+    for key in ('pid','ppid','uid','pgrp','session'):integer(owner[key],0 if key=='uid' else 1,2**31-1)
+    token(owner['start_time'],r'[0-9]{1,20}')
+    deadline=number(record.get('monotonic_deadline'),0,10**10)
+    require(checked_budget(record,UI_BUDGET_SECONDS,owner)==deadline)
+    return value
+
+def bind_budget_owner(root):
+    """Called once at deadline creation by the live display supervisor itself."""
+    from ui_control import checked_budget, UI_BUDGET_SECONDS
+    from ui_session import process_info
+    raw=read_regular(root/'ui-deadline.json',limit=4096);record=json_read(raw)
+    observed=process_info(os.getpid())
+    deadline=checked_budget(record,UI_BUDGET_SECONDS,observed)
+    require(int(observed['start_time'])/os.sysconf('SC_CLK_TCK')<=time.monotonic()<deadline)
+    value=budget_document({'schema_version':1,'kind':'DISPLAY_SUPERVISOR_UI_BUDGET_NOT_ACCEPTANCE',
+        'context':context(root),'record':record,'record_sha256':digest(raw)})
+    publish(root/BUDGET_OWNER,encode(value))
+
+def checked_budget_owner(root,*,live=False):
+    from ui_control import checked_budget, UI_BUDGET_SECONDS
+    raw=read_regular(root/BUDGET_OWNER,limit=8192);value=budget_document(json_read(raw))
+    record_raw=read_regular(root/'ui-deadline.json',limit=4096)
+    require(digest(record_raw)==value['record_sha256'] and json_read(record_raw)==value['record'])
+    require(value['context']==context(root))
+    if live:
+        from ui_control import checked_live_budget
+        deadline=checked_live_budget(value['record'],UI_BUDGET_SECONDS)
+        require(time.monotonic()<deadline)
+    return value,digest(raw)
+
+def owner_matches_gui(budget,identity):
+    owner=budget['record']['owner']
+    require(identity['ppid']==owner['pid'] and identity['uid']==owner['uid'])
+    require(int(identity['start_time'])>=int(owner['start_time']))
+
+def collect_budget_owner(root,run_id,attempt):
+    """Retain the original typed budget even if a later diagnostic is invalid."""
+    root=Path(root);validate_directory(root)
+    require(root.name=='academy-ui-'+token(run_id,r'[1-9][0-9]{0,19}')+'-'+token(attempt,r'[1-9][0-9]{0,19}'))
+    value,_=checked_budget_owner(root)
+    require(value['context']['run_id']==run_id and value['context']['run_attempt']==attempt)
+    return encode(value)
+
 def anchor_document(value):
     fields={'schema_version','kind','context','trust_receipt_sha256','display_binding_sha256',
-            'anchor_wall_ns','anchor_monotonic','effective_deadline','ui_deadline'}
+            'anchor_wall_ns','anchor_monotonic','effective_deadline','ui_deadline','budget_owner_sha256'}
     require(type(value) is dict and set(value)==fields)
     integer(value['schema_version'],1,1);require(value['kind']=='POST_TRUST_ANCHOR_NOT_ACCEPTANCE')
     from project_trust import validate_context
     validate_context(value['context'])
-    for key in ('trust_receipt_sha256','display_binding_sha256'):token(value[key],r'[0-9a-f]{64}')
+    for key in ('trust_receipt_sha256','display_binding_sha256','budget_owner_sha256'):token(value[key],r'[0-9a-f]{64}')
     integer(value['anchor_wall_ns'],0,2**63-1)
     start=number(value['anchor_monotonic'],0,10**10);ui=number(value['ui_deadline'],0,10**10)
     require(value['effective_deadline']==max(start,min(start+LIMIT_SECONDS,ui)))
@@ -73,18 +126,24 @@ def validate_document(value):
     fields={'schema_version','kind','status','context','trust_receipt_sha256','display_binding_sha256','ui_identity','anchor_sha256',
             'anchor_wall_ns','anchor_monotonic','effective_deadline','observer_limit_seconds','fallback_seconds',
             'capture_trigger','scan_count','elapsed_seconds','at_utc','screenshot_status','screenshot_sha256',
-            'stacks','stack_availability','dump_process_attribution'}
+            'stacks','stack_availability','dump_process_attribution','budget_owner','budget_owner_sha256'}
     require(type(value) is dict and set(value)==fields)
     integer(value['schema_version'],1,1);require(value['kind']=='POST_TRUST_PASSIVE_DIAGNOSTIC_NOT_ACCEPTANCE')
     enum(value['status'],STATUSES)
     from project_trust import validate_context
     validate_context(value['context'])
-    for key in ('trust_receipt_sha256','display_binding_sha256','anchor_sha256'):token(value[key],r'[0-9a-f]{64}')
+    for key in ('trust_receipt_sha256','display_binding_sha256','anchor_sha256','budget_owner_sha256'):token(value[key],r'[0-9a-f]{64}')
+    budget=budget_document(value['budget_owner']);require(budget['context']==value['context'])
+    require(digest(encode(budget))==value['budget_owner_sha256'])
     identity=value['ui_identity'];require(type(identity) is dict and set(identity)=={'pid','ppid','uid','pgrp','session','start_time'})
     for key in ('pid','ppid','uid','pgrp','session'):integer(identity[key],0 if key in ('uid','ppid') else 1,2**31-1)
     token(identity['start_time'],r'[0-9]{1,20}')
+    owner_matches_gui(budget,identity)
     integer(value['anchor_wall_ns'],0,2**63-1)
     start=number(value['anchor_monotonic'],0,10**10);end=number(value['effective_deadline'],start,start+LIMIT_SECONDS)
+    owner_born=int(budget['record']['owner']['start_time'])/os.sysconf('SC_CLK_TCK')
+    require(owner_born<=start<budget['record']['monotonic_deadline'])
+    require(end==min(start+LIMIT_SECONDS,budget['record']['monotonic_deadline']))
     integer(value['observer_limit_seconds'],LIMIT_SECONDS,LIMIT_SECONDS);integer(value['fallback_seconds'],FALLBACK_SECONDS,FALLBACK_SECONDS)
     enum(value['capture_trigger'],TRIGGERS);integer(value['scan_count'],0,91)
     # A late scheduling observation must be truthful, but cannot authorize late reads/captures.
@@ -114,22 +173,26 @@ class Observer:
         self.root=Path(root);request,receipt_sha=checked_receipt(self.root)
         identity.verify()
         require(identity.metadata['ide']==bound_ui_identity(self.root))
+        budget,budget_sha=checked_budget_owner(self.root,live=True)
+        owner_matches_gui(budget,identity.metadata['ide'])
         self.run=self.root.parent/('academy-run-'+request['run_id']+'-'+request['run_attempt'])
         self.start=time.monotonic();self.anchor=time.time_ns()
         require(type(ui_deadline) in (int,float) and math.isfinite(ui_deadline))
+        require(ui_deadline==budget['record']['monotonic_deadline'])
         self.deadline=max(self.start,min(self.start+LIMIT_SECONDS,ui_deadline))
         self.next_scan=self.start;self.previous=None;self.current=None;self.first_id=None;self.done=False
         self.value={'schema_version':1,'kind':'POST_TRUST_PASSIVE_DIAGNOSTIC_NOT_ACCEPTANCE',
             'status':'UNAVAILABLE_NOT_ACCEPTANCE','context':{k:request[k] for k in CONTEXT_FIELDS},
             'trust_receipt_sha256':receipt_sha,'display_binding_sha256':request['display_binding_sha256'],
             'ui_identity':dict(identity.metadata['ide']),'anchor_wall_ns':self.anchor,'anchor_monotonic':self.start,
+            'budget_owner':budget,'budget_owner_sha256':budget_sha,
             'effective_deadline':self.deadline,'observer_limit_seconds':LIMIT_SECONDS,'fallback_seconds':FALLBACK_SECONDS,
             'capture_trigger':'OBSERVER_DEADLINE','scan_count':0,'elapsed_seconds':0,'at_utc':utc(),
             'screenshot_status':'UNAVAILABLE_DEADLINE','screenshot_sha256':None,'stacks':None,
             'stack_availability':'UNAVAILABLE_CAPTURE','dump_process_attribution':'NOT_IDENTIFIED_NO_JVM_ATTACH'}
         anchor={k:self.value[k] for k in ('context','trust_receipt_sha256','display_binding_sha256',
                 'anchor_wall_ns','anchor_monotonic','effective_deadline')}
-        anchor.update(schema_version=1,kind='POST_TRUST_ANCHOR_NOT_ACCEPTANCE',ui_deadline=ui_deadline)
+        anchor.update(schema_version=1,kind='POST_TRUST_ANCHOR_NOT_ACCEPTANCE',ui_deadline=ui_deadline,budget_owner_sha256=budget_sha)
         raw=encode(anchor_document(anchor));publish(self.root/ANCHOR,raw);self.value['anchor_sha256']=digest(raw)
 
     def tick(self,proc,screen,identity):
@@ -199,8 +262,11 @@ def collect(root,run_id,attempt):
             and value['display_binding_sha256']==request['display_binding_sha256'])
     require(value['ui_identity']['pid']==request['window_identity']['pid'])
     require(value['ui_identity']==bound_ui_identity(root))
-    born=int(value['ui_identity']['start_time'])/os.sysconf('SC_CLK_TCK')
-    require(anchor['ui_deadline']==born+900 and anchor['anchor_monotonic']>=born)
+    budget,budget_sha=checked_budget_owner(root)
+    require(value['budget_owner']==budget and value['budget_owner_sha256']==anchor['budget_owner_sha256']==budget_sha)
+    owner_matches_gui(budget,value['ui_identity'])
+    born=int(budget['record']['owner']['start_time'])/os.sysconf('SC_CLK_TCK')
+    require(anchor['ui_deadline']==budget['record']['monotonic_deadline'] and born<=anchor['anchor_monotonic']<anchor['ui_deadline'])
     result={REPORT:encode(value)}
     if value['screenshot_status']=='CAPTURED_NOT_ACCEPTANCE':
         raw=read_regular(root/PNG,limit=2*1024*1024);require(digest(raw)==value['screenshot_sha256']);clean=clean_png(raw)

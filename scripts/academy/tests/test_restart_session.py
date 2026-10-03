@@ -13,6 +13,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import restart_session as session
 import ui_session as ui
 import ui_control
+import post_trust_diagnostic as diagnostic
 import apparmor_profile as profile
 from test_project_trust import TrustFixture
 
@@ -71,7 +72,7 @@ class RestartHarness(TrustFixture):
                 patch.object(session.zipfile,'ZipFile',return_value=jar),patch.object(session,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),
                 patch.object(ui_control,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(session.signal,'signal'),
                 patch.object(session.time,'monotonic',side_effect=now),patch.object(session.time,'sleep'),patch.object(ui,'put',side_effect=put),
-                patch.object(session.trust,'context',return_value=context),patch.object(session.trust,'checkpoint'),
+                patch.object(session.trust,'context',return_value=context),patch.object(diagnostic,'context',return_value=context),patch.object(session.trust,'checkpoint'),
                 patch.object(session.plugin,'checkpoint'),patch.object(ui,'PostTrustObserver',return_value=observer),
                 patch.object(ui,'optional_display_diagnostic',side_effect=InterruptedError('synthetic') if fail_at=='capture' else None),
                 patch.object(session.os,'readlink',return_value='/sdk/idea/bin/idea'),patch.object(profile,'prepare',return_value={'parser':{'route':'TERMINAL_SUDO','expected_helpers':{}}}),
