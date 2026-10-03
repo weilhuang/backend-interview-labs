@@ -183,10 +183,10 @@ class SupplementalSafetyTests(unittest.TestCase):
         with patch.dict(os.environ,{'CI':'true'}),patch('redis_probe.socket.create_connection') as connect:
             with self.assertRaises(ValueError):probe(16379,'user-default')
             connect.assert_not_called()
-    def test_only_two_standard_jobs_and_no_wait_for_own_ci_cycle(self):
+    def test_native_jobs_and_isolated_legal_preflight_have_no_own_ci_cycle(self):
         import yaml
         workflow=yaml.load((Path(__file__).resolve().parents[3]/'.github/workflows/academy-official.yml').read_text(),Loader=yaml.BaseLoader)
-        self.assertEqual(set(workflow['jobs']),{'package','environment'})
+        self.assertEqual(set(workflow['jobs']),{'package','environment','legal-preflight'})
         self.assertEqual(workflow['jobs']['environment']['needs'],'package')
         self.assertNotIn('needs',workflow['jobs']['package'])
         for job in workflow['jobs'].values():self.assertEqual(job['runs-on'],'ubuntu-24.04')

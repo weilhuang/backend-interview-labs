@@ -8,6 +8,7 @@ from go_environment import validated_go_environment
 from display_diagnostic import capture as capture_display_diagnostic
 from project_trust import checkpoint as trust_checkpoint, context as trust_context, ACTION as TRUST_ACTION
 from post_trust_diagnostic import Observer as PostTrustObserver
+from plugin_agreement import checkpoint as plugin_checkpoint, ACTIONS as PLUGIN_ACTIONS
 from ui_control import ACTIONS, EUA_SHA256, FIELDS, UI_BUDGET_SECONDS, strict_json, validate_control, atomic_json, checked_budget, read_ui_deadline
 
 
@@ -246,7 +247,7 @@ def launch(root,command):
 
 
 def await_stage(root,stage):
-    deadline=read_ui_deadline(root) if stage==4 else read_outer_deadline(root)
+    deadline=read_ui_deadline(root) if stage in (4,5,6) else read_outer_deadline(root)
     # 首次还包含官方export，仍受其原600秒与原60分钟总界限，不延长。
     while time.monotonic()<deadline:
         if (root/f'stage-{stage}'/'request.json').is_file():return
@@ -423,6 +424,10 @@ def display_session(root,idea,command):
         if action==TRUST_ACTION:
             args.extend([sys.executable,str(Path(__file__).with_name('project_trust.py')),
                          str(root/'stage-4/window-identity.json'),str(root)])
+        if action in PLUGIN_ACTIONS.values():
+            stage=next(k for k,v in PLUGIN_ACTIONS.items() if v==action)
+            args.extend([sys.executable,str(Path(__file__).with_name('plugin_agreement.py')),
+                         str(root/f'stage-{stage}/window-identity.json'),str(root)])
         args.append(str(identity.binding))
         subprocess.run(args,check=True,timeout=snapshot_timeout(ui_deadline,diagnostic_deadline),env=clean_env(),
                        pass_fds=tuple(fd for _,fd in identity.handles.values()))
@@ -462,7 +467,7 @@ def display_session(root,idea,command):
             put(stage_dir/'receipt.json',{**expected,'after_sha256':hashlib.sha256((stage_dir/'after.png').read_bytes()).hexdigest(),
                                          'status':'UI_ACTION_PERFORMED_NOT_ACCEPTANCE'})
         put(root/'ui-complete.json',{'status':'NORMAL_UI_COMPLETED_NOT_COURSE_ACCEPTANCE'})
-        diagnostic_due=time.monotonic()+30;diagnostic_done=False;post_trust_observer=None
+        diagnostic_due=time.monotonic()+30;diagnostic_done=False;post_trust_observer=None;plugin_done=False
         while proc.poll() is None:
             owned.scan()
             if not diagnostic_done and time.monotonic()>=diagnostic_due:
@@ -471,6 +476,10 @@ def display_session(root,idea,command):
                 trust_checkpoint(root,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())
                 post_trust_observer=PostTrustObserver(root,identity,ui_deadline)
             if post_trust_observer is not None:post_trust_observer.tick(proc,screen,identity)
+            if post_trust_observer is not None and post_trust_observer.done and not plugin_done:
+                for stage in (5,6):
+                    plugin_checkpoint(root,stage,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())
+                plugin_done=True
             time.sleep(.25)
         if post_trust_observer is not None:post_trust_observer.tick(proc,screen,identity)
         if not diagnostic_done:
@@ -487,7 +496,7 @@ def display_session(root,idea,command):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('mode',choices=['launch','worker','await','complete','trust-complete','finish','cleanup','display','server'])
-    p.add_argument('--root',type=Path,required=True);p.add_argument('--stage',type=int,choices=[1,2,3,4])
+    p.add_argument('--root',type=Path,required=True);p.add_argument('--stage',type=int,choices=[1,2,3,4,5,6])
     p.add_argument('--idea',type=Path)
     argv=sys.argv[1:];index=argv.index('--') if '--' in argv else len(argv)
     a=p.parse_args(argv[:index]);command=argv[index+1:]

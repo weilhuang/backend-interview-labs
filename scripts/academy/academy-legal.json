@@ -1,0 +1,34 @@
+{
+  "schema_version": 3,
+  "verification_scope": "REVIEWED_OFFICIAL_PDF_BYTES_ONLY",
+  "html_semantics": "NOT_VERIFIED",
+  "ui_links": {
+    "plugin": "https://www.jetbrains.com/legal/docs/terms/jetbrains-academy/plugin/",
+    "privacy": "https://www.jetbrains.com/legal/docs/privacy/privacy/",
+    "ai_not_accepted": "https://www.jetbrains.com/legal/docs/terms/jetbrains-ai-service/"
+  },
+  "documents": [
+    {
+      "document": "plugin",
+      "version": "1.3",
+      "format": "pdf",
+      "url": "https://www.jetbrains.com/legal/docs/terms/jetbrains-academy/plugin/plugin.pdf",
+      "bytes": 38446,
+      "sha256": "6720d6f4e78263d8cf7dadaa09b27e18873937715f423d5bae8dab27afb75a42",
+      "title": "JETBRAINS ACADEMY PLUGIN USER AGREEMENT",
+      "version_line": "Version 1.3, effective as of February 24, 2025",
+      "scope": "BASE_ACADEMY_PLUGIN_USAGE"
+    },
+    {
+      "document": "privacy",
+      "version": "3.2",
+      "format": "pdf",
+      "url": "https://www.jetbrains.com/legal/docs/privacy/privacy/privacy.pdf",
+      "bytes": 77909,
+      "sha256": "d664ac2c6bdc0a9598cad4afca09d5ae9b7348d528205b28e8335cf9243ac84f",
+      "title": "JetBrains Privacy Notice",
+      "version_line": "Version 3.2, last updated: 12 June 2026",
+      "scope": "JETBRAINS_PRIVACY_NOTICE"
+    }
+  ]
+}

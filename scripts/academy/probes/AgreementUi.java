@@ -89,7 +89,9 @@ class AgreementUi {
             return;
         }
         boolean trust=args[0].equals("TRUST_VALIDATION_PROJECT");
-        if (args.length != (trust ? 9 : 5) || !args[2].matches("[0-9a-f]{64}")) throw new IllegalArgumentException("截图摘要不符");
+        boolean plugin=args[0].equals("CHECK_ACADEMY_PLUGIN_ONLY") || args[0].equals("AGREE_ACADEMY_PLUGIN_ONLY");
+        boolean bound=trust || plugin;
+        if (args.length != (bound ? 9 : 5) || !args[2].matches("[0-9a-f]{64}")) throw new IllegalArgumentException("截图摘要不符");
         // 固定 SDK、1280x900 无窗口管理器的已观察布局；审图人员须确认目标点确在相应控件内。
         int x, y;
         switch(args[0]) {
@@ -97,6 +99,8 @@ class AgreementUi {
             case "CONTINUE_EUA": x=879; y=651; break;
             case "DECLINE_USAGE": x=663; y=651; break;
             case "TRUST_VALIDATION_PROJECT": x=596; y=517; break;
+            case "CHECK_ACADEMY_PLUGIN_ONLY": x=448; y=403; break;
+            case "AGREE_ACADEMY_PLUGIN_ONLY": x=765; y=539; break;
             default: throw new IllegalArgumentException("不支持的动作");
         }
         // 同一调用中再次全图比对；任何动态变化均拒绝，不做坐标猜测或自动适配。
@@ -107,7 +111,7 @@ class AgreementUi {
             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
         };
-        if (trust) {
+        if (bound) {
             verifyTrustWindow(args);
             finalTrustClick(() -> { verifyTrustWindow(args); verifyOwned(binding); },
                 () -> capture(robot,bounds),args[2],() -> {

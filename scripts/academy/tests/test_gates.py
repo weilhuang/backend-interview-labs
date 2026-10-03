@@ -158,7 +158,7 @@ class WorkflowTests(unittest.TestCase):
     def workflow(self):
         return yaml.load((Path(__file__).resolve().parents[3]/'.github/workflows/academy-official.yml').read_text(),Loader=yaml.BaseLoader)
     def test_manual_standard_runner_read_only(self):
-        w=self.workflow();self.assertEqual(set(w['on']),{'workflow_dispatch','push'});self.assertEqual(w['on']['push']['branches'],['academy-validation/smoke','academy-validation/full'])
+        w=self.workflow();self.assertEqual(set(w['on']),{'workflow_dispatch','push'});self.assertEqual(w['on']['push']['branches'],['academy-validation/smoke','academy-validation/full','academy-validation/legal-preflight'])
         self.assertEqual(w['permissions'],{'contents':'read','actions':'read'})
         self.assertEqual(w['jobs']['package']['runs-on'],'ubuntu-24.04')
         self.assertEqual(w['on']['workflow_dispatch']['inputs']['phase']['default'],'export-import-smoke')
@@ -168,17 +168,18 @@ class WorkflowTests(unittest.TestCase):
         ui=[s for s in all_uploads if s['with']['name'].startswith('academy-ui-')]
         uploads=[s for s in all_uploads if not s['with']['name'].startswith('academy-ui-')]
         self.assertEqual(len(uploads),2)
-        self.assertEqual(len(ui),8)
+        self.assertEqual(len(ui),12)
         for step in ui:
             self.assertIn("inputs.phase == 'full-validation'",step['if'])
             self.assertEqual(step['with']['retention-days'],'1')
             for path in step['with']['path'].splitlines():
                 allowed_trust={'${{ env.UI_RUN }}/trust-'+phase+'-artifact/project-trust-'+name for phase,names in [('review',('before.png','request.json','images.json','review-target.json')),('receipt',('before.png','after.png','request.json','receipt.json','images.json'))] for name in names}
-                self.assertTrue(path.startswith('${{ env.UI_RUN }}/stage-') or path in allowed_trust|{'${{ env.UI_RUN }}/post-trust-artifact/'+name for name in ('post-trust-diagnostic.json','post-trust-diagnostic.png','post-trust-images.json')}|{'${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.json','${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.png'})
+                allowed_plugin={'${{ env.UI_RUN }}/plugin-'+str(stage)+'-'+phase+'-artifact/plugin-stage-'+str(stage)+'-'+name for stage in (5,6) for phase,names in [('review',('before.png','request.json','images.json','review-target.json')),('receipt',('before.png','after.png','request.json','receipt.json','images.json'))] for name in names}
+                self.assertTrue(path.startswith('${{ env.UI_RUN }}/stage-') or path in allowed_plugin|allowed_trust|{'${{ env.UI_RUN }}/post-trust-artifact/'+name for name in ('post-trust-diagnostic.json','post-trust-diagnostic.png','post-trust-images.json')}|{'${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.json','${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.png'})
                 for forbidden in ('profile','token','.zip','/home/'):
                     self.assertNotIn(forbidden,path.lower())
         self.assertEqual({x['with']['name'].split('${{')[0] for x in ui},
-                         {'academy-ui-stage-1-','academy-ui-stage-2-','academy-ui-stage-3-','academy-ui-stage-4-','academy-ui-project-trust-','academy-ui-post-trust-','academy-ui-receipts-','academy-ui-diagnostic-'})
+                         {'academy-ui-plugin-stage-5-','academy-ui-plugin-stage-6-','academy-ui-plugin-receipt-5-','academy-ui-plugin-receipt-6-','academy-ui-stage-1-','academy-ui-stage-2-','academy-ui-stage-3-','academy-ui-stage-4-','academy-ui-project-trust-','academy-ui-post-trust-','academy-ui-receipts-','academy-ui-diagnostic-'})
         self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outputs.collected == 'true'")
         self.assertIn("steps.handoff.outcome == 'success'",uploads[1]['if'])
         self.assertEqual(uploads[1]['with']['retention-days'],'1');self.assertIn('NOT-A-RELEASE',uploads[1]['with']['name'])
@@ -187,7 +188,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("steps.environment.outcome == 'success'",final['if']);self.assertIn("steps.release_gate.outcome == 'success'",final['if'])
         self.assertEqual(final['with']['retention-days'],'7');self.assertEqual(final['with']['if-no-files-found'],'error')
     def test_no_cache_schedule_or_paid_runner(self):
-        w=self.workflow();self.assertNotIn('schedule',w['on']);self.assertEqual(w['on']['push']['branches'],['academy-validation/smoke','academy-validation/full'])
+        w=self.workflow();self.assertNotIn('schedule',w['on']);self.assertEqual(w['on']['push']['branches'],['academy-validation/smoke','academy-validation/full','academy-validation/legal-preflight'])
         self.assertFalse(any('cache' in s.get('uses','') for s in w['jobs']['package']['steps']))
 
 
@@ -423,10 +424,10 @@ class ReleaseBoundaryTests(unittest.TestCase):
         first=next(i for i,step in enumerate(steps) if step.get('id')=='official')
         last=next(i for i,step in enumerate(steps) if step.get('run')=='python scripts/academy/ui_session.py finish --root "$UI_RUN"')
         group=steps[first:last+1]
-        self.assertEqual(len(group),19)
+        self.assertEqual(len(group),31)
         self.assertIn('ui_session.py launch --root "$UI_RUN"',group[0]['run'])
         self.assertEqual(sum('ui_control.py' in x.get('run','') for x in group),3)
-        self.assertEqual(sum(x.get('uses')=='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' for x in group),8)
+        self.assertEqual(sum(x.get('uses')=='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' for x in group),12)
         for step in group[1:]:self.assertIn("inputs.phase == 'full-validation'",step['if'])
         # 三阶段共享同一已启动进程的kernel-start绝对截止，不按每个等待步骤重新发放60分钟。
         source=(Path(__file__).resolve().parents[1]/'ui_session.py').read_text()

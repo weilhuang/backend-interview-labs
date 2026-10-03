@@ -16,7 +16,7 @@ class TrustClickTest {
         AgreementUi.finalTrustClick(() -> order.add("probe"), () -> { order.add("image"); return current[0]; },
                                     sha(approved), () -> { order.add("click"); clicks[0]++; });
         require(clicks[0]==1 && order.equals(List.of("probe","image","click")));tests++;
-        for (String changed : List.of("synthetic checked parent checkbox","synthetic different project dialog")) {
+        for (String changed : List.of("synthetic checked parent checkbox","synthetic different project dialog","synthetic AI checkbox selected","synthetic base plugin checkbox changed")) {
             clicks[0]=0;current[0]=approved;
             try {
                 AgreementUi.finalTrustClick(() -> current[0]=changed.getBytes(), () -> current[0],sha(approved), () -> clicks[0]++);

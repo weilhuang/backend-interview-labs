@@ -9,18 +9,25 @@ TARGET=(596,517)  # The reviewed normal Trust Project button; never the parent c
 def require(ok):
     if not ok:raise ValueError('invalid validation window identity')
 
-def validate(value):
+TARGETS={"TRUST_VALIDATION_PROJECT":TARGET,"CHECK_ACADEMY_PLUGIN_ONLY":(448,403),"AGREE_ACADEMY_PLUGIN_ONLY":(765,539)}
+
+def target(action):
+    require(type(action) is str and action in TARGETS);return TARGETS[action]
+
+def validate(value,action="TRUST_VALIDATION_PROJECT"):
+    point=target(action)
     fields={'window_id','pid','x','y','width','height','border','title_sha256'}
     require(type(value) is dict and set(value)==fields)
     limits={'window_id':(1,0xffffffff),'pid':(1,2**31-1),'x':(0,1279),'y':(0,899),
             'width':(1,1280),'height':(1,900),'border':(0,8)}
     for key,(low,high) in limits.items():require(type(value[key]) is int and low<=value[key]<=high)
     require(value['x']+value['width']<=1280 and value['y']+value['height']<=900)
-    require(value['x']<=TARGET[0]<value['x']+value['width'] and value['y']<=TARGET[1]<value['y']+value['height'])
+    require(value['x']<=point[0]<value['x']+value['width'] and value['y']<=point[1]<value['y']+value['height'])
     require(type(value['title_sha256']) is str and re.fullmatch('[0-9a-f]{64}',value['title_sha256']) is not None)
     return value
 
-def observe(ide_pid):
+def observe(ide_pid,action="TRUST_VALIDATION_PROJECT"):
+    point=target(action)
     """No window-tree traversal, raw titles, arbitrary display or arbitrary target."""
     require(type(ide_pid) is int and 1<=ide_pid<2**31)
     display=os.environ.get('DISPLAY','');require(re.fullmatch(r':[0-9]{1,4}',display) is not None)
@@ -53,7 +60,7 @@ def observe(ide_pid):
             if data:x.XFree(data)
     try:
         root=x.XDefaultRootWindow(connection);dest_x=i();dest_y=i();window=u()
-        checked(x.XTranslateCoordinates(connection,root,root,*TARGET,C.byref(dest_x),C.byref(dest_y),C.byref(window)))
+        checked(x.XTranslateCoordinates(connection,root,root,*point,C.byref(dest_x),C.byref(dest_y),C.byref(window)))
         require(window.value!=0 and window.value!=root)
         origin=u();left=i();top=i();width=ui();height=ui();border=ui();depth=ui()
         checked(x.XGetGeometry(connection,window,C.byref(origin),C.byref(left),C.byref(top),C.byref(width),C.byref(height),C.byref(border),C.byref(depth)))
@@ -64,5 +71,5 @@ def observe(ide_pid):
         title=prop(window,b'WM_NAME',8,b'STRING')
         return validate({'window_id':window.value,'pid':pid,'x':left.value,'y':top.value,
                          'width':width.value,'height':height.value,'border':border.value,
-                         'title_sha256':hashlib.sha256(title).hexdigest()})
+                         'title_sha256':hashlib.sha256(title).hexdigest()},action)
     finally:x.XCloseDisplay(connection)

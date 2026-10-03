@@ -8,6 +8,7 @@ import re
 from thread_diagnostics import NAME as THREAD_NAME, MAX_OUTPUT as THREAD_LIMIT, strict_json as thread_json, validate_document as thread_document
 from display_diagnostic import collect as collect_display, REPORT_NAME as DISPLAY_REPORT
 from project_trust import collect as collect_project_trust
+from plugin_agreement import collect as collect_plugin_agreement
 from post_trust_diagnostic import collect as collect_post_trust, REPORT as POST_TRUST_REPORT
 from safe_io import absolute, new_directory, read_regular, validate_directory, write_new
 NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','source-contract.json',
@@ -212,6 +213,13 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
         except InterruptedError:raise
         except FileNotFoundError:omitted.append({'name':POST_TRUST_REPORT,'reason':'MISSING'})
         except Exception:omitted.append({'name':POST_TRUST_REPORT,'reason':'INVALID_OR_UNAVAILABLE'})
+        for stage in (5,6):
+            try:
+                for name,data in collect_plugin_agreement(absolute(ui_root),stage,current.get('run_id'),current.get('run_attempt')).items():
+                    output[name]=data;hashes[name]={'uploaded_sha256':sha256(data).hexdigest()}
+            except InterruptedError:raise
+            except FileNotFoundError:omitted.append({'name':f'plugin-stage-{stage}-request.json','reason':'MISSING'})
+            except Exception:omitted.append({'name':f'plugin-stage-{stage}-request.json','reason':'INVALID_OR_UNAVAILABLE'})
     if 'summary.json' not in output:
         output['summary.json']=(json.dumps({'status':'NOT_RUN','reason':'official command not reached'})+'\n').encode()
     summary=json.loads(output['summary.json'])
