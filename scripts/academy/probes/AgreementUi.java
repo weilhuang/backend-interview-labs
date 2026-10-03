@@ -2,6 +2,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,10 +13,19 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
-/** 仅供本次专用 Xvfb；动作不接受坐标、文本或任意命令。 */
+/** 本次专用 Xvfb；有限审图坐标或固定 Enter，不接收文本与任意命令。 */
 class AgreementUi {
     interface CheckedStep { void run() throws Exception; }
     interface Snapshot { byte[] read() throws Exception; }
+    static int[] profilePoint(String horizontal, String vertical) {
+        if (!horizontal.matches("[0-9]{1,4}") || !vertical.matches("[0-9]{1,3}")) throw new IllegalArgumentException("本次审图坐标不符");
+        int x=Integer.parseInt(horizontal),y=Integer.parseInt(vertical);
+        if (x>=1280 || y>=900) throw new IllegalArgumentException("本次审图坐标越界");
+        return new int[]{x,y};
+    }
+    static void profileClick(CheckedStep ownership, CheckedStep cancellation, CheckedStep click) throws Exception {
+        ownership.run(); cancellation.run(); click.run();
+    }
     static void finalTrustClick(CheckedStep finalProbe, Snapshot image, String approvedSha, CheckedStep click) throws Exception {
         finalProbe.run();
         // No blocking metadata probe may follow this final whole-image comparison.
@@ -37,7 +47,8 @@ class AgreementUi {
         try (var stream = Files.newInputStream(binding)) { expected.load(stream); }
         if (!expected.getProperty("authority.path").equals(System.getenv("XAUTHORITY"))) throw new IllegalStateException("授权文件路径变化");
         if (!expected.getProperty("display").equals(System.getenv("DISPLAY"))) throw new IllegalStateException("显示器编号变化");
-        for (String kind : new String[]{"wrapper", "server", "ide"}) {
+        String[] kinds=expected.containsKey("terminal.pid") ? new String[]{"wrapper","server","ide","terminal"} : new String[]{"wrapper","server","ide"};
+        for (String kind : kinds) {
             String pid = expected.getProperty(kind+".pid");
             String fd = expected.getProperty(kind+".fd");
             if (!pid.matches("[0-9]+") || !fd.matches("[0-9]+")) throw new IllegalStateException("进程标识不符");
@@ -76,7 +87,7 @@ class AgreementUi {
         }
     }
     public static void main(String[] args) throws Exception {
-        if (args.length != 3 && args.length != 5 && args.length != 9) throw new IllegalArgumentException("参数数量不符");
+        if (args.length != 3 && args.length != 5 && args.length != 9 && args.length != 11) throw new IllegalArgumentException("参数数量不符");
         Path binding=Path.of(args[args.length-1]);
         verifyOwned(binding);
         var device = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -90,8 +101,11 @@ class AgreementUi {
         }
         boolean trust=args[0].equals("TRUST_VALIDATION_PROJECT");
         boolean plugin=args[0].equals("CHECK_ACADEMY_PLUGIN_ONLY") || args[0].equals("AGREE_ACADEMY_PLUGIN_ONLY");
-        boolean bound=trust || plugin;
-        if (args.length != (bound ? 9 : 5) || !args[2].matches("[0-9a-f]{64}")) throw new IllegalArgumentException("截图摘要不符");
+        boolean profile=args[0].equals("ENABLE_BROWSER_OPTIONS") || args[0].equals("INSTALL_SCOPED_APPARMOR_PROFILE");
+        boolean install=args[0].equals("INSTALL_SCOPED_APPARMOR_PROFILE");
+        boolean terminal=args[0].equals("ACK_VENDOR_INSTALL_COMPLETION");
+        boolean bound=trust || plugin || profile || terminal;
+        if (args.length != (profile ? 11 : bound ? 9 : 5) || !args[2].matches("[0-9a-f]{64}")) throw new IllegalArgumentException("截图摘要不符");
         // 固定 SDK、1280x900 无窗口管理器的已观察布局；审图人员须确认目标点确在相应控件内。
         int x, y;
         switch(args[0]) {
@@ -101,6 +115,11 @@ class AgreementUi {
             case "TRUST_VALIDATION_PROJECT": x=596; y=517; break;
             case "CHECK_ACADEMY_PLUGIN_ONLY": x=448; y=403; break;
             case "AGREE_ACADEMY_PLUGIN_ONLY": x=765; y=539; break;
+            case "ACK_VENDOR_INSTALL_COMPLETION": x=-1; y=-1; break; // No click, focus change, or text input.
+            case "ENABLE_BROWSER_OPTIONS":
+            case "INSTALL_SCOPED_APPARMOR_PROFILE":
+                int[] point=profilePoint(args[8],args[9]);x=point[0];y=point[1];
+                break;
             default: throw new IllegalArgumentException("不支持的动作");
         }
         // 同一调用中再次全图比对；任何动态变化均拒绝，不做坐标猜测或自动适配。
@@ -108,17 +127,27 @@ class AgreementUi {
         if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("再次采集画面不同");
         verifyOwned(binding);
         CheckedStep click = () -> {
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            if (terminal) { robot.keyPress(KeyEvent.VK_ENTER); robot.keyRelease(KeyEvent.VK_ENTER); }
+            else { robot.mousePress(InputEvent.BUTTON1_DOWN_MASK); robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); }
         };
         if (bound) {
             verifyTrustWindow(args);
             finalTrustClick(() -> { verifyTrustWindow(args); verifyOwned(binding); },
                 () -> capture(robot,bounds),args[2],() -> {
-                    robot.mouseMove(x,y); verifyOwned(binding); click.run();
+                    if (!terminal) robot.mouseMove(x,y);
+                    if (profile || terminal) profileClick(() -> verifyOwned(binding), () -> {
+                        if (Files.exists(Path.of(args[7]).resolve("cancelled.json"))) throw new InterruptedException("本次准备已取消");
+                    },click);
+                    else { verifyOwned(binding);click.run(); }
                 });
         } else {
             robot.mouseMove(x,y); verifyOwned(binding); click.run();
+        }
+        if (install || terminal) {
+            // The armed normal vendor action may close this IDE immediately.
+            // Record only dispatch. New process/context/images prove outcome.
+            Files.writeString(Path.of(args[3]),args[0]+"\n",StandardOpenOption.CREATE_NEW);
+            return;
         }
         robot.delay(500);
         verifyOwned(binding);

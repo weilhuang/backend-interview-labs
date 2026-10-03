@@ -206,13 +206,11 @@ class OwnershipRevisionTest(unittest.TestCase):
                 with self.assertRaises(OSError):session.server_session(r,['fixture'])
             owned.stop.assert_called_once();proc.wait.assert_called_once()
     def test_ui_deadline_write_failure_after_spawn_cleans(self):
-        import hashlib
-        with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);proc=Mock();owned=Mock();owned.register_root.return_value=self.child
-            identity=Mock();jar=MagicMock();jar.__enter__.return_value=jar;jar.getinfo.return_value.file_size=7;jar.read.return_value=b'fixture'
-            with patch.object(session,'trust_context'),patch.object(session.zipfile,'ZipFile',return_value=jar),patch.object(session,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(session,'Owned',return_value=owned),patch.object(session,'DisplayIdentity',return_value=identity),patch.object(session.subprocess,'Popen',return_value=proc),patch.object(session,'put',side_effect=OSError('fixture')),patch.object(session.signal,'signal'):
-                with self.assertRaises(OSError):session.display_session(root,root,['fixture'])
-            owned.stop.assert_called_once();identity.close.assert_called_once();proc.wait.assert_called_once()
+        from test_restart_session import run_fixture
+        code,value,family,identity,_=run_fixture('deadline-write')
+        self.assertEqual(code,1);self.assertFalse(value['phase2_started'])
+        family.spawn.assert_not_called()
+        self.assertEqual(value['registered_processes'],0)
 
 class DisplayIdentityRevisionTest(unittest.TestCase):
     def identity(self):
@@ -366,9 +364,9 @@ class SharedUiDeadlineTest(unittest.TestCase):
         waits=[step for step in workflow['jobs']['package']['steps'] if 'ui_control.py' in step.get('run','')]
         self.assertEqual(len(waits),3);self.assertTrue(all(step['timeout-minutes']==5 for step in waits))
         source=(BASE/'ui_session.py').read_text()
-        self.assertIn('while time.monotonic()<started+30:',source)
-        self.assertIn('owned=Owned(started+2700)',source)
-        self.assertEqual(source.count("put(root/'ui-deadline.json',record)"),1)
+        self.assertIn('end=min(ui_deadline,time.monotonic()+30)',(BASE/'restart_session.py').read_text())
+        self.assertIn('deadline=min(started+2700,ui.read_outer_deadline(root))',(BASE/'restart_session.py').read_text())
+        self.assertEqual((BASE/'restart_session.py').read_text().count("ui.put(root/'ui-deadline.json',ui_record)"),1)
         self.assertIn("put(root/'state.json',budget_record(owner,3600))",source)
         self.assertIn("2700,root,phase='validate'",(BASE/'run_official.py').read_text())
 
@@ -380,7 +378,7 @@ class WorkflowTest(unittest.TestCase):
     def test_original_budgets(self):
         self.assertIn('&& 85 || 30',self.workflow);self.assertIn('timeout-minutes: 65',self.workflow)
         self.assertIn("2700,root,phase='validate'",self.runner)
-        self.assertIn('ui_deadline=started+UI_BUDGET_SECONDS',(BASE/'ui_session.py').read_text())
+        self.assertIn("ui_record=ui.budget_record(owner,UI_BUDGET_SECONDS)",(BASE/'restart_session.py').read_text())
     def test_source_gate_still_exact(self):
         self.assertIn('check_source_ci.py --report',self.workflow)
         self.assertIn("ci.get('sha')==os.environ.get('GITHUB_SHA')",self.runner)
@@ -391,7 +389,8 @@ class WorkflowTest(unittest.TestCase):
     def test_all_three_artifacts_and_finite_actions(self):
         for stage in (1,2,3):self.assertIn(f'academy-ui-stage-{stage}-',self.workflow)
         for action in control.ACTIONS.values():self.assertIn(f'case "{action}"',self.helper)
-        self.assertNotIn('Integer.parseInt',self.helper)
+        self.assertIn('profile ? 11 : bound ? 9 : 5',self.helper)
+        self.assertIn('if (x>=1280 || y>=900)',self.helper)
     def test_fresh_home_no_acceptance_write(self):
         self.assertIn("'config','system','log','tmp','home'",self.runner)
         self.assertIn('-Duser.home=',self.runner)

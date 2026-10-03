@@ -165,21 +165,23 @@ class WorkflowTests(unittest.TestCase):
     def test_final_artifact_has_all_gates_and_short_retention(self):
         workflow=self.workflow();package=workflow['jobs']['package'];environment=workflow['jobs']['environment']
         all_uploads=[s for s in package['steps'] if s.get('uses')=='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02']
-        ui=[s for s in all_uploads if s['with']['name'].startswith('academy-ui-')]
-        uploads=[s for s in all_uploads if not s['with']['name'].startswith('academy-ui-')]
+        ui=[s for s in all_uploads if s['with']['name'].startswith(('academy-ui-','academy-profile-'))]
+        uploads=[s for s in all_uploads if not s['with']['name'].startswith(('academy-ui-','academy-profile-'))]
         self.assertEqual(len(uploads),2)
-        self.assertEqual(len(ui),12)
+        self.assertEqual(len(ui),22)
+        self.assertEqual(len({step['with']['name'] for step in ui}),len(ui))
         for step in ui:
             self.assertIn("inputs.phase == 'full-validation'",step['if'])
             self.assertEqual(step['with']['retention-days'],'1')
             for path in step['with']['path'].splitlines():
                 allowed_trust={'${{ env.UI_RUN }}/trust-'+phase+'-artifact/project-trust-'+name for phase,names in [('review',('before.png','request.json','images.json','review-target.json')),('receipt',('before.png','after.png','request.json','receipt.json','images.json'))] for name in names}
                 allowed_plugin={'${{ env.UI_RUN }}/plugin-'+str(stage)+'-'+phase+'-artifact/plugin-stage-'+str(stage)+'-'+name for stage in (5,6) for phase,names in [('review',('before.png','request.json','images.json','review-target.json')),('receipt',('before.png','after.png','request.json','receipt.json','images.json'))] for name in names}
-                self.assertTrue(path.startswith('${{ env.UI_RUN }}/stage-') or path in allowed_plugin|allowed_trust|{'${{ env.UI_RUN }}/post-trust-artifact/'+name for name in ('post-trust-diagnostic.json','post-trust-diagnostic.png','post-trust-images.json')}|{'${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.json','${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.png'})
-                for forbidden in ('profile','token','.zip','/home/'):
+                allowed_profile={'${{ env.UI_RUN }}/profile-'+str(stage)+'-'+phase+'-artifact/profile-stage-'+str(stage)+'-'+name for stage in (7,8,9,10,11) for phase in ('review','receipt') for name in ('before.png','request.json','images.json','profile-summary.json',*(['apparmor-context.json'] if stage in (10,11) else []),*(['installed-profile.json'] if stage==9 else []),*(['review-target.json'] if phase=='review' else ['receipt.json']),*(['after.png'] if stage==7 and phase=='receipt' else []))}
+                self.assertTrue(path.startswith('${{ env.UI_RUN }}/stage-') or path in allowed_profile|allowed_plugin|allowed_trust|{'${{ env.UI_RUN }}/post-trust-artifact/'+name for name in ('post-trust-diagnostic.json','post-trust-diagnostic.png','post-trust-images.json')}|{'${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.json','${{ env.UI_RUN }}/diagnostic-artifact/post-ui-diagnostic.png'})
+                for forbidden in ('validate-profile/','profile-candidate','provider-observation','token','.zip','/home/','/config/'):
                     self.assertNotIn(forbidden,path.lower())
         self.assertEqual({x['with']['name'].split('${{')[0] for x in ui},
-                         {'academy-ui-plugin-stage-5-','academy-ui-plugin-stage-6-','academy-ui-plugin-receipt-5-','academy-ui-plugin-receipt-6-','academy-ui-stage-1-','academy-ui-stage-2-','academy-ui-stage-3-','academy-ui-stage-4-','academy-ui-project-trust-','academy-ui-post-trust-','academy-ui-receipts-','academy-ui-diagnostic-'})
+                         {'academy-ui-plugin-stage-5-','academy-ui-plugin-stage-6-','academy-ui-plugin-receipt-5-','academy-ui-plugin-receipt-6-','academy-ui-stage-1-','academy-ui-stage-2-','academy-ui-stage-3-','academy-ui-stage-4-','academy-ui-project-trust-','academy-ui-post-trust-','academy-ui-receipts-','academy-ui-diagnostic-'}|{'academy-profile-'+kind+'-'+str(stage)+'-' for kind in ('stage','receipt') for stage in (7,8,9,10,11)})
         self.assertEqual(uploads[0]['if'],"always() && steps.evidence.outputs.collected == 'true'")
         self.assertIn("steps.handoff.outcome == 'success'",uploads[1]['if'])
         self.assertEqual(uploads[1]['with']['retention-days'],'1');self.assertIn('NOT-A-RELEASE',uploads[1]['with']['name'])
@@ -424,10 +426,10 @@ class ReleaseBoundaryTests(unittest.TestCase):
         first=next(i for i,step in enumerate(steps) if step.get('id')=='official')
         last=next(i for i,step in enumerate(steps) if step.get('run')=='python scripts/academy/ui_session.py finish --root "$UI_RUN"')
         group=steps[first:last+1]
-        self.assertEqual(len(group),31)
+        self.assertEqual(len(group),51)
         self.assertIn('ui_session.py launch --root "$UI_RUN"',group[0]['run'])
         self.assertEqual(sum('ui_control.py' in x.get('run','') for x in group),3)
-        self.assertEqual(sum(x.get('uses')=='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' for x in group),12)
+        self.assertEqual(sum(x.get('uses')=='actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' for x in group),22)
         for step in group[1:]:self.assertIn("inputs.phase == 'full-validation'",step['if'])
         # 三阶段共享同一已启动进程的kernel-start绝对截止，不按每个等待步骤重新发放60分钟。
         source=(Path(__file__).resolve().parents[1]/'ui_session.py').read_text()
@@ -436,7 +438,7 @@ class ReleaseBoundaryTests(unittest.TestCase):
         self.assertIn("deadline=read_outer_deadline(root)",source)
         self.assertIn("int(owner['start_time'])/os.sysconf('SC_CLK_TCK')+seconds",control)
         self.assertIn("if record['monotonic_deadline']!=deadline",control)
-        self.assertIn("record=budget_record(ide_meta,UI_BUDGET_SECONDS)",source)
+        self.assertIn("ui_record=ui.budget_record(owner,UI_BUDGET_SECONDS)",(Path(__file__).resolve().parents[1]/'restart_session.py').read_text())
         self.assertIn("ui_session.py cleanup --root",steps[last+2]['run'])
         for index,step in enumerate(steps):
             if index==first:full+=60;smoke+=8;continue

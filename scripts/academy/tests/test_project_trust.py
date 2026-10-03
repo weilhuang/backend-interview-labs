@@ -283,7 +283,8 @@ class IntegrationStructureTests(unittest.TestCase):
         self.assertIn('case "TRUST_VALIDATION_PROJECT": x=596; y=517;',source)
         self.assertEqual(source.count('verifyTrustWindow(args);'),2)
         self.assertEqual(source.count('robot.mousePress('),1);self.assertEqual(source.count('robot.mouseRelease('),1)
-        self.assertIn('finalProbe.run();',source);self.assertLess(source.index('finalProbe.run();'),source.index('sha(image.read())'));self.assertLess(source.index('sha(image.read())'),source.index('click.run();'))
+        sequence=source[source.index('static void finalTrustClick'):source.index('private static byte[] capture')]
+        self.assertIn('finalProbe.run();',sequence);self.assertLess(sequence.index('finalProbe.run();'),sequence.index('sha(image.read())'));self.assertLess(sequence.index('sha(image.read())'),sequence.index('click.run();'))
     def test_window_observation_never_enumerates_root_tree_or_exports_titles(self):
         source=Path(window.__file__).read_text();self.assertNotIn('XQueryTree',source);self.assertIn("'_NET_WM_PID'",source);self.assertNotIn('XSendEvent',source)
     def test_workflow_fourth_action_has_no_budget_extension(self):

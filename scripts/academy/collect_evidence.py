@@ -9,6 +9,8 @@ from thread_diagnostics import NAME as THREAD_NAME, MAX_OUTPUT as THREAD_LIMIT, 
 from display_diagnostic import collect as collect_display, REPORT_NAME as DISPLAY_REPORT
 from project_trust import collect as collect_project_trust
 from plugin_agreement import collect as collect_plugin_agreement
+from profile_control import collect as collect_profile_control
+from restart_session import collect as collect_restart_result
 from post_trust_diagnostic import collect as collect_post_trust, REPORT as POST_TRUST_REPORT
 from safe_io import absolute, new_directory, read_regular, validate_directory, write_new
 NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','source-contract.json',
@@ -220,6 +222,19 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
             except InterruptedError:raise
             except FileNotFoundError:omitted.append({'name':f'plugin-stage-{stage}-request.json','reason':'MISSING'})
             except Exception:omitted.append({'name':f'plugin-stage-{stage}-request.json','reason':'INVALID_OR_UNAVAILABLE'})
+        for stage in (7,8,9,10,11):
+            try:
+                for name,data in collect_profile_control(absolute(ui_root),stage,current.get('run_id'),current.get('run_attempt')).items():
+                    output[name]=data;hashes[name]={'uploaded_sha256':sha256(data).hexdigest()}
+            except InterruptedError:raise
+            except FileNotFoundError:omitted.append({'name':f'profile-stage-{stage}-request.json','reason':'MISSING'})
+            except Exception:omitted.append({'name':f'profile-stage-{stage}-request.json','reason':'INVALID_OR_UNAVAILABLE'})
+        try:
+            data=collect_restart_result(absolute(ui_root))
+            output['restart-result.json']=data;hashes['restart-result.json']={'uploaded_sha256':sha256(data).hexdigest()}
+        except InterruptedError:raise
+        except FileNotFoundError:omitted.append({'name':'restart-result.json','reason':'MISSING'})
+        except Exception:omitted.append({'name':'restart-result.json','reason':'INVALID_OR_UNAVAILABLE'})
     if 'summary.json' not in output:
         output['summary.json']=(json.dumps({'status':'NOT_RUN','reason':'official command not reached'})+'\n').encode()
     summary=json.loads(output['summary.json'])

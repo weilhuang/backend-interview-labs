@@ -87,21 +87,21 @@ def validate_control(value,expected):
     request_document({k:value[k] for k in REQUEST_FIELDS})
     return value
 
-def window_probe(pid,environment):
+def window_probe(pid,environment,runner=None):
     # Isolated read-only metadata process bounds Xlib calls even if the server stalls.
     args=[sys.executable,__file__,'observe-window','--pid',str(pid)]
-    result=subprocess.run(args,env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=2,check=True)
+    result=(runner or subprocess.run)(args,env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=2,check=True)
     require(len(result.stdout)<=2048);return validate_window(json_read(result.stdout))
 
-def checkpoint(root,proc,screen,identity,owned,deadline,command,idea,environment):
+def checkpoint(root,proc,screen,identity,owned,deadline,command,idea,environment,runner=None):
     """No automatic approval: prepare, wait, revalidate, then one normal button click."""
     require(time.monotonic()<deadline and proc.poll() is None)
     expected_context=context(root,command,idea)
     stage=root/'stage-4';new_directory(stage)
     before=stage/'before.png';identity.verify()
-    window=window_probe(identity.metadata['ide']['pid'],environment)
+    window=window_probe(identity.metadata['ide']['pid'],environment,**({'runner':runner} if runner else {}))
     screen('SNAPSHOT',before);identity.verify()
-    require(window_probe(identity.metadata['ide']['pid'],environment)==window)
+    require(window_probe(identity.metadata['ide']['pid'],environment,**({'runner':runner} if runner else {}))==window)
     raw=read_regular(before,limit=2*1024*1024);clean_png(raw)
     receipt=read_regular(root/'stage-3/receipt.json',limit=4096);r=json_read(receipt)
     require(r.get('run_id')==expected_context['run_id'] and r.get('run_attempt')==expected_context['run_attempt']
@@ -122,7 +122,7 @@ def checkpoint(root,proc,screen,identity,owned,deadline,command,idea,environment
     require(time.monotonic()<deadline and proc.poll() is None)
     require(context(root,command,idea)==expected_context)
     require(digest(read_regular(identity.binding,limit=4096))==expected['display_binding_sha256'])
-    identity.verify();require(window_probe(identity.metadata['ide']['pid'],environment)==window)
+    identity.verify();require(window_probe(identity.metadata['ide']['pid'],environment,**({'runner':runner} if runner else {}))==window)
     # The existing Java Robot helper compares the full image twice, rechecks owned
     # display/process identity, and checks this same X11 window immediately before clicking.
     screen(ACTION,stage/'after.png',expected['screenshot_sha256'],stage/'performed.txt')

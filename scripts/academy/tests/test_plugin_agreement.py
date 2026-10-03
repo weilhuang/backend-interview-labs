@@ -15,7 +15,7 @@ class PluginFixture(TrustFixture):
         self.window={'window_id':56,'pid':100,'x':380,'y':335,'width':520,'height':235,'border':0,'title_sha256':'e'*64}
         self.request=self.make_request(5);self.approval={**copy.deepcopy(self.request),'visual_review':plugin.review(5)}
     def make_request(self,stage):
-        return {**self.context,'schema':1,'stage':stage,'action':plugin.ACTIONS[stage],'protocol':plugin.PROTOCOL,'terminal_stage':6,
+        return {**self.context,'schema':1,'stage':stage,'action':plugin.ACTIONS[stage],'protocol':plugin.PROTOCOL,'terminal_stage':plugin.TERMINAL_STAGE,
             'legal_identity':dict(plugin.LEGAL_ID),'plugin_binary_sha256':plugin.PLUGIN_SHA,
             'preceding_receipt_sha256':plugin.preceding(self.root,stage,self.context),
             'screenshot_sha256':trust.digest(self.image),'display_binding_sha256':trust.digest((self.root/'display-binding.properties').read_bytes()),'window_identity':self.window}
@@ -200,9 +200,9 @@ class WorkflowBoundaryTests(unittest.TestCase):
                 self.assertIn(f"steps.plugin_{stage}_{phase}.outputs.collected == 'true'",upload['if'])
                 self.assertNotIn('*',upload['with']['path']);self.assertEqual(upload['with']['retention-days'],1)
     def test_source_and_timing_and_security_surfaces_are_narrow(self):
-        repo=Path(plugin.__file__).parents[2];session=(repo/'scripts/academy/ui_session.py').read_text();helper=(repo/'scripts/academy/probes/AgreementUi.java').read_text()
-        self.assertIn('for stage in (5,6):',session);self.assertIn('plugin_checkpoint(root,stage,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())',session)
-        self.assertNotIn('INSTALL_PROFILE',helper);self.assertNotIn('DISABLE_SANDBOX',helper)
+        repo=Path(plugin.__file__).parents[2];session=(repo/'scripts/academy/restart_session.py').read_text();helper=(repo/'scripts/academy/probes/AgreementUi.java').read_text()
+        self.assertIn('for stage in (5,6):',session);self.assertIn('plugin.checkpoint(root,stage,current,screen,identity,family,ui_deadline,command,idea,helper_env,runner=family.run)',session)
+        self.assertIn('case "INSTALL_SCOPED_APPARMOR_PROFILE"',helper);self.assertNotIn('case "DISABLE_SANDBOX"',helper)
         self.assertIn('if (bound)',helper);self.assertIn('finalTrustClick',helper)
 
 if __name__=='__main__':unittest.main()

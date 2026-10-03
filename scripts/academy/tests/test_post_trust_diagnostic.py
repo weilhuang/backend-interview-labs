@@ -152,7 +152,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(upload['with']['path'].splitlines(),['${{ env.UI_RUN }}/post-trust-artifact/'+name for name in (diagnostic.REPORT,diagnostic.PNG,diagnostic.MAPPING)])
         self.assertEqual(upload['with']['retention-days'],1)
         self.assertEqual(ui_control.UI_BUDGET_SECONDS,900)
-        source=(repo/'scripts/academy/ui_session.py').read_text();self.assertIn('post_trust_observer.tick(proc,screen,identity)',source)
+        source=(repo/'scripts/academy/restart_session.py').read_text();self.assertIn('observer.tick(current,screen,identity)',source)
         self.assertNotIn('jcmd',source);self.assertNotIn('jps',source)
     def test_diagnostic_state_cannot_satisfy_release_gate(self):
         from release_gate import evaluate
@@ -160,21 +160,9 @@ class IntegrationTests(unittest.TestCase):
         for status in diagnostic.STATUSES:
             with self.assertRaises(GateError):evaluate({'status':status,'native_archive_verified':True})
     def test_observer_cancellation_reaches_existing_owned_cleanup(self):
-        import hashlib,tempfile
-        with tempfile.TemporaryDirectory() as temp:
-            root=Path(temp);jar=MagicMock();jar.__enter__.return_value=jar;jar.getinfo.return_value.file_size=7;jar.read.return_value=b'fixture'
-            proc=Mock();proc.pid=100;proc.poll.return_value=None;proc.wait.return_value=-15
-            owned=Mock();owned.members={100:({'pid':100},9)};owned.register_root.return_value={'pid':100,'start_time':'0','uid':0,'session':100,'pgrp':100}
-            identity=Mock();identity.metadata={'fixture':True};identity.handles={};identity.binding=root/'binding'
-            observer=Mock();observer.tick.side_effect=InterruptedError('cancelled')
-            clock=[0];original=ui_session.put
-            def now():clock[0]+=1;return clock[0]
-            def put(path,value):
-                original(path,value)
-                if path.name=='request.json':original(path.with_name('control.json'),value)
-            def screen_command(args,**kwargs):Path(args[6]).write_bytes(b'SYNTHETIC_PNG')
-            with patch.dict(os.environ,{'GITHUB_RUN_ID':'123','GITHUB_RUN_ATTEMPT':'1'}),patch.object(ui_session,'trust_context'),patch.object(ui_session.zipfile,'ZipFile',return_value=jar),patch.object(ui_session,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(ui_control,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(ui_session,'Owned',return_value=owned),patch.object(ui_session,'DisplayIdentity',return_value=identity),patch.object(ui_session.subprocess,'Popen',return_value=proc),patch.object(ui_session.subprocess,'run',side_effect=screen_command),patch.object(ui_session.signal,'signal'),patch.object(ui_session.time,'monotonic',side_effect=now),patch.object(ui_session.time,'sleep'),patch.object(ui_session,'put',side_effect=put),patch.object(ui_session,'capture_display_diagnostic',return_value=None),patch.object(ui_session,'trust_checkpoint'),patch.object(ui_session,'PostTrustObserver',return_value=observer):
-                with self.assertRaises(InterruptedError):ui_session.display_session(root,root,['fixture'])
-            owned.stop.assert_called_once();identity.close.assert_called_once();proc.wait.assert_called_once()
+        from test_restart_session import run_fixture
+        code,value,family,identity,_=run_fixture('observer')
+        self.assertEqual(code,1);self.assertTrue(value['cancelled'])
+        family.close.assert_called_once();family.begin_validation.assert_not_called()
 
 if __name__=='__main__':unittest.main()

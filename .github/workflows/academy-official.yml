@@ -429,7 +429,254 @@ jobs:
             ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-request.json
             ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-receipt.json
             ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-images.json
-      - name: 等待同一官方进程完成全部原生门禁（原60分钟总界限不变）
+      - name: 第7阶段等待并严格投影当前profile准备画面
+        id: profile_7_review
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 2
+        run: |
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 7
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 7 --phase review --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第7阶段上传本次已验证待审证据
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_7_review.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-stage-7-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-7-review-artifact/profile-stage-7-before.png
+            ${{ env.UI_RUN }}/profile-7-review-artifact/profile-stage-7-request.json
+            ${{ env.UI_RUN }}/profile-7-review-artifact/profile-stage-7-images.json
+            ${{ env.UI_RUN }}/profile-7-review-artifact/profile-stage-7-profile-summary.json
+            ${{ env.UI_RUN }}/profile-7-review-artifact/profile-stage-7-review-target.json
+      - name: 第7阶段等待精确审图并投影本次结果
+        id: profile_7_receipt
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/profile_control.py receive --root "$UI_RUN" --stage 7
+          python scripts/academy/profile_control.py complete --root "$UI_RUN" --stage 7
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 7 --phase receipt --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第7阶段上传本次严格回执（非课程验收）
+        id: profile_7_upload
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_7_receipt.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-receipt-7-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-7-receipt-artifact/profile-stage-7-before.png
+            ${{ env.UI_RUN }}/profile-7-receipt-artifact/profile-stage-7-request.json
+            ${{ env.UI_RUN }}/profile-7-receipt-artifact/profile-stage-7-images.json
+            ${{ env.UI_RUN }}/profile-7-receipt-artifact/profile-stage-7-profile-summary.json
+            ${{ env.UI_RUN }}/profile-7-receipt-artifact/profile-stage-7-after.png
+            ${{ env.UI_RUN }}/profile-7-receipt-artifact/profile-stage-7-receipt.json
+      - name: 第8阶段等待并严格投影当前profile准备画面
+        id: profile_8_review
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 2
+        run: |
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 8
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 8 --phase review --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第8阶段上传本次已验证待审证据
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_8_review.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-stage-8-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-8-review-artifact/profile-stage-8-before.png
+            ${{ env.UI_RUN }}/profile-8-review-artifact/profile-stage-8-request.json
+            ${{ env.UI_RUN }}/profile-8-review-artifact/profile-stage-8-images.json
+            ${{ env.UI_RUN }}/profile-8-review-artifact/profile-stage-8-profile-summary.json
+            ${{ env.UI_RUN }}/profile-8-review-artifact/profile-stage-8-review-target.json
+      - name: 第8阶段等待精确审图并投影本次结果
+        id: profile_8_receipt
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/profile_control.py receive --root "$UI_RUN" --stage 8
+          python scripts/academy/profile_control.py complete --root "$UI_RUN" --stage 8
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 8 --phase receipt --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第8阶段上传本次严格回执（非课程验收）
+        id: profile_8_upload
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_8_receipt.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-receipt-8-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-8-receipt-artifact/profile-stage-8-before.png
+            ${{ env.UI_RUN }}/profile-8-receipt-artifact/profile-stage-8-request.json
+            ${{ env.UI_RUN }}/profile-8-receipt-artifact/profile-stage-8-images.json
+            ${{ env.UI_RUN }}/profile-8-receipt-artifact/profile-stage-8-profile-summary.json
+            ${{ env.UI_RUN }}/profile-8-receipt-artifact/profile-stage-8-receipt.json
+      - name: 第9阶段等待并严格投影已完成安装的供应商终端画面
+        id: profile_9_review
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 2
+        run: |
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 9
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 9 --phase review --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第9阶段上传本次已验证待审证据
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_9_review.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-stage-9-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-9-review-artifact/profile-stage-9-before.png
+            ${{ env.UI_RUN }}/profile-9-review-artifact/profile-stage-9-request.json
+            ${{ env.UI_RUN }}/profile-9-review-artifact/profile-stage-9-images.json
+            ${{ env.UI_RUN }}/profile-9-review-artifact/profile-stage-9-profile-summary.json
+            ${{ env.UI_RUN }}/profile-9-review-artifact/profile-stage-9-installed-profile.json
+            ${{ env.UI_RUN }}/profile-9-review-artifact/profile-stage-9-review-target.json
+      - name: 第9阶段等待精确审图并投影本次结果
+        id: profile_9_receipt
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/profile_control.py receive --root "$UI_RUN" --stage 9
+          python scripts/academy/profile_control.py complete --root "$UI_RUN" --stage 9
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 9 --phase receipt --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第9阶段上传本次严格回执（非课程验收）
+        id: profile_9_upload
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_9_receipt.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-receipt-9-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-9-receipt-artifact/profile-stage-9-before.png
+            ${{ env.UI_RUN }}/profile-9-receipt-artifact/profile-stage-9-request.json
+            ${{ env.UI_RUN }}/profile-9-receipt-artifact/profile-stage-9-images.json
+            ${{ env.UI_RUN }}/profile-9-receipt-artifact/profile-stage-9-profile-summary.json
+            ${{ env.UI_RUN }}/profile-9-receipt-artifact/profile-stage-9-installed-profile.json
+            ${{ env.UI_RUN }}/profile-9-receipt-artifact/profile-stage-9-receipt.json
+      - name: 第10阶段等待并严格投影当前profile准备画面
+        id: profile_10_review
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 2
+        run: |
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 10
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 10 --phase review --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第10阶段上传本次已验证待审证据
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_10_review.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-stage-10-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-10-review-artifact/profile-stage-10-before.png
+            ${{ env.UI_RUN }}/profile-10-review-artifact/profile-stage-10-request.json
+            ${{ env.UI_RUN }}/profile-10-review-artifact/profile-stage-10-images.json
+            ${{ env.UI_RUN }}/profile-10-review-artifact/profile-stage-10-profile-summary.json
+            ${{ env.UI_RUN }}/profile-10-review-artifact/profile-stage-10-apparmor-context.json
+            ${{ env.UI_RUN }}/profile-10-review-artifact/profile-stage-10-review-target.json
+      - name: 第10阶段等待精确审图并投影本次结果
+        id: profile_10_receipt
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/profile_control.py receive --root "$UI_RUN" --stage 10
+          python scripts/academy/profile_control.py complete --root "$UI_RUN" --stage 10
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 10 --phase receipt --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第10阶段上传本次严格回执（非课程验收）
+        id: profile_10_upload
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_10_receipt.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-receipt-10-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-10-receipt-artifact/profile-stage-10-before.png
+            ${{ env.UI_RUN }}/profile-10-receipt-artifact/profile-stage-10-request.json
+            ${{ env.UI_RUN }}/profile-10-receipt-artifact/profile-stage-10-images.json
+            ${{ env.UI_RUN }}/profile-10-receipt-artifact/profile-stage-10-profile-summary.json
+            ${{ env.UI_RUN }}/profile-10-receipt-artifact/profile-stage-10-apparmor-context.json
+            ${{ env.UI_RUN }}/profile-10-receipt-artifact/profile-stage-10-receipt.json
+      - name: 第11阶段等待并严格投影当前profile准备画面
+        id: profile_11_review
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 2
+        run: |
+          python scripts/academy/ui_session.py await --root "$UI_RUN" --stage 11
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 11 --phase review --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第11阶段上传本次已验证待审证据
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_11_review.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-stage-11-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-11-review-artifact/profile-stage-11-before.png
+            ${{ env.UI_RUN }}/profile-11-review-artifact/profile-stage-11-request.json
+            ${{ env.UI_RUN }}/profile-11-review-artifact/profile-stage-11-images.json
+            ${{ env.UI_RUN }}/profile-11-review-artifact/profile-stage-11-profile-summary.json
+            ${{ env.UI_RUN }}/profile-11-review-artifact/profile-stage-11-apparmor-context.json
+            ${{ env.UI_RUN }}/profile-11-review-artifact/profile-stage-11-review-target.json
+      - name: 第11阶段等待精确审图并投影本次结果
+        id: profile_11_receipt
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/academy/profile_control.py receive --root "$UI_RUN" --stage 11
+          python scripts/academy/profile_control.py complete --root "$UI_RUN" --stage 11
+          python scripts/academy/profile_control.py stage-artifact --root "$UI_RUN" --stage 11 --phase receipt --run-id "$GITHUB_RUN_ID" --run-attempt "$GITHUB_RUN_ATTEMPT"
+          printf 'collected=true\n' >> "$GITHUB_OUTPUT"
+      - name: 第11阶段上传本次严格回执（非课程验收）
+        id: profile_11_upload
+        if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && steps.profile_11_receipt.outputs.collected == 'true'
+        timeout-minutes: 1
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: academy-profile-receipt-11-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ env.UI_RUN }}/profile-11-receipt-artifact/profile-stage-11-before.png
+            ${{ env.UI_RUN }}/profile-11-receipt-artifact/profile-stage-11-request.json
+            ${{ env.UI_RUN }}/profile-11-receipt-artifact/profile-stage-11-images.json
+            ${{ env.UI_RUN }}/profile-11-receipt-artifact/profile-stage-11-profile-summary.json
+            ${{ env.UI_RUN }}/profile-11-receipt-artifact/profile-stage-11-apparmor-context.json
+            ${{ env.UI_RUN }}/profile-11-receipt-artifact/profile-stage-11-receipt.json
+      - name: 等待全新官方验证进程完成全部原生门禁（原60分钟总界限不变）
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
         timeout-minutes: 60
         run: python scripts/academy/ui_session.py finish --root "$UI_RUN"

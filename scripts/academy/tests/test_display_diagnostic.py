@@ -47,19 +47,10 @@ class DisplayTests(unittest.TestCase):
         with patch.object(ui_session,'capture_display_diagnostic',side_effect=InterruptedError('cancelled')):
             with self.assertRaises(InterruptedError):ui_session.optional_display_diagnostic(self.root,self.proc,screen,self.identity,99999999)
     def test_cancelled_post_ui_capture_runs_existing_session_cleanup(self):
-        jar=MagicMock();jar.__enter__.return_value=jar;jar.getinfo.return_value.file_size=7;jar.read.return_value=b'fixture'
-        proc=Mock();proc.pid=100;proc.poll.return_value=None;proc.wait.return_value=-15
-        owned=Mock();owned.members={100:({'pid':100},9)};owned.register_root.return_value={'pid':100,'start_time':'0','uid':0,'session':100,'pgrp':100}
-        identity=Mock();identity.metadata={'fixture':True};identity.handles={};identity.binding=self.root/'display-binding.properties'
-        root=Path(self.tmp.name)/'session-cancel';root.mkdir();clock=[0];original=ui_session.put
-        def now():clock[0]+=1;return clock[0]
-        def put(path,value):
-            original(path,value)
-            if path.name=='request.json':original(path.with_name('control.json'),value)
-        def screen_command(args,**kwargs):Path(args[6]).write_bytes(b'PNG_FIXTURE')
-        with patch.object(ui_session,'trust_context'),patch.object(ui_session.zipfile,'ZipFile',return_value=jar),patch.object(ui_session,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(ui_control,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(ui_session,'Owned',return_value=owned),patch.object(ui_session,'DisplayIdentity',return_value=identity),patch.object(ui_session.subprocess,'Popen',return_value=proc),patch.object(ui_session.subprocess,'run',side_effect=screen_command),patch.object(ui_session.signal,'signal'),patch.object(ui_session.time,'monotonic',side_effect=now),patch.object(ui_session.time,'sleep'),patch.object(ui_session,'put',side_effect=put),patch.object(ui_session,'capture_display_diagnostic',side_effect=InterruptedError('cancelled')):
-            with self.assertRaises(InterruptedError):ui_session.display_session(root,root,['fixture'])
-        owned.stop.assert_called_once();identity.close.assert_called_once();proc.wait.assert_called_once()
+        from test_restart_session import run_fixture
+        code,value,family,identity,_=run_fixture('capture')
+        self.assertEqual(code,1);self.assertTrue(value['cancelled'])
+        family.close.assert_called_once();family.begin_validation.assert_not_called()
     def test_report_is_complete_before_its_name_becomes_visible(self):
         original=diag.os.link;seen=[]
         def observe(source,destination,**kwargs):
@@ -153,9 +144,9 @@ class DisplayTests(unittest.TestCase):
         output=Path(self.tmp.name)/'artifact';collect_all(run,output,ui_root=self.root)
         self.assertFalse((output/diag.PNG_NAME).exists());self.assertIn('INVALID_OR_UNAVAILABLE',(output/'collection.json').read_text())
     def test_existing_loop_delays_once_without_new_action_or_budget(self):
-        source=(Path(__file__).resolve().parents[1]/'ui_session.py').read_text()
-        self.assertIn('diagnostic_due=time.monotonic()+30;diagnostic_done=False',source)
-        self.assertIn('not diagnostic_done and time.monotonic()>=diagnostic_due',source)
-        self.assertIn('owned=Owned(started+2700)',source)
+        source=(Path(__file__).resolve().parents[1]/'restart_session.py').read_text()
+        self.assertEqual(source.count('ui.optional_display_diagnostic('),1)
+        self.assertIn('end=min(ui_deadline,time.monotonic()+30)',source)
+        self.assertIn('deadline=min(started+2700,ui.read_outer_deadline(root))',source)
         self.assertNotIn('ACCEPT_TRUST',source)
 if __name__=='__main__':unittest.main()

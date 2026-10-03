@@ -278,6 +278,12 @@ def execute(a):
         dump(evidence/'summary.json',result)
         run=capture(command,env,repo,evidence/'validate.stdout.log',evidence/'validate.stderr.log',2700,root,phase='validate')
         result['stages']['official_validate_process']=run;dump(evidence/'summary.json',result)
+        if getattr(a,'ui_root',None):
+            from restart_session import validate_result as validate_restart_result
+            restart_receipt=validate_restart_result(read_json(a.ui_root/'restart-result.json'))
+            require(restart_receipt['status']=='FRESH_VALIDATION_EXITED_NOT_ACCEPTANCE',
+                    'fresh validation did not finish after verified profile/restart preparation')
+            result['stages']['profile_preparation_and_fresh_validation']=restart_receipt
         # Parse available failure reports even when process failed/timed out.
         if report.is_file():
             native=validate_report(read_json(report),contract);dump(evidence/'validation-gate.json',native)

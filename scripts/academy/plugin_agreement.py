@@ -16,7 +16,8 @@ import project_trust as trust
 import trust_window as window
 
 ACTIONS={5:'CHECK_ACADEMY_PLUGIN_ONLY',6:'AGREE_ACADEMY_PLUGIN_ONLY'}
-PROTOCOL='ACADEMY_PLUGIN_ONLY_STAGES_5_6_SHORT_DIAGNOSTIC_V1'
+PROTOCOL='ACADEMY_PLUGIN_ONLY_THEN_SCOPED_PROFILE_TERMINAL_ACK_V2'
+TERMINAL_STAGE=11
 LEGAL_SHA='aca54faf26bbebc27bc32f2b9ac2f3118817f21f6a081ef07610776f9bda75b7'
 PLUGIN_SHA='8358566831fe364238b584a120d7c9f8251f3cc972bce257441c52a29e6eb82b'
 LEGAL_ID={'plugin_version':'1.3','privacy_version':'3.2','documents_sha256':LEGAL_SHA,
@@ -57,7 +58,7 @@ def fetch_legal(deadline):
         require(item['format']=='pdf' and len(raw)==item['bytes'] and digest(raw)==item['sha256'])
     return dict(LEGAL_ID)
 
-def verify_legal(deadline):
+def verify_legal(deadline,runner=None):
     # A directly spawned read-only child gives the entire two-PDF HTTP transaction a hard
     # wall-clock cap, including a server that trickles bytes before socket timeout.
     remaining=min(15,deadline-time.monotonic());require(remaining>0)
@@ -65,7 +66,7 @@ def verify_legal(deadline):
     # Retain only existing normal proxy/CA routing when present; never disable TLS.
     for name in ('HTTPS_PROXY','HTTP_PROXY','ALL_PROXY','NO_PROXY','https_proxy','http_proxy','all_proxy','no_proxy','SSL_CERT_FILE','SSL_CERT_DIR'):
         if name in os.environ:environment[name]=os.environ[name]
-    result=subprocess.run([sys.executable,__file__,'legal-body-check','--deadline',str(deadline)],
+    result=(runner or subprocess.run)([sys.executable,__file__,'legal-body-check','--deadline',str(deadline)],
         env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,
         timeout=remaining,check=True)
     require(time.monotonic()<deadline and len(result.stdout)<=512)
@@ -87,7 +88,7 @@ def request_document(value):
     trust.validate_context({k:value[k] for k in trust.CONTEXT_FIELDS})
     stage=stage_number(value['stage'])
     require(type(value['schema']) is int and value['schema']==1 and value['action']==ACTIONS[stage])
-    require(value['protocol']==PROTOCOL and type(value['terminal_stage']) is int and value['terminal_stage']==6)
+    require(value['protocol']==PROTOCOL and type(value['terminal_stage']) is int and value['terminal_stage']==TERMINAL_STAGE)
     require(type(value['legal_identity']) is dict and value['legal_identity']==LEGAL_ID)
     require(value['plugin_binary_sha256']==PLUGIN_SHA)
     for key in ('screenshot_sha256','display_binding_sha256','preceding_receipt_sha256'):trust.token(value[key],r'[0-9a-f]{64}')
@@ -124,23 +125,23 @@ def preceding(root,stage,expected_context):
     require(digest(read_regular(root/'display-binding.properties',limit=4096))==request['display_binding_sha256'])
     return digest(raw)
 
-def window_probe(pid,action,environment):
+def window_probe(pid,action,environment,runner=None):
     require(action in ACTIONS.values())
-    result=subprocess.run([sys.executable,__file__,'observe-window','--pid',str(pid),'--stage',str(next(k for k,v in ACTIONS.items() if v==action))],
+    result=(runner or subprocess.run)([sys.executable,__file__,'observe-window','--pid',str(pid),'--stage',str(next(k for k,v in ACTIONS.items() if v==action))],
         env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=2,check=True)
     require(len(result.stdout)<=2048);return window.validate(json_read(result.stdout),action)
 
-def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,environment):
+def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,environment,runner=None):
     stage_number(stage);require(time.monotonic()<deadline and proc.poll() is None)
     expected_context=trust.context(root,command,idea)
-    plugin=verify_plugin(root,idea);legal=verify_legal(deadline)
+    plugin=verify_plugin(root,idea);legal=verify_legal(deadline,**({'runner':runner} if runner else {}))
     prior=preceding(root,stage,expected_context)
     folder=root/f'stage-{stage}';new_directory(folder)
-    action=ACTIONS[stage];identity.verify();win=window_probe(identity.metadata['ide']['pid'],action,environment)
+    action=ACTIONS[stage];identity.verify();win=window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))
     screen('SNAPSHOT',folder/'before.png');identity.verify()
-    require(window_probe(identity.metadata['ide']['pid'],action,environment)==win)
+    require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==win)
     raw=read_regular(folder/'before.png',limit=2*1024*1024);clean_png(raw)
-    expected=request_document({**expected_context,'schema':1,'stage':stage,'action':action,'protocol':PROTOCOL,'terminal_stage':6,
+    expected=request_document({**expected_context,'schema':1,'stage':stage,'action':action,'protocol':PROTOCOL,'terminal_stage':TERMINAL_STAGE,
         'legal_identity':legal,'plugin_binary_sha256':plugin,'preceding_receipt_sha256':prior,
         'screenshot_sha256':digest(raw),'display_binding_sha256':digest(read_regular(identity.binding,limit=4096)),'window_identity':win})
     publish(folder/'window-identity.json',encode(win));publish(folder/'request.json',encode(expected))
@@ -151,9 +152,9 @@ def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,envir
     approved=validate_control(trust.read_json(folder/'control.json',4096),expected)
     require(time.monotonic()<deadline and proc.poll() is None)
     require(trust.context(root,command,idea)==expected_context and preceding(root,stage,expected_context)==prior)
-    verify_plugin(root,idea);require(verify_legal(deadline)==legal)
+    verify_plugin(root,idea);require(verify_legal(deadline,**({'runner':runner} if runner else {}))==legal)
     require(digest(read_regular(identity.binding,limit=4096))==expected['display_binding_sha256'])
-    identity.verify();require(window_probe(identity.metadata['ide']['pid'],action,environment)==win)
+    identity.verify();require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==win)
     require(time.monotonic()<deadline and proc.poll() is None)
     screen(action,folder/'after.png',expected['screenshot_sha256'],folder/'performed.txt')
     require(read_regular(folder/'performed.txt',limit=64)==(action+'\n').encode())
@@ -198,7 +199,7 @@ def stage_artifact(root,stage,phase,run_id,attempt):
     if phase=='review':require(not receipt.exists())
     else:require(receipt.is_file())
     files=collect(root,stage,run_id,attempt)
-    if phase=='review':files[f'plugin-stage-{stage}-review-target.json']=encode({'protocol':PROTOCOL,'terminal_stage':6,'action':ACTIONS[stage],
+    if phase=='review':files[f'plugin-stage-{stage}-review-target.json']=encode({'protocol':PROTOCOL,'terminal_stage':TERMINAL_STAGE,'action':ACTIONS[stage],
         'fixed_target':list(window.target(ACTIONS[stage])),'screen':[1280,900],'required_visual_review':review(stage),'legal_identity':LEGAL_ID})
     for name,raw in files.items():publish(out/name,raw)
 

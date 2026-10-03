@@ -247,7 +247,7 @@ def launch(root,command):
 
 
 def await_stage(root,stage):
-    deadline=read_ui_deadline(root) if stage in (4,5,6) else read_outer_deadline(root)
+    deadline=read_ui_deadline(root) if stage in (4,5,6,7,8,9,10,11) else read_outer_deadline(root)
     # 首次还包含官方export，仍受其原600秒与原60分钟总界限，不延长。
     while time.monotonic()<deadline:
         if (root/f'stage-{stage}'/'request.json').is_file():return
@@ -408,95 +408,14 @@ def snapshot_timeout(ui_deadline,diagnostic_deadline=None):
 
 
 def display_session(root,idea,command):
-    """由原 capture 在自有 xvfb-run 内调用；原2700秒包含全部UI等待。"""
-    # 固定官方配置元数据只核实际内置协议，不更改vendor jar。
-    with zipfile.ZipFile(idea/'lib/intellij.platform.ide.impl.jar') as jar:
-        info=jar.getinfo('eua.html')
-        if info.file_size>512*1024:raise ValueError('内置协议尺寸不符')
-        if hashlib.sha256(jar.read(info)).hexdigest()!=EUA_SHA256:raise ValueError('内置协议不符')
-    helper=Path(__file__).with_name('probes')/'AgreementUi.java'
-    java=str(idea/'jbr/bin/java')
-    def screen(action,destination,expected=None,receipt=None,diagnostic_deadline=None):
-        if diagnostic_deadline is not None and action!='SNAPSHOT':raise ValueError('诊断仅允许只读截图')
-        identity.verify()
-        args=[java,'-Xmx96m','-XX:ActiveProcessorCount=1',f'-Duser.home={os.environ["HOME"]}',str(helper),action,str(destination)]
-        if expected is not None:args.extend([expected,str(receipt)])
-        if action==TRUST_ACTION:
-            args.extend([sys.executable,str(Path(__file__).with_name('project_trust.py')),
-                         str(root/'stage-4/window-identity.json'),str(root)])
-        if action in PLUGIN_ACTIONS.values():
-            stage=next(k for k,v in PLUGIN_ACTIONS.items() if v==action)
-            args.extend([sys.executable,str(Path(__file__).with_name('plugin_agreement.py')),
-                         str(root/f'stage-{stage}/window-identity.json'),str(root)])
-        args.append(str(identity.binding))
-        subprocess.run(args,check=True,timeout=snapshot_timeout(ui_deadline,diagnostic_deadline),env=clean_env(),
-                       pass_fds=tuple(fd for _,fd in identity.handles.values()))
-        identity.verify()
-    started=time.monotonic();ui_deadline=started+UI_BUDGET_SECONDS
-    owned=Owned(started+2700);identity=DisplayIdentity();proc=None
-    def terminate(*_):raise InterruptedError('本次UI会话取消')
-    signal.signal(signal.SIGTERM,terminate);signal.signal(signal.SIGINT,terminate)
-    try:
-        trust_context(root,command,idea)  # Exact current100 source/archive/CLI target; never a generic trust grant.
-        proc=subprocess.Popen(command,env=os.environ.copy(),start_new_session=True)
-        ide_meta=owned.register_root(proc)
-        record=budget_record(ide_meta,UI_BUDGET_SECONDS);ui_deadline=record['monotonic_deadline']
-        put(root/'ui-deadline.json',record)
-        identity.establish(root,ide_meta,owned.members[proc.pid][1],ui_deadline)
-        # 仅给正常窗口初始化留时间；这不是正确状态判定，真正动作必须经本次画面人工核对。
-        while time.monotonic()<started+30:
-            if proc.poll() is not None:raise RuntimeError('IDE在首张图前退出')
-            owned.scan();time.sleep(.25)
-        for stage,action in ACTIONS.items():
-            stage_dir=root/f'stage-{stage}';stage_dir.mkdir()
-            before=stage_dir/'before.png';screen('SNAPSHOT',before)
-            put(stage_dir/'review-target.json',{'action':action,'fixed_target':{1:[382,612],2:[879,651],3:[663,651]}[stage],
-                'screen':[1280,900],'requirement':'审图时确认固定目标位于对应控件内；不同布局不得批准'})
-            expected={'schema':1,'run_id':os.environ['GITHUB_RUN_ID'],'run_attempt':os.environ['GITHUB_RUN_ATTEMPT'],
-                      'stage':stage,'action':action,'eua_sha256':EUA_SHA256,
-                      'screenshot_sha256':hashlib.sha256(before.read_bytes()).hexdigest()}
-            identity.verify();put(stage_dir/'display-identity.json',identity.metadata)
-            put(stage_dir/'request.json',expected)
-            while not (stage_dir/'control.json').exists():
-                if proc.poll() is not None:raise RuntimeError('IDE已退出')
-                if time.monotonic()>=ui_deadline:raise TimeoutError('900秒UI总预算耗尽')
-                owned.scan();time.sleep(.2)
-            validate_control(strict_json((stage_dir/'control.json').read_bytes()),expected)
-            if time.monotonic()>=ui_deadline or proc.poll() is not None:raise RuntimeError('动作已过期')
-            screen(action,stage_dir/'after.png',expected['screenshot_sha256'],stage_dir/'performed.txt')
-            put(stage_dir/'receipt.json',{**expected,'after_sha256':hashlib.sha256((stage_dir/'after.png').read_bytes()).hexdigest(),
-                                         'status':'UI_ACTION_PERFORMED_NOT_ACCEPTANCE'})
-        put(root/'ui-complete.json',{'status':'NORMAL_UI_COMPLETED_NOT_COURSE_ACCEPTANCE'})
-        diagnostic_due=time.monotonic()+30;diagnostic_done=False;post_trust_observer=None;plugin_done=False
-        while proc.poll() is None:
-            owned.scan()
-            if not diagnostic_done and time.monotonic()>=diagnostic_due:
-                diagnostic_done=True
-                optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
-                trust_checkpoint(root,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())
-                post_trust_observer=PostTrustObserver(root,identity,ui_deadline)
-            if post_trust_observer is not None:post_trust_observer.tick(proc,screen,identity)
-            if post_trust_observer is not None and post_trust_observer.done and not plugin_done:
-                for stage in (5,6):
-                    plugin_checkpoint(root,stage,proc,screen,identity,owned,ui_deadline,command,idea,clean_env())
-                plugin_done=True
-            time.sleep(.25)
-        if post_trust_observer is not None:post_trust_observer.tick(proc,screen,identity)
-        if not diagnostic_done:
-            optional_display_diagnostic(root,proc,screen,identity,ui_deadline)
-        return proc.returncode
-    finally:
-        identity.close()
-        if proc is not None:
-            try:owned.stop()
-            finally:
-                try:proc.wait(timeout=1)
-                except subprocess.TimeoutExpired:pass
+    # Same process/direct xvfb-run parent, with a dedicated sole-reaper family.
+    from restart_session import display_session as prepare_then_validate
+    return prepare_then_validate(root,idea,command)
 
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('mode',choices=['launch','worker','await','complete','trust-complete','finish','cleanup','display','server'])
-    p.add_argument('--root',type=Path,required=True);p.add_argument('--stage',type=int,choices=[1,2,3,4,5,6])
+    p.add_argument('--root',type=Path,required=True);p.add_argument('--stage',type=int,choices=[1,2,3,4,5,6,7,8,9,10,11])
     p.add_argument('--idea',type=Path)
     argv=sys.argv[1:];index=argv.index('--') if '--' in argv else len(argv)
     a=p.parse_args(argv[:index]);command=argv[index+1:]
