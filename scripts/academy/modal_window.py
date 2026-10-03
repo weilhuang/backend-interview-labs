@@ -181,13 +181,16 @@ def _attrs(value, root_child=False, node_index=0):
     _require(type(value) is dict and set(value) == _ATTRS, call_site="ATTR_RECORD")
     try:
         _integer(value["window_id"], 1, 0xffffffff, "ATTR_ID")
-        _integer(value["x"], 0 if root_child else -32768, 1279 if root_child else 32767, "ATTR_X")
-        _integer(value["y"], 0 if root_child else -32768, 899 if root_child else 32767, "ATTR_Y")
+        _integer(value["map_state"], 0, 2, "ATTR_MAP_STATE")
+        # Unmapped root children retain signed parent-relative geometry in the
+        # proof. Mapped roots still require the original full-screen bounds.
+        on_screen = root_child and value["map_state"] != 0
+        _integer(value["x"], 0 if on_screen else -32768, 1279 if on_screen else 32767, "ATTR_X")
+        _integer(value["y"], 0 if on_screen else -32768, 899 if on_screen else 32767, "ATTR_Y")
         _integer(value["width"], 1, 1280, "ATTR_WIDTH")
         _integer(value["height"], 1, 900, "ATTR_HEIGHT")
         _integer(value["border"], 0, 8, "ATTR_BORDER")
         _integer(value["window_class"], 1, 2, "ATTR_CLASS")
-        _integer(value["map_state"], 0, 2, "ATTR_MAP_STATE")
         _integer(value["event_mask"], 0, (1 << 25) - 1, "ATTR_EVENT_MASK")
         _integer(value["do_not_propagate_mask"], 0, (1 << 25) - 1, "ATTR_DNP_MASK")
         _require(type(value["override_redirect"]) is bool, call_site="ATTR_OVERRIDE")
@@ -200,9 +203,10 @@ def _attrs(value, root_child=False, node_index=0):
         if value["window_class"] == 2:
             _require(value["border"] == 0, call_site="ATTR_INPUTONLY_BORDER")
         if root_child:
-            _require(value["x"] + value["width"] + 2 * value["border"] <= 1280 and
-                     value["y"] + value["height"] + 2 * value["border"] <= 900,
-                     call_site="ROOT_CHILD_BOUNDS")
+            if on_screen:
+                _require(value["x"] + value["width"] + 2 * value["border"] <= 1280 and
+                         value["y"] + value["height"] + 2 * value["border"] <= 900,
+                         call_site="ROOT_CHILD_BOUNDS")
             _require(value["map_state"] in (0, 2), call_site="ROOT_CHILD_MAP_STATE")
     except ProofError as exc:
         facts = _numeric_facts(node_index=node_index, root_child=int(root_child),

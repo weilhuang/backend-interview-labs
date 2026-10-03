@@ -194,7 +194,8 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
                                  'helper_sha256':base/'probes/AwtTitleFixture.java','selector_sha256':base/'modal_window.py'}
                         for key,path in sources.items():
                             if sha256(read_regular(path,limit=128*1024)).hexdigest()!=value['runtime']['hashes'][key]:raise ValueError('AWT fixture source digest mismatch')
-                    data=(json.dumps(value,ensure_ascii=True,indent=2)+'\n').encode()
+                    data=(json.dumps(value,ensure_ascii=True,sort_keys=True,separators=(',',':'))+'\n').encode()
+                    if len(data)>8192:raise ValueError('AWT fixture output limit')
                 elif name==MODAL_FIXTURE_NAME:
                     from display_diagnostic import json_read
                     value=modal_fixture_report(json_read(data))

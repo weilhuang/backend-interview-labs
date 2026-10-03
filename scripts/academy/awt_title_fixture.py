@@ -1,10 +1,12 @@
-"""Private bundled-JBR title compatibility prerequisite, never IDE acceptance.
+"""Private bundled-JBR title and full-modal prerequisite, never IDE acceptance.
 
 The workflow runs this after its checksum-verified pinned IDEA installation.
 The two AWT windows live on a separate authenticated Xvfb. Only their modern
 title properties are removed to expose the WM_NAME values written by AWT.
 The production selector handles all reads and encoding validation. The sole
 wrong-type write targets a synthetic window created by the short-lived probe.
+Two separate production observations prove the genuine Swing dialog without
+dispatching input. Public records are bounded projections, never raw proofs.
 """
 from pathlib import Path
 import ctypes as C
@@ -28,7 +30,8 @@ from safe_io import BoundaryError, absolute, read_regular, regular_reader, valid
 
 R = Path(__file__).resolve().parent
 NAME = 'awt-title-fixture.json'
-KIND = 'PRIVATE_BUNDLED_JBR_AWT_TITLE_COMPATIBILITY_NOT_IDE_OR_ACCEPTANCE'
+KIND = 'PRIVATE_BUNDLED_JBR_AWT_TITLE_AND_MODAL_PROOF_NOT_IDE_OR_ACCEPTANCE'
+SCHEMA = 2
 BINARY = Path('/usr/bin/Xvfb')
 HELPER = R / 'probes/AwtTitleFixture.java'
 RUNTIME_VERSION = '25.0.4+1-b329.128'
@@ -45,9 +48,15 @@ MODERN_HASHES = tuple(modal_window._title_digest(b'_NET_WM_NAME', b'UTF8_STRING'
                       for raw in TITLES)
 CASE_NAMES = ('awt_modern_ascii', 'awt_modern_non_latin', 'awt_legacy_ascii',
               'awt_legacy_non_latin', 'owned_synthetic_wrong_type')
+MODAL_ACTIONS = ('CHECK_ACADEMY_PLUGIN_ONLY', 'AGREE_ACADEMY_PLUGIN_ONLY')
+MODAL_TITLE = b'Academy AWT modal fixture'
+MODAL_TITLE_HASH = modal_window._title_digest(b'_NET_WM_NAME', b'UTF8_STRING', MODAL_TITLE)
+MODAL_GEOMETRY = (380, 335, 520, 235, 0)
+MAX_UNMAPPED_FACTS = 8
+MAX_MODAL_PROBE_BYTES = modal_window.MAX_PROOF_BYTES + 4096
 ERRORS = ('PRECHECK_UNAVAILABLE', 'XVFB_START_UNAVAILABLE', 'JVM_START_UNAVAILABLE',
           'JVM_EXITED', 'PROBE_FAILED', 'PROBE_TIMEOUT', 'BUDGET_EXHAUSTED',
-          'CANCELLED', 'CLEANUP_UNVERIFIED')
+          'CANCELLED', 'CLEANUP_UNVERIFIED', 'MODAL_REGRESSION_CASE_MISSING', 'MODAL_IDENTITY_MISMATCH')
 HASH_NAMES = ('toolchain_sha256', 'fixture_sha256', 'helper_sha256', 'selector_sha256',
               'release_sha256', 'java_sha256', 'libjvm_sha256', 'libawt_xawt_sha256')
 PRECHECK_STEPS = ('ROOT_BINDING', 'ROOT_DIRECTORY', 'PINS_READ', 'PINS_JSON', 'PINS_IDENTITY',
@@ -198,11 +207,92 @@ def _runtime(value):
     return {**value, 'hashes': hashes}
 
 
+def _bounded_integer(value, low, high):
+    require(type(value) is int and low <= value <= high)
+    return value
+
+
+def _modal_cases(value):
+    require(type(value) is list and len(value) <= len(MODAL_ACTIONS))
+    return [_modal_case_document(item, MODAL_ACTIONS[index]) for index, item in enumerate(value)]
+
+
+def _modal_case_document(value, action):
+    _closed(value, ('action', 'status', 'proof_sha256', 'decision_title_sha256',
+                    'decision_geometry', 'root_count', 'node_count', 'focus_count', 'route_count',
+                    'unmapped_inputonly_total', 'unmapped_inputonly_omitted', 'unmapped_inputonly'))
+    require(type(action) is str and action in MODAL_ACTIONS)
+    require(type(value['action']) is str and value['action'] == action)
+    require(type(value['status']) is str and value['status'] == 'PASS')
+    _token(value['proof_sha256'], r'[0-9a-f]{64}')
+    require(type(value['decision_title_sha256']) is str and value['decision_title_sha256'] == MODAL_TITLE_HASH)
+    geometry = value['decision_geometry']
+    require(type(geometry) is list and len(geometry) == len(MODAL_GEOMETRY))
+    require(all(type(item) is int and item == expected for item, expected in zip(geometry, MODAL_GEOMETRY)))
+    roots = _bounded_integer(value['root_count'], 2, modal_window.MAX_ROOT_CHILDREN)
+    nodes = _bounded_integer(value['node_count'], 1, modal_window.MAX_NODES)
+    for key in ('focus_count', 'route_count'):
+        _bounded_integer(value[key], 1, min(nodes, modal_window.MAX_DEPTH + 1))
+    total = _bounded_integer(value['unmapped_inputonly_total'], 1, roots - 1)
+    stored = value['unmapped_inputonly']
+    require(type(stored) is list and len(stored) == min(total, MAX_UNMAPPED_FACTS))
+    _bounded_integer(value['unmapped_inputonly_omitted'], 0, modal_window.MAX_ROOT_CHILDREN - 1)
+    require(value['unmapped_inputonly_omitted'] == total - len(stored))
+    previous = -1
+    for record in stored:
+        _closed(record, ('root_index', 'x', 'y', 'width', 'height', 'border', 'window_class', 'map_state'))
+        previous = _bounded_integer(record['root_index'], previous + 1, roots - 1)
+        for key in ('x', 'y'):
+            _bounded_integer(record[key], -32768, 32767)
+        require(record['x'] < 0 or record['y'] < 0)
+        _bounded_integer(record['width'], 1, 1280)
+        _bounded_integer(record['height'], 1, 900)
+        for key, expected in (('border', 0), ('window_class', 2), ('map_state', 0)):
+            _bounded_integer(record[key], expected, expected)
+    # The stored first matches leave enough indexes for every omitted match.
+    require(roots - 1 - previous >= value['unmapped_inputonly_omitted'])
+    return {**value, 'decision_geometry': list(geometry),
+            'unmapped_inputonly': [dict(record) for record in stored]}
+
+
+class MissingModalRegressionCase(ValueError):
+    """No observed negative-coordinate unmapped InputOnly root on this display."""
+
+
+class ModalIdentityMismatch(ValueError):
+    """A valid production proof did not identify the exact private fixture."""
+
+
+def _modal_case(proof, jvm_pid, action):
+    _bounded_integer(jvm_pid, 2, 2 ** 31 - 1)
+    require(type(action) is str and action in MODAL_ACTIONS)
+    proof = modal_window.validate(proof, action)
+    identity = proof['window_identity']
+    if (identity['pid'] != jvm_pid or identity['title_sha256'] != MODAL_TITLE_HASH
+            or tuple(identity[key] for key in ('x', 'y', 'width', 'height', 'border')) != MODAL_GEOMETRY):
+        raise ModalIdentityMismatch('MODAL_IDENTITY_MISMATCH')
+    observed = [{'root_index': index, **{key: record[key] for key in
+                 ('x', 'y', 'width', 'height', 'border', 'window_class', 'map_state')}}
+                for index, record in enumerate(proof['root_children'])
+                if record['window_class'] == 2 and record['map_state'] == 0
+                and (record['x'] < 0 or record['y'] < 0)]
+    if not observed:
+        raise MissingModalRegressionCase('MODAL_REGRESSION_CASE_MISSING')
+    return _modal_case_document({'action': action, 'status': 'PASS',
+        'proof_sha256': hashlib.sha256(encode(proof)).hexdigest(),
+        'decision_title_sha256': identity['title_sha256'], 'decision_geometry': list(MODAL_GEOMETRY),
+        'root_count': len(proof['root_children']), 'node_count': len(proof['dialog_tree']),
+        'focus_count': len(proof['focus_path']), 'route_count': len(proof['target_route']),
+        'unmapped_inputonly_total': len(observed),
+        'unmapped_inputonly_omitted': max(0, len(observed) - MAX_UNMAPPED_FACTS),
+        'unmapped_inputonly': observed[:MAX_UNMAPPED_FACTS]}, action)
+
+
 def report_document(value):
     """Closed public artifact: typed codes and hashes, no paths, titles or logs."""
-    _closed(value, ('schema', 'status', 'kind', 'cases', 'cleanup', 'exit_codes', 'error', 'diagnosis',
+    _closed(value, ('schema', 'status', 'kind', 'cases', 'modal_cases', 'cleanup', 'exit_codes', 'error', 'diagnosis',
                     'runtime', 'precheck_failure', 'run_id', 'run_attempt', 'tested_sha', 'elapsed_milliseconds'))
-    require(type(value['schema']) is int and value['schema'] == 1)
+    require(type(value['schema']) is int and value['schema'] == SCHEMA)
     require(type(value['status']) is str and value['status'] in ('PASS', 'FAIL'))
     require(type(value['kind']) is str and value['kind'] == KIND)
     require(value['error'] is None or (type(value['error']) is str and value['error'] in ERRORS))
@@ -220,13 +310,15 @@ def report_document(value):
             require(code is None)
         if value['cleanup'][child] == 'REAPED':
             require(type(code) is int)
-    result = {**value, 'cases': _cases(value['cases']), 'cleanup': dict(value['cleanup']),
+    result = {**value, 'cases': _cases(value['cases']), 'modal_cases': _modal_cases(value['modal_cases']),
+              'cleanup': dict(value['cleanup']),
               'exit_codes': dict(value['exit_codes']),
               'runtime': _runtime(value['runtime']),
               'precheck_failure': None if value['precheck_failure'] is None else precheck_document(value['precheck_failure']),
               'diagnosis': None if value['diagnosis'] is None else modal_window.failure_document(value['diagnosis'])}
     if result['status'] == 'PASS':
-        require(len(result['cases']) == len(CASE_NAMES) and result['error'] is None and result['diagnosis'] is None
+        require(len(result['cases']) == len(CASE_NAMES) and len(result['modal_cases']) == len(MODAL_ACTIONS)
+                and result['error'] is None and result['diagnosis'] is None
                 and result['precheck_failure'] is None)
         require(all(status == 'REAPED' for status in result['cleanup'].values()))
         require(result['runtime'] is not None and result['runtime']['java_runtime_version'] == RUNTIME_VERSION)
@@ -235,10 +327,14 @@ def report_document(value):
     if result['error'] == 'PRECHECK_UNAVAILABLE':
         require(result['precheck_failure'] is not None)
     if result['precheck_failure'] is not None:
-        require(result['status'] == 'FAIL' and not result['cases']
+        require(result['status'] == 'FAIL' and not result['cases'] and not result['modal_cases']
                 and all(s == 'NOT_STARTED' for s in result['cleanup'].values()))
     if result['cases']:
         require(result['runtime'] is not None and result['runtime']['java_runtime_version'] == RUNTIME_VERSION)
+    if result['modal_cases'] or result['error'] in ('MODAL_REGRESSION_CASE_MISSING', 'MODAL_IDENTITY_MISMATCH'):
+        require(len(result['cases']) == len(CASE_NAMES))
+    if result['error'] in ('MODAL_REGRESSION_CASE_MISSING', 'MODAL_IDENTITY_MISMATCH'):
+        require(result['diagnosis'] is None and len(result['modal_cases']) < len(MODAL_ACTIONS))
     if 'UNVERIFIED' in result['cleanup'].values():
         require(result['status'] == 'FAIL' and result['error'] == 'CLEANUP_UNVERIFIED')
     require(len(encode(result)) <= 8192)
@@ -416,6 +512,45 @@ def _probe_document(value):
     return {**value, 'cases': cases, 'diagnosis': diagnosis}
 
 
+def _modal_probe_document(value, jvm_pid, action):
+    """Private child response; full proof is validated before public projection."""
+    _closed(value, ('schema', 'status', 'action', 'proof', 'error', 'diagnosis'))
+    require(type(value['schema']) is int and value['schema'] == 1)
+    require(type(value['action']) is str and value['action'] == action and action in MODAL_ACTIONS)
+    require(type(value['status']) is str and value['status'] in ('PASS', 'FAIL'))
+    diagnosis = None if value['diagnosis'] is None else modal_window.failure_document(value['diagnosis'])
+    if value['status'] == 'PASS':
+        require(value['error'] is None and diagnosis is None)
+        _modal_case(value['proof'], jvm_pid, action)
+    else:
+        require(value['proof'] is None and type(value['error']) is str)
+        require((value['error'] == 'PROBE_FAILED' and diagnosis is not None)
+                or (value['error'] in ('MODAL_REGRESSION_CASE_MISSING', 'MODAL_IDENTITY_MISMATCH')
+                    and diagnosis is None))
+    require(len(encode(value)) <= MAX_MODAL_PROBE_BYTES)
+    return {**value, 'diagnosis': diagnosis}
+
+
+def _modal_probe(jvm_pid, action):
+    """One exact production observation, with no retries, input or proof repairs."""
+    _bounded_integer(jvm_pid, 2, 2 ** 31 - 1)
+    require(type(action) is str and action in MODAL_ACTIONS)
+    require(os.environ.get('DISPLAY') == DISPLAY)
+    result = {'schema': 1, 'status': 'FAIL', 'action': action, 'proof': None,
+              'error': 'PROBE_FAILED', 'diagnosis': None}
+    try:
+        proof = modal_window.observe(jvm_pid, action)
+        _modal_case(proof, jvm_pid, action)
+        result.update(status='PASS', proof=proof, error=None)
+    except MissingModalRegressionCase:
+        result['error'] = 'MODAL_REGRESSION_CASE_MISSING'
+    except ModalIdentityMismatch:
+        result['error'] = 'MODAL_IDENTITY_MISMATCH'
+    except Exception as error:
+        result['diagnosis'] = modal_window.failure_from_exception(error)
+    return _modal_probe_document(result, jvm_pid, action)
+
+
 def _legacy_encoding(x, window):
     """Zero-length metadata read only, after the production selector accepts WM_NAME."""
     atom = x.x.XInternAtom(x.connection, b'WM_NAME', True)
@@ -527,7 +662,7 @@ def _probe(jvm_pid):
 def main(toolchain_root, output):
     start = time.monotonic()
     deadline = start + ACTIVITY_SECONDS
-    report = {'schema': 1, 'status': 'FAIL', 'kind': KIND, 'cases': [],
+    report = {'schema': SCHEMA, 'status': 'FAIL', 'kind': KIND, 'cases': [], 'modal_cases': [],
               'cleanup': {'jvm': 'NOT_STARTED', 'xvfb': 'NOT_STARTED'},
               'exit_codes': {'jvm': None, 'xvfb': None},
               'error': 'PRECHECK_UNAVAILABLE', 'diagnosis': None, 'runtime': None, 'precheck_failure': None,
@@ -590,6 +725,25 @@ def main(toolchain_root, output):
         result = _probe_document(json_read(probed.stdout))
         report['cases'], report['diagnosis'] = result['cases'], result['diagnosis']
         require(probed.returncode == 0 and result['status'] == 'PASS')
+        for action in MODAL_ACTIONS:
+            report['error'] = 'JVM_EXITED'
+            require(jvm.poll() is None and server.poll() is None)
+            report['error'] = 'PROBE_FAILED'
+            try:
+                probed = subprocess.run([sys.executable, '-B', str(Path(__file__).resolve()),
+                                        '--modal-probe', str(jvm.pid), '--action', action],
+                                       env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                       stderr=subprocess.DEVNULL, timeout=_remaining(deadline, PROBE_SECONDS))
+            except subprocess.TimeoutExpired:
+                report['error'] = 'PROBE_TIMEOUT'
+                raise
+            require(len(probed.stdout) <= MAX_MODAL_PROBE_BYTES)
+            result = _modal_probe_document(json_read(probed.stdout), jvm.pid, action)
+            report['diagnosis'] = result['diagnosis']
+            if result['status'] == 'FAIL':
+                report['error'] = result['error']
+            require(probed.returncode == 0 and result['status'] == 'PASS')
+            report['modal_cases'].append(_modal_case(result['proof'], jvm.pid, action))
         report['error'] = 'JVM_EXITED'
         require(jvm.poll() is None and server.poll() is None)
         _remaining(deadline, 1)
@@ -601,6 +755,12 @@ def main(toolchain_root, output):
             error = error.__cause__
         if isinstance(error, InterruptedError) or isinstance(error, KeyboardInterrupt):
             report['error'] = 'CANCELLED'
+        elif isinstance(error, MissingModalRegressionCase):
+            report['error'] = 'MODAL_REGRESSION_CASE_MISSING'
+        elif isinstance(error, ModalIdentityMismatch):
+            report['error'] = 'MODAL_IDENTITY_MISMATCH'
+        elif isinstance(error, modal_window.ProofError) and report['diagnosis'] is None:
+            report['diagnosis'] = modal_window.failure_from_exception(error)
         elif isinstance(error, TimeoutError) and time.monotonic() >= deadline:
             report['error'] = 'BUDGET_EXHAUSTED'
     finally:
@@ -640,11 +800,19 @@ if __name__ == '__main__':
     parser.add_argument('--toolchain-root', type=Path)
     parser.add_argument('--report', type=Path)
     parser.add_argument('--probe', type=int)
+    parser.add_argument('--modal-probe', type=int)
+    parser.add_argument('--action', choices=MODAL_ACTIONS)
     args = parser.parse_args()
     if args.probe is not None:
-        require(args.toolchain_root is None and args.report is None)
+        require(args.toolchain_root is None and args.report is None
+                and args.modal_probe is None and args.action is None)
         result = _probe(args.probe)
         sys.stdout.buffer.write(encode(result))
         raise SystemExit(0 if result['status'] == 'PASS' else 1)
-    require(args.toolchain_root is not None and args.report is not None)
+    if args.modal_probe is not None:
+        require(args.toolchain_root is None and args.report is None and args.action is not None)
+        result = _modal_probe(args.modal_probe, args.action)
+        sys.stdout.buffer.write(encode(result))
+        raise SystemExit(0 if result['status'] == 'PASS' else 1)
+    require(args.toolchain_root is not None and args.report is not None and args.action is None)
     main(args.toolchain_root, args.report)

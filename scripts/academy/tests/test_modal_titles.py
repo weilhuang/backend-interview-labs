@@ -159,6 +159,18 @@ class TitleAdapter(unittest.TestCase):
                 with self.assertRaises(ValueError):modal.failure_document(bad)
 
 class AwtArtifactBoundary(unittest.TestCase):
+    def modal_cases(self,count=1):
+        import awt_title_fixture as fixture
+        from test_modal_window import proof_fixture,_record
+        result=[]
+        for action in fixture.MODAL_ACTIONS:
+            proof=proof_fixture(action)
+            for record in (proof['window_identity'],proof['root_children'][0],proof['dialog_tree'][0]):
+                record['title_sha256']=fixture.MODAL_TITLE_HASH
+            proof['root_children'].extend(_record(90+i,-100,-100,10,10,window_class=2,map_state=0) for i in range(count))
+            result.append(fixture._modal_case(proof,100,action))
+        return result
+
     def report(self):
         import awt_title_fixture as fixture
         base=Path(modal.__file__).parent
@@ -166,7 +178,7 @@ class AwtArtifactBoundary(unittest.TestCase):
             'helper_sha256':base/'probes/AwtTitleFixture.java','selector_sha256':base/'modal_window.py'}
         hashes={key:hashlib.sha256(path.read_bytes()).hexdigest() for key,path in paths.items()}
         hashes.update({key:'a'*64 for key in fixture.HASH_NAMES if key not in hashes})
-        return {'schema':1,'status':'PASS','kind':fixture.KIND,'cases':[
+        return {'schema':fixture.SCHEMA,'status':'PASS','kind':fixture.KIND,'modal_cases':self.modal_cases(),'cases':[
             {'case':name,'status':'REJECTED' if i==4 else 'PASS',
              'title_sha256':fixture.MODERN_HASHES[i] if i<2 else None if i==4 else 'b'*64,
              'title_encoding':'UTF8_STRING' if i<2 else None if i==4 else 'STRING' if i==2 else 'COMPOUND_TEXT'}
@@ -191,6 +203,36 @@ class AwtArtifactBoundary(unittest.TestCase):
         out=self.collected(self.report());self.assertTrue((out/fixture.NAME).exists())
         self.assertEqual(json.loads((out/fixture.NAME).read_text())['status'],'PASS')
 
+    def test_maximum_modal_projection_stays_bounded_after_collection(self):
+        import awt_title_fixture as fixture
+        report=self.report();report['modal_cases']=self.modal_cases(31)
+        out=self.collected(report);raw=(out/fixture.NAME).read_bytes()
+        self.assertLessEqual(len(raw),8192)
+        value=fixture.report_document(json.loads(raw))
+        for case in value['modal_cases']:
+            self.assertEqual(case['unmapped_inputonly_total'],31)
+            self.assertEqual(len(case['unmapped_inputonly']),8)
+            self.assertEqual(case['unmapped_inputonly_omitted'],23)
+
+    def test_prior_title_only_pass_is_omitted_with_safe_logs_retained(self):
+        import awt_title_fixture as fixture
+        report=self.report();report.pop('modal_cases');report['schema']=1
+        report['kind']='PRIVATE_BUNDLED_JBR_AWT_TITLE_COMPATIBILITY_NOT_IDE_OR_ACCEPTANCE'
+        out=self.collected(report)
+        self.assertFalse((out/fixture.NAME).exists())
+        self.assertTrue((out/'validate.stderr.log').exists())
+
+    def test_modal_projection_rejects_private_or_type_confused_nested_data(self):
+        import awt_title_fixture as fixture
+        changes=(lambda c:c.__setitem__('proof_sha256',{'environment':'PRIVATE_ENV'}),
+                 lambda c:c.__setitem__('root_count',True),
+                 lambda c:c['unmapped_inputonly'][0].__setitem__('x',{'command':'PRIVATE_COMMAND'}),
+                 lambda c:c['unmapped_inputonly'][0].__setitem__('map_state',False))
+        for change in changes:
+            report=self.report();change(report['modal_cases'][0]);out=self.collected(report)
+            self.assertFalse((out/fixture.NAME).exists())
+            for path in out.iterdir():self.assertNotIn(b'PRIVATE',path.read_bytes())
+
     def test_stale_source_run_or_helper_hash_is_omitted(self):
         import awt_title_fixture as fixture
         for change in ('run_attempt','tested_sha','helper_sha256'):
@@ -211,7 +253,7 @@ class AwtArtifactBoundary(unittest.TestCase):
 
     def test_failure_without_runtime_is_retained_without_inventing_identity(self):
         import awt_title_fixture as fixture
-        report=self.report();report.update(status='FAIL',cases=[],runtime=None,error='PRECHECK_UNAVAILABLE',cleanup={'jvm':'NOT_STARTED','xvfb':'NOT_STARTED'},exit_codes={'jvm':None,'xvfb':None})
+        report=self.report();report.update(status='FAIL',cases=[],modal_cases=[],runtime=None,error='PRECHECK_UNAVAILABLE',cleanup={'jvm':'NOT_STARTED','xvfb':'NOT_STARTED'},exit_codes={'jvm':None,'xvfb':None})
         report['precheck_failure']={'step':'PRODUCT_READ','reason':'MISSING','exception_class':'FileNotFoundError','facts':{}}
         out=self.collected(report);value=json.loads((out/fixture.NAME).read_text())
         self.assertEqual(value['precheck_failure']['step'],'PRODUCT_READ')

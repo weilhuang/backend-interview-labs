@@ -32,7 +32,9 @@ def cases():
 
 
 def report():
-    return {'schema': 1, 'status': 'PASS', 'kind': fixture.KIND, 'cases': cases(),
+    from test_awt_modal_fixture import modal_cases
+    return {'schema': fixture.SCHEMA, 'status': 'PASS', 'kind': fixture.KIND, 'cases': cases(),
+            'modal_cases': modal_cases(),
             'cleanup': {'jvm': 'REAPED', 'xvfb': 'REAPED'}, 'error': None, 'diagnosis': None,
             'exit_codes': {'jvm': -15, 'xvfb': -15}, 'precheck_failure': None,
             'runtime': runtime(), 'run_id': '123', 'run_attempt': '2', 'tested_sha': 'd' * 40,
@@ -86,7 +88,7 @@ class TypedReport(unittest.TestCase):
                 fixture.report_document({**report(), 'cases': value})
 
     def test_precheck_failure_has_no_false_runtime_or_cases(self):
-        value = {**report(), 'status': 'FAIL', 'cases': [], 'runtime': None,
+        value = {**report(), 'status': 'FAIL', 'cases': [], 'modal_cases': [], 'runtime': None,
                  'cleanup': {'jvm': 'NOT_STARTED', 'xvfb': 'NOT_STARTED'},
                  'exit_codes': {'jvm': None, 'xvfb': None}, 'error': 'PRECHECK_UNAVAILABLE',
                  'precheck_failure': {'step': 'PRODUCT_READ', 'reason': 'MISSING',
@@ -103,7 +105,7 @@ class TypedReport(unittest.TestCase):
             fixture.report_document({**value, 'error': 'CANCELLED'})
 
     def test_typed_diagnosis_never_serializes_exception_text(self):
-        value = {**report(), 'status': 'FAIL', 'error': 'PROBE_FAILED', 'cases': [],
+        value = {**report(), 'status': 'FAIL', 'error': 'PROBE_FAILED', 'cases': [], 'modal_cases': [],
                  'diagnosis': modal_window.failure_from_exception(ValueError('PRIVATE_TITLE_OR_PATH'))}
         self.assertNotIn(b'PRIVATE_TITLE_OR_PATH', encode(fixture.report_document(value)))
 
@@ -285,9 +287,14 @@ class Child:
 
 class CoordinatorLifecycle(unittest.TestCase):
     def execute(self, *, failure=None, ready_failure=None, pidfd_failure=False, cleanup_failure=False,
-                expired_budget=False):
+                expired_budget=False, probe_results=None):
+        from test_awt_modal_fixture import modal_response
         server, jvm = Child(101), Child(102)
         result = {'schema': 1, 'status': 'PASS', 'cases': cases(), 'diagnosis': None}
+        if probe_results is None:
+            probe_results = [subprocess.CompletedProcess([], 0, encode(result)),
+                             *(subprocess.CompletedProcess([], 0, encode(modal_response(action, jvm.pid)))
+                               for action in fixture.MODAL_ACTIONS)]
         identity = runtime()
         identity['java_runtime_version'] = None
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
@@ -299,8 +306,8 @@ class CoordinatorLifecycle(unittest.TestCase):
             stack.enter_context(patch.object(fixture, '_wait_xvfb'))
             stack.enter_context(patch.object(fixture, '_ready', side_effect=ready_failure))
             popen = stack.enter_context(patch.object(fixture.subprocess, 'Popen', side_effect=[server, jvm]))
-            run = stack.enter_context(patch.object(fixture.subprocess, 'run', side_effect=failure,
-                                                   return_value=subprocess.CompletedProcess([], 0, encode(result))))
+            run = stack.enter_context(patch.object(fixture.subprocess, 'run',
+                                                   side_effect=failure if failure is not None else probe_results))
             stack.enter_context(patch.object(fixture.os, 'pidfd_open', side_effect=OSError('private') if pidfd_failure else [201, 202]))
             stack.enter_context(patch.object(fixture.os, 'close'))
             sends = stack.enter_context(patch.object(fixture.signal, 'pidfd_send_signal'))
