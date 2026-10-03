@@ -121,7 +121,11 @@ jobs:
           fi
       - name: 下载固定官方 IDEA 和 Academy 并校验 SHA256
         timeout-minutes: 7
-        run: bash scripts/academy/install_toolchain.sh "$TOOLCHAIN_DIR" > "$EVIDENCE_DIR/install.log" 2>&1
+        run: |
+          bash scripts/academy/install_toolchain.sh "$TOOLCHAIN_DIR" > "$EVIDENCE_DIR/install.log" 2>&1
+          if [ '${{ github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation') }}' = true ]; then
+            python scripts/academy/awt_title_fixture.py --toolchain-root "$TOOLCHAIN_DIR" --report "$EVIDENCE_DIR/awt-title-fixture.json"
+          fi
       - name: 官方 CLI 导出、原字节捕获与按所选阶段验收
         id: official
         timeout-minutes: ${{ (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation')) && 60 || 8 }}

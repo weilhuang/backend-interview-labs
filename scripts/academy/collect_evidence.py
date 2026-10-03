@@ -11,6 +11,7 @@ from display_diagnostic import collect as collect_display, REPORT_NAME as DISPLA
 from project_trust import collect as collect_project_trust
 from plugin_agreement import collect as collect_plugin_agreement
 from modal_fixture import NAME as MODAL_FIXTURE_NAME, report_document as modal_fixture_report
+from awt_title_fixture import NAME as AWT_FIXTURE_NAME, report_document as awt_fixture_report
 from profile_control import collect as collect_profile_control
 from restart_session import collect as collect_restart_result
 from post_trust_diagnostic import collect as collect_post_trust, REPORT as POST_TRUST_REPORT, collect_budget_owner, BUDGET_OWNER
@@ -22,7 +23,7 @@ NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','sourc
        'export.stdout.log','export.stderr.log','validate.stdout.log','validate.stderr.log',
        'export-idea.log','validate-idea.log','export-idea-pretermination.log','validate-idea-pretermination.log','gradle-jvm.jsonl','gradle-jvm-gate.json','unified-source-validation.json','release-gate.json'}
 NAMES.add(THREAD_NAME)
-BOOTSTRAP_NAMES={'source-ci.json','bootstrap.json','install.log','go-bootstrap.json',MODAL_FIXTURE_NAME}
+BOOTSTRAP_NAMES={'source-ci.json','bootstrap.json','install.log','go-bootstrap.json',MODAL_FIXTURE_NAME,AWT_FIXTURE_NAME}
 SUPERVISOR_NAMES={'result.json':'supervisor-result.json','launch-result.json':'supervisor-launch.json',
                   'cleanup-result.json':'supervisor-cleanup.json','worker.stdout.log':'supervisor-worker.stdout.log',
                   'worker.stderr.log':'supervisor-worker.stderr.log','supervisor.log':'supervisor.log'}
@@ -144,14 +145,25 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
     for index,src in enumerate(sources):
         if ui_root is not None and src==absolute(ui_root):continue
         for name in sorted(NAMES if index==0 else BOOTSTRAP_NAMES):
-            try:data=read_regular(src/name,limit=THREAD_LIMIT if name==THREAD_NAME else MAX_FILE)
+            try:data=read_regular(src/name,limit=8192 if name==AWT_FIXTURE_NAME else THREAD_LIMIT if name==THREAD_NAME else MAX_FILE)
             except FileNotFoundError:continue
             except Exception as exc:
                 omitted.append({'name':name,'reason':type(exc).__name__});continue
             from hashlib import sha256
             original_sha=sha256(data).hexdigest()
             try:
-                if name==MODAL_FIXTURE_NAME:
+                if name==AWT_FIXTURE_NAME:
+                    from display_diagnostic import json_read
+                    value=awt_fixture_report(json_read(data))
+                    if any(value[key]!=os.environ.get(env) for key,env in [('run_id','GITHUB_RUN_ID'),('run_attempt','GITHUB_RUN_ATTEMPT'),('tested_sha','GITHUB_SHA')]):raise ValueError('AWT fixture binding mismatch')
+                    if value['runtime'] is not None:
+                        base=Path(__file__).parent
+                        sources={'toolchain_sha256':base/'toolchain.json','fixture_sha256':base/'awt_title_fixture.py',
+                                 'helper_sha256':base/'probes/AwtTitleFixture.java','selector_sha256':base/'modal_window.py'}
+                        for key,path in sources.items():
+                            if sha256(read_regular(path,limit=128*1024)).hexdigest()!=value['runtime']['hashes'][key]:raise ValueError('AWT fixture source digest mismatch')
+                    data=(json.dumps(value,ensure_ascii=True,indent=2)+'\n').encode()
+                elif name==MODAL_FIXTURE_NAME:
                     from display_diagnostic import json_read
                     value=modal_fixture_report(json_read(data))
                     if any(value[key]!=os.environ.get(env) for key,env in [('run_id','GITHUB_RUN_ID'),('run_attempt','GITHUB_RUN_ATTEMPT'),('tested_sha','GITHUB_SHA')]):raise ValueError('synthetic fixture binding mismatch')

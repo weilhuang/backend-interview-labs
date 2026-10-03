@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import re
+import struct
 import time
 
 import trust_window
@@ -23,6 +24,8 @@ MAX_ROOT_CHILDREN = 32
 MAX_NODES = 64  # Includes the decision window itself.
 MAX_DEPTH = 8  # The decision window is depth zero.
 MAX_TITLE_BYTES = 1024
+MAX_CONVERTED_TITLE_BYTES = 4096  # Includes the terminating NUL during native output scanning.
+TITLE_DOMAIN = b"ACADEMY_MODAL_SELECTED_TITLE_V1\0"
 PROBE_SECONDS = 2.0
 ACTIONS = ("CHECK_ACADEMY_PLUGIN_ONLY", "AGREE_ACADEMY_PLUGIN_ONLY")
 _ATTRS = {"window_id", "pid", "title_sha256", "x", "y", "width", "height",
@@ -63,6 +66,8 @@ _FAILURE_SITES = frozenset({
     "OBSERVE_MODAL_PID", "OBSERVE_IDENTITY", "OBSERVE_MODAL_BORDER", "OBSERVE_NODE_LIMIT",
     "OBSERVE_NODE_PARENT", "OBSERVE_FOCUS_ANCESTRY", "OBSERVE_CHILD_ROUTE", "DISPLAY",
     "OBSERVE_SAMPLES", "OBSERVE_EXCEPTION", "VALIDATE_IDENTITY", "VALIDATE_MODAL_BORDER",
+    "TITLE_PROPERTY", "TITLE_ENCODING", "TITLE_CONTROLS", "TITLE_CONVERSION",
+    "TITLE_CONVERTED_LIMIT", "TITLE_NATIVE_OUTPUT",
 })
 _I32 = (-2**31, 2**31 - 1)
 _FACT_LIMITS = {
@@ -78,6 +83,7 @@ _FACT_LIMITS = {
     "type_matches": (0, 1), "has_pointer": (0, 1), "root_matches": (0, 1),
     "parent_matches": (0, 1), "route_index": (0, MAX_DEPTH),
     "major": (0, 65535), "minor": (0, 65535), "proof_bytes": (0, 2**31 - 1),
+    "property_name": (0, 2), "actual_type": (0, 5), "converted_bytes": (0, MAX_CONVERTED_TITLE_BYTES),
 }
 
 
@@ -399,6 +405,26 @@ class _Rectangle(C.Structure):
     _fields_ = [("x", C.c_short), ("y", C.c_short), ("width", C.c_ushort), ("height", C.c_ushort)]
 
 
+class _TextProperty(C.Structure):
+    _fields_ = [("value", C.c_void_p), ("encoding", C.c_ulong),
+                ("format", C.c_int), ("nitems", C.c_ulong)]
+
+
+def _text_controls(text):
+    # This is an output repertoire check, not a complete COMPOUND_TEXT parser.
+    _require(all((ord(c) >= 32 or c in '\t\n') and not 127 <= ord(c) <= 159 for c in text),
+             call_site="TITLE_CONTROLS")
+
+
+def _title_digest(name, encoding, raw):
+    _require(type(name) is bytes and name in (b"_NET_WM_NAME", b"WM_NAME"), call_site="TITLE_PROPERTY")
+    _require(type(encoding) is bytes and encoding in (b"STRING", b"UTF8_STRING", b"COMPOUND_TEXT"), call_site="TITLE_ENCODING")
+    _require(type(raw) is bytes and len(raw) <= MAX_TITLE_BYTES, call_site="TITLE_ENCODING")
+    framed = TITLE_DOMAIN + struct.pack('>H', len(name)) + name
+    framed += struct.pack('>H', len(encoding)) + encoding + struct.pack('>I', len(raw)) + raw
+    return hashlib.sha256(framed).hexdigest()
+
+
 class _X11:
     """Small read-only Xlib adapter. All server-returned lists are bounded before copying."""
     def __init__(self, display, deadline):
@@ -416,6 +442,8 @@ class _X11:
             "XTranslateCoordinates": ([ptr, u, u, i, i, p(i), p(i), p(u)], i),
             "XInternAtom": ([ptr, C.c_char_p, i], u),
             "XGetWindowProperty": ([ptr, u, u, C.c_long, C.c_long, i, u, p(u), p(i), p(u), p(u), p(ptr)], i),
+            "Xutf8TextPropertyToTextList": ([ptr, p(_TextProperty), p(p(ptr)), p(i)], i),
+            "XFreeStringList": ([p(ptr)], None),
             "XFree": ([ptr], i), "XSync": ([ptr, i], i), "XSetErrorHandler": ([ptr], ptr)}
         for name, (args, result) in declarations.items():
             function = getattr(self.x, name)
@@ -506,7 +534,100 @@ class _X11:
                 "map_state": value.map_state, "override_redirect": bool(value.override_redirect),
                 "event_mask": value.all_event_masks, "do_not_propagate_mask": value.do_not_propagate_mask,
                 "pid": self.property(window, b"_NET_WM_PID", 32, b"CARDINAL"),
-                "title_sha256": self.property(window, b"WM_NAME", 8, b"STRING")}
+                "title_sha256": self.title(window)}
+
+    def _title_type_atoms(self):
+        # Fixed names only; never resolve an arbitrary atom name into public text.
+        if not hasattr(self, '_title_atoms'):
+            self._title_atoms = {}
+            for name in (b"STRING", b"UTF8_STRING", b"COMPOUND_TEXT", b"CARDINAL"):
+                _check_time(self.deadline)
+                self._title_atoms[name] = int(self.x.XInternAtom(self.connection, name, True))
+                self.sync()
+        return self._title_atoms
+
+    def _compound_text(self, raw, encoding):
+        _check_time(self.deadline)
+        if not raw:
+            return ''
+        source = C.create_string_buffer(raw)
+        prop = _TextProperty(C.cast(source, C.c_void_p), encoding, 8, len(raw))
+        strings, count = C.POINTER(C.c_void_p)(), C.c_int()
+        try:
+            status = self.x.Xutf8TextPropertyToTextList(self.connection, C.byref(prop), C.byref(strings), C.byref(count))
+            _check_time(self.deadline)
+            _require(status == 0 and count.value == 1 and bool(strings), call_site="TITLE_CONVERSION",
+                     return_code=status, count=count.value, has_pointer=int(bool(strings)))
+            address = strings[0]  # c_void_p avoids c_char_p's unbounded automatic string copy.
+            _require(bool(address), call_site="TITLE_NATIVE_OUTPUT", has_pointer=int(bool(address)))
+            data = C.cast(address, C.POINTER(C.c_ubyte))
+            length = 0
+            while length < MAX_CONVERTED_TITLE_BYTES and data[length] != 0:
+                length += 1
+            _require(length < MAX_CONVERTED_TITLE_BYTES, call_site="TITLE_CONVERTED_LIMIT", converted_bytes=length)
+            converted = C.string_at(address, length)
+            try:
+                text = converted.decode('utf-8', errors='strict')
+            except UnicodeError:
+                raise ProofError(call_site="TITLE_ENCODING") from None
+            _text_controls(text)
+            _check_time(self.deadline)
+            return text
+        finally:
+            if strings:
+                self.x.XFreeStringList(strings)
+
+    def _title_property(self, window, name):
+        _require(name in (b"_NET_WM_NAME", b"WM_NAME"), call_site="TITLE_PROPERTY")
+        kind = 2 if name == b"_NET_WM_NAME" else 1
+        _check_time(self.deadline)
+        atom = self.x.XInternAtom(self.connection, name, True)
+        self.sync()
+        if atom == 0:
+            return None
+        actual, fmt, count, remaining, data = C.c_ulong(), C.c_int(), C.c_ulong(), C.c_ulong(), C.c_void_p()
+        try:
+            _check_time(self.deadline)
+            code = self.x.XGetWindowProperty(self.connection, window, atom, 0, MAX_TITLE_BYTES // 4,
+                                            False, 0, C.byref(actual), C.byref(fmt), C.byref(count),
+                                            C.byref(remaining), C.byref(data))
+            self.sync()
+            _require(code == 0 and remaining.value == 0, call_site="X_PROPERTY_REPLY",
+                     property_kind=1, property_name=kind, return_code=code, remaining_bytes=remaining.value)
+            if actual.value == 0:
+                _require(fmt.value == 0 and count.value == 0, call_site="X_PROPERTY_ABSENT",
+                         property_kind=1, property_name=kind, format=fmt.value, count=count.value)
+                return None
+            atoms = self._title_type_atoms()
+            names = (b"STRING", b"UTF8_STRING", b"COMPOUND_TEXT", b"CARDINAL")
+            encoding = next((n for n in names if atoms[n] != 0 and atoms[n] == actual.value), None)
+            category = names.index(encoding) + 1 if encoding is not None else 5
+            allowed = (b"UTF8_STRING",) if kind == 2 else names[:3]
+            _require(encoding in allowed and fmt.value == 8, call_site="X_PROPERTY_TYPE",
+                     property_kind=1, property_name=kind, actual_type=category,
+                     type_matches=int(encoding in allowed), format=fmt.value)
+            _require(count.value <= MAX_TITLE_BYTES and (count.value == 0 or bool(data)),
+                     call_site="X_PROPERTY_TITLE", property_name=kind, count=count.value, has_pointer=int(bool(data)))
+            raw = C.string_at(data, count.value) if count.value else b""
+            _require(b'\0' not in raw, call_site="TITLE_ENCODING", property_name=kind, actual_type=category)
+            if encoding == b"COMPOUND_TEXT":
+                self._compound_text(raw, actual.value)
+            else:
+                try:
+                    text = raw.decode('utf-8' if encoding == b"UTF8_STRING" else 'latin-1', errors='strict')
+                except UnicodeError:
+                    raise ProofError(call_site="TITLE_ENCODING", facts={'property_name':kind,'actual_type':category}) from None
+                _text_controls(text)
+            _check_time(self.deadline)
+            return _title_digest(name, encoding, raw)
+        finally:
+            if data:
+                self.x.XFree(data)
+
+    def title(self, window):
+        # EWMH preference: malformed modern data fails; only absence permits fallback.
+        modern = self._title_property(window, b"_NET_WM_NAME")
+        return modern if modern is not None else self._title_property(window, b"WM_NAME")
 
     def property(self, window, name, expected_format, expected_type):
         _check_time(self.deadline)
