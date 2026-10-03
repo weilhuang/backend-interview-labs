@@ -34,7 +34,7 @@ def cases():
 def report():
     return {'schema': 1, 'status': 'PASS', 'kind': fixture.KIND, 'cases': cases(),
             'cleanup': {'jvm': 'REAPED', 'xvfb': 'REAPED'}, 'error': None, 'diagnosis': None,
-            'exit_codes': {'jvm': -15, 'xvfb': -15},
+            'exit_codes': {'jvm': -15, 'xvfb': -15}, 'precheck_failure': None,
             'runtime': runtime(), 'run_id': '123', 'run_attempt': '2', 'tested_sha': 'd' * 40,
             'elapsed_milliseconds': 123}
 
@@ -88,7 +88,9 @@ class TypedReport(unittest.TestCase):
     def test_precheck_failure_has_no_false_runtime_or_cases(self):
         value = {**report(), 'status': 'FAIL', 'cases': [], 'runtime': None,
                  'cleanup': {'jvm': 'NOT_STARTED', 'xvfb': 'NOT_STARTED'},
-                 'exit_codes': {'jvm': None, 'xvfb': None}, 'error': 'PRECHECK_UNAVAILABLE'}
+                 'exit_codes': {'jvm': None, 'xvfb': None}, 'error': 'PRECHECK_UNAVAILABLE',
+                 'precheck_failure': {'step': 'PRODUCT_READ', 'reason': 'MISSING',
+                     'exception_class': 'FileNotFoundError', 'facts': {}}}
         self.assertEqual(fixture.report_document(value), value)
         with self.assertRaises(ValueError):
             fixture.report_document({**value, 'cases': cases()[:1]})
@@ -118,12 +120,13 @@ class RuntimeIdentity(unittest.TestCase):
             path = root / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(raw)
+        (root / 'idea/jbr/bin/java').chmod(0o700)
         return root
 
     def test_pinned_identity_hashes_without_claiming_live_verification(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self.create_tree(Path(tmp))
-            with patch.dict(os.environ, {'RUNNER_TEMP': tmp, 'TOOLCHAIN_DIR': str(root)}), patch('awt_title_fixture.os.access', return_value=True):
+            with patch.dict(os.environ, {'RUNNER_TEMP': tmp, 'TOOLCHAIN_DIR': str(root)}):
                 java, identity = fixture._runtime_identity(root)
             self.assertEqual(java, root / 'idea/jbr/bin/java')
             self.assertIsNone(identity['java_runtime_version'])
@@ -133,7 +136,7 @@ class RuntimeIdentity(unittest.TestCase):
     def test_rejects_other_toolchain_bad_product_and_unexpected_release(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = self.create_tree(Path(tmp))
-            with patch.dict(os.environ, {'RUNNER_TEMP': tmp, 'TOOLCHAIN_DIR': str(root)}), patch('awt_title_fixture.os.access', return_value=True):
+            with patch.dict(os.environ, {'RUNNER_TEMP': tmp, 'TOOLCHAIN_DIR': str(root)}):
                 with self.assertRaises(ValueError):
                     fixture._runtime_identity(Path(tmp))
                 (root / 'idea/product-info.json').write_text('{"version":"other","buildNumber":"other"}')

@@ -8,6 +8,7 @@ wrong-type write targets a synthetic window created by the short-lived probe.
 """
 from pathlib import Path
 import ctypes as C
+import errno
 import hashlib
 import json
 import os
@@ -23,7 +24,7 @@ import time
 
 import modal_window
 from display_diagnostic import encode, json_read, publish
-from safe_io import absolute, read_regular, regular_reader, validate_directory
+from safe_io import BoundaryError, absolute, read_regular, regular_reader, validate_directory
 
 R = Path(__file__).resolve().parent
 NAME = 'awt-title-fixture.json'
@@ -48,6 +49,100 @@ ERRORS = ('PRECHECK_UNAVAILABLE', 'XVFB_START_UNAVAILABLE', 'JVM_START_UNAVAILAB
           'CANCELLED', 'CLEANUP_UNVERIFIED')
 HASH_NAMES = ('toolchain_sha256', 'fixture_sha256', 'helper_sha256', 'selector_sha256',
               'release_sha256', 'java_sha256', 'libjvm_sha256', 'libawt_xawt_sha256')
+PRECHECK_STEPS = ('ROOT_BINDING', 'ROOT_DIRECTORY', 'PINS_READ', 'PINS_JSON', 'PINS_IDENTITY',
+                  'PRODUCT_READ', 'PRODUCT_JSON', 'PRODUCT_IDENTITY', 'RELEASE_READ',
+                  'RELEASE_VERSION', 'JAVA_EXECUTABLE',
+                  *('HASH_' + name.removesuffix('_sha256').upper() for name in HASH_NAMES),
+                  'RUNTIME_SCHEMA', 'PIDFD_CAPABILITY', 'XVFB_BINARY', 'DISPLAY_AVAILABLE',
+                  'PRIVATE_DIRECTORY', 'AUTHORITY_CREATE')
+PRECHECK_CLASSES = ('FileNotFoundError', 'PermissionError', 'NotADirectoryError',
+                    'IsADirectoryError', 'BoundaryError', 'OSError', 'UnicodeDecodeError',
+                    'JSONDecodeError', 'KeyError', 'TypeError', 'ValueError',
+                    'TimeoutError', 'InterruptedError', 'KeyboardInterrupt', 'OTHER_EXCEPTION')
+PRECHECK_REASONS = ('MISSING', 'PERMISSION', 'PATH_OR_FILE_BOUNDARY', 'INVALID_JSON',
+                   'INVALID_UTF8', 'REQUIRED_FIELD', 'CONDITION_REJECTED', 'IO_ERROR',
+                   'CANCELLED', 'TIMEOUT', 'UNEXPECTED_EXCEPTION')
+
+
+def _identity_token(value):
+    # Numeric vendor version/build tokens only; never arbitrary release-file text.
+    if type(value) is not str or len(value) > 64:
+        return None
+    pattern = r'[0-9]{1,4}(?:\.[0-9]{1,5}){0,3}(?:-(?:ea|internal))?(?:\+[0-9]{1,4}(?:-b[0-9]{1,4}(?:\.[0-9]{1,4}){0,2})?)?'
+    return value if re.fullmatch(pattern, value) else None
+
+
+def precheck_document(value):
+    _closed(value, ('step', 'reason', 'exception_class', 'facts'))
+    for key, allowed in (('step', PRECHECK_STEPS), ('reason', PRECHECK_REASONS),
+                         ('exception_class', PRECHECK_CLASSES)):
+        require(type(value[key]) is str and value[key] in allowed)
+    facts = value['facts']
+    require(type(facts) is dict and len(facts) <= 10)
+    for key, item in facts.items():
+        require(type(key) is str)
+        if key in ('regular', 'size_capped', 'within_limit', 'identity_matches', 'executable', 'hash_complete'):
+            require(type(item) is bool)
+        elif key in ('observed_version', 'observed_build'):
+            require(item is None or (type(item) is str and _identity_token(item) == item))
+        elif key == 'metadata_sha256':
+            _token(item, r'[0-9a-f]{64}')
+        elif key == 'version_field_count':
+            require(type(item) is int and 0 <= item <= 16)
+        elif key == 'size_bytes':
+            require(type(item) is int and 0 <= item <= 2 ** 31 - 1)
+        else:
+            raise ValueError('INVALID_PRECHECK_FACT')
+    return {**value, 'facts': dict(facts)}
+
+
+class PrecheckFailure(ValueError):
+    def __init__(self, step, error, facts):
+        kind = type(error).__name__
+        reason = ('CANCELLED' if isinstance(error, (InterruptedError, KeyboardInterrupt)) else
+                  'TIMEOUT' if isinstance(error, TimeoutError) else
+                  'MISSING' if isinstance(error, FileNotFoundError) else
+                  'PERMISSION' if isinstance(error, PermissionError) else
+                  'PATH_OR_FILE_BOUNDARY' if isinstance(error, (BoundaryError, NotADirectoryError, IsADirectoryError))
+                  or (isinstance(error, OSError) and error.errno in (errno.ELOOP, errno.ENOTDIR)) else
+                  'INVALID_JSON' if isinstance(error, json.JSONDecodeError) else
+                  'INVALID_UTF8' if isinstance(error, UnicodeDecodeError) else
+                  'REQUIRED_FIELD' if isinstance(error, KeyError) else
+                  'IO_ERROR' if isinstance(error, OSError) else
+                  'CONDITION_REJECTED' if isinstance(error, (ValueError, TypeError)) else
+                  'UNEXPECTED_EXCEPTION')
+        self.document = precheck_document({'step': step, 'reason': reason,
+            'exception_class': kind if kind in PRECHECK_CLASSES else 'OTHER_EXCEPTION', 'facts': facts})
+        super().__init__('AWT_TITLE_PRECHECK_FAILED')
+
+
+def _checked(step, action, facts=None):
+    facts = {} if facts is None else facts
+    try:
+        return action()
+    except PrecheckFailure:
+        raise
+    except BaseException as error:
+        raise PrecheckFailure(step, error, facts) from error
+
+
+def _condition(step, matched, **facts):
+    facts['identity_matches'] = bool(matched)
+    _checked(step, lambda: require(matched), facts)
+
+
+def _checked_read(step, path, limit):
+    facts = {}
+    def read():
+        with regular_reader(path) as stream:
+            size = os.fstat(stream.fileno()).st_size
+            facts.update(regular=True, size_bytes=min(size, 2 ** 31 - 1),
+                         size_capped=size > 2 ** 31 - 1, within_limit=size <= limit)
+            require(size <= limit)
+            raw = stream.read(limit + 1)
+            require(len(raw) == size and len(raw) <= limit)
+            return raw
+    return _checked(step, read, facts)
 
 
 def require(ok):
@@ -105,7 +200,7 @@ def _runtime(value):
 def report_document(value):
     """Closed public artifact: typed codes and hashes, no paths, titles or logs."""
     _closed(value, ('schema', 'status', 'kind', 'cases', 'cleanup', 'exit_codes', 'error', 'diagnosis',
-                    'runtime', 'run_id', 'run_attempt', 'tested_sha', 'elapsed_milliseconds'))
+                    'runtime', 'precheck_failure', 'run_id', 'run_attempt', 'tested_sha', 'elapsed_milliseconds'))
     require(type(value['schema']) is int and value['schema'] == 1)
     require(type(value['status']) is str and value['status'] in ('PASS', 'FAIL'))
     require(type(value['kind']) is str and value['kind'] == KIND)
@@ -127,13 +222,20 @@ def report_document(value):
     result = {**value, 'cases': _cases(value['cases']), 'cleanup': dict(value['cleanup']),
               'exit_codes': dict(value['exit_codes']),
               'runtime': _runtime(value['runtime']),
+              'precheck_failure': None if value['precheck_failure'] is None else precheck_document(value['precheck_failure']),
               'diagnosis': None if value['diagnosis'] is None else modal_window.failure_document(value['diagnosis'])}
     if result['status'] == 'PASS':
-        require(len(result['cases']) == len(CASE_NAMES) and result['error'] is None and result['diagnosis'] is None)
+        require(len(result['cases']) == len(CASE_NAMES) and result['error'] is None and result['diagnosis'] is None
+                and result['precheck_failure'] is None)
         require(all(status == 'REAPED' for status in result['cleanup'].values()))
         require(result['runtime'] is not None and result['runtime']['java_runtime_version'] == RUNTIME_VERSION)
     else:
         require(result['error'] is not None)
+    if result['error'] == 'PRECHECK_UNAVAILABLE':
+        require(result['precheck_failure'] is not None)
+    if result['precheck_failure'] is not None:
+        require(result['status'] == 'FAIL' and not result['cases']
+                and all(s == 'NOT_STARTED' for s in result['cleanup'].values()))
     if result['cases']:
         require(result['runtime'] is not None and result['runtime']['java_runtime_version'] == RUNTIME_VERSION)
     if 'UNVERIFIED' in result['cleanup'].values():
@@ -149,10 +251,14 @@ def _remaining(deadline, cap):
     return min(left, cap)
 
 
-def _hash_file(path, cap):
+def _hash_file(path, cap, facts=None):
     # Reject symlinks in every path component; bound both size and total read.
     with regular_reader(path) as stream:
-        require(0 < os.fstat(stream.fileno()).st_size <= cap)
+        size = os.fstat(stream.fileno()).st_size
+        if facts is not None:
+            facts.update(regular=True, size_bytes=min(size, 2 ** 31 - 1),
+                         size_capped=size > 2 ** 31 - 1, within_limit=0 < size <= cap, hash_complete=False)
+        require(0 < size <= cap)
         digest = hashlib.sha256()
         total = 0
         while True:
@@ -162,25 +268,46 @@ def _hash_file(path, cap):
             total += len(data)
             require(total <= cap)
             digest.update(data)
+        require(total == size)
+        if facts is not None:
+            facts['hash_complete'] = True
         return digest.hexdigest()
 
 
 def _runtime_identity(toolchain_root):
-    root = absolute(toolchain_root)
-    runner = absolute(os.environ['RUNNER_TEMP'])
-    require(root == absolute(os.environ['TOOLCHAIN_DIR']) and root != runner and root.is_relative_to(runner))
-    validate_directory(root)
-    pins = json_read(read_regular(R / 'toolchain.json', limit=16384))
-    require(pins['idea']['version'] == IDEA_VERSION and pins['idea']['build'] == IDEA_BUILD
-            and pins['idea']['sha256'] == IDEA_ARCHIVE_SHA256)
+    def root_binding():
+        root = absolute(toolchain_root)
+        runner = absolute(os.environ['RUNNER_TEMP'])
+        require(root == absolute(os.environ['TOOLCHAIN_DIR']) and root != runner and root.is_relative_to(runner))
+        return root
+    root = _checked('ROOT_BINDING', root_binding)
+    _checked('ROOT_DIRECTORY', lambda: validate_directory(root))
+    raw_pins = _checked_read('PINS_READ', R / 'toolchain.json', 16384)
+    pins = _checked('PINS_JSON', lambda: json_read(raw_pins))
+    _checked('PINS_IDENTITY', lambda: _condition('PINS_IDENTITY',
+        pins['idea']['version'] == IDEA_VERSION and pins['idea']['build'] == IDEA_BUILD
+        and pins['idea']['sha256'] == IDEA_ARCHIVE_SHA256))
     idea = root / 'idea'
-    info = json_read(read_regular(idea / 'product-info.json', limit=65536))
-    require(info['version'] == IDEA_VERSION and info['buildNumber'] == IDEA_BUILD)
-    release = read_regular(idea / 'jbr/release', limit=16384)
+    raw_info = _checked_read('PRODUCT_READ', idea / 'product-info.json', 65536)
+    info = _checked('PRODUCT_JSON', lambda: json_read(raw_info))
+    product_facts = {'metadata_sha256': hashlib.sha256(raw_info).hexdigest(), 'size_bytes': len(raw_info),
+                     'observed_version': _identity_token(info.get('version')) if type(info) is dict else None,
+                     'observed_build': _identity_token(info.get('buildNumber')) if type(info) is dict else None}
+    _checked('PRODUCT_IDENTITY', lambda: _condition('PRODUCT_IDENTITY',
+        info['version'] == IDEA_VERSION and info['buildNumber'] == IDEA_BUILD, **product_facts), product_facts)
+    release = _checked_read('RELEASE_READ', idea / 'jbr/release', 16384)
     # The live JVM separately verifies the complete runtime version before READY.
-    require(re.findall(rb'^JAVA_VERSION="([^"]+)"$', release, flags=re.M) == [b'25.0.4'])
+    versions = re.findall(rb'^JAVA_VERSION="([^"]+)"$', release, flags=re.M)
+    observed = _identity_token(versions[0].decode('ascii', errors='replace')) if len(versions) == 1 else None
+    _condition('RELEASE_VERSION', versions == [b'25.0.4'], observed_version=observed,
+               version_field_count=min(len(versions), 16), size_bytes=len(release),
+               metadata_sha256=hashlib.sha256(release).hexdigest())
     java = idea / 'jbr/bin/java'
-    require(stat.S_ISREG(java.lstat().st_mode) and os.access(java, os.X_OK))
+    def executable():
+        regular = stat.S_ISREG(java.lstat().st_mode)
+        allowed = os.access(java, os.X_OK)
+        _condition('JAVA_EXECUTABLE', regular and allowed, regular=regular, executable=allowed)
+    _checked('JAVA_EXECUTABLE', executable)
     files = {'toolchain_sha256': (R / 'toolchain.json', 16384),
              'fixture_sha256': (Path(__file__), 65536), 'helper_sha256': (HELPER, 16384),
              'selector_sha256': (R / 'modal_window.py', 128 * 1024),
@@ -188,10 +315,15 @@ def _runtime_identity(toolchain_root):
              'java_sha256': (java, 4 * 1024 * 1024),
              'libjvm_sha256': (idea / 'jbr/lib/server/libjvm.so', 128 * 1024 * 1024),
              'libawt_xawt_sha256': (idea / 'jbr/lib/libawt_xawt.so', 16 * 1024 * 1024)}
+    hashes = {}
+    for name, (path, cap) in files.items():
+        facts = {}
+        hashes[name] = _checked('HASH_' + name.removesuffix('_sha256').upper(),
+                               lambda: _hash_file(path, cap, facts), facts)
     identity = {'idea_version': IDEA_VERSION, 'idea_build': IDEA_BUILD,
                 'idea_archive_sha256': IDEA_ARCHIVE_SHA256, 'java_runtime_version': None,
-                'hashes': {name: _hash_file(path, cap) for name, (path, cap) in files.items()}}
-    return java, _runtime(identity)
+                'hashes': hashes}
+    return java, _checked('RUNTIME_SCHEMA', lambda: _runtime(identity))
 
 
 def _authority(folder):
@@ -397,10 +529,13 @@ def main(toolchain_root, output):
     report = {'schema': 1, 'status': 'FAIL', 'kind': KIND, 'cases': [],
               'cleanup': {'jvm': 'NOT_STARTED', 'xvfb': 'NOT_STARTED'},
               'exit_codes': {'jvm': None, 'xvfb': None},
-              'error': 'PRECHECK_UNAVAILABLE', 'diagnosis': None, 'runtime': None,
+              'error': 'PRECHECK_UNAVAILABLE', 'diagnosis': None, 'runtime': None, 'precheck_failure': None,
               'run_id': os.environ['GITHUB_RUN_ID'], 'run_attempt': os.environ['GITHUB_RUN_ATTEMPT'],
               'tested_sha': os.environ['GITHUB_SHA'], 'elapsed_milliseconds': 0}
-    report_document(report)  # Reject malformed current-source/run identity before spawning.
+    # Reject malformed current-source/run identity before entering any precheck.
+    for key, pattern in (('run_id', r'[1-9][0-9]{0,19}'), ('run_attempt', r'[1-9][0-9]{0,19}'),
+                         ('tested_sha', r'[0-9a-f]{40}')):
+        _token(report[key], pattern)
     server = jvm = None
     server_fd = jvm_fd = None
     temporary = None
@@ -414,14 +549,14 @@ def main(toolchain_root, output):
     signal.alarm(ACTIVITY_SECONDS)
     try:
         java, report['runtime'] = _runtime_identity(toolchain_root)
-        require(hasattr(os, 'pidfd_open') and hasattr(signal, 'pidfd_send_signal'))
-        require(BINARY.is_file() and not BINARY.is_symlink())
-        require(not Path('/tmp/.X11-unix/X' + DISPLAY[1:]).exists()
-                and not Path('/tmp/.X' + DISPLAY[1:] + '-lock').exists())
-        temporary = tempfile.TemporaryDirectory(prefix='academy-awt-title-')
+        _checked('PIDFD_CAPABILITY', lambda: require(hasattr(os, 'pidfd_open') and hasattr(signal, 'pidfd_send_signal')))
+        _checked('XVFB_BINARY', lambda: require(BINARY.is_file() and not BINARY.is_symlink()))
+        _checked('DISPLAY_AVAILABLE', lambda: require(not Path('/tmp/.X11-unix/X' + DISPLAY[1:]).exists()
+                and not Path('/tmp/.X' + DISPLAY[1:] + '-lock').exists()))
+        temporary = _checked('PRIVATE_DIRECTORY', lambda: tempfile.TemporaryDirectory(prefix='academy-awt-title-'))
         folder = Path(temporary.name)
-        folder.chmod(0o700)
-        authority = _authority(folder)
+        _checked('PRIVATE_DIRECTORY', lambda: folder.chmod(0o700))
+        authority = _checked('AUTHORITY_CREATE', lambda: _authority(folder))
         env = {'PATH': os.defpath, 'LANG': 'C.UTF-8', 'DISPLAY': DISPLAY,
                'XAUTHORITY': str(authority), 'HOME': str(folder), 'TMPDIR': str(folder),
                'XDG_CACHE_HOME': str(folder / 'cache')}
@@ -460,6 +595,9 @@ def main(toolchain_root, output):
         report['status'], report['error'] = 'PASS', None
     except BaseException as error:
         report['status'] = 'FAIL'
+        if isinstance(error, PrecheckFailure):
+            report['precheck_failure'] = error.document
+            error = error.__cause__
         if isinstance(error, InterruptedError) or isinstance(error, KeyboardInterrupt):
             report['error'] = 'CANCELLED'
         elif isinstance(error, TimeoutError) and time.monotonic() >= deadline:

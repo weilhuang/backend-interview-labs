@@ -173,7 +173,7 @@ class AwtArtifactBoundary(unittest.TestCase):
             for i,name in enumerate(fixture.CASE_NAMES)],'cleanup':{'jvm':'REAPED','xvfb':'REAPED'},'exit_codes':{'jvm':-15,'xvfb':0},
             'error':None,'diagnosis':None,'runtime':{'idea_version':fixture.IDEA_VERSION,'idea_build':fixture.IDEA_BUILD,
                 'idea_archive_sha256':fixture.IDEA_ARCHIVE_SHA256,'java_runtime_version':fixture.RUNTIME_VERSION,'hashes':hashes},
-            'run_id':'123','run_attempt':'1','tested_sha':'a'*40,'elapsed_milliseconds':100}
+            'run_id':'123','run_attempt':'1','tested_sha':'a'*40,'elapsed_milliseconds':100,'precheck_failure':None}
 
     def collected(self,report):
         from collect_evidence import collect
@@ -203,14 +203,18 @@ class AwtArtifactBoundary(unittest.TestCase):
     def test_malformed_private_fixture_payload_never_enters_artifact(self):
         import awt_title_fixture as fixture
         for change in ({'diagnosis':{'title':'PRIVATE_TITLE'}},{'runtime':{'environment':'PRIVATE_ENV'}},
-            {'elapsed_milliseconds':True},{'extra':'PRIVATE_COMMAND'},{'cases':['PRIVATE'*3000]}):
+            {'elapsed_milliseconds':True},{'extra':'PRIVATE_COMMAND'},{'cases':['PRIVATE'*3000]},
+            {'precheck_failure':{'step':'PRODUCT_READ','reason':'MISSING','exception_class':'FileNotFoundError',
+                'facts':{'size_bytes':{'environment':'PRIVATE_ENV'}}}}):
             out=self.collected({**self.report(),**change});self.assertFalse((out/fixture.NAME).exists())
             for path in out.iterdir():self.assertNotIn(b'PRIVATE',path.read_bytes())
 
     def test_failure_without_runtime_is_retained_without_inventing_identity(self):
         import awt_title_fixture as fixture
         report=self.report();report.update(status='FAIL',cases=[],runtime=None,error='PRECHECK_UNAVAILABLE',cleanup={'jvm':'NOT_STARTED','xvfb':'NOT_STARTED'},exit_codes={'jvm':None,'xvfb':None})
+        report['precheck_failure']={'step':'PRODUCT_READ','reason':'MISSING','exception_class':'FileNotFoundError','facts':{}}
         out=self.collected(report);value=json.loads((out/fixture.NAME).read_text())
+        self.assertEqual(value['precheck_failure']['step'],'PRODUCT_READ')
         self.assertIsNone(value['runtime']);self.assertEqual(value['status'],'FAIL')
 
     def test_genuine_fixture_uses_existing_install_budget_before_official_ide(self):
