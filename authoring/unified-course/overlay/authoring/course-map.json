@@ -1,0 +1,1033 @@
+{
+  "schema_version": 2,
+  "course_id": "backend-interview",
+  "language": "Chinese",
+  "source_courses": [
+    {
+      "id": "java-foundations",
+      "source": "courses/java-foundations",
+      "sections": {
+        "c00": "c00",
+        "c01": "c01"
+      }
+    },
+    {
+      "id": "java-concurrency",
+      "source": "courses/java-concurrency",
+      "sections": {
+        "juc": "juc"
+      }
+    },
+    {
+      "id": "java-jvm",
+      "source": "courses/java-jvm",
+      "sections": {
+        "jvm": "jvm"
+      }
+    },
+    {
+      "id": "java-frameworks",
+      "source": "courses/java-frameworks",
+      "sections": {
+        "framework-course": "framework-course"
+      }
+    },
+    {
+      "id": "mysql-engineering",
+      "source": "courses/data-storage/mysql-engineering",
+      "sections": {
+        "mysql": "mysql"
+      }
+    },
+    {
+      "id": "redis-engineering",
+      "source": "courses/data-storage/redis-engineering",
+      "sections": {
+        "redis": "redis-course/redis"
+      }
+    },
+    {
+      "id": "distributed-systems",
+      "source": "courses/distributed-systems",
+      "sections": {
+        "distributed-course": "distributed-course"
+      }
+    },
+    {
+      "id": "messaging",
+      "source": "courses/messaging",
+      "sections": {
+        "kafka": "kafka",
+        "rocketmq": "rocketmq"
+      }
+    },
+    {
+      "id": "backend-capstone",
+      "source": "courses/backend-capstone",
+      "sections": {
+        "capstone": "capstone"
+      }
+    }
+  ],
+  "sections": [
+    {
+      "path": "c00",
+      "source_course": "java-foundations",
+      "source_path": "c00"
+    },
+    {
+      "path": "c01",
+      "source_course": "java-foundations",
+      "source_path": "c01"
+    },
+    {
+      "path": "juc",
+      "source_course": "java-concurrency",
+      "source_path": "juc"
+    },
+    {
+      "path": "jvm",
+      "source_course": "java-jvm",
+      "source_path": "jvm"
+    },
+    {
+      "path": "framework-course",
+      "source_course": "java-frameworks",
+      "source_path": "framework-course"
+    },
+    {
+      "path": "mysql",
+      "source_course": "mysql-engineering",
+      "source_path": "mysql"
+    },
+    {
+      "path": "redis-course",
+      "source_course": "redis-engineering",
+      "source_path": "redis"
+    },
+    {
+      "path": "distributed-course",
+      "source_course": "distributed-systems",
+      "source_path": "distributed-course"
+    },
+    {
+      "path": "kafka",
+      "source_course": "messaging",
+      "source_path": "kafka"
+    },
+    {
+      "path": "rocketmq",
+      "source_course": "messaging",
+      "source_path": "rocketmq"
+    },
+    {
+      "path": "capstone",
+      "source_course": "backend-capstone",
+      "source_path": "capstone"
+    },
+    {
+      "path": "c11-cloud-native",
+      "source_course": "cloud-native",
+      "source_path": "c11-cloud-native"
+    },
+    {
+      "path": "observability",
+      "source_course": "observability",
+      "source_path": "observability"
+    },
+    {
+      "path": "go-course",
+      "source_course": "go",
+      "source_path": "go-course"
+    },
+    {
+      "path": "identity",
+      "source_course": "identity",
+      "source_path": "identity"
+    }
+  ],
+  "tasks": [
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/01-workspace/lab",
+      "path": "c00/01-workspace/lab",
+      "gradle_project": ":c00-01-workspace-lab",
+      "original_module": "c00-01-workspace-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/02-values/lab",
+      "path": "c00/02-values/lab",
+      "gradle_project": ":c00-02-values-lab",
+      "original_module": "c00-02-values-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/03-parsing/lab",
+      "path": "c00/03-parsing/lab",
+      "gradle_project": ":c00-03-parsing-lab",
+      "original_module": "c00-03-parsing-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/04-generics/lab",
+      "path": "c00/04-generics/lab",
+      "gradle_project": ":c00-04-generics-lab",
+      "original_module": "c00-04-generics-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/05-io/lab",
+      "path": "c00/05-io/lab",
+      "gradle_project": ":c00-05-io-lab",
+      "original_module": "c00-05-io-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/06-debug/lab",
+      "path": "c00/06-debug/lab",
+      "gradle_project": ":c00-06-debug-lab",
+      "original_module": "c00-06-debug-lab",
+      "placeholders": 3
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/07-algorithms/lab",
+      "path": "c00/07-algorithms/lab",
+      "gradle_project": ":c00-07-algorithms-lab",
+      "original_module": "c00-07-algorithms-lab",
+      "placeholders": 4
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c00/08-capstone/lab",
+      "path": "c00/08-capstone/lab",
+      "gradle_project": ":c00-08-capstone-lab",
+      "original_module": "c00-08-capstone-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/01-views/lab",
+      "path": "c01/01-views/lab",
+      "gradle_project": ":c01-01-views-lab",
+      "original_module": "c01-01-views-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/02-array-list/lab",
+      "path": "c01/02-array-list/lab",
+      "gradle_project": ":c01-02-array-list-lab",
+      "original_module": "c01-02-array-list-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/03-linked/lab",
+      "path": "c01/03-linked/lab",
+      "gradle_project": ":c01-03-linked-lab",
+      "original_module": "c01-03-linked-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/04-hash-map/lab",
+      "path": "c01/04-hash-map/lab",
+      "gradle_project": ":c01-04-hash-map-lab",
+      "original_module": "c01-04-hash-map-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/05-real-hash-map/lab",
+      "path": "c01/05-real-hash-map/lab",
+      "gradle_project": ":c01-05-real-hash-map-lab",
+      "original_module": "c01-05-real-hash-map-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/06-ordered/lab",
+      "path": "c01/06-ordered/lab",
+      "gradle_project": ":c01-06-ordered-lab",
+      "original_module": "c01-06-ordered-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/07-iterators/lab",
+      "path": "c01/07-iterators/lab",
+      "gradle_project": ":c01-07-iterators-lab",
+      "original_module": "c01-07-iterators-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-foundations",
+      "source_task": "c01/08-query-project/lab",
+      "path": "c01/08-query-project/lab",
+      "gradle_project": ":c01-08-query-project-lab",
+      "original_module": "c01-08-query-project-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/01-publication/lab",
+      "path": "juc/01-publication/lab",
+      "gradle_project": ":juc-01-publication-lab",
+      "original_module": "juc-01-publication-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/02-cancellation/lab",
+      "path": "juc/02-cancellation/lab",
+      "gradle_project": ":juc-02-cancellation-lab",
+      "original_module": "juc-02-cancellation-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/03-bounded-buffer/lab",
+      "path": "juc/03-bounded-buffer/lab",
+      "gradle_project": ":juc-03-bounded-buffer-lab",
+      "original_module": "juc-03-bounded-buffer-lab",
+      "placeholders": 4
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/04-aqs/lab",
+      "path": "juc/04-aqs/lab",
+      "gradle_project": ":juc-04-aqs-lab",
+      "original_module": "juc-04-aqs-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/05-atomics/lab",
+      "path": "juc/05-atomics/lab",
+      "gradle_project": ":juc-05-atomics-lab",
+      "original_module": "juc-05-atomics-lab",
+      "placeholders": 3
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/06-executor/lab",
+      "path": "juc/06-executor/lab",
+      "gradle_project": ":juc-06-executor-lab",
+      "original_module": "juc-06-executor-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/07-futures/lab",
+      "path": "juc/07-futures/lab",
+      "gradle_project": ":juc-07-futures-lab",
+      "original_module": "juc-07-futures-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-concurrency",
+      "source_task": "juc/08-virtual-threads/lab",
+      "path": "juc/08-virtual-threads/lab",
+      "gradle_project": ":juc-08-virtual-threads-lab",
+      "original_module": "juc-08-virtual-threads-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/01-loading/lab",
+      "path": "jvm/01-loading/lab",
+      "gradle_project": ":jvm-01-loading-lab",
+      "original_module": "jvm-01-loading-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/02-lifecycle/lab",
+      "path": "jvm/02-lifecycle/lab",
+      "gradle_project": ":jvm-02-lifecycle-lab",
+      "original_module": "jvm-02-lifecycle-lab",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/03-gc/lab",
+      "path": "jvm/03-gc/lab",
+      "gradle_project": ":jvm-03-gc-lab",
+      "original_module": "jvm-03-gc-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/04-diagnostics/lab",
+      "path": "jvm/04-diagnostics/lab",
+      "gradle_project": ":jvm-04-diagnostics-lab",
+      "original_module": "jvm-04-diagnostics-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/05-migration/lab",
+      "path": "jvm/05-migration/lab",
+      "gradle_project": ":jvm-05-migration-lab",
+      "original_module": "jvm-05-migration-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/06-java21/lab",
+      "path": "jvm/06-java21/lab",
+      "gradle_project": ":jvm-06-java21-lab",
+      "original_module": "jvm-06-java21-lab",
+      "placeholders": 3
+    },
+    {
+      "source_course": "java-jvm",
+      "source_task": "jvm/07-java25/lab",
+      "path": "jvm/07-java25/lab",
+      "gradle_project": ":jvm-07-java25-lab",
+      "original_module": "jvm-07-java25-lab",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/01-configuration",
+      "path": "framework-course/01-boot/01-configuration",
+      "gradle_project": ":framework-course-01-boot-01-configuration",
+      "original_module": "01-configuration",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/02-http-contract",
+      "path": "framework-course/01-boot/02-http-contract",
+      "gradle_project": ":framework-course-01-boot-02-http-contract",
+      "original_module": "02-http-contract",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/03-transactions",
+      "path": "framework-course/01-boot/03-transactions",
+      "gradle_project": ":framework-course-01-boot-03-transactions",
+      "original_module": "03-transactions",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/04-test-layers",
+      "path": "framework-course/01-boot/04-test-layers",
+      "gradle_project": ":framework-course-01-boot-04-test-layers",
+      "original_module": "04-test-layers",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/05-security",
+      "path": "framework-course/01-boot/05-security",
+      "gradle_project": ":framework-course-01-boot-05-security",
+      "original_module": "05-security",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/06-runtime-lifecycle",
+      "path": "framework-course/01-boot/06-runtime-lifecycle",
+      "gradle_project": ":framework-course-01-boot-06-runtime-lifecycle",
+      "original_module": "06-runtime-lifecycle",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/01-boot/07-integrated-service",
+      "path": "framework-course/01-boot/07-integrated-service",
+      "gradle_project": ":framework-course-01-boot-07-integrated-service",
+      "original_module": "07-integrated-service",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/08-container-di",
+      "path": "framework-course/02-source/08-container-di",
+      "gradle_project": ":framework-course-02-source-08-container-di",
+      "original_module": "08-container-di",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/09-bean-lifecycle",
+      "path": "framework-course/02-source/09-bean-lifecycle",
+      "gradle_project": ":framework-course-02-source-09-bean-lifecycle",
+      "original_module": "09-bean-lifecycle",
+      "placeholders": 2
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/10-circular-boundary",
+      "path": "framework-course/02-source/10-circular-boundary",
+      "gradle_project": ":framework-course-02-source-10-circular-boundary",
+      "original_module": "10-circular-boundary",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/11-aop-proxy",
+      "path": "framework-course/02-source/11-aop-proxy",
+      "gradle_project": ":framework-course-02-source-11-aop-proxy",
+      "original_module": "11-aop-proxy",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/12-transaction-source",
+      "path": "framework-course/02-source/12-transaction-source",
+      "gradle_project": ":framework-course-02-source-12-transaction-source",
+      "original_module": "12-transaction-source",
+      "placeholders": 4
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/13-mvc-source",
+      "path": "framework-course/02-source/13-mvc-source",
+      "gradle_project": ":framework-course-02-source-13-mvc-source",
+      "original_module": "13-mvc-source",
+      "placeholders": 1
+    },
+    {
+      "source_course": "java-frameworks",
+      "source_task": "framework-course/02-source/14-autoconfiguration",
+      "path": "framework-course/02-source/14-autoconfiguration",
+      "gradle_project": ":framework-course-02-source-14-autoconfiguration",
+      "original_module": "14-autoconfiguration",
+      "placeholders": 3
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/01-model/01-order-contract",
+      "path": "mysql/01-model/01-order-contract",
+      "gradle_project": ":mysql-01-model-01-order-contract",
+      "original_module": "mysql-01-model-01-order-contract",
+      "placeholders": 1
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/02-index/02-plan-evidence",
+      "path": "mysql/02-index/02-plan-evidence",
+      "gradle_project": ":mysql-02-index-02-plan-evidence",
+      "original_module": "mysql-02-index-02-plan-evidence",
+      "placeholders": 1
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/03-query/03-pagination",
+      "path": "mysql/03-query/03-pagination",
+      "gradle_project": ":mysql-03-query-03-pagination",
+      "original_module": "mysql-03-query-03-pagination",
+      "placeholders": 1
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/04-isolation/04-mvcc",
+      "path": "mysql/04-isolation/04-mvcc",
+      "gradle_project": ":mysql-04-isolation-04-mvcc",
+      "original_module": "mysql-04-isolation-04-mvcc",
+      "placeholders": 1
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/05-locks/05-deadlock",
+      "path": "mysql/05-locks/05-deadlock",
+      "gradle_project": ":mysql-05-locks-05-deadlock",
+      "original_module": "mysql-05-locks-05-deadlock",
+      "placeholders": 1
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/06-recovery/06-durability",
+      "path": "mysql/06-recovery/06-durability",
+      "gradle_project": ":mysql-06-recovery-06-durability",
+      "original_module": "mysql-06-recovery-06-durability",
+      "placeholders": 1
+    },
+    {
+      "source_course": "mysql-engineering",
+      "source_task": "mysql/07-stock/07-inventory",
+      "path": "mysql/07-stock/07-inventory",
+      "gradle_project": ":mysql-07-stock-07-inventory",
+      "original_module": "mysql-07-stock-07-inventory",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/01-structures",
+      "path": "redis-course/redis/01-structures",
+      "gradle_project": ":redis-course-redis-01-structures",
+      "original_module": "redis:01-structures",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/02-expiry",
+      "path": "redis-course/redis/02-expiry",
+      "gradle_project": ":redis-course-redis-02-expiry",
+      "original_module": "redis:02-expiry",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/03-stampede",
+      "path": "redis-course/redis/03-stampede",
+      "gradle_project": ":redis-course-redis-03-stampede",
+      "original_module": "redis:03-stampede",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/04-consistency",
+      "path": "redis-course/redis/04-consistency",
+      "gradle_project": ":redis-course-redis-04-consistency",
+      "original_module": "redis:04-consistency",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/05-replication",
+      "path": "redis-course/redis/05-replication",
+      "gradle_project": ":redis-course-redis-05-replication",
+      "original_module": "redis:05-replication",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/06-leases",
+      "path": "redis-course/redis/06-leases",
+      "gradle_project": ":redis-course-redis-06-leases",
+      "original_module": "redis:06-leases",
+      "placeholders": 1
+    },
+    {
+      "source_course": "redis-engineering",
+      "source_task": "redis/07-resilience",
+      "path": "redis-course/redis/07-resilience",
+      "gradle_project": ":redis-course-redis-07-resilience",
+      "original_module": "redis:07-resilience",
+      "placeholders": 1
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/01-failure-model",
+      "path": "distributed-course/services/01-failure-model",
+      "gradle_project": ":distributed-course-services-01-failure-model",
+      "original_module": "01-failure-model",
+      "placeholders": 2
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/02-grpc",
+      "path": "distributed-course/services/02-grpc",
+      "gradle_project": ":distributed-course-services-02-grpc",
+      "original_module": "02-grpc",
+      "placeholders": 3
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/03-dubbo",
+      "path": "distributed-course/services/03-dubbo",
+      "gradle_project": ":distributed-course-services-03-dubbo",
+      "original_module": "03-dubbo",
+      "placeholders": 2
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/04-resilience",
+      "path": "distributed-course/services/04-resilience",
+      "gradle_project": ":distributed-course-services-04-resilience",
+      "original_module": "04-resilience",
+      "placeholders": 3
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/05-idempotency",
+      "path": "distributed-course/services/05-idempotency",
+      "gradle_project": ":distributed-course-services-05-idempotency",
+      "original_module": "05-idempotency",
+      "placeholders": 3
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/06-transactions",
+      "path": "distributed-course/services/06-transactions",
+      "gradle_project": ":distributed-course-services-06-transactions",
+      "original_module": "06-transactions",
+      "placeholders": 4
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/07-outbox-cache",
+      "path": "distributed-course/services/07-outbox-cache",
+      "gradle_project": ":distributed-course-services-07-outbox-cache",
+      "original_module": "07-outbox-cache",
+      "placeholders": 5
+    },
+    {
+      "source_course": "distributed-systems",
+      "source_task": "distributed-course/services/08-capacity",
+      "path": "distributed-course/services/08-capacity",
+      "gradle_project": ":distributed-course-services-08-capacity",
+      "original_module": "08-capacity",
+      "placeholders": 3
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "kafka/01-contract/practice",
+      "path": "kafka/01-contract/practice",
+      "gradle_project": ":kafka-01-contract-practice",
+      "original_module": "kafka-01-contract",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "kafka/02-producer/practice",
+      "path": "kafka/02-producer/practice",
+      "gradle_project": ":kafka-02-producer-practice",
+      "original_module": "kafka-02-producer",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "kafka/03-inbox/practice",
+      "path": "kafka/03-inbox/practice",
+      "gradle_project": ":kafka-03-inbox-practice",
+      "original_module": "kafka-03-inbox",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "kafka/04-rebalance/practice",
+      "path": "kafka/04-rebalance/practice",
+      "gradle_project": ":kafka-04-rebalance-practice",
+      "original_module": "kafka-04-rebalance",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "kafka/05-transactions/practice",
+      "path": "kafka/05-transactions/practice",
+      "gradle_project": ":kafka-05-transactions-practice",
+      "original_module": "kafka-05-transactions",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "kafka/06-recovery/practice",
+      "path": "kafka/06-recovery/practice",
+      "gradle_project": ":kafka-06-recovery-practice",
+      "original_module": "kafka-06-recovery",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "rocketmq/01-routing/practice",
+      "path": "rocketmq/01-routing/practice",
+      "gradle_project": ":rocketmq-01-routing-practice",
+      "original_module": "rocketmq-01-routing",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "rocketmq/02-retry/practice",
+      "path": "rocketmq/02-retry/practice",
+      "gradle_project": ":rocketmq-02-retry-practice",
+      "original_module": "rocketmq-02-retry",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "rocketmq/03-order-delay/practice",
+      "path": "rocketmq/03-order-delay/practice",
+      "gradle_project": ":rocketmq-03-order-delay-practice",
+      "original_module": "rocketmq-03-order-delay",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "rocketmq/04-transactions/practice",
+      "path": "rocketmq/04-transactions/practice",
+      "gradle_project": ":rocketmq-04-transactions-practice",
+      "original_module": "rocketmq-04-transactions",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "rocketmq/05-storage/practice",
+      "path": "rocketmq/05-storage/practice",
+      "gradle_project": ":rocketmq-05-storage-practice",
+      "original_module": "rocketmq-05-storage",
+      "placeholders": 1
+    },
+    {
+      "source_course": "messaging",
+      "source_task": "rocketmq/06-comparison/practice",
+      "path": "rocketmq/06-comparison/practice",
+      "gradle_project": ":rocketmq-06-comparison-practice",
+      "original_module": "rocketmq-06-comparison",
+      "placeholders": 1
+    },
+    {
+      "source_course": "backend-capstone",
+      "source_task": "capstone/stages/01-contract",
+      "path": "capstone/stages/01-contract",
+      "gradle_project": ":capstone-stages-01-contract",
+      "original_module": "01-contract",
+      "placeholders": 3
+    },
+    {
+      "source_course": "backend-capstone",
+      "source_task": "capstone/stages/02-reliability",
+      "path": "capstone/stages/02-reliability",
+      "gradle_project": ":capstone-stages-02-reliability",
+      "original_module": "02-reliability",
+      "placeholders": 2
+    },
+    {
+      "source_course": "backend-capstone",
+      "source_task": "capstone/stages/03-delivery",
+      "path": "capstone/stages/03-delivery",
+      "gradle_project": ":capstone-stages-03-delivery",
+      "original_module": "03-delivery",
+      "placeholders": 2
+    },
+    {
+      "source_course": "backend-capstone",
+      "source_task": "capstone/stages/04-recovery",
+      "path": "capstone/stages/04-recovery",
+      "gradle_project": ":capstone-stages-04-recovery",
+      "original_module": "04-recovery",
+      "placeholders": 1
+    },
+    {
+      "source_course": "backend-capstone",
+      "source_task": "capstone/stages/05-defense",
+      "path": "capstone/stages/05-defense",
+      "gradle_project": ":capstone-stages-05-defense",
+      "original_module": "05-defense",
+      "placeholders": 1
+    },
+    {
+      "source_course": "cloud-native",
+      "source_task": "c11-cloud-native/01-images/01-build-and-stop",
+      "path": "c11-cloud-native/01-images/01-build-and-stop",
+      "gradle_project": ":c11-cloud-native-01-images-01-build-and-stop",
+      "original_module": "c11-cloud-native-01-images-01-build-and-stop",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "cloud-native",
+      "source_task": "c11-cloud-native/02-compose/01-ready-and-seed",
+      "path": "c11-cloud-native/02-compose/01-ready-and-seed",
+      "gradle_project": ":c11-cloud-native-02-compose-01-ready-and-seed",
+      "original_module": "c11-cloud-native-02-compose-01-ready-and-seed",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "cloud-native",
+      "source_task": "c11-cloud-native/03-network/01-service-discovery",
+      "path": "c11-cloud-native/03-network/01-service-discovery",
+      "gradle_project": ":c11-cloud-native-03-network-01-service-discovery",
+      "original_module": "c11-cloud-native-03-network-01-service-discovery",
+      "placeholders": 2,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "cloud-native",
+      "source_task": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas",
+      "path": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas",
+      "gradle_project": ":c11-cloud-native-04-kubernetes-basics-01-probes-and-replicas",
+      "original_module": "c11-cloud-native-04-kubernetes-basics-01-probes-and-replicas",
+      "placeholders": 2,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "cloud-native",
+      "source_task": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets",
+      "path": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets",
+      "gradle_project": ":c11-cloud-native-05-kubernetes-config-01-dns-config-secrets",
+      "original_module": "c11-cloud-native-05-kubernetes-config-01-dns-config-secrets",
+      "placeholders": 3,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "cloud-native",
+      "source_task": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources",
+      "path": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources",
+      "gradle_project": ":c11-cloud-native-06-kubernetes-release-01-rollout-and-resources",
+      "original_module": "c11-cloud-native-06-kubernetes-release-01-rollout-and-resources",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "go",
+      "source_task": "go-course/core/greeting",
+      "path": "go-course/core/greeting",
+      "gradle_project": ":go-course-core-greeting",
+      "original_module": "go-course-core-greeting",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "go",
+      "source_task": "go-course/core/order-total",
+      "path": "go-course/core/order-total",
+      "gradle_project": ":go-course-core-order-total",
+      "original_module": "go-course-core-order-total",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "go",
+      "source_task": "go-course/core/quantity",
+      "path": "go-course/core/quantity",
+      "gradle_project": ":go-course-core-quantity",
+      "original_module": "go-course-core-quantity",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "go",
+      "source_task": "go-course/core/snapshot",
+      "path": "go-course/core/snapshot",
+      "gradle_project": ":go-course-core-snapshot",
+      "original_module": "go-course-core-snapshot",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "go",
+      "source_task": "go-course/http/request-lifecycle",
+      "path": "go-course/http/request-lifecycle",
+      "gradle_project": ":go-course-http-request-lifecycle",
+      "original_module": "go-course-http-request-lifecycle",
+      "placeholders": 2,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "go",
+      "source_task": "go-course/http/gin-pipeline",
+      "path": "go-course/http/gin-pipeline",
+      "gradle_project": ":go-course-http-gin-pipeline",
+      "original_module": "go-course-http-gin-pipeline",
+      "placeholders": 3,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "identity",
+      "source_task": "identity/01-policy/lab",
+      "path": "identity/01-policy/lab",
+      "gradle_project": ":identity-01-policy-lab",
+      "original_module": "identity-01-policy-lab",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "observability",
+      "source_task": "observability/first-slice/metrics",
+      "path": "observability/first-slice/metrics",
+      "gradle_project": ":observability-first-slice-metrics",
+      "original_module": "observability-first-slice-metrics",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "observability",
+      "source_task": "observability/first-slice/safe-events",
+      "path": "observability/first-slice/safe-events",
+      "gradle_project": ":observability-first-slice-safe-events",
+      "original_module": "observability-first-slice-safe-events",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    },
+    {
+      "source_course": "observability",
+      "source_task": "observability/first-slice/trace-context",
+      "path": "observability/first-slice/trace-context",
+      "gradle_project": ":observability-first-slice-trace-context",
+      "original_module": "observability-first-slice-trace-context",
+      "placeholders": 1,
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    }
+  ],
+  "support_projects": [
+    {
+      "source_course": "java-foundations",
+      "original_module": "common",
+      "gradle_project": ":java-foundations-common",
+      "path": "materials/java-foundations/common",
+      "optional_property": null,
+      "test_tasks": {
+        "test": "test",
+        "unitTest": "test"
+      }
+    },
+    {
+      "source_course": "java-foundations",
+      "original_module": "benchmark",
+      "gradle_project": ":java-foundations-benchmark",
+      "path": "materials/java-foundations/benchmark",
+      "optional_property": "withJmh",
+      "test_tasks": {}
+    },
+    {
+      "source_course": "redis-engineering",
+      "original_module": "support",
+      "gradle_project": ":redis-engineering-support",
+      "path": "materials/redis-engineering/support",
+      "optional_property": null,
+      "test_tasks": {
+        "test": "test",
+        "unitTest": "unitTest"
+      }
+    },
+    {
+      "source_course": "distributed-systems",
+      "original_module": "support",
+      "gradle_project": ":distributed-systems-support",
+      "path": "materials/distributed-systems/support",
+      "optional_property": null,
+      "test_tasks": {
+        "test": "test",
+        "unitTest": "unitTest"
+      }
+    },
+    {
+      "source_course": "messaging",
+      "original_module": "support",
+      "gradle_project": ":messaging-support",
+      "path": "materials/messaging/support",
+      "optional_property": null,
+      "test_tasks": {
+        "test": "test",
+        "unitTest": "test"
+      }
+    },
+    {
+      "source_course": "identity",
+      "original_module": "support",
+      "gradle_project": ":identity-resource-server",
+      "path": "materials/identity/identity-lab",
+      "test_tasks": {
+        "test": "test",
+        "unitTest": "test"
+      },
+      "integration_status": "SCOPED_ADAPTER_IMPLEMENTED"
+    }
+  ],
+  "assembly_status": "PUBLIC_REVIEWED_SOURCE_DRAFT"
+}

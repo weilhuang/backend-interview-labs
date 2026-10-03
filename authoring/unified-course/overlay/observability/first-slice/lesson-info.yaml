@@ -1,0 +1,6 @@
+type: lesson
+custom_name: 安全日志、指标与跨服务链路
+content:
+- safe-events
+- metrics
+- trace-context

@@ -1,0 +1,8 @@
+{
+  "scope": "this-lab-only",
+  "service": "collector",
+  "health_endpoint": "http://127.0.0.1:13133",
+  "action": "stop",
+  "started_at": "REPLACE_WITH_UTC_TIMESTAMP",
+  "evidence_sha256": "REPLACE_WITH_ACTUAL_OPERATOR_EVIDENCE_SHA256"
+}

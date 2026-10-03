@@ -1,0 +1,853 @@
+{
+  "schema_version": 1,
+  "gradle": "8.10.2",
+  "jdk": 21,
+  "spring_boot": "3.5.16",
+  "declared_dependencies": [
+    {
+      "source_course": "java-foundations",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "java-concurrency",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "java-jvm",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "java-frameworks",
+      "coordinate": "org.testcontainers:testcontainers-bom:1.20.6"
+    },
+    {
+      "source_course": "mysql-engineering",
+      "coordinate": "com.mysql:mysql-connector-j:9.2.0"
+    },
+    {
+      "source_course": "mysql-engineering",
+      "coordinate": "com.zaxxer:HikariCP:6.2.1"
+    },
+    {
+      "source_course": "mysql-engineering",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "mysql-engineering",
+      "coordinate": "org.slf4j:slf4j-simple:2.0.16"
+    },
+    {
+      "source_course": "mysql-engineering",
+      "coordinate": "org.testcontainers:junit-jupiter:1.20.6"
+    },
+    {
+      "source_course": "mysql-engineering",
+      "coordinate": "org.testcontainers:mysql:1.20.6"
+    },
+    {
+      "source_course": "redis-engineering",
+      "coordinate": "com.mysql:mysql-connector-j:9.2.0"
+    },
+    {
+      "source_course": "redis-engineering",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "redis-engineering",
+      "coordinate": "org.testcontainers:mysql:1.20.6"
+    },
+    {
+      "source_course": "redis-engineering",
+      "coordinate": "org.testcontainers:testcontainers:1.20.6"
+    },
+    {
+      "source_course": "redis-engineering",
+      "coordinate": "redis.clients:jedis:5.2.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "com.google.protobuf:protobuf-java:4.29.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "com.h2database:h2:2.3.232"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "com.mysql:mysql-connector-j:9.2.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "io.github.resilience4j:resilience4j-bulkhead:2.3.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "io.github.resilience4j:resilience4j-circuitbreaker:2.3.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "io.github.resilience4j:resilience4j-ratelimiter:2.3.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "io.grpc:grpc-netty-shaded:1.71.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "io.grpc:grpc-protobuf:1.71.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "io.grpc:grpc-stub:1.71.0"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "javax.annotation:javax.annotation-api:1.3.2"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.apache.curator:curator-test:5.7.1"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.apache.dubbo:dubbo-registry-zookeeper:3.3.6"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.apache.dubbo:dubbo-remoting-zookeeper-curator5:3.3.6"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.apache.dubbo:dubbo:3.3.6"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.apache.kafka:kafka-clients:3.9.1"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.apiguardian:apiguardian-api:1.1.2"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.slf4j:slf4j-simple:2.0.16"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.testcontainers:kafka:1.20.6"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "org.testcontainers:mysql:1.20.6"
+    },
+    {
+      "source_course": "distributed-systems",
+      "coordinate": "redis.clients:jedis:5.2.0"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "com.h2database:h2:2.3.232"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "com.mysql:mysql-connector-j:9.2.0"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.apache.kafka:kafka-clients:3.9.1"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.apache.rocketmq:rocketmq-client-java:5.0.8"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.apiguardian:apiguardian-api:1.1.2"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.junit:junit-bom:5.11.4"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.slf4j:slf4j-simple:2.0.16"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.testcontainers:kafka:1.20.6"
+    },
+    {
+      "source_course": "messaging",
+      "coordinate": "org.testcontainers:mysql:1.20.6"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "com.google.protobuf:protobuf-java:4.29.0"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "com.h2database:h2:2.3.232"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "com.mysql:mysql-connector-j:9.2.0"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "io.grpc:grpc-netty-shaded:1.71.0"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "io.grpc:grpc-protobuf:1.71.0"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "io.grpc:grpc-stub:1.71.0"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "javax.annotation:javax.annotation-api:1.3.2"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "org.apache.kafka:kafka-clients:3.9.1"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "org.apiguardian:apiguardian-api:1.1.2"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "org.springframework.boot:spring-boot-dependencies:3.5.16"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "org.testcontainers:testcontainers-bom:1.20.6"
+    },
+    {
+      "source_course": "backend-capstone",
+      "coordinate": "redis.clients:jedis:5.2.0"
+    }
+  ],
+  "source_lockfiles": [
+    {
+      "path": "capstone/stages/01-contract/gradle.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "capstone/stages/02-reliability/gradle.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "capstone/stages/03-delivery/gradle.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "capstone/stages/04-recovery/gradle.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "capstone/stages/05-defense/gradle.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "distributed-course/services/01-failure-model/gradle.lockfile",
+      "sha256": "41f6f1de06b175b4e115193da825add00435adb22363b239946c135b3ae3a4b7"
+    },
+    {
+      "path": "distributed-course/services/02-grpc/gradle.lockfile",
+      "sha256": "a5f96f3b506c52068ec3e505b19bc2aa211b7ea2212aa292b9da96d2416619fa"
+    },
+    {
+      "path": "distributed-course/services/03-dubbo/gradle.lockfile",
+      "sha256": "655d691e48d859d48c7f8e0e746fb1f3621cb5edb3d8eea950de493fa10c866c"
+    },
+    {
+      "path": "distributed-course/services/04-resilience/gradle.lockfile",
+      "sha256": "12acea0b9370836157df5ca5606768ccc3beda02ab98af2e6d84c3aeb63030b1"
+    },
+    {
+      "path": "distributed-course/services/05-idempotency/gradle.lockfile",
+      "sha256": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76"
+    },
+    {
+      "path": "distributed-course/services/06-transactions/gradle.lockfile",
+      "sha256": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76"
+    },
+    {
+      "path": "distributed-course/services/07-outbox-cache/gradle.lockfile",
+      "sha256": "36de96abbb48978b36b5181cffaaa2dc8f7faf0b6565fe81970dd0947f475302"
+    },
+    {
+      "path": "distributed-course/services/08-capacity/gradle.lockfile",
+      "sha256": "43f52cac94471680fe4de5c02fff4de75421975c79694c4fd4c3167f712418ab"
+    },
+    {
+      "path": "framework-course/01-boot/01-configuration/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/01-boot/02-http-contract/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/01-boot/03-transactions/gradle.lockfile",
+      "sha256": "4b7d35822324c5b5e78d02101ae6057b5dc7b14a1216cb9e1ca6f38f7773a2a4"
+    },
+    {
+      "path": "framework-course/01-boot/04-test-layers/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/01-boot/05-security/gradle.lockfile",
+      "sha256": "2011965c2919e496adffef26e3dab4f26a1aad1a67f071ceb0f15d6459e8a44e"
+    },
+    {
+      "path": "framework-course/01-boot/06-runtime-lifecycle/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/01-boot/07-integrated-service/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/08-container-di/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/09-bean-lifecycle/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/10-circular-boundary/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/11-aop-proxy/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/12-transaction-source/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/13-mvc-source/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "framework-course/02-source/14-autoconfiguration/gradle.lockfile",
+      "sha256": "2b99b847ed6cafb77871b4214ed42bae9a8f50ba914987da5d4646c9e7c3620a"
+    },
+    {
+      "path": "kafka/01-contract/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "kafka/02-producer/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "kafka/03-inbox/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "kafka/04-rebalance/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "kafka/05-transactions/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "kafka/06-recovery/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "materials/distributed-systems/support/gradle.lockfile",
+      "sha256": "3b3bab4eadb21dbd39ebf51cbb752144c70ddc8bf3e057539410c9182f4207c0"
+    },
+    {
+      "path": "materials/messaging/support/gradle.lockfile",
+      "sha256": "1a8d0d3a70c1988a0d30038404b638664808795800571ff91c43fbb198c4e72c"
+    },
+    {
+      "path": "rocketmq/01-routing/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "rocketmq/02-retry/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "rocketmq/03-order-delay/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "rocketmq/04-transactions/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "rocketmq/05-storage/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "rocketmq/06-comparison/practice/gradle.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    }
+  ],
+  "active_lock_directory": "dependency-locks",
+  "resolution_verification": "LOCKS_PRESENT_REVERIFY_REQUIRED",
+  "note": "保留原始锁；统一图及尚无锁的课程必须在 JDK21 窗口中实际解析并生成，不能凭静态检查宣称通过。",
+  "active_lockfiles": [
+    {
+      "path": "dependency-locks/c00-01-workspace-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-02-values-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-03-parsing-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-04-generics-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-05-io-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-06-debug-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-07-algorithms-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c00-08-capstone-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-01-views-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-02-array-list-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-03-linked-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-04-hash-map-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-05-real-hash-map-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-06-ordered-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-07-iterators-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c01-08-query-project-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c11-cloud-native-01-images-01-build-and-stop.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c11-cloud-native-02-compose-01-ready-and-seed.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c11-cloud-native-03-network-01-service-discovery.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c11-cloud-native-04-kubernetes-basics-01-probes-and-replicas.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c11-cloud-native-05-kubernetes-config-01-dns-config-secrets.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/c11-cloud-native-06-kubernetes-release-01-rollout-and-resources.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/capstone-stages-01-contract.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "dependency-locks/capstone-stages-02-reliability.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "dependency-locks/capstone-stages-03-delivery.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "dependency-locks/capstone-stages-04-recovery.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "dependency-locks/capstone-stages-05-defense.lockfile",
+      "sha256": "2b3ff3023055705e9a65103b175e98193037c30d97f1eb14e1e7cc3d93dbb752"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-01-failure-model.lockfile",
+      "sha256": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-02-grpc.lockfile",
+      "sha256": "ed4990617df0fcc3a40a87f1e0a550de5dc0380c8b706a68220a70705f98e20e"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-03-dubbo.lockfile",
+      "sha256": "a29973bcf2210012b921e5b06778bec3e6d392ace44fd7e788b5cb7def7c00df"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-04-resilience.lockfile",
+      "sha256": "3227ae6a3b315a316b9f713805be88792b3590d50db6bfd221ade090d2b1c0cc"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-05-idempotency.lockfile",
+      "sha256": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-06-transactions.lockfile",
+      "sha256": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-07-outbox-cache.lockfile",
+      "sha256": "36de96abbb48978b36b5181cffaaa2dc8f7faf0b6565fe81970dd0947f475302"
+    },
+    {
+      "path": "dependency-locks/distributed-course-services-08-capacity.lockfile",
+      "sha256": "43f52cac94471680fe4de5c02fff4de75421975c79694c4fd4c3167f712418ab"
+    },
+    {
+      "path": "dependency-locks/distributed-systems-support.lockfile",
+      "sha256": "98e4d7664e5af0989b5d84e8e8ed650ab9d88e1d6e55a2fce635e6430c4dbd76"
+    },
+    {
+      "path": "dependency-locks/environment-ledger.lockfile",
+      "sha256": "32c18865f15ccad306d20447fee69d3e20022180985d3f5cdd4f564e3c363697"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-01-configuration.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-02-http-contract.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-03-transactions.lockfile",
+      "sha256": "c776102e2d3a22e25db430416d6346e25fa0ad2339d1d83ed992493059c3c6f5"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-04-test-layers.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-05-security.lockfile",
+      "sha256": "80eaa34ec1ac2e88c33c3f3a43f6553afd7dfcb7540b4c6203f4a4c011f8b3df"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-06-runtime-lifecycle.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-01-boot-07-integrated-service.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-08-container-di.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-09-bean-lifecycle.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-10-circular-boundary.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-11-aop-proxy.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-12-transaction-source.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-13-mvc-source.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/framework-course-02-source-14-autoconfiguration.lockfile",
+      "sha256": "effb626859cf11fac4cf7105b989dda2a26083792d9ea7f79391df174e64fd97"
+    },
+    {
+      "path": "dependency-locks/go-course-core-greeting.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/go-course-core-order-total.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/go-course-core-quantity.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/go-course-core-snapshot.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/go-course-http-gin-pipeline.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/go-course-http-request-lifecycle.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/identity-01-policy-lab.lockfile",
+      "sha256": "1f91c1662aa8ffa6bf5423cb507ab520647793944e1eb886033c63b8ceae85b1"
+    },
+    {
+      "path": "dependency-locks/identity-resource-server.lockfile",
+      "sha256": "e9ba38009bbf248b5e5c697d572ab96c1c05b7fa9e5c95ab806a14d581013ff2"
+    },
+    {
+      "path": "dependency-locks/java-foundations-benchmark.lockfile",
+      "sha256": "1f2d774300dad0d5c5f62db0abedd777a9f0fbe67379c4f177ccb140f02c17af"
+    },
+    {
+      "path": "dependency-locks/java-foundations-common.lockfile",
+      "sha256": "32c18865f15ccad306d20447fee69d3e20022180985d3f5cdd4f564e3c363697"
+    },
+    {
+      "path": "dependency-locks/juc-01-publication-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-02-cancellation-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-03-bounded-buffer-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-04-aqs-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-05-atomics-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-06-executor-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-07-futures-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/juc-08-virtual-threads-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-01-loading-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-02-lifecycle-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-03-gc-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-04-diagnostics-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-05-migration-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-06-java21-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/jvm-07-java25-lab.lockfile",
+      "sha256": "b7994b46ebdd0f0838301508b72a9b171e8e5fe2c3243c66f14c5e227bc11f54"
+    },
+    {
+      "path": "dependency-locks/kafka-01-contract-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/kafka-02-producer-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/kafka-03-inbox-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/kafka-04-rebalance-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/kafka-05-transactions-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/kafka-06-recovery-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/messaging-support.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/mysql-01-model-01-order-contract.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/mysql-02-index-02-plan-evidence.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/mysql-03-query-03-pagination.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/mysql-04-isolation-04-mvcc.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/mysql-05-locks-05-deadlock.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/mysql-06-recovery-06-durability.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/mysql-07-stock-07-inventory.lockfile",
+      "sha256": "e257f50f7c382645205e58fa7e5302f119ae05a0229130fb35325170187e46bd"
+    },
+    {
+      "path": "dependency-locks/observability-first-slice-metrics.lockfile",
+      "sha256": "2611d79b87d12f38f946cdb657302c75cd0cf95b191872f6cbe43a4a7662b7a9"
+    },
+    {
+      "path": "dependency-locks/observability-first-slice-safe-events.lockfile",
+      "sha256": "2611d79b87d12f38f946cdb657302c75cd0cf95b191872f6cbe43a4a7662b7a9"
+    },
+    {
+      "path": "dependency-locks/observability-first-slice-trace-context.lockfile",
+      "sha256": "2611d79b87d12f38f946cdb657302c75cd0cf95b191872f6cbe43a4a7662b7a9"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-01-structures.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-02-expiry.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-03-stampede.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-04-consistency.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-05-replication.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-06-leases.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-course-redis-07-resilience.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/redis-engineering-support.lockfile",
+      "sha256": "867ad52374b51b7429aee103b2bab40b9ffe4aa631b82f6211f7eff2f04e552c"
+    },
+    {
+      "path": "dependency-locks/rocketmq-01-routing-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/rocketmq-02-retry-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/rocketmq-03-order-delay-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/rocketmq-04-transactions-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/rocketmq-05-storage-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    },
+    {
+      "path": "dependency-locks/rocketmq-06-comparison-practice.lockfile",
+      "sha256": "7a21425578e566e816b9acf1ae4e9788f5e8e0264665fc8ab7ea14925b06b7fd"
+    }
+  ],
+  "lock_inventory_complete": true,
+  "go_http_modules": [
+    {
+      "module": "course.local/request-lifecycle",
+      "go": "1.27.1",
+      "mod_sha256": "06150321fe335852c560807abdd7597625ade805b04d761e688d39648ce1760b"
+    },
+    {
+      "module": "course.local/gin-pipeline",
+      "go": "1.27.1",
+      "gin": "1.12.0",
+      "build_tags": [
+        "nomsgpack"
+      ],
+      "mod_sha256": "e03c807dbae4174495273a49ef532ddf7f9379c874f89ec25573efe855eccbc7",
+      "sum_sha256": "2653d40976ff6cbc2dec9e0e640974836d35c5e45902d194d56d5b995ace1985"
+    }
+  ]
+}

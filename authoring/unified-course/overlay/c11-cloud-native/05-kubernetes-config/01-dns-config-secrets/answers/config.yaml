@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orders-config
+# 仅非敏感配置；密码由driver在内存中生成，通过stdin创建Secret。
+data:
+  redis-host: redis
+  greeting: hello-v1
+  banner: banner-v1

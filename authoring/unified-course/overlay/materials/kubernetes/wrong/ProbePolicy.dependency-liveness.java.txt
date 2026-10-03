@@ -1,0 +1,14 @@
+package labs;
+
+/** C11-04：纯策略易于公开测试，实际状态由KubernetesApp采集。 */
+public final class ProbePolicy {
+    private ProbePolicy() {}
+    public static boolean startup(boolean initialized) { return initialized; }
+    public static boolean live(boolean localFailure, boolean dependencyHealthy) {
+        return !localFailure && dependencyHealthy; // 下游故障不是重启本进程的理由。
+    }
+    public static boolean ready(boolean initialized, boolean dependencyHealthy,
+                                boolean seeded, boolean draining, boolean forcedNotReady) {
+        return initialized && dependencyHealthy && seeded && !draining && !forcedNotReady;
+    }
+}

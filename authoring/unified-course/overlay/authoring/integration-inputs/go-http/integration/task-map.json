@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "mode": "additive-overlay-not-course-root",
+  "tasks": [
+    {
+      "id": "go-http-request-lifecycle",
+      "task_path": "go-course/http/request-lifecycle",
+      "gradle_project": ":go-course-http-request-lifecycle",
+      "go_module": "course.local/request-lifecycle",
+      "go_root": "go-course/http/request-lifecycle/go",
+      "edit_file": "go/exercise.go",
+      "placeholder_regions": [
+        "decode",
+        "create"
+      ],
+      "expected_junit_tests": 3,
+      "required_go_version": "1.27.1",
+      "gin_version": null
+    },
+    {
+      "id": "go-http-gin-pipeline",
+      "task_path": "go-course/http/gin-pipeline",
+      "gradle_project": ":go-course-http-gin-pipeline",
+      "go_module": "course.local/gin-pipeline",
+      "go_root": "go-course/http/gin-pipeline/go",
+      "edit_file": "go/exercise.go",
+      "placeholder_regions": [
+        "gate",
+        "errors",
+        "routes"
+      ],
+      "expected_junit_tests": 3,
+      "required_go_version": "1.27.1",
+      "gin_version": "1.12.0"
+    }
+  ],
+  "native_academy_status": "NOT_RUN",
+  "unified_Gradle_bridge_status": "NOT_RUN"
+}

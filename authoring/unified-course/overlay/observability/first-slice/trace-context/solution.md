@@ -1,0 +1,45 @@
+# 参考实现阅读
+
+reference-map对应方法练习；reference-typed是只读完整类对照，含区外变化，不能当单一练习区替换文本。两者当前均未运行。
+
+# C12-05 让两个服务讲同一个故事
+
+## 第一步：父子关系，不急着装后台
+
+先读 `TraceBridgeTest.propagationKeepsTraceAndParentChildIdsAcrossServiceBoundary`。手工创建 checkout SERVER → inventory CLIENT → inventory SERVER。三个 span 的 trace ID 相同，span ID 不同；库存 SERVER 的 parent 是 CLIENT，不直接跳到 checkout。
+
+运行 `bash scripts/gradle.sh :observability-first-slice-trace-context:test --tests labs.observability.TraceBridgeTest`。这里使用真实 OpenTelemetry SDK + 内存 exporter，只证明 SDK 行为，没有证明 Collector 或数据库。
+
+## 第二步：补一个提取函数
+
+输入：小写 HTTP header map。输出：SDK 的 Context。非法 traceparent 不应该抛出业务错误，更不能原样写入日志。使用 W3CTraceContextPropagator 提取，不手写不完整的正则实现 W3C 规范。使用 Context.root()，避免工作线程意外继承上一请求。
+
+H1：上下文不是字符串 trace ID。H2：TextMapGetter 只是告诉 SDK 怎么读 carrier。H3：SDK 负责校验全零 ID、版本 ff、长度/十六进制等。H4：把 incoming 交给 propagator.extract；建立 SERVER span 时 setParent(extracted)。第二正确实现提供大小写不敏感 getter，对照 HTTP 头名大小写语义。
+
+## 第三步：真实回环 HTTP 验证
+
+运行 `bash scripts/gradle.sh :observability-first-slice-trace-context:test --tests labs.observability.HttpCallChainTest`。测试在同一个测试JVM中启动两个独立Spring Web context和真实HTTP server，使用各自SDK与动态端口；测试结束关闭并验证端口拒绝连接。它不等于两个独立OS进程的部署验收。不是 MockMvc、不是模拟 HTTP 响应。SDK 导出仍在内存中，因此必须分别记录HTTP和后端的实际状态，不能用预期替代执行证据；本轮两者均为NOT_RUN。
+
+正常请求：HTTP200，3 spans。库存失败：HTTP503，3 spans 正确标错。只读库存第一次503后第二次200：HTTP200，5 spans；两次库存尝试与一次 checkout 要分清。坏 JSON：HTTP400，库存零调用。合法 traceparent 不会让未知商品变合法，trace ID 不是授权凭证。
+
+## 第四步：现成前端（后端集成获准后）
+
+启动 inventory 的 appArgs：`--lab.role=inventory --server.port=18082`；checkout：`--lab.role=checkout --server.port=18081 --lab.inventory=http://127.0.0.1:18082`。两个服务默认只绑定回环。用浏览器打开 checkout 的 `/`，按钮已写好。启动命令形如 `bash scripts/gradle.sh :observability-first-slice-trace-context:run -PappArgs='...'`，分别在两个终端运行，退出各终端进程即可；不要使用全局 pkill。
+
+页面仅显示真实 HTTP 返回值，trace ID 可在 JSON 文件里找。Collector 还没启动时会出现可见 OTLP 导出错误，业务依然能返回；这不是后台查询通过。实际 Collector/Jaeger 查询需按后续文档准备并运行 `verify_backend.py`。
+
+## 异步、采样和秘密
+
+- 普通线程池不自动继承 ThreadLocal 上下文；提交前 capture，执行时 `context.wrap`，结束必须 close Scope
+- parent sampled=00 时 parent-based sampler 不记录 span。Collector 尾采样无法恢复 SDK 从未发送的 span；日志有 trace ID 但后端查不到可能是采样，不能马上归咎业务
+- 只传播 trace context，不复制 Authorization、Cookie 或 baggage。业务个人信息不放 baggage
+- 当前实验没有鉴权功能；收到任意有效 trace ID 既不授予权限也不证明可信身份
+- 不把异常消息、完整 URL、body 写入 span。固定错误类型更适合教学和安全边界
+
+## 面试回答骨架
+
+“我先确认请求真实结果，再看 trace 是否采样、上下文是否跨边界传播、SDK 是否导出、Collector 是否接收/丢弃、后端是否可查询。每一层都有独立证据；日志/指标缺口不能被一张漂亮拓扑图掩盖。”
+
+## 参考类与练习区的范围
+
+本题只有标出的一个方法可编辑。reference-map是当前支架的直接方法参考；reference-typed目录是只读的完整类对照材料，可能包含record、方法归一化或getter的区外修改，不能只截取其中一个方法体粘贴到本题。它的正确性必须通过整棵源码单独构建验证，当前为NOT_RUN。answers目录不参与src/test编译。详见[参考实现范围与验证器契约](../../../materials/observability/docs/06-参考实现范围与验证器契约.md)。

@@ -1,0 +1,17 @@
+digraph G {
+ rankdir=TB; bgcolor="#f7fafc"; pad=0.25; nodesep=0.35; ranksep=0.35;
+ graph [fontname="Noto Sans CJK SC",label="net/http：请求边界与合作式取消",fontsize=20,labelloc=t];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f0ff",fontname="Noto Sans CJK SC",fontsize=12,margin="0.2,0.1"];
+ edge [fontname="Noto Sans CJK SC",fontsize=11,color="#435671"];
+ client [label="客户端 → 回环 TCP\nServer → ServeMux"];
+ decode [label="Content-Type → 256字节上限\nDecode → EOF → 字段校验"];
+ deadline [label="WithTimeout(Request.Context)\n先检查 Err，defer cancel"];
+ store [label="Store.Create(ctx, input)\n下游必须观察 Done/Err"];
+ response [label="错误分类或 201\nContent-Type → 状态码 → 唯一 JSON"];
+ reject [label="400 / 413 / 415 / 422\n不调用 Store",fillcolor="#fff1d6"];
+ cancel [label="客户端取消 / 父超时\n子 context Done",fillcolor="#e2f7ec"];
+ client -> decode -> deadline -> store -> response;
+ decode -> reject [label="输入失败"];
+ client -> cancel [style=dashed,label="请求生命周期"];
+ cancel -> store [style=dashed,label="通知，不强杀"];
+}

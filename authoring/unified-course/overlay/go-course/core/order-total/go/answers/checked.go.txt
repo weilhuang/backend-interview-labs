@@ -1,0 +1,35 @@
+package lab
+
+import (
+ "errors"
+ "math"
+)
+
+type Line struct {
+ UnitCents int64 // 单价：整数“分”，不是“元”的浮点数。
+ Quantity int64
+}
+type Order struct { Lines []Line }
+var ErrInvalidLine = errors.New("单价不能为负且数量必须为正")
+var ErrTotalOverflow = errors.New("金额超出int64范围")
+var _ = math.MaxInt64
+
+func (o Order) TotalCents() (int64, error) {
+	// 练习区开始：只替换下方函数体片段 🧪
+	checkedLine := func(line Line) (int64,error) {
+		if line.UnitCents < 0 || line.Quantity <= 0 { return 0, ErrInvalidLine }
+		if line.UnitCents != 0 && line.Quantity > math.MaxInt64/line.UnitCents { return 0, ErrTotalOverflow }
+		return line.UnitCents*line.Quantity, nil
+	}
+	checkedAdd := func(a,b int64) (int64,error) {
+		if b > math.MaxInt64-a { return 0, ErrTotalOverflow }
+		return a+b,nil
+	}
+	var total int64
+	for _,line := range o.Lines {
+		n,err := checkedLine(line); if err!=nil { return 0,err }
+		total,err = checkedAdd(total,n); if err!=nil { return 0,err }
+	}
+	return total,nil
+	// 练习区结束
+}

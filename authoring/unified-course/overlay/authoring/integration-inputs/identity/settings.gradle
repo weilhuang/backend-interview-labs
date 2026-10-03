@@ -1,0 +1,4 @@
+rootProject.name='identity-access-lab'
+include('identity-01-policy-lab','identity-resource-server')
+project(':identity-01-policy-lab').projectDir=file('identity/01-policy/lab')
+project(':identity-resource-server').projectDir=file('materials/identity/identity-lab')

@@ -1,0 +1,157 @@
+{
+  "merge_into_existing_course_info_only": true,
+  "files": [
+    {
+      "name": "materials/kubernetes/.dockerignore",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/Dockerfile",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/README.md",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/answers/ProbePolicy.explicit.java.txt",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/bin/call.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/bin/lab.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/bin/scenarios.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/bin/verify_java.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/diagrams/config.svg",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/diagrams/probes.svg",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/diagrams/request-path.svg",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/diagrams/rollout.svg",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/docs/roadmap.md",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/docs/sources.md",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/docs/troubleshooting.md",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/caller.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/config.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/deployment.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/pod-example.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/rbac.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/redis.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/manifests/service.yaml",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/AddressPolicy.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/AppConfig.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/FixtureCtl.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/HttpCaller.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/Inventory.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/KubernetesApp.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/ProbePolicy.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/src/labs/RedisClient.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/test-java/labs/PolicyContractTest.java",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/tests/check_task.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/tests/test_contracts.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/tests/test_scenario_regressions.py",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/web/index.html",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/wrong/ProbePolicy.always-ready.java.txt",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/wrong/ProbePolicy.dependency-liveness.java.txt",
+      "visible": true
+    },
+    {
+      "name": "materials/kubernetes/wrong/README.md",
+      "visible": true
+    }
+  ]
+}

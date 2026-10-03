@@ -1,0 +1,50 @@
+// Additive proposal. Root integration, strict lock generation, and JDK21 execution are separate gates.
+def goHTTPModules = [
+ ':go-course-http-request-lifecycle':'go-course/http/request-lifecycle',
+ ':go-course-http-gin-pipeline':'go-course/http/gin-pipeline'
+]
+goHTTPModules.each { modulePath,relativeDir ->
+ def module = rootProject.findProject(modulePath)
+ if (module == null || module.projectDir.canonicalFile != rootProject.file(relativeDir).canonicalFile)
+  throw new GradleException('Go HTTP 项目映射不符合合同: ' + modulePath)
+ configure(module) {
+  apply plugin:'java'
+  repositories { mavenCentral() }
+  java { toolchain { languageVersion=JavaLanguageVersion.of(21) } }
+  sourceSets {
+   main { java.setSrcDirs(['src']); resources.setSrcDirs([]) }
+   test { java.setSrcDirs(['test']); resources.setSrcDirs([]) }
+  }
+  dependencies {
+   testImplementation platform('org.junit:junit-bom:5.11.4')
+   testImplementation 'org.junit.jupiter:junit-jupiter'
+   testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+  }
+  dependencyLocking { lockAllConfigurations(); lockMode=LockMode.STRICT }
+  tasks.withType(JavaCompile).configureEach { options.release=21; options.encoding='UTF-8' }
+  def sourceGate=tasks.register('verifyGoHTTPContractSources') {
+   doLast {
+    ['src/GoTestBridge.java','test/GoContractTest.java','test/GoTestBridgeTest.java',
+     'go/go.mod','go/exercise.go','go/contract_test.go','go/model.go','go/router.go',
+     'go/cmd/server/main.go','go/cmd/server/main_test.go','go/cmd/server/process_test.go'].each { path ->
+     if (!project.file(path).isFile()) throw new GradleException('NOT_RUN: 缺少公开合同文件 '+path)
+    }
+    if (project.name.endsWith('gin-pipeline') && (!project.file('go/go.sum').isFile() || !project.file('go/middleware_test.go').isFile()))
+     throw new GradleException('NOT_RUN: Gin 依赖校验或中间件测试缺失')
+   }
+  }
+  tasks.withType(Test).configureEach {
+   dependsOn sourceGate
+   useJUnitPlatform()
+   maxParallelForks=1
+   maxHeapSize='384m'
+   jvmArgs '-XX:ActiveProcessorCount=2'
+   testLogging { events 'failed','skipped'; exceptionFormat 'full' }
+   afterSuite { descriptor,result ->
+    if (descriptor.parent==null && (result.testCount!=3 || result.skippedTestCount!=0))
+     throw new GradleException('NOT_RUN: Go HTTP 入口必须执行完整3项JUnit，且不得跳过')
+   }
+  }
+  apply from:project.file('build.gradle.fragment')
+ }
+}

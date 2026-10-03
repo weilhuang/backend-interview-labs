@@ -1,0 +1,19 @@
+digraph Ownership {
+ graph [rankdir=LR, bgcolor="white", fontname="Noto Sans CJK SC", label="复制值之后，谁仍共享可变数据？", labelloc=t, fontsize=22, pad=.35, nodesep=.35, ranksep=.55];
+ node [shape=box, style="rounded,filled", fontname="Noto Sans CJK SC", fontsize=14, fillcolor="#eff6ff", color="#2563eb", margin=".18,.13"];
+ edge [color="#64748b", arrowsize=.8];
+ subgraph cluster_before {
+  label="起点：只复制顶层"; fontname="Noto Sans CJK SC"; fontsize=18; color="#fca5a5";
+  a [label="输入 Order"]; b [label="输出 Order"];
+  c [label="同一组 Lines",fillcolor="#fee2e2",color="#dc2626"]; d [label="同一组 Tags",fillcolor="#fee2e2",color="#dc2626"];
+  e [label="同一个 Metadata map",fillcolor="#fee2e2",color="#dc2626"];
+  a->c; b->c; c->d; a->e; b->e;
+ }
+ subgraph cluster_after {
+  label="修复：每层容器独立"; fontname="Noto Sans CJK SC"; fontsize=18; color="#86efac";
+  f [label="输入 Order"]; g [label="输出 Order"];
+  h [label="原 Lines"]; i [label="原 Tags"]; j [label="原 Metadata"];
+  k [label="新 Lines",fillcolor="#dcfce7",color="#16a34a"]; l [label="新 Tags",fillcolor="#dcfce7",color="#16a34a"]; m [label="新 Metadata",fillcolor="#dcfce7",color="#16a34a"];
+  f->h;h->i;f->j;g->k;k->l;g->m;
+ }
+}

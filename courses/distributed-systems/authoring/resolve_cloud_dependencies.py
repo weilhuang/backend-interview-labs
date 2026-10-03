@@ -5,8 +5,10 @@ from pathlib import Path
 R=Path(__file__).resolve().parents[1];os.chdir(R)
 os.environ['NO_PROXY']='';os.environ['no_proxy']=''
 cache=R/'build/maven-cache'
-env=dict(os.environ,JAVA_HOME='/workspace/shared/toolchains/jdk-21',GRADLE_USER_HOME='/workspace/shared/gradle-home-dist',GRADLE_OPTS='-Dorg.gradle.native=false -Dorg.gradle.vfs.watch=false',LAB_MAVEN_REPOSITORY=cache.as_uri())
-command=['/workspace/shared/toolchains/gradle-8.10.2/bin/gradle','--no-daemon','testClasses','integrationTestClasses','verificationClasspath','--continue','--write-locks']
+for name in ('JAVA_HOME','GRADLE_USER_HOME','LAB_GRADLE_BIN'):
+ if not os.environ.get(name):raise SystemExit('请显式配置 '+name+'；本脚本不安装工具链')
+env=dict(os.environ,GRADLE_OPTS='-Dorg.gradle.native=false -Dorg.gradle.vfs.watch=false',LAB_MAVEN_REPOSITORY=cache.as_uri())
+command=[os.environ['LAB_GRADLE_BIN'],'--no-daemon','testClasses','integrationTestClasses','verificationClasspath','--continue','--write-locks']
 def get(rel):
  dest=cache/rel
  if dest.exists():return True

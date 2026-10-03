@@ -1,0 +1,65 @@
+type: edu
+custom_name: HTTP输入边界与取消链
+files:
+- name: build.gradle.fragment
+  visible: true
+- name: go/answers/reference.go.txt
+  visible: true
+- name: go/cmd/server/main.go
+  visible: true
+- name: go/cmd/server/main_test.go
+  visible: true
+- name: go/cmd/server/process_test.go
+  visible: true
+- name: go/contract_test.go
+  visible: true
+- name: go/diagrams/lifecycle.dot
+  visible: true
+- name: go/diagrams/lifecycle.png
+  visible: true
+  is_binary: true
+- name: go/diagrams/lifecycle.svg
+  visible: true
+- name: go/docs/源码定位.md
+  visible: true
+- name: go/exercise.go
+  visible: true
+  placeholders:
+  - offset: 519
+    length: 1078
+    placeholder_text: "\treturn Input{}, problem(501, \"starter\", \"implement input\
+      \ contract\")\n"
+  - offset: 2093
+    length: 433
+    placeholder_text: "\t\twriteProblem(w, problem(501, \"starter\", \"implement request\
+      \ lifecycle\"))\n"
+- name: go/go.mod
+  visible: true
+- name: go/model.go
+  visible: true
+- name: go/router.go
+  visible: true
+- name: go/stages/01-input-boundary.go.txt
+  visible: true
+- name: go/starters/exercise.go.txt
+  visible: true
+- name: go/wrong-solutions/accept-trailing.go.txt
+  visible: true
+- name: go/wrong-solutions/corrupt-input.go.txt
+  visible: true
+- name: go/wrong-solutions/ignore-parent.go.txt
+  visible: true
+- name: go/wrong-solutions/no-body-limit.go.txt
+  visible: true
+- name: go/wrong-solutions/omit-cancel.go.txt
+  visible: true
+- name: go/wrong-solutions/omit-postcheck.go.txt
+  visible: true
+- name: go/wrong-solutions/skip-validation.go.txt
+  visible: true
+- name: src/GoTestBridge.java
+  visible: true
+- name: test/GoContractTest.java
+  visible: true
+- name: test/GoTestBridgeTest.java
+  visible: true

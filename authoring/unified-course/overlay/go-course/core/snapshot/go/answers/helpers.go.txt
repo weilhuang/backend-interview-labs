@@ -1,0 +1,30 @@
+package ownership
+
+// 此变体把各层责任放在小函数，保留同一公开契约，不使用反射或序列化。
+func SnapshotOrders(src []Order) []Order {
+	if src == nil { return nil }
+	dst := make([]Order, len(src))
+	for i := range src { dst[i] = cloneOrder(src[i]) }
+	return dst
+}
+
+func cloneOrder(src Order) Order {
+	dst := src
+	if src.Lines != nil {
+		dst.Lines = make([]Line, len(src.Lines))
+		copy(dst.Lines, src.Lines)
+		for i := range src.Lines { dst.Lines[i].Tags = cloneTags(src.Lines[i].Tags) }
+	}
+	if src.Metadata != nil {
+		dst.Metadata = make(map[string]string, len(src.Metadata))
+		for key, value := range src.Metadata { dst.Metadata[key] = value }
+	}
+	return dst
+}
+
+func cloneTags(src []string) []string {
+	if src == nil { return nil }
+	dst := make([]string, len(src))
+	copy(dst, src)
+	return dst
+}

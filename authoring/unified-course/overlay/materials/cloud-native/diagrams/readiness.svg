@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 310" role="img" aria-labelledby="title desc">
+<title id="title">从启动到可以接单</title>
+<desc id="desc">依赖短暂故障：/ready与订单503，/live仍200；恢复后验证原库存</desc>
+<rect width="1060" height="310" fill="#f7f5ed"/>
+<style>text{font-family:system-ui,sans-serif;fill:#20382c}.title{font-size:28px;font-weight:700}.box{font-size:22px;font-weight:600}.sub{font-size:16px}</style>
+<text class="title" x="40" y="50">从启动到可以接单</text>
+<rect x="40" y="94" width="300" height="110" rx="14" fill="#fff" stroke="#79a18c" stroke-width="2"/>
+<text class="box" x="58" y="132">进程起来</text>
+<text class="sub" x="58" y="171">/live = 200</text>
+<path d="M346 149h24m-9-8 9 8-9 8" fill="none" stroke="#3d7059" stroke-width="3"/>
+<rect x="380" y="94" width="300" height="110" rx="14" fill="#fff" stroke="#79a18c" stroke-width="2"/>
+<text class="box" x="398" y="132">下游可连并初始化</text>
+<text class="sub" x="398" y="171">PING正常 + seed完成</text>
+<path d="M686 149h24m-9-8 9 8-9 8" fill="none" stroke="#3d7059" stroke-width="3"/>
+<rect x="720" y="94" width="300" height="110" rx="14" fill="#fff" stroke="#79a18c" stroke-width="2"/>
+<text class="box" x="738" y="132">业务就绪</text>
+<text class="sub" x="738" y="171">/ready = 200，接收订单</text>
+<text class="sub" x="40" y="263">依赖短暂故障：/ready与订单503，/live仍200；恢复后验证原库存</text>
+</svg>

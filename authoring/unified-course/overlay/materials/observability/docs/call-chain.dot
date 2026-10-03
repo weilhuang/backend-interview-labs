@@ -1,0 +1,24 @@
+digraph C12 {
+ graph [rankdir=TB,bgcolor="#f8fafc",pad="0.3",nodesep="0.5",ranksep="0.7",label="C12 | 一次请求，三种证据\n实线：Java/真实回环 HTTP 测试 | 虚线：真实后端尚未运行",labelloc=t,fontname="Noto Sans CJK SC",fontsize=17];
+ node [shape=box,style="rounded,filled",fillcolor="#e0efff",color="#52739b",fontname="Noto Sans CJK SC",fontsize=12,margin="0.18,0.13"];
+ edge [fontname="Noto Sans CJK SC",fontsize=10,color="#405a76"];
+ ui [label="已提供的浏览器页面\nPOST /checkout"];
+ a [label="checkout :18081\nSERVER span + Context"];
+ c [label="inventory HTTP client\nCLIENT span + traceparent"];
+ b [label="inventory :18082\nExtract -> SERVER span"];
+ ui -> a -> c -> b;
+ b -> c [label="200 / 503",constraint=false];
+ a -> logs [label="一条安全 JSON 事件"];
+ b -> logs [label="一条安全 JSON 事件"];
+ logs [label="业务 JSON 事件文件\n不采集请求头与正文",fillcolor="#e3f4e8"];
+ sdk [label="OpenTelemetry SDK\n有界队列 + 指标",fillcolor="#fef2cd"];
+ a -> sdk; b -> sdk;
+ collector [label="Collector\nreceiver -> processors -> exporters",fillcolor="#fff0dc"];
+ jaeger [label="Jaeger\n按 trace_id 查询",fillcolor="#fff0dc"];
+ prom [label="Prometheus\n计数与直方图",fillcolor="#fff0dc"];
+ elk [label="Logstash -> ES -> Kibana\n独立日志教学环境",fillcolor="#fff0dc"];
+ sdk -> collector [style=dashed,label="OTLP/HTTP"];
+ collector -> jaeger [style=dashed,label="OTLP/gRPC"];
+ collector -> prom [style=dashed,label="scrape"];
+ logs -> elk [style=dashed,label="仅安全 JSON"];
+}

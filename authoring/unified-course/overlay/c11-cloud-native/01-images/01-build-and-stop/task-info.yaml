@@ -1,0 +1,41 @@
+type: edu
+custom_name: C11-01 · Docker镜像与优雅停止
+files:
+- name: Dockerfile
+  visible: true
+  placeholders:
+  - offset: 0
+    length: 544
+    placeholder_text: '# C11-01 starter：可以构建运行，但单阶段带编译器且默认root，故验收预期失败。
+
+      ARG JAVA_BUILD_IMAGE
+
+      FROM ${JAVA_BUILD_IMAGE}
+
+      WORKDIR /opt/app
+
+      COPY src/ src/
+
+      COPY web/ web/
+
+      RUN mkdir -p classes && javac --release 21 -encoding UTF-8 -d classes src/labs/*.java
+
+      EXPOSE 8080
+
+      ENTRYPOINT ["java", "-cp", "/opt/app/classes", "labs.CloudNativeApp"]
+
+      '
+- name: solution.md
+  visible: true
+- name: observations.md
+  visible: true
+- name: visible-test-contract.md
+  visible: true
+- name: answers/Dockerfile.exec
+  visible: true
+- name: answers/Dockerfile.exec-script
+  visible: true
+- name: answers/entrypoint.sh
+  visible: true
+- name: test/LabCheckTest.java
+  visible: true

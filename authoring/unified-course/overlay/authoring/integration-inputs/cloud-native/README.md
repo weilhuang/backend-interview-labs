@@ -1,0 +1,5 @@
+# 待集成依赖
+
+本草稿不包含独立基础设施版本台账。Compose读取总课程提供的JAVA_BUILD_IMAGE、JAVA_RUNTIME_IMAGE与REDIS_IMAGE；其中JRE运行层的单项版本提案在versions.env.additions，须合入唯一台账后使用。
+
+尚需：环境配置与回环端口预检、限定项目/namespace生命周期入口、JUnit可见桥、总课程Gradle配置、strict dependency locks，以及Academy原生Check验证。不要以task-info.yaml存在或离线Python结果替代这些步骤。

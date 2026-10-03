@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "tasks": [
+    {
+      "task": "c11-cloud-native/01-images/01-build-and-stop",
+      "project": ":c11-cloud-native-01-images-01-build-and-stop",
+      "native_task": ":c11-cloud-native-01-images-01-build-and-stop:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Python3+PyYAML"
+      ],
+      "coverage": "local-policy-and-manifest-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "c11-cloud-native/02-compose/01-ready-and-seed",
+      "project": ":c11-cloud-native-02-compose-01-ready-and-seed",
+      "native_task": ":c11-cloud-native-02-compose-01-ready-and-seed:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Python3+PyYAML"
+      ],
+      "coverage": "local-policy-and-manifest-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "c11-cloud-native/03-network/01-service-discovery",
+      "project": ":c11-cloud-native-03-network-01-service-discovery",
+      "native_task": ":c11-cloud-native-03-network-01-service-discovery:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Python3+PyYAML"
+      ],
+      "coverage": "local-policy-and-manifest-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas",
+      "project": ":c11-cloud-native-04-kubernetes-basics-01-probes-and-replicas",
+      "native_task": ":c11-cloud-native-04-kubernetes-basics-01-probes-and-replicas:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Python3+PyYAML"
+      ],
+      "coverage": "local-policy-and-manifest-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets",
+      "project": ":c11-cloud-native-05-kubernetes-config-01-dns-config-secrets",
+      "native_task": ":c11-cloud-native-05-kubernetes-config-01-dns-config-secrets:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Python3+PyYAML"
+      ],
+      "coverage": "local-policy-and-manifest-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources",
+      "project": ":c11-cloud-native-06-kubernetes-release-01-rollout-and-resources",
+      "native_task": ":c11-cloud-native-06-kubernetes-release-01-rollout-and-resources:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Python3+PyYAML"
+      ],
+      "coverage": "local-policy-and-manifest-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "go-course/core/greeting",
+      "project": ":go-course-core-greeting",
+      "native_task": ":go-course-core-greeting:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Go1.27.1-explicit-path"
+      ],
+      "coverage": "local-JUnit-Go-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "go-course/core/order-total",
+      "project": ":go-course-core-order-total",
+      "native_task": ":go-course-core-order-total:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Go1.27.1-explicit-path"
+      ],
+      "coverage": "local-JUnit-Go-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "go-course/core/quantity",
+      "project": ":go-course-core-quantity",
+      "native_task": ":go-course-core-quantity:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Go1.27.1-explicit-path"
+      ],
+      "coverage": "local-JUnit-Go-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "go-course/core/snapshot",
+      "project": ":go-course-core-snapshot",
+      "native_task": ":go-course-core-snapshot:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Go1.27.1-explicit-path"
+      ],
+      "coverage": "local-JUnit-Go-contract",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "identity/01-policy/lab",
+      "project": ":identity-01-policy-lab",
+      "native_task": ":identity-01-policy-lab:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2"
+      ],
+      "coverage": "local-policy-and-HTTP-finalizer",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "observability/first-slice/metrics",
+      "project": ":observability-first-slice-metrics",
+      "native_task": ":observability-first-slice-metrics:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2"
+      ],
+      "coverage": "local-JUnit-HTTP",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "observability/first-slice/safe-events",
+      "project": ":observability-first-slice-safe-events",
+      "native_task": ":observability-first-slice-safe-events:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2"
+      ],
+      "coverage": "local-JUnit-HTTP",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "observability/first-slice/trace-context",
+      "project": ":observability-first-slice-trace-context",
+      "native_task": ":observability-first-slice-trace-context:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2"
+      ],
+      "coverage": "local-JUnit-HTTP",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "go-course/http/request-lifecycle",
+      "project": ":go-course-http-request-lifecycle",
+      "native_task": ":go-course-http-request-lifecycle:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Go1.27.1-explicit-path",
+        "preverified-Go-module-cache"
+      ],
+      "coverage": "local-JUnit-Go-contract-and-owned-loopback-HTTP",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    },
+    {
+      "task": "go-course/http/gin-pipeline",
+      "project": ":go-course-http-gin-pipeline",
+      "native_task": ":go-course-http-gin-pipeline:test",
+      "prestarted_middleware": [],
+      "runtime_requirements": [
+        "JDK21",
+        "Gradle8.10.2",
+        "Go1.27.1-explicit-path",
+        "preverified-Go-module-cache"
+      ],
+      "coverage": "local-JUnit-Go-contract-and-owned-loopback-HTTP",
+      "external_acceptance": "NOT_RUN",
+      "runtime_evidence": "EXTERNAL_BOUND_REPORT_REQUIRED"
+    }
+  ],
+  "infrastructure_gate": ":verifyExtensionInfrastructure",
+  "infrastructure_status": "NOT_IMPLEMENTED_FAIL_CLOSED"
+}

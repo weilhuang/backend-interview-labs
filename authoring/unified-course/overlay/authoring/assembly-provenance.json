@@ -1,0 +1,2900 @@
+{
+  "baseline_commit": "998a95a206801078fabb2e531cf9e8e503dfd89a",
+  "files": [
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/Dockerfile",
+      "sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/Dockerfile"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/answers/Dockerfile.exec",
+      "sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/answers/Dockerfile.exec"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/answers/Dockerfile.exec-script",
+      "sha256": "f080af93ee001103bd830907ba039b01aebd7930cf7241657f749e66e9fd6df0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/answers/Dockerfile.exec-script"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/answers/entrypoint.sh",
+      "sha256": "e852f6fa131206b216e97f37bf77c0118fbf573989d1b1b583e6cf900e4e3976",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/answers/entrypoint.sh"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/observations.md",
+      "sha256": "b479a9481a14a786b6da96c32efe88412d551751e3cd2c1171b0222f3aff71fa",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/observations.md"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/solution.md",
+      "sha256": "e39aba18cc36115556659090abe73b2925b5e85dd02b4ad956ac190fe392b27b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/solution.md"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/task-info.yaml",
+      "sha256": "d17667c7a5b89f66e7a94eabc6ce25098f890944cc354920a5dba50084b8d0ca",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/task-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/task.md",
+      "sha256": "4fa07ed9809ae415851c704679d75dfeb82af68db9f0e2eea6cec8c11de7a1b9",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/task.md"
+    },
+    {
+      "target": "c11-cloud-native/01-images/01-build-and-stop/visible-test-contract.md",
+      "sha256": "fa452c7cedd1e76e3ab45fe6bc1e725112205bac305fe1e821fe5b278174a116",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/01-build-and-stop/visible-test-contract.md"
+    },
+    {
+      "target": "c11-cloud-native/01-images/lesson-info.yaml",
+      "sha256": "530c8b8eaab0db88e846be0ac3d8d1a959bad0f940ba642d9b9eb96f1b592fea",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/01-images/lesson-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/CloudPolicy.java",
+      "sha256": "8494de65fd65c15e96b931698efb8c566687aa2391ec7fbcd67562a630c093ac",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/CloudPolicy.java"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/answers/CloudPolicy.explicit.java.txt",
+      "sha256": "ab3a3fa3a90dc5c7a1d04230486891b08382144f897fe1d95aa0b0f3bd372be7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/answers/CloudPolicy.explicit.java.txt"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/answers/CloudPolicy.expression.java.txt",
+      "sha256": "8494de65fd65c15e96b931698efb8c566687aa2391ec7fbcd67562a630c093ac",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/answers/CloudPolicy.expression.java.txt"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/observations.md",
+      "sha256": "76b4a7b3ad8d037e19538a8c59205f676ccfd320eeee301f2b74b13d3472443b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/observations.md"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/solution.md",
+      "sha256": "21923ef4f2f4466c69c8cbed038ad022b9b6589f59ee2d2590b1c8d22c1d17d1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/solution.md"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/task-info.yaml",
+      "sha256": "bd910f4a153a4b917441fd074825f315638d2880d11f46c58f5d34d6b0fec919",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/task-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/task.md",
+      "sha256": "ed268b21308de4497fcbb0b4a84abf58531c90309ca4303fea74add9ee350c4a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/task.md"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/01-ready-and-seed/visible-test-contract.md",
+      "sha256": "b309558d269e78a123bf60767fdcf081bf9a6c4f33b5cacf9fe42ef915a6388f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/01-ready-and-seed/visible-test-contract.md"
+    },
+    {
+      "target": "c11-cloud-native/02-compose/lesson-info.yaml",
+      "sha256": "cbb9a6a9e7dd8f3b1e9ef38335cd2b2277011b219a24e992c9d4c700f41cd5eb",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/02-compose/lesson-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/AddressPolicy.java",
+      "sha256": "69802654cb3d5027299e5a573626de670e39d8d9ddfc0d913cece0be31d71827",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/AddressPolicy.java"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/answers/AddressPolicy.defaults.java.txt",
+      "sha256": "69802654cb3d5027299e5a573626de670e39d8d9ddfc0d913cece0be31d71827",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/answers/AddressPolicy.defaults.java.txt"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/answers/AddressPolicy.explicit.java.txt",
+      "sha256": "2fbde365ab7a6ae4f0bf82251f703768a27d88bcf2e4d91c19d226e545f1ba4b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/answers/AddressPolicy.explicit.java.txt"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/observations.md",
+      "sha256": "616d89ed5cc670b9aedaf0960286411fc67f0ab961c2879f9a0994c38f950df0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/observations.md"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/solution.md",
+      "sha256": "7fd8c66e2a2e8be4a14ae0ca799e07e6c7e82336f24a183321d7668b2f4e5fb6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/solution.md"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/task-info.yaml",
+      "sha256": "45397be9575fa82a41d73eebed5e71fb41ed3ac4196c491ff7a584f37e9dd453",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/task-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/task.md",
+      "sha256": "0dde648f904ebb1fa94d37d673b11172faf3618910ca0f73dcfcb58135d3dd63",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/task.md"
+    },
+    {
+      "target": "c11-cloud-native/03-network/01-service-discovery/visible-test-contract.md",
+      "sha256": "efd53993af1c52957aad6be85c46ef115b5c0dd0b7c22f73ca992b94054963e1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/01-service-discovery/visible-test-contract.md"
+    },
+    {
+      "target": "c11-cloud-native/03-network/lesson-info.yaml",
+      "sha256": "4ac1d2e3756891a919762696eec0e8d77a4a8f476ee9a0d553b0cda89b92faf5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/03-network/lesson-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/section-info.yaml",
+      "sha256": "61887cec64a925f3b7055ce4b0db1adcd973e80b56f6c5b76385d3dc778fda19",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/section-info.yaml"
+    },
+    {
+      "target": "materials/cloud-native/.dockerignore",
+      "sha256": "7616396f3a03176bcb2c2172db4113d28b0d6524b018769194401210c60ea9c4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/.dockerignore"
+    },
+    {
+      "target": "materials/cloud-native/README.md",
+      "sha256": "088ea6beb815f745a66fcca1dd23cfb5fb2518d89d628bc0d9638116489c7155",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/README.md"
+    },
+    {
+      "target": "materials/cloud-native/answers/AddressPolicy-explicit.java.txt",
+      "sha256": "2fbde365ab7a6ae4f0bf82251f703768a27d88bcf2e4d91c19d226e545f1ba4b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/answers/AddressPolicy-explicit.java.txt"
+    },
+    {
+      "target": "materials/cloud-native/answers/CloudPolicy-explicit.java.txt",
+      "sha256": "ab3a3fa3a90dc5c7a1d04230486891b08382144f897fe1d95aa0b0f3bd372be7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/answers/CloudPolicy-explicit.java.txt"
+    },
+    {
+      "target": "materials/cloud-native/answers/Dockerfile.exec",
+      "sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/answers/Dockerfile.exec"
+    },
+    {
+      "target": "materials/cloud-native/answers/Dockerfile.exec-script",
+      "sha256": "f080af93ee001103bd830907ba039b01aebd7930cf7241657f749e66e9fd6df0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/answers/Dockerfile.exec-script"
+    },
+    {
+      "target": "materials/cloud-native/bin/call.py",
+      "sha256": "aadac381fcd1f78f5221242b298205ade7195fed4a3d67533f76248918c8739d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/bin/call.py"
+    },
+    {
+      "target": "materials/cloud-native/bin/compile.py",
+      "sha256": "af6cccf160e0885d28bff8e32b40a58cc09d8cfdbb2da8e81144d7852d429a0a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/bin/compile.py"
+    },
+    {
+      "target": "materials/cloud-native/bin/compile.sh",
+      "sha256": "3a3b3362feef0e028ae334d2ea97259b1c3e7ea57b578d5e23b701a6ff6b9e26",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/bin/compile.sh"
+    },
+    {
+      "target": "materials/cloud-native/bin/run.sh",
+      "sha256": "f8080e3da90bd85a1f0f6bc330066475b93cac890c747c65179aefca7d17cf52",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/bin/run.sh"
+    },
+    {
+      "target": "materials/cloud-native/bin/verify_offline.py",
+      "sha256": "508eb0f3c413a73907f27e5e7ec9ecf28164668324070b43496567eab9a75415",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/bin/verify_offline.py"
+    },
+    {
+      "target": "materials/cloud-native/container/Dockerfile",
+      "sha256": "f8ff91a72ea5d1635c41cb53d5f25abe9890ea178cb270b1a315c73a13d148ca",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/container/Dockerfile"
+    },
+    {
+      "target": "materials/cloud-native/container/entrypoint.sh",
+      "sha256": "e852f6fa131206b216e97f37bf77c0118fbf573989d1b1b583e6cf900e4e3976",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/container/entrypoint.sh"
+    },
+    {
+      "target": "materials/cloud-native/diagrams/build-runtime.svg",
+      "sha256": "2c309bef707daba5f07785171e257c426ed8f3d6861ff250be26eda593a1dde0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/diagrams/build-runtime.svg"
+    },
+    {
+      "target": "materials/cloud-native/diagrams/network-path.svg",
+      "sha256": "4875e27f9a85fc21e374ca547c8e301d5529ac109a6aaca1c7871f5021d14c2e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/diagrams/network-path.svg"
+    },
+    {
+      "target": "materials/cloud-native/diagrams/readiness.svg",
+      "sha256": "f5cd7eb0b344163621543b5e6770a282293910554cdcceeb18f713c56f945b04",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/diagrams/readiness.svg"
+    },
+    {
+      "target": "materials/cloud-native/docs/kubernetes-istio-next.md",
+      "sha256": "1c9172ab14ddf84bd5293431cf78ab96cbd07daa3bfeec52a1d65b4b465cd559",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/docs/kubernetes-istio-next.md"
+    },
+    {
+      "target": "materials/cloud-native/docs/source-anchors.md",
+      "sha256": "37df6f088eeb378ded9c2d06c5e6911d30fae9d34d4b24a4885508597808ed31",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/docs/source-anchors.md"
+    },
+    {
+      "target": "materials/cloud-native/docs/verification.md",
+      "sha256": "d0397c918812855f516cbee533a15dd3963072a7c79734c7e7a3d43264e7c520",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/docs/verification.md"
+    },
+    {
+      "target": "materials/cloud-native/src/labs/AddressPolicy.java",
+      "sha256": "69802654cb3d5027299e5a573626de670e39d8d9ddfc0d913cece0be31d71827",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/src/labs/AddressPolicy.java"
+    },
+    {
+      "target": "materials/cloud-native/src/labs/CloudNativeApp.java",
+      "sha256": "28a4160157273b5143e7b245f70f1984bb001af45e8bdfac34b3589d057a91cc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/src/labs/CloudNativeApp.java"
+    },
+    {
+      "target": "materials/cloud-native/src/labs/CloudPolicy.java",
+      "sha256": "8494de65fd65c15e96b931698efb8c566687aa2391ec7fbcd67562a630c093ac",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/src/labs/CloudPolicy.java"
+    },
+    {
+      "target": "materials/cloud-native/src/labs/Inventory.java",
+      "sha256": "0daf4fa688febda37685d14775a6647389f06551f368c45946e0c41318dd9739",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/src/labs/Inventory.java"
+    },
+    {
+      "target": "materials/cloud-native/src/labs/RedisClient.java",
+      "sha256": "215fd5ebaa9a96d0fe9c3a3243e8b76f2f6d5a5e630cb9fd5288f738563db587",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/src/labs/RedisClient.java"
+    },
+    {
+      "target": "materials/cloud-native/src/labs/RedisDiagnostic.java",
+      "sha256": "48ae8dae6c4e777957a66c1f09996573a18733092a72c51cb05549a88cc2157c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/src/labs/RedisDiagnostic.java"
+    },
+    {
+      "target": "materials/cloud-native/starter/AddressPolicy.java.txt",
+      "sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/starter/AddressPolicy.java.txt"
+    },
+    {
+      "target": "materials/cloud-native/starter/CloudPolicy.java.txt",
+      "sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/starter/CloudPolicy.java.txt"
+    },
+    {
+      "target": "materials/cloud-native/starter/Dockerfile",
+      "sha256": "76164820acfcbfb7e59f51f82a8633bcdd653ac7a10a117bbedf9d7fd2cc6c64",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/starter/Dockerfile"
+    },
+    {
+      "target": "materials/cloud-native/test-java/labs/PolicyContractTest.java",
+      "sha256": "784a7524c24e0c76c2ea74064b5dc26c326dd015454bf5582546631fd7cea111",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/test-java/labs/PolicyContractTest.java"
+    },
+    {
+      "target": "materials/cloud-native/tests/compose_policy.py",
+      "sha256": "276a454f51ddd740b4b53d6a48a84e7ff67e709eea7ff78b9c3aa9623cde2282",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/compose_policy.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/contract.py",
+      "sha256": "e23eb007db7c409335069e9ec760b14bbbd5b9aa9c454738e5c1b7902fff4c33",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/contract.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/docker_variant_verify.py",
+      "sha256": "35f62593396b7ec83024d5c9cc8a4b5bb651038964c81d3ff5eaba097455c223",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/docker_variant_verify.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/docker_verify.py",
+      "sha256": "b89334f28e39e8b5dd05234f94e19b6ce5923c31e61bbeab1cb8a958db574e0a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/docker_verify.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/fake_redis.py",
+      "sha256": "0e3501228d0a44aeded8d0d7392b6247c14f97bde90a10ee24b8b4f50f9cc872",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/fake_redis.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/native_verify.py",
+      "sha256": "99f0c86db7dd18b76477e1dcb149909f12410fc9a93cfc700f9deab4675316dc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/native_verify.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/test_http_negative_witness.py",
+      "sha256": "78d635d311bf2c4cbad43c8a04bab2e51d6ded4d41c869ef05f2517317096e9e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/test_http_negative_witness.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/test_offline.py",
+      "sha256": "3ecb4c7c2657a997fc7827ddc865038aed41425b72a2c0bbb89457052b065421",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/test_offline.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/test_verification_guardrails.py",
+      "sha256": "3a72f2eb2d8de9cc929ccd40a2bae37a4fd9761b120fed0024ed61b97fec432a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/test_verification_guardrails.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/variant_verify.py",
+      "sha256": "bbb7f94c6d314871dfa30bd56ce1f7452e8f2da34cd55c04775a198d4a8499ae",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/variant_verify.py"
+    },
+    {
+      "target": "materials/cloud-native/tests/verification_guard.py",
+      "sha256": "d29dc4c30698ee68550441f87ea74d3c730960ca91b362430d37214026ac08fc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/tests/verification_guard.py"
+    },
+    {
+      "target": "materials/cloud-native/web/index.html",
+      "sha256": "5b0cd8dffe6b24a401dc35576885a006ff949340e22a6b377e0b3ae6fa2e7ff8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/web/index.html"
+    },
+    {
+      "target": "materials/cloud-native/wrong/AddressPolicy-localhost.java.txt",
+      "sha256": "1a3b6e71cb734036cce8afdcd44952b9af1744fd3c01025526f1395bcc135d1a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/wrong/AddressPolicy-localhost.java.txt"
+    },
+    {
+      "target": "materials/cloud-native/wrong/CloudPolicy-always-ready.java.txt",
+      "sha256": "18fd245f700140ba8d7ed46543d9b5902c8052e1d5118151bf5da12ccbfa6e6e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/wrong/CloudPolicy-always-ready.java.txt"
+    },
+    {
+      "target": "materials/cloud-native/wrong/entrypoint-swallow-term.sh",
+      "sha256": "8c07c5af558bb8b7ccfbad6fbc119829145d4b208025759ebd785a6cb4ee1336",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/cloud-native/wrong/entrypoint-swallow-term.sh"
+    },
+    {
+      "target": "infra/cloudnative.compose.yaml",
+      "sha256": "0aff297f27ea0ff3d236ca3a898a577047e96cbaa1f0c1f1a5f9ee72b9f5f557",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/infra/cloudnative.compose.yaml"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/ProbePolicy.java",
+      "sha256": "3439a84ea9e3cec3bf9045ae39e0a5928de9bd2a4e6704b5948d9c8a087139c1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/ProbePolicy.java"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/answers/ProbePolicy.java",
+      "sha256": "3439a84ea9e3cec3bf9045ae39e0a5928de9bd2a4e6704b5948d9c8a087139c1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/answers/ProbePolicy.java"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/answers/deployment.yaml",
+      "sha256": "614547d4624462719fdc06a1d933c710abb75c00a2aa740fa584c8c39690122b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/answers/deployment.yaml"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/deployment.yaml",
+      "sha256": "614547d4624462719fdc06a1d933c710abb75c00a2aa740fa584c8c39690122b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/deployment.yaml"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/observations.md",
+      "sha256": "f7ed3f0794d6609f812e3bcce5207db455842bbaa71a5266e06e9c01d7eac131",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/observations.md"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/solution.md",
+      "sha256": "b37d4d5fa81efdfe539b5ed4dc2a5ddd3f8998c0c145c430c00e7c7968ea6bd5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/solution.md"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/task-info.yaml",
+      "sha256": "866e32950b0164180844f3755cd455b1c3dc44b4004e0f1c4e7b501e4490f7d3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/task-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/task.md",
+      "sha256": "a24b881df987aa4d9136d21c0c3de10cddef0380c636ad0531c0e9f92ccb4b2a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/task.md"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/test/LabCheckTest.java",
+      "sha256": "f08105adfd28f2ba126b6807a0fdb20aee23c90bb5c9746a058c0bf12697fb2e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/test/LabCheckTest.java"
+    },
+    {
+      "target": "c11-cloud-native/04-kubernetes-basics/lesson-info.yaml",
+      "sha256": "3a88446352a636f288c0cd95377e7434912187bc8a65cef3f1e235b38d04f434",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/04-kubernetes-basics/lesson-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/AppConfig.java",
+      "sha256": "d07077f71ffcd9130340ae3c09ce74c7da890691089ecc0d6fd02f6ca688416c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/AppConfig.java"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/AppConfig.java",
+      "sha256": "d07077f71ffcd9130340ae3c09ce74c7da890691089ecc0d6fd02f6ca688416c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/AppConfig.java"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/config.yaml",
+      "sha256": "9366792aa84a8485b883b2e2c15faeee6ed619dbca0022a3c30a806c668f42d2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/config.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/rbac.yaml",
+      "sha256": "45e2a9a1c0c454af1eecac116d73e416ba8107b7a8e2e17bf44c62554d007b35",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/rbac.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/service.yaml",
+      "sha256": "d54c1b0d74134d6a5687f752561138f07f89fe7f33721adc3854292862ff0fe3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/answers/service.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/config.yaml",
+      "sha256": "9366792aa84a8485b883b2e2c15faeee6ed619dbca0022a3c30a806c668f42d2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/config.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/observations.md",
+      "sha256": "db28ac64e550df2a1ccb786042b6093971718fe2e2dfafff8ff8d4a4df0e4ca4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/observations.md"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/rbac.yaml",
+      "sha256": "45e2a9a1c0c454af1eecac116d73e416ba8107b7a8e2e17bf44c62554d007b35",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/rbac.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/service.yaml",
+      "sha256": "d54c1b0d74134d6a5687f752561138f07f89fe7f33721adc3854292862ff0fe3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/service.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/solution.md",
+      "sha256": "1a88703a61c1b61e2f2e7a7733113715d2be7ab638004a524f95a1315664cd4e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/solution.md"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/task-info.yaml",
+      "sha256": "71fee23d8e10f52aa07c16813ade510ad72148742b4063dfa558753c00c27f4a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/task-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/task.md",
+      "sha256": "e15234d959847f54f1c6bf47da31845942d56d9d5c5f4591c95e685205edd19e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/task.md"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/test/LabCheckTest.java",
+      "sha256": "80f3492e2124c55f0b48b5126f52dcfc977803f759016a79115f5463077af131",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/test/LabCheckTest.java"
+    },
+    {
+      "target": "c11-cloud-native/05-kubernetes-config/lesson-info.yaml",
+      "sha256": "c3b8edc3bbe0a4cdb1273d0b296a2808db05a6394f06b8bd6e8e046a842f07f1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/05-kubernetes-config/lesson-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/answers/deployment.yaml",
+      "sha256": "614547d4624462719fdc06a1d933c710abb75c00a2aa740fa584c8c39690122b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/answers/deployment.yaml"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/deployment.yaml",
+      "sha256": "614547d4624462719fdc06a1d933c710abb75c00a2aa740fa584c8c39690122b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/deployment.yaml"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/observations.md",
+      "sha256": "eb057b2d692f8d74071e2fd1ac747343882d2d29e3c343217d3c5771a81c5349",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/observations.md"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/solution.md",
+      "sha256": "7da8fd126c614e4fcb6b516e8f8fdb8fe48a178bfa5539af59e57fd78f480abf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/solution.md"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/task-info.yaml",
+      "sha256": "9be565ddc70d4194360d8599634cd5b653aebf3bfe0238b1291f74d875737da8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/task-info.yaml"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/task.md",
+      "sha256": "698555ff3eb35eecf22161be18e8f693aecd2fbd09c63e02332ab478a6abba96",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/task.md"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/test/LabCheckTest.java",
+      "sha256": "8d2bfc14de2944b19d4423a9d55c765ac59d9d966b05ea7900201ebefb0fba9c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/test/LabCheckTest.java"
+    },
+    {
+      "target": "c11-cloud-native/06-kubernetes-release/lesson-info.yaml",
+      "sha256": "60eb42888a805f97540d15dd9478bab4bd080741b99e7dc3488b0c58334c002b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/06-kubernetes-release/lesson-info.yaml"
+    },
+    {
+      "target": "materials/kubernetes/.dockerignore",
+      "sha256": "fc055a91554773d8de6901a28fb872092df840ff460211f00d3654f4f60ab52a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/.dockerignore"
+    },
+    {
+      "target": "materials/kubernetes/Dockerfile",
+      "sha256": "6225dead2da1f79fa847b088490c2743883b1abcffea8cc9e3d42ac846129cbc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/Dockerfile"
+    },
+    {
+      "target": "materials/kubernetes/README.md",
+      "sha256": "095f82928980edd5bbcbaee2fb6c9d2f5fb216508a8785ec6e2e5d6bd221dc01",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/README.md"
+    },
+    {
+      "target": "materials/kubernetes/answers/ProbePolicy.explicit.java.txt",
+      "sha256": "e08d9e60133eb331911d3225b632121596acbb7fc723b26839c1f57618f44b8f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/answers/ProbePolicy.explicit.java.txt"
+    },
+    {
+      "target": "materials/kubernetes/bin/call.py",
+      "sha256": "9e1755c822f64594a9c7ec5dd8acd0726ea633c404752f1aa3c7311932be1319",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/bin/call.py"
+    },
+    {
+      "target": "materials/kubernetes/bin/lab.py",
+      "sha256": "b3cecae6f6851e26ad712021590be7ab87e28c1ef0ad404dfa3a3778c434a491",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/bin/lab.py"
+    },
+    {
+      "target": "materials/kubernetes/bin/scenarios.py",
+      "sha256": "c90767dff63fd5375df7bdad696d2f8843846b26819bc8bf3b67ba78861361ad",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/bin/scenarios.py"
+    },
+    {
+      "target": "materials/kubernetes/bin/verify_java.py",
+      "sha256": "0c9f4609b67b34dc5c66ae19c779776daf97cfe08359954fd4d5ad005b22d9da",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/bin/verify_java.py"
+    },
+    {
+      "target": "materials/kubernetes/diagrams/config.svg",
+      "sha256": "dcafa025f5386c2c7d0358195f34c9b69b62ba6f03e2a74cfed81c7c67a37ca2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/diagrams/config.svg"
+    },
+    {
+      "target": "materials/kubernetes/diagrams/probes.svg",
+      "sha256": "92bfa6ce3a03c06a63504dc27214dc2e10265af8311d6c6125b30ecf60e84fbd",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/diagrams/probes.svg"
+    },
+    {
+      "target": "materials/kubernetes/diagrams/request-path.svg",
+      "sha256": "136cc9d863d4e3678b8d5aeca1c2c6891c4b5c63ef581e27bc521e2277bddd18",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/diagrams/request-path.svg"
+    },
+    {
+      "target": "materials/kubernetes/diagrams/rollout.svg",
+      "sha256": "237a4660f49cdd66c378e3421984477ea690ad2d440d947b692747d800d2d7c1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/diagrams/rollout.svg"
+    },
+    {
+      "target": "materials/kubernetes/docs/roadmap.md",
+      "sha256": "72d646d8e6e906935309aeb043f1bb97a8b19ac3d221f1898192559be671fe24",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/docs/roadmap.md"
+    },
+    {
+      "target": "materials/kubernetes/docs/sources.md",
+      "sha256": "bb28920ab6bcb35a3939da341d3f1848f5c97870caaf196e2df55b178e2cb3fe",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/docs/sources.md"
+    },
+    {
+      "target": "materials/kubernetes/docs/troubleshooting.md",
+      "sha256": "6967eb461b499d06a0e49a59a78bfe78dd9315c928326d12434cea330728ffd4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/docs/troubleshooting.md"
+    },
+    {
+      "target": "materials/kubernetes/manifests/caller.yaml",
+      "sha256": "b8b6808013812f3d37ab60f8fe15f3634f353802066d2f9052af747496d14eed",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/caller.yaml"
+    },
+    {
+      "target": "materials/kubernetes/manifests/config.yaml",
+      "sha256": "9366792aa84a8485b883b2e2c15faeee6ed619dbca0022a3c30a806c668f42d2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/config.yaml"
+    },
+    {
+      "target": "materials/kubernetes/manifests/deployment.yaml",
+      "sha256": "614547d4624462719fdc06a1d933c710abb75c00a2aa740fa584c8c39690122b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/deployment.yaml"
+    },
+    {
+      "target": "materials/kubernetes/manifests/pod-example.yaml",
+      "sha256": "2e8a3db12d190193bcdb32b57b2c9f5e01fa43f0b1288e3571cad4502a5d3271",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/pod-example.yaml"
+    },
+    {
+      "target": "materials/kubernetes/manifests/rbac.yaml",
+      "sha256": "45e2a9a1c0c454af1eecac116d73e416ba8107b7a8e2e17bf44c62554d007b35",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/rbac.yaml"
+    },
+    {
+      "target": "materials/kubernetes/manifests/redis.yaml",
+      "sha256": "c097867d9c3baa0bb56c5c4665131968fc49d062324382f611dc3d1a8b96f0e2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/redis.yaml"
+    },
+    {
+      "target": "materials/kubernetes/manifests/service.yaml",
+      "sha256": "d54c1b0d74134d6a5687f752561138f07f89fe7f33721adc3854292862ff0fe3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/manifests/service.yaml"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/AddressPolicy.java",
+      "sha256": "69802654cb3d5027299e5a573626de670e39d8d9ddfc0d913cece0be31d71827",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/AddressPolicy.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/AppConfig.java",
+      "sha256": "d07077f71ffcd9130340ae3c09ce74c7da890691089ecc0d6fd02f6ca688416c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/AppConfig.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/FixtureCtl.java",
+      "sha256": "b11afb5f21e5c4daa3ec6d70b707a8debc4d93d35375ef6089967c788a08bc0c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/FixtureCtl.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/HttpCaller.java",
+      "sha256": "8c175e3a295d0d8645c2f06a5c0aee4222f147fbb36299fc851cd3be7266cc13",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/HttpCaller.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/Inventory.java",
+      "sha256": "0daf4fa688febda37685d14775a6647389f06551f368c45946e0c41318dd9739",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/Inventory.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/KubernetesApp.java",
+      "sha256": "94d0e039aad3e5d446362514901b15a3be03fdffaaea29de08a208741356ae97",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/KubernetesApp.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/ProbePolicy.java",
+      "sha256": "3439a84ea9e3cec3bf9045ae39e0a5928de9bd2a4e6704b5948d9c8a087139c1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/ProbePolicy.java"
+    },
+    {
+      "target": "materials/kubernetes/src/labs/RedisClient.java",
+      "sha256": "215fd5ebaa9a96d0fe9c3a3243e8b76f2f6d5a5e630cb9fd5288f738563db587",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/src/labs/RedisClient.java"
+    },
+    {
+      "target": "materials/kubernetes/test-java/labs/PolicyContractTest.java",
+      "sha256": "fd2d448091d2711056e8ff7e7c617162d00493974c50d6ddd82b17f6ac88c0fa",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/test-java/labs/PolicyContractTest.java"
+    },
+    {
+      "target": "materials/kubernetes/tests/check_task.py",
+      "sha256": "ebc876b29f08deb78c4bffa8fd6b34d74ea42011d3510c32c143f8cb8ab789aa",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/tests/check_task.py"
+    },
+    {
+      "target": "materials/kubernetes/tests/test_contracts.py",
+      "sha256": "dafe51c040e512c95bf76da0da832e696633da5165ef82c5f697ca69c30b12cf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/tests/test_contracts.py"
+    },
+    {
+      "target": "materials/kubernetes/tests/test_scenario_regressions.py",
+      "sha256": "bb60251158ddfcc7fa2699453e157aeb3f4ee89abef1ae9918cdd2c37127b03b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/tests/test_scenario_regressions.py"
+    },
+    {
+      "target": "materials/kubernetes/web/index.html",
+      "sha256": "5b0cd8dffe6b24a401dc35576885a006ff949340e22a6b377e0b3ae6fa2e7ff8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/web/index.html"
+    },
+    {
+      "target": "materials/kubernetes/wrong/ProbePolicy.always-ready.java.txt",
+      "sha256": "69ef8982f22f5bf85e90a3eabf214801d7be1ab39ed1d5e263ff9277c9c84fda",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/wrong/ProbePolicy.always-ready.java.txt"
+    },
+    {
+      "target": "materials/kubernetes/wrong/ProbePolicy.dependency-liveness.java.txt",
+      "sha256": "f5e7137c519b3591631d5604b1ae619edd6d69a3bc25a7b46c554073b98f26d8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/wrong/ProbePolicy.dependency-liveness.java.txt"
+    },
+    {
+      "target": "materials/kubernetes/wrong/README.md",
+      "sha256": "597c8e615babb6b88d79417e1a1aa86d6d5283f7e030f44594f19b675820155e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/kubernetes/wrong/README.md"
+    },
+    {
+      "target": "c11-cloud-native/section-info.yaml",
+      "sha256": "28d7b200893ea187632db17f7f297da272e110bea540460a3dc784c86e46117c",
+      "transformation": "explicit-metadata-composition",
+      "source": "authoring/unified-course/overlay/c11-cloud-native/section-info.yaml"
+    },
+    {
+      "target": "materials/observability/course.gradle.fragment",
+      "sha256": "fce7d1ef5c2645fa5370ac59b0314a02c94e8903b151be9bffa4daa4f1852742",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/course.gradle.fragment"
+    },
+    {
+      "target": "materials/observability/docs/00-从一次请求认识观测.md",
+      "sha256": "c8b0c8b4f9cbd031c6eb2e0a8d0d5130644dc489488bd2eb67f59db713c2ea0c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/00-从一次请求认识观测.md"
+    },
+    {
+      "target": "materials/observability/docs/01-结构化日志练习与答案.md",
+      "sha256": "b47634f977e3822baf82fd98368cc551a8ccc110f878826ec003f031dc758420",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/01-结构化日志练习与答案.md"
+    },
+    {
+      "target": "materials/observability/docs/02-指标练习与答案.md",
+      "sha256": "9aac664f53fd8a7b5aac9c8301ef0e154acd25e593cf520bd19dfe81802645a7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/02-指标练习与答案.md"
+    },
+    {
+      "target": "materials/observability/docs/03-链路传播练习与答案.md",
+      "sha256": "084a911c0280123a14efdd1fb5d876b4d233c27209af750354f1c3683633dc10",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/03-链路传播练习与答案.md"
+    },
+    {
+      "target": "materials/observability/docs/04-Collector-ELK-SkyWalking分层实战.md",
+      "sha256": "91c1794bb7a6e619403a26e485575ade20728736b52bdb7a7cf582eb4cc6faab",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/04-Collector-ELK-SkyWalking分层实战.md"
+    },
+    {
+      "target": "materials/observability/docs/05-官方版本源码与面试路线.md",
+      "sha256": "00c1562e3ec146c75afe7f01b567b94aaf5fc7baa27c1553e18caf85934c18a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/05-官方版本源码与面试路线.md"
+    },
+    {
+      "target": "materials/observability/docs/06-参考实现范围与验证器契约.md",
+      "sha256": "412caa61bbf01952f475cd96635fe21105cd479fbe254c035464f53387aa440c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/06-参考实现范围与验证器契约.md"
+    },
+    {
+      "target": "materials/observability/docs/call-chain.dot",
+      "sha256": "aac73e652d6d970ee8aa85edd21e34be88baa7eedc0808768746507dd22d402e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/call-chain.dot"
+    },
+    {
+      "target": "materials/observability/docs/阶段报告.md",
+      "sha256": "9325b391093d47b7cfd5893077e24a92990f9b7fe5fc2c4c16a741066e397f30",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/docs/阶段报告.md"
+    },
+    {
+      "target": "materials/observability/infra/backend-cases.json",
+      "sha256": "dcc36916bc36e7d5c83942c733236540efa0f1c85a5402d99a82f130a3d2a4c4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/backend-cases.json"
+    },
+    {
+      "target": "materials/observability/infra/collector-isolation.example.json",
+      "sha256": "323639f20a9e977972b7d6e21c7ebeffd0974638c5a49cd589037eb7407dc3ad",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/collector-isolation.example.json"
+    },
+    {
+      "target": "materials/observability/infra/collector.yaml",
+      "sha256": "4672b5a2b67d8face9102bcea975c232779fdd93b220bb1c0b784ce65a49f08f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/collector.yaml"
+    },
+    {
+      "target": "materials/observability/infra/elasticsearch-template.json",
+      "sha256": "5d534cd1bca451fb0ae39ced66e6a9b720b789ef8b25ecc0d9395b08a978c6e8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/elasticsearch-template.json"
+    },
+    {
+      "target": "materials/observability/infra/elk-collection.example.json",
+      "sha256": "9b38f071f743980b8f63bc095e82c0b4550c6b236923c31ec5e9f8271ef542f1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/elk-collection.example.json"
+    },
+    {
+      "target": "materials/observability/infra/elk-fixture-cases.ndjson",
+      "sha256": "f147263188ab99c0fd9add2307de1f9bff3021be99fbff1260175d88b2a5b1bd",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/elk-fixture-cases.ndjson"
+    },
+    {
+      "target": "materials/observability/infra/logstash.conf",
+      "sha256": "03d37f5d5f3932664d1225e505b9746d53719f4067ab5d9ea3025fa012a68eae",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/logstash.conf"
+    },
+    {
+      "target": "materials/observability/infra/logstash.yml",
+      "sha256": "d7f478fda207945b507eea0b2d804fffaa570491d67194f84dffd6d9c55ce501",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/logstash.yml"
+    },
+    {
+      "target": "materials/observability/infra/observability.compose.yaml",
+      "sha256": "f84665fc80c78b89752e8f72b9b62cec7b419f2d129fb264b532eed5a93ef2c0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/observability.compose.yaml"
+    },
+    {
+      "target": "materials/observability/infra/prometheus.yaml",
+      "sha256": "af5efb535eee5f07536b8bb69bfddff9891774874f88c3bc3f31c3f2be66e7f5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/infra/prometheus.yaml"
+    },
+    {
+      "target": "materials/observability/resources/application.properties",
+      "sha256": "bf4bfc740fab8b6b2afd71c4bbd82a701580b6958e0f1e3f76bbbdf2492d4050",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/resources/application.properties"
+    },
+    {
+      "target": "materials/observability/resources/static/index.html",
+      "sha256": "81b6a15be39119d094d02553fb0d76688caeb8ddfa9a674850326fded0636e7e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/observability/resources/static/index.html"
+    },
+    {
+      "target": "observability/first-slice/lesson-info.yaml",
+      "sha256": "6e95e3421114b88763f70e8c8bc69ea2d35dd8a960be6d198d4c07f5f1c3a0c3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/lesson-info.yaml"
+    },
+    {
+      "target": "observability/first-slice/metrics/answers/reference-map/RequestMetrics.java",
+      "sha256": "6e1dad128093735596ee7ea772f899848df6960dff52c30827ee289eba0374b5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/answers/reference-map/RequestMetrics.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/answers/reference-typed/RequestMetrics.java",
+      "sha256": "94306485e2fd42bbb357ef52613e4b3b195dd957827037533a858d77d342206d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/answers/reference-typed/RequestMetrics.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/solution.md",
+      "sha256": "800bc6a525706a35d1ffe9ec02c5a136260e7ab149f47e6b3b1df487356a2175",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/solution.md"
+    },
+    {
+      "target": "observability/first-slice/metrics/source-guide.md",
+      "sha256": "00c1562e3ec146c75afe7f01b567b94aaf5fc7baa27c1553e18caf85934c18a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/source-guide.md"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/CheckoutController.java",
+      "sha256": "1ea5b9facc436617ff48ca5412c8d4ae14c6ca00ba3369261c4e64e3014daef5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/CheckoutController.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/EventSink.java",
+      "sha256": "e9291ee1013f3018ed0a3e0be98a82a2f0282aa113a8d5a484e26eb17e6fca6e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/EventSink.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/InventoryController.java",
+      "sha256": "3c7b0e083c153fe54e8aa5f0cf72eb7808c56f7edd55f39b908f353f89fd7bea",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/InventoryController.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/ObservabilityApplication.java",
+      "sha256": "588de2a5ab302f7d7fb93040127d99ba20ec8df5e27f0c213a7d64554ddf610b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/ObservabilityApplication.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/ReadyController.java",
+      "sha256": "bfd650ca93f46b3d9f5eb209e65b1aad292b6145a346387213c1540c0a9335a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/ReadyController.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/RequestMetrics.java",
+      "sha256": "6e1dad128093735596ee7ea772f899848df6960dff52c30827ee289eba0374b5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/RequestMetrics.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/Routes.java",
+      "sha256": "dd405847f8253c9fbb03374ea86bda8ebe80dd00616d7a2bb1ad4fe88a4a36fe",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/Routes.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/SafeEvents.java",
+      "sha256": "dc456463fa76dff2609116f804dc9d19abf27ee8c1a2e5490e5b3a2430244175",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/SafeEvents.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/Telemetry.java",
+      "sha256": "e1a14c189913fca1850d145c88d4aa7e552b9946a87d4ca87a4b3f8d2a06b7e7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/Telemetry.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/TelemetryFilter.java",
+      "sha256": "108bd1e38f9a65cbb830b00fbe37af8c725a49d1853341521981177606935cdd",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/TelemetryFilter.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/TraceBridge.java",
+      "sha256": "d31e47c9452a3489cf53905c5441436c4a693dce1844ef9d89e0f2619dd87109",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/TraceBridge.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/src/labs/observability/Usage.java",
+      "sha256": "fd95db0a4ddea49af5bfbece6cbdf75011ea8565d242598874b54a9cbec80adf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/src/labs/observability/Usage.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/task-info.yaml",
+      "sha256": "2cd6da7e21902b37ec13f211c94a0d43b3170b0cc29e0eb5f569cd599de2f75b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/task-info.yaml"
+    },
+    {
+      "target": "observability/first-slice/metrics/task.md",
+      "sha256": "16813bc1d986a41e905070ecb6d37bd4cd41345952f5fee2d7609dd36e2cb291",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/task.md"
+    },
+    {
+      "target": "observability/first-slice/metrics/test/labs/observability/ExporterFailureTest.java",
+      "sha256": "8763e46ca65f54d85e6fd10d3312a06dde4b4a573bded0099f67d1dab3ced33e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/test/labs/observability/ExporterFailureTest.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/test/labs/observability/HttpCallChainTest.java",
+      "sha256": "2aed0f4e327e87b4331a499e4f1cd06eaefb48bc0409b3a0abc1ded09a740632",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/test/labs/observability/HttpCallChainTest.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/test/labs/observability/RequestMetricsTest.java",
+      "sha256": "0846d4aa93de280292e0707f7b07b3ed6e153f3c05f0f0535f10e023e9efe340",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/test/labs/observability/RequestMetricsTest.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/test/labs/observability/SafeEventsTest.java",
+      "sha256": "286e2c9ff0c96ee8e970487977f7543ae669bdbe16cb3fcd9aed4b112f093f8d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/test/labs/observability/SafeEventsTest.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/test/labs/observability/TelemetryEndpointTest.java",
+      "sha256": "f434e7077828972e4dec005e2a32184efb8b399823cacca96c2bc2a72091f776",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/test/labs/observability/TelemetryEndpointTest.java"
+    },
+    {
+      "target": "observability/first-slice/metrics/test/labs/observability/TraceBridgeTest.java",
+      "sha256": "6886712aa3c5394dbd8fe1b98c3a57e97b431d50ed6fe42ee2cc18824b5d6197",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/metrics/test/labs/observability/TraceBridgeTest.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/answers/reference-map/SafeEvents.java",
+      "sha256": "dc456463fa76dff2609116f804dc9d19abf27ee8c1a2e5490e5b3a2430244175",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/answers/reference-map/SafeEvents.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/answers/reference-typed/SafeEvents.java",
+      "sha256": "a4db622b5cd2e0758cb04f2f4f0d292174960bdb93aec6114a26430114a4eb2c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/answers/reference-typed/SafeEvents.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/solution.md",
+      "sha256": "8223df7aa34a2c18f22f5812ed17a9e528101f51242e8a06077a62952c68cf61",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/solution.md"
+    },
+    {
+      "target": "observability/first-slice/safe-events/source-guide.md",
+      "sha256": "00c1562e3ec146c75afe7f01b567b94aaf5fc7baa27c1553e18caf85934c18a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/source-guide.md"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/CheckoutController.java",
+      "sha256": "1ea5b9facc436617ff48ca5412c8d4ae14c6ca00ba3369261c4e64e3014daef5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/CheckoutController.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/EventSink.java",
+      "sha256": "e9291ee1013f3018ed0a3e0be98a82a2f0282aa113a8d5a484e26eb17e6fca6e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/EventSink.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/InventoryController.java",
+      "sha256": "3c7b0e083c153fe54e8aa5f0cf72eb7808c56f7edd55f39b908f353f89fd7bea",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/InventoryController.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/ObservabilityApplication.java",
+      "sha256": "588de2a5ab302f7d7fb93040127d99ba20ec8df5e27f0c213a7d64554ddf610b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/ObservabilityApplication.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/ReadyController.java",
+      "sha256": "bfd650ca93f46b3d9f5eb209e65b1aad292b6145a346387213c1540c0a9335a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/ReadyController.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/RequestMetrics.java",
+      "sha256": "6e1dad128093735596ee7ea772f899848df6960dff52c30827ee289eba0374b5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/RequestMetrics.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/Routes.java",
+      "sha256": "dd405847f8253c9fbb03374ea86bda8ebe80dd00616d7a2bb1ad4fe88a4a36fe",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/Routes.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/SafeEvents.java",
+      "sha256": "dc456463fa76dff2609116f804dc9d19abf27ee8c1a2e5490e5b3a2430244175",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/SafeEvents.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/Telemetry.java",
+      "sha256": "e1a14c189913fca1850d145c88d4aa7e552b9946a87d4ca87a4b3f8d2a06b7e7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/Telemetry.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/TelemetryFilter.java",
+      "sha256": "108bd1e38f9a65cbb830b00fbe37af8c725a49d1853341521981177606935cdd",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/TelemetryFilter.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/TraceBridge.java",
+      "sha256": "d31e47c9452a3489cf53905c5441436c4a693dce1844ef9d89e0f2619dd87109",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/TraceBridge.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/src/labs/observability/Usage.java",
+      "sha256": "fd95db0a4ddea49af5bfbece6cbdf75011ea8565d242598874b54a9cbec80adf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/src/labs/observability/Usage.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/task-info.yaml",
+      "sha256": "0cdbba0078f5115922dad2fe0c5bb7bdf2516a87fd540c1a143afc9c090a7e23",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/task-info.yaml"
+    },
+    {
+      "target": "observability/first-slice/safe-events/task.md",
+      "sha256": "263cd2e4a5f0bc263fe0d8e8e432eae5ef7d9af837a39fc2b36618324896702d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/task.md"
+    },
+    {
+      "target": "observability/first-slice/safe-events/test/labs/observability/ExporterFailureTest.java",
+      "sha256": "8763e46ca65f54d85e6fd10d3312a06dde4b4a573bded0099f67d1dab3ced33e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/test/labs/observability/ExporterFailureTest.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/test/labs/observability/HttpCallChainTest.java",
+      "sha256": "2aed0f4e327e87b4331a499e4f1cd06eaefb48bc0409b3a0abc1ded09a740632",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/test/labs/observability/HttpCallChainTest.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/test/labs/observability/RequestMetricsTest.java",
+      "sha256": "0846d4aa93de280292e0707f7b07b3ed6e153f3c05f0f0535f10e023e9efe340",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/test/labs/observability/RequestMetricsTest.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/test/labs/observability/SafeEventsTest.java",
+      "sha256": "286e2c9ff0c96ee8e970487977f7543ae669bdbe16cb3fcd9aed4b112f093f8d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/test/labs/observability/SafeEventsTest.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/test/labs/observability/TelemetryEndpointTest.java",
+      "sha256": "f434e7077828972e4dec005e2a32184efb8b399823cacca96c2bc2a72091f776",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/test/labs/observability/TelemetryEndpointTest.java"
+    },
+    {
+      "target": "observability/first-slice/safe-events/test/labs/observability/TraceBridgeTest.java",
+      "sha256": "6886712aa3c5394dbd8fe1b98c3a57e97b431d50ed6fe42ee2cc18824b5d6197",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/safe-events/test/labs/observability/TraceBridgeTest.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/answers/reference-map/TraceBridge.java",
+      "sha256": "d31e47c9452a3489cf53905c5441436c4a693dce1844ef9d89e0f2619dd87109",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/answers/reference-map/TraceBridge.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/answers/reference-typed/TraceBridge.java",
+      "sha256": "ad98b581584be6f7f230260af76404fdc1313db90f66d73145c1174139cde705",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/answers/reference-typed/TraceBridge.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/solution.md",
+      "sha256": "839cbef29fd3039b4e770c22c68155b41789ad477628997ee33c3e1cbfc63b01",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/solution.md"
+    },
+    {
+      "target": "observability/first-slice/trace-context/source-guide.md",
+      "sha256": "00c1562e3ec146c75afe7f01b567b94aaf5fc7baa27c1553e18caf85934c18a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/source-guide.md"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/CheckoutController.java",
+      "sha256": "1ea5b9facc436617ff48ca5412c8d4ae14c6ca00ba3369261c4e64e3014daef5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/CheckoutController.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/EventSink.java",
+      "sha256": "e9291ee1013f3018ed0a3e0be98a82a2f0282aa113a8d5a484e26eb17e6fca6e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/EventSink.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/InventoryController.java",
+      "sha256": "3c7b0e083c153fe54e8aa5f0cf72eb7808c56f7edd55f39b908f353f89fd7bea",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/InventoryController.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/ObservabilityApplication.java",
+      "sha256": "588de2a5ab302f7d7fb93040127d99ba20ec8df5e27f0c213a7d64554ddf610b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/ObservabilityApplication.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/ReadyController.java",
+      "sha256": "bfd650ca93f46b3d9f5eb209e65b1aad292b6145a346387213c1540c0a9335a0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/ReadyController.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/RequestMetrics.java",
+      "sha256": "6e1dad128093735596ee7ea772f899848df6960dff52c30827ee289eba0374b5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/RequestMetrics.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/Routes.java",
+      "sha256": "dd405847f8253c9fbb03374ea86bda8ebe80dd00616d7a2bb1ad4fe88a4a36fe",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/Routes.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/SafeEvents.java",
+      "sha256": "dc456463fa76dff2609116f804dc9d19abf27ee8c1a2e5490e5b3a2430244175",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/SafeEvents.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/Telemetry.java",
+      "sha256": "e1a14c189913fca1850d145c88d4aa7e552b9946a87d4ca87a4b3f8d2a06b7e7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/Telemetry.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/TelemetryFilter.java",
+      "sha256": "108bd1e38f9a65cbb830b00fbe37af8c725a49d1853341521981177606935cdd",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/TelemetryFilter.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/TraceBridge.java",
+      "sha256": "d31e47c9452a3489cf53905c5441436c4a693dce1844ef9d89e0f2619dd87109",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/TraceBridge.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/src/labs/observability/Usage.java",
+      "sha256": "fd95db0a4ddea49af5bfbece6cbdf75011ea8565d242598874b54a9cbec80adf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/src/labs/observability/Usage.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/task-info.yaml",
+      "sha256": "1b30d327a00c4e5abbf6fdad1efaa6b5c5a5fa72f582ebf14fb1b17ab669e0a4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/task-info.yaml"
+    },
+    {
+      "target": "observability/first-slice/trace-context/task.md",
+      "sha256": "461a41c16798cc988fc75e4ea7f2ae74a3cec151eb08dcfec0e7eb3ff3e485d1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/task.md"
+    },
+    {
+      "target": "observability/first-slice/trace-context/test/labs/observability/ExporterFailureTest.java",
+      "sha256": "8763e46ca65f54d85e6fd10d3312a06dde4b4a573bded0099f67d1dab3ced33e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/test/labs/observability/ExporterFailureTest.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/test/labs/observability/HttpCallChainTest.java",
+      "sha256": "2aed0f4e327e87b4331a499e4f1cd06eaefb48bc0409b3a0abc1ded09a740632",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/test/labs/observability/HttpCallChainTest.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/test/labs/observability/RequestMetricsTest.java",
+      "sha256": "0846d4aa93de280292e0707f7b07b3ed6e153f3c05f0f0535f10e023e9efe340",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/test/labs/observability/RequestMetricsTest.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/test/labs/observability/SafeEventsTest.java",
+      "sha256": "286e2c9ff0c96ee8e970487977f7543ae669bdbe16cb3fcd9aed4b112f093f8d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/test/labs/observability/SafeEventsTest.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/test/labs/observability/TelemetryEndpointTest.java",
+      "sha256": "f434e7077828972e4dec005e2a32184efb8b399823cacca96c2bc2a72091f776",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/test/labs/observability/TelemetryEndpointTest.java"
+    },
+    {
+      "target": "observability/first-slice/trace-context/test/labs/observability/TraceBridgeTest.java",
+      "sha256": "6886712aa3c5394dbd8fe1b98c3a57e97b431d50ed6fe42ee2cc18824b5d6197",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/first-slice/trace-context/test/labs/observability/TraceBridgeTest.java"
+    },
+    {
+      "target": "observability/section-info.yaml",
+      "sha256": "dae662f2ab5934da71dc6b1705d3886240756a0ca069b76276cb0f54f9199286",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/observability/section-info.yaml"
+    },
+    {
+      "target": "go-course/core/greeting/build.gradle.fragment",
+      "sha256": "9a0fda675b5c270bf0ed3f4fad0c9bcb928de3f61c94df30771c2ba185d26403",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/build.gradle.fragment"
+    },
+    {
+      "target": "go-course/core/greeting/go/answers/explicit.go.txt",
+      "sha256": "2bb4b4b7ce91335e123b80bb4ddb584d93f684f4839533e4f5a21b3485d25c77",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/answers/explicit.go.txt"
+    },
+    {
+      "target": "go-course/core/greeting/go/answers/helpers.go.txt",
+      "sha256": "275b564d4816cb68a12ee3800f8f578ffa2abab076de2735df0248b3ecbcee17",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/answers/helpers.go.txt"
+    },
+    {
+      "target": "go-course/core/greeting/go/cmd/hello/main.go",
+      "sha256": "a54d8a65455329b5f5009dd7b3a47b994f657af1bc5d6d835ed7ee8ad3b4bcb9",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/cmd/hello/main.go"
+    },
+    {
+      "target": "go-course/core/greeting/go/cmd/hello/main_process_test.go",
+      "sha256": "40d30af37320338fffe3340c4308a533f6c3feed578163534cc96cbee69b65e5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/cmd/hello/main_process_test.go"
+    },
+    {
+      "target": "go-course/core/greeting/go/cmd/hello/main_test.go",
+      "sha256": "e7deb03077db2c68be8b5db628ca11e161e3d27ae37e752380a8ce2d440425e8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/cmd/hello/main_test.go"
+    },
+    {
+      "target": "go-course/core/greeting/go/contract_test.go",
+      "sha256": "f2023709f0d06f12837ef5213a2962fc88e4cd1596c1d288316f9bde68b88a0c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/contract_test.go"
+    },
+    {
+      "target": "go-course/core/greeting/go/diagrams/flow.dot",
+      "sha256": "d78eaf7afff17604cb8c77886c565f48684b8d04ebcca7dc63a53f7d1d53f1d9",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/diagrams/flow.dot"
+    },
+    {
+      "target": "go-course/core/greeting/go/diagrams/flow.png",
+      "sha256": "2157643181ea1fee57626850a643c64e231bca9f9215705ec86ed9eb01d0029f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/diagrams/flow.png"
+    },
+    {
+      "target": "go-course/core/greeting/go/diagrams/flow.svg",
+      "sha256": "e3145522642d9754b1be5332095c47a6ab7f526fefeed717d9536d0f8bcd0ec3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/diagrams/flow.svg"
+    },
+    {
+      "target": "go-course/core/greeting/go/exercise.go",
+      "sha256": "2bb4b4b7ce91335e123b80bb4ddb584d93f684f4839533e4f5a21b3485d25c77",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/exercise.go"
+    },
+    {
+      "target": "go-course/core/greeting/go/go.mod",
+      "sha256": "047e4ef63f388988724efa50b94e9a86a1d0db6aaaf075cb58112839a6c36797",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/go.mod"
+    },
+    {
+      "target": "go-course/core/greeting/go/wrong-solutions/constant.go.txt",
+      "sha256": "1b40f0b87f65713299ea55b40955391cdfd0dc9c74d6adb704be56390aad8d5b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/wrong-solutions/constant.go.txt"
+    },
+    {
+      "target": "go-course/core/greeting/go/wrong-solutions/empty-not-guest.go.txt",
+      "sha256": "d69f12d1a78d9395d9e8f5d19170a66ae6831d530832a397841e82a54a0bdb0d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/wrong-solutions/empty-not-guest.go.txt"
+    },
+    {
+      "target": "go-course/core/greeting/go/wrong-solutions/no-trim.go.txt",
+      "sha256": "eddec9d3d18e2517de0f1f2533529f013929f6ed25f7645c229456285f1cb45e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/wrong-solutions/no-trim.go.txt"
+    },
+    {
+      "target": "go-course/core/greeting/go/源码定位.md",
+      "sha256": "35791c33d83db82c8cbdc3f7973066030fecb481e83212b1458a021de8710698",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/go/源码定位.md"
+    },
+    {
+      "target": "go-course/core/greeting/src/GoTestBridge.java",
+      "sha256": "2db9548080ec562ef633b9732792e3363c95a233b82b18ac6fa5c001fcb5401c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/src/GoTestBridge.java"
+    },
+    {
+      "target": "go-course/core/greeting/task-info.yaml",
+      "sha256": "351f3fd49ff707f56379c3d3ecfa129b1b546f6567c28eb7460bc2e71476bead",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/task-info.yaml"
+    },
+    {
+      "target": "go-course/core/greeting/task.md",
+      "sha256": "71bb065826dfed5de417aec3850d3ffce0a5d4d28944d3296431896d631dae93",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/task.md"
+    },
+    {
+      "target": "go-course/core/greeting/test/GoContractTest.java",
+      "sha256": "4b7dfdcb130bdd696bcbb55aa74261975b1292fd401ece1dfb46f5a70d3db8c7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/test/GoContractTest.java"
+    },
+    {
+      "target": "go-course/core/greeting/test/GoTestBridgeTest.java",
+      "sha256": "ea322d3fb6ebdcc6ef77c57532552edfc11ef83cf68967f3527f351980a4b0a6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/greeting/test/GoTestBridgeTest.java"
+    },
+    {
+      "target": "go-course/core/order-total/build.gradle.fragment",
+      "sha256": "9a0fda675b5c270bf0ed3f4fad0c9bcb928de3f61c94df30771c2ba185d26403",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/build.gradle.fragment"
+    },
+    {
+      "target": "go-course/core/order-total/go/answers/checked.go.txt",
+      "sha256": "38a7b1db7dc966781f0847a03c03c226cd535efc7da3f74cf44939dcd9a992ab",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/answers/checked.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/answers/explicit.go.txt",
+      "sha256": "bf08c4b659c72c8a3da4574dab4ffe12dc055e17df6e27b6f81edabc4c065ba1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/answers/explicit.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/cmd/order/main.go",
+      "sha256": "03d2ae12c8246a4437dad4c9a7b607b65d807f0a9a866c798884e1b850f8b1c6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/cmd/order/main.go"
+    },
+    {
+      "target": "go-course/core/order-total/go/cmd/order/main_process_test.go",
+      "sha256": "37b830504b18135efb673fe513075e4055b09f4e450d181b895c20e0c1cf3d34",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/cmd/order/main_process_test.go"
+    },
+    {
+      "target": "go-course/core/order-total/go/cmd/order/main_test.go",
+      "sha256": "68547adccbdc143b1d8fc1954d241e7081c9b33fce30b56c03e9a14c04347afc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/cmd/order/main_test.go"
+    },
+    {
+      "target": "go-course/core/order-total/go/contract_test.go",
+      "sha256": "072160582bcb873019237664f585bfb862e1fd1f5c66230954ecde1a1c6767d9",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/contract_test.go"
+    },
+    {
+      "target": "go-course/core/order-total/go/diagrams/flow.dot",
+      "sha256": "7e651570b6e1812cad956d6a84225a95ae092af1455b04a5564c7c9ff827e4f3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/diagrams/flow.dot"
+    },
+    {
+      "target": "go-course/core/order-total/go/diagrams/flow.png",
+      "sha256": "be486a065d66cbd851426a0385d965da9a49a7100a161c347304338e0eb2f21e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/diagrams/flow.png"
+    },
+    {
+      "target": "go-course/core/order-total/go/diagrams/flow.svg",
+      "sha256": "03ed8ac2c480a53fa84c5351db41fe726d54864ea6a114d2ea7f6ea876c6cf65",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/diagrams/flow.svg"
+    },
+    {
+      "target": "go-course/core/order-total/go/exercise.go",
+      "sha256": "bf08c4b659c72c8a3da4574dab4ffe12dc055e17df6e27b6f81edabc4c065ba1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/exercise.go"
+    },
+    {
+      "target": "go-course/core/order-total/go/go.mod",
+      "sha256": "117111ce425e7a15b444bd86589102ba511e199600610a0d718a8c774716c961",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/go.mod"
+    },
+    {
+      "target": "go-course/core/order-total/go/wrong-solutions/copy-line-reset.go.txt",
+      "sha256": "8cff81c9f43ba9d94ad5575dbfbbe5241c0d69efd5320408406dc5d4c5a68c53",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/wrong-solutions/copy-line-reset.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/wrong-solutions/float-money.go.txt",
+      "sha256": "4cba8b2834a80c075d2c76ebe456154121d7a2eb44bff464f2a0057e9f89627e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/wrong-solutions/float-money.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/wrong-solutions/mutate-shared.go.txt",
+      "sha256": "2e89200e1b9bc5862e83d3ac80c1bbe08af4c1d11d607a7beac5ee3e9b011c34",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/wrong-solutions/mutate-shared.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/wrong-solutions/prevalidate-all-first.go.txt",
+      "sha256": "e7ccf3fac1de14444a262e1aa787e88cbef583b5d17dbce5dcc001d2759d84c4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/wrong-solutions/prevalidate-all-first.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/wrong-solutions/unchecked.go.txt",
+      "sha256": "1edc0feb87f1bf33f059a60e878b7168c9b8f7755a7f47e1f3c3eb376b1d03bf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/wrong-solutions/unchecked.go.txt"
+    },
+    {
+      "target": "go-course/core/order-total/go/源码定位.md",
+      "sha256": "35791c33d83db82c8cbdc3f7973066030fecb481e83212b1458a021de8710698",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/go/源码定位.md"
+    },
+    {
+      "target": "go-course/core/order-total/src/GoTestBridge.java",
+      "sha256": "b158d5ff77fc46d389c7e56ebee191e7c0259cad9042bbbaea724cf7ee1879b0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/src/GoTestBridge.java"
+    },
+    {
+      "target": "go-course/core/order-total/task-info.yaml",
+      "sha256": "c4e53230d9ad7d641a87a42a8db6fe7acf48b38da4863ed188f128e7ea9f16b2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/task-info.yaml"
+    },
+    {
+      "target": "go-course/core/order-total/task.md",
+      "sha256": "c969c527a7b548d3285ef3d7d492452f5101a4345080c0bd77dea090438f275f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/task.md"
+    },
+    {
+      "target": "go-course/core/order-total/test/GoContractTest.java",
+      "sha256": "4b7dfdcb130bdd696bcbb55aa74261975b1292fd401ece1dfb46f5a70d3db8c7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/test/GoContractTest.java"
+    },
+    {
+      "target": "go-course/core/order-total/test/GoTestBridgeTest.java",
+      "sha256": "ea322d3fb6ebdcc6ef77c57532552edfc11ef83cf68967f3527f351980a4b0a6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/order-total/test/GoTestBridgeTest.java"
+    },
+    {
+      "target": "go-course/core/quantity/build.gradle.fragment",
+      "sha256": "9a0fda675b5c270bf0ed3f4fad0c9bcb928de3f61c94df30771c2ba185d26403",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/build.gradle.fragment"
+    },
+    {
+      "target": "go-course/core/quantity/go/answers/manual.go.txt",
+      "sha256": "de98ad856742f7a15c85e90299e717c516373d072fa501d0ab369a9f6a9e9a3f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/answers/manual.go.txt"
+    },
+    {
+      "target": "go-course/core/quantity/go/answers/stdlib.go.txt",
+      "sha256": "1cff46499dfb4b84573a0655e30522a82a470df63f1a4a3c053d976f2bdfc667",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/answers/stdlib.go.txt"
+    },
+    {
+      "target": "go-course/core/quantity/go/cmd/quantity/main.go",
+      "sha256": "1e1a386ccf673dd6bc004e86ad98bc5651f4c3227da3c8684f8561121993548e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/cmd/quantity/main.go"
+    },
+    {
+      "target": "go-course/core/quantity/go/cmd/quantity/main_process_test.go",
+      "sha256": "ee0038c2a38a38748a6411b1484b2b311222846bb8da5f1f78a1eef3b234d59a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/cmd/quantity/main_process_test.go"
+    },
+    {
+      "target": "go-course/core/quantity/go/cmd/quantity/main_test.go",
+      "sha256": "e7f114bf3a064e01ffaf691de63d71f4a199e3a13aac3623d7d34fe027b11de4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/cmd/quantity/main_test.go"
+    },
+    {
+      "target": "go-course/core/quantity/go/contract_test.go",
+      "sha256": "58f468cb43b09577767b998d12b7ce9e037a541d100f232572204829dad035bf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/contract_test.go"
+    },
+    {
+      "target": "go-course/core/quantity/go/diagrams/flow.dot",
+      "sha256": "82449f0aac2a08964944fdd9c36b058a43897399e84443bbf6ee15a7fbbc0d43",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/diagrams/flow.dot"
+    },
+    {
+      "target": "go-course/core/quantity/go/diagrams/flow.png",
+      "sha256": "4e2dccc2a15877e2a19dab12b6c28926bb48185dddbd04e0366f4e508108def5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/diagrams/flow.png"
+    },
+    {
+      "target": "go-course/core/quantity/go/diagrams/flow.svg",
+      "sha256": "90700375f55530d49cd875e8400a95b5a60382faf72bd57dc92d548c83169be3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/diagrams/flow.svg"
+    },
+    {
+      "target": "go-course/core/quantity/go/exercise.go",
+      "sha256": "1cff46499dfb4b84573a0655e30522a82a470df63f1a4a3c053d976f2bdfc667",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/exercise.go"
+    },
+    {
+      "target": "go-course/core/quantity/go/go.mod",
+      "sha256": "8c18e7001b6488b3f65ba176b00ef332b87f58046d3b99b8ebd031e253c671bf",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/go.mod"
+    },
+    {
+      "target": "go-course/core/quantity/go/wrong-solutions/accept-plus.go.txt",
+      "sha256": "a0d70cc068825c9272b54ea36ebd0e4e166fd820d60aea444f6000bedebf223a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/wrong-solutions/accept-plus.go.txt"
+    },
+    {
+      "target": "go-course/core/quantity/go/wrong-solutions/empty-is-one.go.txt",
+      "sha256": "b0ae604b1d85fa5d24f388a5974b6cbd5d055a65a3297e7acd1f5f8295155761",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/wrong-solutions/empty-is-one.go.txt"
+    },
+    {
+      "target": "go-course/core/quantity/go/wrong-solutions/ignore-error.go.txt",
+      "sha256": "a19b8f87543a562fde5de91980ff40d5ac32f681ca78b1317c03e1c23b97571c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/wrong-solutions/ignore-error.go.txt"
+    },
+    {
+      "target": "go-course/core/quantity/go/wrong-solutions/overflow-zero.go.txt",
+      "sha256": "00eac39bc7ee5c444a2c6ed0d936565d9ec64b798592c99dee0d696a7fc654ab",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/wrong-solutions/overflow-zero.go.txt"
+    },
+    {
+      "target": "go-course/core/quantity/go/源码定位.md",
+      "sha256": "35791c33d83db82c8cbdc3f7973066030fecb481e83212b1458a021de8710698",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/go/源码定位.md"
+    },
+    {
+      "target": "go-course/core/quantity/src/GoTestBridge.java",
+      "sha256": "e732ca7f4be14dbb74a34102408d759808f4d714b2a6bf36e2ea96a1a568fcdc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/src/GoTestBridge.java"
+    },
+    {
+      "target": "go-course/core/quantity/task-info.yaml",
+      "sha256": "f1dee5769b7a9e67d9968fdec4f7c30455c67daaf09c513a307d154afa0adbdc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/task-info.yaml"
+    },
+    {
+      "target": "go-course/core/quantity/task.md",
+      "sha256": "37c463ab4bda8c431015bda2cf107ec5151cbac675818463179a6d638e63a6e0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/task.md"
+    },
+    {
+      "target": "go-course/core/quantity/test/GoContractTest.java",
+      "sha256": "4b7dfdcb130bdd696bcbb55aa74261975b1292fd401ece1dfb46f5a70d3db8c7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/test/GoContractTest.java"
+    },
+    {
+      "target": "go-course/core/quantity/test/GoTestBridgeTest.java",
+      "sha256": "ea322d3fb6ebdcc6ef77c57532552edfc11ef83cf68967f3527f351980a4b0a6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/quantity/test/GoTestBridgeTest.java"
+    },
+    {
+      "target": "go-course/core/snapshot/build.gradle.fragment",
+      "sha256": "eaa5d9cec11390339f679c0584a9cd1fd3cd50b2747b3a0028e607fff30ac8aa",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/build.gradle.fragment"
+    },
+    {
+      "target": "go-course/core/snapshot/go/answers/explicit.go.txt",
+      "sha256": "c2033149cb6746d01c219143afd546eeb80628bce91771f65699ce27dcbb3a3f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/answers/explicit.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/answers/helpers.go.txt",
+      "sha256": "f9cf71fbb65349db9574b46e03e0aa442c296746a0483839f9c2a0ebc5b457e7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/answers/helpers.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/answers/local-helpers.go.txt",
+      "sha256": "edacfa10f76357683e6c52005380d9c3a1064992a73f0fbe17c912726e229295",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/answers/local-helpers.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/answers/migration/view.go.txt",
+      "sha256": "bb3d2fc0b167414529ad487cf53a87d21deeb07cd2e4de8991dced5a67871096",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/answers/migration/view.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/answers/migration/view_test.go.txt",
+      "sha256": "dc51c839c292830c1818a7c2cb37a5ba70e092faeeaf08a88206a043d30c215c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/answers/migration/view_test.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/cmd/demo/main.go",
+      "sha256": "ef03d2ae50657f2fbbef747b9e153a44ad77a2618a7eb5bbf26d2ad9241975f6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/cmd/demo/main.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/cmd/demo/main_test.go",
+      "sha256": "9edef17c9e02dd29907e94543f4d4773f90a55acc879d8c0497502d1a014337b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/cmd/demo/main_test.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/cmd/observe/main.go",
+      "sha256": "6438533bde76089726dcf2539e9ebc16267b4de78621ffc2a83fdc89c345b681",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/cmd/observe/main.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/cmd/observe/main_test.go",
+      "sha256": "6819ea7f4b1bc2609cfa89e9b0c46aafe814c10325f9b3553bcbe7db66d5a84c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/cmd/observe/main_test.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/demo.go",
+      "sha256": "257da8f35b90433835332227828fb61dcab0d2efea643befd2a066719af72470",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/demo.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/diagrams/ownership.dot",
+      "sha256": "49163d8bd79f3e11c1a97729268d15193a398fef09a07b85c6c5b3f94ac33c0b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/diagrams/ownership.dot"
+    },
+    {
+      "target": "go-course/core/snapshot/go/diagrams/ownership.png",
+      "sha256": "8a76704ca7a254bd36bdd416be19c8ddf13beb9bfb8c89afa787a94fa811af7d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/diagrams/ownership.png"
+    },
+    {
+      "target": "go-course/core/snapshot/go/diagrams/ownership.svg",
+      "sha256": "b1a911e32da2f7866dffea2363d6fa780a3e05672022cd65abb83e891e79fc3d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/diagrams/ownership.svg"
+    },
+    {
+      "target": "go-course/core/snapshot/go/docs/提示与答案.md",
+      "sha256": "f1577c0c4222b4dcb9ae284f9b7e0f57082f31509d450672c7851eb69e527b8e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/docs/提示与答案.md"
+    },
+    {
+      "target": "go-course/core/snapshot/go/docs/源码定位与官方来源.md",
+      "sha256": "49087eedc6d74820259b5a1a9d7ce50a4dbd81409880d62d79411bc7d721f28a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/docs/源码定位与官方来源.md"
+    },
+    {
+      "target": "go-course/core/snapshot/go/docs/语法补课.md",
+      "sha256": "234bb0ee72f2e2e5f6ebf551f4f9b746c3a6b2a5f620795b9f0c1125a08340e0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/docs/语法补课.md"
+    },
+    {
+      "target": "go-course/core/snapshot/go/go.mod",
+      "sha256": "0fd7c244e8fe59d6bccd452986087d9e8820fa4fdf683f01be83169da033e8ed",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/go.mod"
+    },
+    {
+      "target": "go-course/core/snapshot/go/model.go",
+      "sha256": "dfe10eb88be2eb6095d320fa2dbad3f33edd4e665b249e41d72fe268664b2c08",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/model.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/snapshot.go",
+      "sha256": "c2033149cb6746d01c219143afd546eeb80628bce91771f65699ce27dcbb3a3f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/snapshot.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/snapshot_test.go",
+      "sha256": "1cd0d41fb77cb46da4bd28a403ed9abe4c7bc0063093f8d63c2b13e9e41ac196",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/snapshot_test.go"
+    },
+    {
+      "target": "go-course/core/snapshot/go/task.md",
+      "sha256": "bcaa57119db0f252a2f7304e4f16fb79dd47b0a0fe69d90f8c9cbbf6e1265437",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/task.md"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/drop-fields.go.txt",
+      "sha256": "238079f09fcb65822a9179d1287d38cbfe348c4eb8aebb8dcc427a225775b70c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/drop-fields.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/empty-to-nil.go.txt",
+      "sha256": "23ce9e288d919ccee3671c5b99006faf06406289ea5e9b6c4e26f8d6af2cfef7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/empty-to-nil.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/missing-map.go.txt",
+      "sha256": "fd31119b8a3b68450a848f55b83d34a3e35adfd25de0578402545fdefd1b832b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/missing-map.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/missing-tags.go.txt",
+      "sha256": "2faaaafb717a21b8cfe91371556ec33ec5843ab36c52414fb55c2dff8a874648",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/missing-tags.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/mutate-source.go.txt",
+      "sha256": "296457fea263a9166bee0506925006cee9ef3a14dc8241a1de6fdc41bd70ceb5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/mutate-source.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/return-alias.go.txt",
+      "sha256": "55a595f920380103fdd41ee896142bb92766f7220238f7bf8cd1283320219ce7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/return-alias.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/reverse-order.go.txt",
+      "sha256": "2d18c4a1eb00c7d8ead2115564ab593ca3bb8b396c06fe00725262908b17bbc6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/reverse-order.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/go/wrong-solutions/shallow-only.go.txt",
+      "sha256": "4bea41bad26087f7d1b5a28fb3937593962da8d853e2c3dcb04ab0b50c709e97",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/go/wrong-solutions/shallow-only.go.txt"
+    },
+    {
+      "target": "go-course/core/snapshot/src/GoTestBridge.java",
+      "sha256": "471cfcd0143c905593bb0e599e1a098aea31d9d64754fc393e7aebc38d8a38b6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/src/GoTestBridge.java"
+    },
+    {
+      "target": "go-course/core/snapshot/task-info.yaml",
+      "sha256": "15caa0572753ff1d8379c45dbd76cac77362b8b2a921bccab696588726badad4",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/task-info.yaml"
+    },
+    {
+      "target": "go-course/core/snapshot/task.md",
+      "sha256": "c1545940bd115551abce5c00a85486670a9ab50252656e57c8e7234f72720dbd",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/task.md"
+    },
+    {
+      "target": "go-course/core/snapshot/test/GoContractTest.java",
+      "sha256": "ae1e06366dd2717f0f268c900a567c9bf04cdbaf59f32072ff743dfdd208ab0b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/test/GoContractTest.java"
+    },
+    {
+      "target": "go-course/core/snapshot/test/GoTestBridgeTest.java",
+      "sha256": "22cd27de535b5bb6abf6fc803bdef5a500640b37501574e16a8f6705d87fff53",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/go-course/core/snapshot/test/GoTestBridgeTest.java"
+    },
+    {
+      "target": "identity/01-policy/lab/gradle.lockfile",
+      "sha256": "1f91c1662aa8ffa6bf5423cb507ab520647793944e1eb886033c63b8ceae85b1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/gradle.lockfile"
+    },
+    {
+      "target": "identity/01-policy/lab/mutants/admin-any-action/Policy.java",
+      "sha256": "35788a894ab965a9302321a4e57870d75c1f1c86d78d8f2b989229f273d61385",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/mutants/admin-any-action/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/mutants/empty-identifiers/Policy.java",
+      "sha256": "527a74569b5cec59ab776f20aadd034ebfa8215a047d2bb83f7ddcfaf9858160",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/mutants/empty-identifiers/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/mutants/missing-tenant-check/Policy.java",
+      "sha256": "d74e83bf7d998fc619cfd83f199631e66c47cbeea5fbb9c22e085953be299a4f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/mutants/missing-tenant-check/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/mutants/token-means-admin/Policy.java",
+      "sha256": "8b1cc4b9e5245dbe3b19577d69e23ee16722e603510cbb74558d3b88cab9eb85",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/mutants/token-means-admin/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/mutants/wrong-precedence/Policy.java",
+      "sha256": "b4ffc07212fc8685f85905cac2602e7e135930e00662adf36cb875d667765fd7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/mutants/wrong-precedence/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/mutants/wrong-reasons/Policy.java",
+      "sha256": "1353d26fd49aec3672d040c776fd1cb337a75aeffbd7879fb9218846b6b3a2fe",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/mutants/wrong-reasons/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/reference/explicit/Policy.java",
+      "sha256": "5fa2f6ec17cfe81551cb575da7667c34a4392367bc9387a5379c2a840ad974da",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/reference/explicit/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/reference/table/Policy.java",
+      "sha256": "50529a83ee26f43589238846126be0e3606da733e9648c05f3684e232207987d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/reference/table/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/src/labs/identity/Policy.java",
+      "sha256": "4ff71da32fa7a38e225849646a887249870ea34a0a89778d1eb5742dc6741e33",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/src/labs/identity/Policy.java"
+    },
+    {
+      "target": "identity/01-policy/lab/src/labs/identity/Usage.java",
+      "sha256": "7d0a70b41f635e049bc9166d6f0557bfdf6ddb05b4955a4aec0f0251e8921097",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/src/labs/identity/Usage.java"
+    },
+    {
+      "target": "identity/01-policy/lab/task-info.yaml",
+      "sha256": "8a5be9ae0d2c530f9bfa247202448d0e1e6273c978f8a7e1322d461e8345fe15",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/task-info.yaml"
+    },
+    {
+      "target": "identity/01-policy/lab/task.md",
+      "sha256": "c37df36acb997012cc45ebde80896aca3dbdd58904cbff58a7da9b7461de92b2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/task.md"
+    },
+    {
+      "target": "identity/01-policy/lab/test/labs/identity/PolicyTest.java",
+      "sha256": "57dcb3003112a55f8540a1f13f3c0e68fb1daee2540e051c8f687da2b9dab736",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/test/labs/identity/PolicyTest.java"
+    },
+    {
+      "target": "identity/01-policy/lab/答案.md",
+      "sha256": "39b7bf49c78dc423585c6ee73dc5b5b08538e0870f39b44b4e7446aaadb1bae0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/答案.md"
+    },
+    {
+      "target": "identity/01-policy/lab/资料/identity-call-chain.svg",
+      "sha256": "98470136dcfd9a5df18693e950f400ac22e2d55cdfafa2a44c21e4a874a7fefa",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/资料/identity-call-chain.svg"
+    },
+    {
+      "target": "identity/01-policy/lab/资料/先修与身份概念卡.md",
+      "sha256": "2338af50df94ba9f9cca28f9988ba12971f68b8140f4b2d79c8485e5fd933ad6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/资料/先修与身份概念卡.md"
+    },
+    {
+      "target": "identity/01-policy/lab/资料/协议与版本核查.md",
+      "sha256": "beb6eb5569fb625b4437a3d8745899d75dd60932681e4ce47fa3741c9b78e48d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/资料/协议与版本核查.md"
+    },
+    {
+      "target": "identity/01-policy/lab/资料/源码锚点与面试迁移.md",
+      "sha256": "0634b572b49a3a5af46ba1ce80525047a956630195b09f65745769b8dabfc720",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/资料/源码锚点与面试迁移.md"
+    },
+    {
+      "target": "identity/01-policy/lab/资料/调用链与排错.md",
+      "sha256": "e51b1e058810491875a844172eaba4656f695bec94bdffcda7692c6d6af8e0a5",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lab/资料/调用链与排错.md"
+    },
+    {
+      "target": "materials/identity/identity-lab/gradle.lockfile",
+      "sha256": "e9ba38009bbf248b5e5c697d572ab96c1c05b7fa9e5c95ab806a14d581013ff2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/gradle.lockfile"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/java/labs/identity/IdentityApplication.java",
+      "sha256": "8d4ed86cf3248adebeef63dcb68b69baf6d49c699ca025ba68b23da61eb0038b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/java/labs/identity/IdentityApplication.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/java/labs/identity/IdentityTokenDecoder.java",
+      "sha256": "8ed9c0ca0c7bc6eadac7dc396abfe9edea0bfb3b2a206e5f5dca8bc5a0953231",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/java/labs/identity/IdentityTokenDecoder.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/java/labs/identity/LdapSafety.java",
+      "sha256": "6427ed4f9b117ebd60177d3c8cff7ef6a19d1691d1cf743391d6182b48a486c1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/java/labs/identity/LdapSafety.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/java/labs/identity/OrderController.java",
+      "sha256": "e8e3088d1120bb0137d826c4763f0edd32ffe03b7a8ee92030d26769e07257df",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/java/labs/identity/OrderController.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/java/labs/identity/SecurityConfig.java",
+      "sha256": "fe7173ed561fa50d291ff619ee67f4285b5e12744fd28e16cba41db6a0ef4726",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/java/labs/identity/SecurityConfig.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/java/labs/identity/TrustedSubject.java",
+      "sha256": "cd610ff6f313a0ef3f30ef11130b1063f254d67fd94c823f0a1cafbfb273a0f1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/java/labs/identity/TrustedSubject.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/resources/application-fixture.properties",
+      "sha256": "d5cba8a0bd6e073bb1bced0a3ea3ef868d7aeb5d86a5debe9d19b38d5ad162c0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/resources/application-fixture.properties"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/resources/application.properties",
+      "sha256": "637e25d9e3da48c602125df376d9849643e62471d6248cc0fc841284d49b4d40",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/resources/application.properties"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/resources/static/app.js",
+      "sha256": "79a49fbc8253cf3667e0bc2fcadec9fe38541fd1fbbd0befb47238d5f59b15d1",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/resources/static/app.js"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/resources/static/index.html",
+      "sha256": "b86e163a426141520e2f63995032d8d826b8046257cdd573ec94b83e7b21f989",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/resources/static/index.html"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/main/resources/static/style.css",
+      "sha256": "c07f2af0c4e895cfb9df50f7a0cf1f19f7680ec38b96228f0d105a1314090fd6",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/main/resources/static/style.css"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityHttpTest.java",
+      "sha256": "4ab3d45bb2f065efd872a98f1be3f15f0310d8251e472e256afd21620e0d99fc",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/java/labs/identity/IdentityHttpTest.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityNetworkTest.java",
+      "sha256": "40ba2af502c5c9efa5431ae9e9d0dd3467e79b747fd0311624ac2ba89af816f2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/java/labs/identity/IdentityNetworkTest.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityTokenDecoderTest.java",
+      "sha256": "9f3423b837aef06d40eb57dbec5c87bae954cdd557c4b97497eb7a0b3559ed0d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/java/labs/identity/IdentityTokenDecoderTest.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/java/labs/identity/LdapSafetyTest.java",
+      "sha256": "f0be5412e2fb9e1fa4ea52fa028215dc78b1792780bace123ffee007e91ad045",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/java/labs/identity/LdapSafetyTest.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/java/labs/identity/ProductionPolicyOriginTest.java",
+      "sha256": "2ee05e84b0d6f81b71391a53ebb3f43d565a88b666c32f27285aa54807d7cf7b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/java/labs/identity/ProductionPolicyOriginTest.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/java/labs/identity/TokenFixture.java",
+      "sha256": "063a98eb3602e4d12ad2dd06fc1ab932e7f83253b293730adf68ccd8c9d1284b",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/java/labs/identity/TokenFixture.java"
+    },
+    {
+      "target": "materials/identity/identity-lab/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker",
+      "sha256": "8eca853a5a457f17e0479b71dfbe95f2a13aff9eeff250261ecdc8ca9b847a6a",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/materials/identity/identity-lab/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker"
+    },
+    {
+      "target": "go-course/section-info.yaml",
+      "sha256": "dbd225b4413a02f6a1257c55c1d7ba101bb250c3dcf40e651836a7e18ded0688",
+      "transformation": "explicit-metadata-composition",
+      "source": "authoring/unified-course/overlay/go-course/section-info.yaml"
+    },
+    {
+      "target": "go-course/core/lesson-info.yaml",
+      "sha256": "b47aa50a4c2360431dd1b7366b9c0b8c3e52646a1f340a34fd60957a40ed300d",
+      "transformation": "explicit-metadata-composition",
+      "source": "authoring/unified-course/overlay/go-course/core/lesson-info.yaml"
+    },
+    {
+      "target": "identity/section-info.yaml",
+      "sha256": "d082591633730b7eadbdbf7ae0f0bf03825679334b9cd6260afb59dcd2c9c384",
+      "transformation": "explicit-metadata-composition",
+      "source": "authoring/unified-course/overlay/identity/section-info.yaml"
+    },
+    {
+      "target": "identity/01-policy/lesson-info.yaml",
+      "sha256": "e27a229ed2b270ce09fc2faae0cafc8eecc41334be011bc50de0fbae9099183d",
+      "transformation": "explicit-metadata-composition",
+      "source": "authoring/unified-course/overlay/identity/01-policy/lesson-info.yaml"
+    },
+    {
+      "target": "authoring/integration-inputs/cloud-native/README.md",
+      "sha256": "02745d71b34024dafd50bd963edfe8ba27930aaf35f780b264a7ced8af4402f2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/cloud-native/README.md"
+    },
+    {
+      "target": "authoring/integration-inputs/cloud-native/task-map.json",
+      "sha256": "2b3f63e2b61eb363eaf0687c643d4a74afcad4fa9cca71c16417729cfe4c1a00",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/cloud-native/task-map.json"
+    },
+    {
+      "target": "authoring/integration-inputs/cloud-native/versions.env.additions",
+      "sha256": "8922a42c05557a8095eb8eafdd6eb5095be6f6165d3ebb35d3653985f43666cb",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/cloud-native/versions.env.additions"
+    },
+    {
+      "target": "authoring/integration-inputs/kubernetes/README.md",
+      "sha256": "a235324a9417520d4a5e83336fc7beee51f43c51842c12226feaca4bceaeabf8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/kubernetes/README.md"
+    },
+    {
+      "target": "authoring/integration-inputs/kubernetes/additional-files.json",
+      "sha256": "b3600313ad3adde203108316e49af9a83720ce4aa22d4ccba55fd751f5cd9da3",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/kubernetes/additional-files.json"
+    },
+    {
+      "target": "authoring/integration-inputs/kubernetes/kubernetes-task.gradle",
+      "sha256": "9ff4e314ff5fe7d9f2e254c68c8e7ef0b2eea5b62e4d0cd4fd818c7e0f65eb77",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/kubernetes/kubernetes-task.gradle"
+    },
+    {
+      "target": "authoring/integration-inputs/kubernetes/task-map.json",
+      "sha256": "73982c16b0e44b84aad0a0db7f3bb55419c4628377d015a800436e9542c2a86c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/kubernetes/task-map.json"
+    },
+    {
+      "target": "authoring/integration-inputs/kubernetes/versions.env.additions",
+      "sha256": "bde3c05ceb9cdda5621968624e3b84d17566fa687abecd8ad49f8dadafbc1621",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/kubernetes/versions.env.additions"
+    },
+    {
+      "target": "authoring/integration-inputs/go-foundations/go-foundations.gradle",
+      "sha256": "3ac4fd64104f220f2af27f31f7046d990532168cf918935594c9228ac5a59b03",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/go-foundations/go-foundations.gradle"
+    },
+    {
+      "target": "authoring/integration-inputs/go-foundations/settings.gradle.fragment",
+      "sha256": "4cb0f4f7abdc9d5a763db36d356c93cc7b8753be618a42516c185bd8c7da1c6d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/go-foundations/settings.gradle.fragment"
+    },
+    {
+      "target": "authoring/integration-inputs/go-snapshot/go-snapshot.gradle",
+      "sha256": "866f488b2ac1918ac15e241c6b92eef6e86c744d2b468309fb13d77154bc2194",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/go-snapshot/go-snapshot.gradle"
+    },
+    {
+      "target": "authoring/integration-inputs/go-snapshot/settings.gradle.fragment",
+      "sha256": "f9b22df8bd21aaa5633b5efdeb5e04d190e005a4c4ecbaf9e760634036a563f8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/go-snapshot/settings.gradle.fragment"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/build.gradle",
+      "sha256": "f5b78cafcfd66f11508c06c70f9e43fc8d6e70a8d749be3c84b2933ab054a34d",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/build.gradle"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/settings.gradle",
+      "sha256": "23bb384dd34d8f7814b5df26626338d6ae23336a0238c3dd67828c2d6b7480e0",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/settings.gradle"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/gradle.properties",
+      "sha256": "b671b03f1330489649048ef9b39d2b650cecc24c470f84d5743a4c98c0df468e",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/gradle.properties"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/gate-contract.json",
+      "sha256": "8aa63a50e08d11d216468c4b81f7066dac412d8926d9ee8693b5294226398c65",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/gate-contract.json"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/source_manifest.json",
+      "sha256": "f2e51d6255ff16a608a7a319fe8c6e93d152b0b761e72f629f1d188a0697375f",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/source_manifest.json"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/scripts/gate_receipts.gradle",
+      "sha256": "4abc0403fb360304c81222cab4d128002d0b26a3b44694b88310189cb51bafd8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/scripts/gate_receipts.gradle"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/scripts/owned_process.py",
+      "sha256": "7df04650ba87f28a7e7db103985a2c600fcb16eb3f17f402b365805e7c0067f8",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/scripts/owned_process.py"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/scripts/verify_ci.py",
+      "sha256": "fe1c70d381b77e5ba466eb6926972395a017b0bae3b5201388072af88e892a74",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/scripts/verify_ci.py"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/scripts/verify_finalizedby_gate.py",
+      "sha256": "cfc1cdb4309b5146675252570f6e4e1ae33590ef019e54ec39bc30cbe70b8186",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/scripts/verify_finalizedby_gate.py"
+    },
+    {
+      "target": "authoring/integration-inputs/identity/manifest/ci-variants.json",
+      "sha256": "cb515cf00982f5953a9de558fe8b78e24180f53bff3ece359a2c762a2407b3f2",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/authoring/integration-inputs/identity/manifest/ci-variants.json"
+    },
+    {
+      "target": "kafka/06-recovery/practice/src/test/resources/simplelogger.properties",
+      "sha256": "d77c71da07f13e1c21dfe0af0032bce0195557802142cb587bab73b7bc6d0de7",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/src/test/resources/simplelogger.properties"
+    },
+    {
+      "target": "kafka/06-recovery/practice/task-info.yaml",
+      "sha256": "9cec5c121f649a07eb8fc3a6e2be564616b0b482b85f9bcbd5f78bee69eadac9",
+      "previous_sha256": "4db494b89613fb220dbcba0828ba246d3c8fba41ba41bebcf24ced4a87242866",
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/task-info.yaml"
+    },
+    {
+      "target": "kafka/06-recovery/practice/task.md",
+      "sha256": "fcdba91406468da43f5f817b9210c045ffe3537c71db20499eb686061e879c2d",
+      "previous_sha256": "afe89bd6ce86895bbd060d26acc9052311087b7ed4e208d63636fb7d12bba2cc",
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/task.md"
+    },
+    {
+      "target": "kafka/06-recovery/practice/test/ReplicaEvidence.java",
+      "sha256": "7d0b9b1e9937fd5df607ab660b9b5038ef694b20309db967f79af0ee1f0a7ffe",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/test/ReplicaEvidence.java"
+    },
+    {
+      "target": "kafka/06-recovery/practice/test/ReplicaRecovery.java",
+      "sha256": "6450c570eb4f2d52d0ce8d54ca6434ebfa07fdd579ef66e2e14e2a8fa2c8312c",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/test/ReplicaRecovery.java"
+    },
+    {
+      "target": "kafka/06-recovery/practice/test/ReplicaRecoveryTest.java",
+      "sha256": "ab8e108289d131b3849928fe63ab7b6a1007b7f152de07a1e099a6c228f8a1af",
+      "previous_sha256": null,
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/test/ReplicaRecoveryTest.java"
+    },
+    {
+      "target": "kafka/06-recovery/practice/test/ReplicaTest.java",
+      "sha256": "53b2c15bdc7cf58910a498dc849f67cb7c9e9e48debd72eacdf8e2266b706256",
+      "previous_sha256": "90912c58e12127c9db9e46a9d78a93f8d3511ffae0073f2ae25b1cf903dbc2aa",
+      "transformation": "identity",
+      "source": "authoring/unified-course/overlay/kafka/06-recovery/practice/test/ReplicaTest.java"
+    }
+  ],
+  "source_role": "Historical assembly-stage hashes, retained for lineage; current exact source hashes are in the maintainer authoring/unified-course/manifest.json. Logical source locations refer to that maintained overlay.",
+  "reviewed_source_manifest_sha256": "4bf64648e4cfe1d022fe58d6773900dbb5f32b2c92cc33edf49a021573a29be2"
+}

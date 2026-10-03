@@ -1,0 +1,82 @@
+package lab
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"io"
+	"mime"
+	"net/http"
+	"strings"
+	"time"
+	"unicode/utf8"
+)
+
+// Fixed imports are shared by starter and answers. Production code keeps only used imports.
+var _ = []any{context.WithTimeout, json.NewDecoder, errors.As, io.EOF, mime.ParseMediaType, strings.TrimSpace, utf8.RuneCountInString}
+
+// DecodeInput enforces transport shape before any service side effect.
+func DecodeInput(w http.ResponseWriter, r *http.Request) (Input, *Problem) {
+	// BEGIN decode
+	media, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	if err != nil || media != "application/json" {
+		return Input{}, problem(415, "unsupported_media_type", "use application/json")
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, MaxBodyBytes)
+	decoder := json.NewDecoder(r.Body)
+	decoder.DisallowUnknownFields()
+	// Streaming policy: return the decoder-observed first error; invalid oversized
+	// input may be 400. Map 413 only when Decode returns a MaxBytesError. Do not drain.
+	var input Input
+	if err := decoder.Decode(&input); err != nil {
+		return Input{}, decodeProblem(err)
+	}
+	var extra any
+	if err := decoder.Decode(&extra); err != io.EOF {
+		if err != nil {
+			return Input{}, decodeProblem(err)
+		}
+		return Input{}, problem(400, "invalid_json", "exactly one JSON object required")
+	}
+	input.SKU = strings.TrimSpace(input.SKU)
+	if input.SKU == "" || utf8.RuneCountInString(input.SKU) > 32 || input.Quantity < 1 || input.Quantity > 100 {
+		return Input{}, problem(422, "invalid_input", "sku and quantity do not satisfy the contract")
+	}
+	return input, nil
+	// END decode
+}
+func decodeProblem(err error) *Problem {
+	var tooLarge *http.MaxBytesError
+	if errors.As(err, &tooLarge) {
+		return problem(413, "body_too_large", "body exceeds 256 bytes")
+	}
+	return problem(400, "invalid_json", "exactly one JSON object required")
+}
+
+// CreateHandler owns the response. It never starts a goroutine to race a write.
+func CreateHandler(store Store, budget time.Duration) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// BEGIN create
+		input, p := DecodeInput(w, r)
+		if p != nil {
+			writeProblem(w, p)
+			return
+		}
+		ctx, cancel := context.WithTimeout(r.Context(), budget)
+		defer cancel()
+		if err := ctx.Err(); err != nil {
+			writeProblem(w, classify(err))
+			return
+		}
+		order, err := store.Create(ctx, input)
+		if err == nil {
+			err = ctx.Err()
+		}
+		if err != nil {
+			writeProblem(w, classify(err))
+			return
+		}
+		writeJSON(w, http.StatusCreated, order)
+		// END create
+	}
+}
