@@ -67,11 +67,72 @@ class PrecheckBoundary(unittest.TestCase):
         self.precheck_fails('PRODUCT_READ', 'MISSING')
 
     def test_product_size_boundary_records_safe_size_without_reading_payload(self):
-        (self.root / 'idea/product-info.json').write_bytes(b'SYNTHETIC_PRIVATE' * 5000)
+        (self.root / 'idea/product-info.json').write_bytes(b'x' * (fixture.PRODUCT_INFO_MAX_BYTES + 1))
         value = self.precheck_fails('PRODUCT_READ', 'CONDITION_REJECTED')
-        self.assertEqual(value['facts']['size_bytes'], 85000)
+        self.assertEqual(value['facts']['size_bytes'], fixture.PRODUCT_INFO_MAX_BYTES + 1)
         self.assertFalse(value['facts']['within_limit'])
         self.assertNotIn('SYNTHETIC_PRIVATE', json.dumps(value))
+
+    def product_bytes(self, size, **fields):
+        value = {'version': fixture.IDEA_VERSION, 'buildNumber': fixture.IDEA_BUILD,
+                 'layout': [{'name': 'synthetic vendor layout', 'padding': ''}], **fields}
+        raw = json.dumps(value, separators=(',', ':')).encode()
+        self.assertLessEqual(len(raw), size)
+        value['layout'][0]['padding'] = 'x' * (size - len(raw))
+        result = json.dumps(value, separators=(',', ':')).encode()
+        self.assertEqual(len(result), size)
+        return result
+
+    def test_measured_product_size_and_exact_cap_pass_real_read_and_identity(self):
+        self.assertEqual(fixture.PRODUCT_INFO_MAX_BYTES, 512 * 1024)
+        for size in (319506, 512 * 1024):
+            with self.subTest(size=size):
+                raw = self.product_bytes(size)
+                path = self.root / 'idea/product-info.json'
+                path.write_bytes(raw)
+                self.assertEqual(fixture._checked_read('PRODUCT_READ', path,
+                    fixture.PRODUCT_INFO_MAX_BYTES), raw)
+                _, identity = fixture._runtime_identity(self.root)
+                self.assertEqual(identity['idea_version'], fixture.IDEA_VERSION)
+                self.assertIsNone(identity['java_runtime_version'])
+
+    def test_valid_product_json_one_byte_over_cap_rejects_before_parse(self):
+        (self.root / 'idea/product-info.json').write_bytes(self.product_bytes(512 * 1024 + 1))
+        value = self.precheck_fails('PRODUCT_READ', 'CONDITION_REJECTED')
+        self.assertEqual(value['facts']['size_bytes'], 512 * 1024 + 1)
+        self.assertFalse(value['facts']['within_limit'])
+
+    def test_large_product_invalid_utf8_and_json_still_fail_strictly(self):
+        path = self.root / 'idea/product-info.json'
+        for raw, reason in ((b'\xff' + b' ' * 319505, 'INVALID_UTF8'),
+                            (b'{' + b' ' * 319505, 'INVALID_JSON')):
+            with self.subTest(reason=reason):
+                path.write_bytes(raw)
+                self.precheck_fails('PRODUCT_JSON', reason)
+
+    def test_large_product_identity_still_exact_and_unknown_fields_never_project(self):
+        path = self.root / 'idea/product-info.json'
+        raw = self.product_bytes(319506, optional={'environment': 'SYNTHETIC_PRIVATE',
+            'arbitrary': [{'nested': ['still not public evidence']}], 'number': 12})
+        path.write_bytes(raw)
+        _, identity = fixture._runtime_identity(self.root)
+        self.assertNotIn('SYNTHETIC_PRIVATE', json.dumps(identity))
+        self.assertNotIn('optional', json.dumps(identity))
+        path.write_bytes(self.product_bytes(319506, version='2026.1.6'))
+        failure = self.precheck_fails('PRODUCT_IDENTITY', 'CONDITION_REJECTED')
+        self.assertEqual(failure['facts']['observed_version'], '2026.1.6')
+        self.assertFalse(failure['facts']['identity_matches'])
+
+    def test_duplicate_unknown_keys_and_nested_nonobject_root_remain_fail_closed(self):
+        path = self.root / 'idea/product-info.json'
+        duplicate = b'{"version":"2026.1.5","buildNumber":"261.27258.48","optional":1,"optional":2}'
+        path.write_bytes(duplicate + b' ' * (319506 - len(duplicate)))
+        self.precheck_fails('PRODUCT_JSON', 'CONDITION_REJECTED')
+        deep = b'[' * 2000 + b'0' + b']' * 2000
+        path.write_bytes(deep)
+        with self.assertRaises(fixture.PrecheckFailure) as raised:
+            fixture._runtime_identity(self.root)
+        self.assertIn(raised.exception.document['step'], ('PRODUCT_JSON', 'PRODUCT_IDENTITY'))
 
     def test_product_parse_and_identity_are_distinct(self):
         path = self.root / 'idea/product-info.json'

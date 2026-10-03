@@ -35,6 +35,7 @@ RUNTIME_VERSION = '25.0.4+1-b329.128'
 IDEA_VERSION = '2026.1.5'
 IDEA_BUILD = '261.27258.48'
 IDEA_ARCHIVE_SHA256 = 'b60483784c4051e72f852529d40bc7ab6c52e5fd791a088dea455a254473e4ce'
+PRODUCT_INFO_MAX_BYTES = 512 * 1024  # Installed pinned metadata measured 319,506 bytes.
 ACTIVITY_SECONDS = 40
 PROBE_SECONDS = 2
 DISPLAY = ':7998'
@@ -288,7 +289,7 @@ def _runtime_identity(toolchain_root):
         pins['idea']['version'] == IDEA_VERSION and pins['idea']['build'] == IDEA_BUILD
         and pins['idea']['sha256'] == IDEA_ARCHIVE_SHA256))
     idea = root / 'idea'
-    raw_info = _checked_read('PRODUCT_READ', idea / 'product-info.json', 65536)
+    raw_info = _checked_read('PRODUCT_READ', idea / 'product-info.json', PRODUCT_INFO_MAX_BYTES)
     info = _checked('PRODUCT_JSON', lambda: json_read(raw_info))
     product_facts = {'metadata_sha256': hashlib.sha256(raw_info).hexdigest(), 'size_bytes': len(raw_info),
                      'observed_version': _identity_token(info.get('version')) if type(info) is dict else None,
