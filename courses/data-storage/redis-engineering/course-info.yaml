@@ -31,6 +31,7 @@ additional_files:
 - name: support/src/labs/support/MySqlLab.java
 - name: support/src/labs/support/RedisLab.java
 - name: support/src/labs/support/Transactions.java
+- name: support/test/labs/support/RedisLabReadinessTest.java
 - name: authoring/materialize_learner.py
 - name: authoring/requirements.txt
 - name: authoring/sync_metadata.py

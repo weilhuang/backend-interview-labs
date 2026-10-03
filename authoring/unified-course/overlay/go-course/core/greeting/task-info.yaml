@@ -1,0 +1,46 @@
+type: edu
+custom_name: 第一次Go构建测试和调试
+files:
+- name: go/exercise.go
+  visible: true
+  placeholders:
+  - offset: 123
+    length: 94
+    placeholder_text: "\treturn \"\"\n"
+- name: build.gradle.fragment
+  visible: true
+- name: go/answers/explicit.go.txt
+  visible: true
+- name: go/answers/helpers.go.txt
+  visible: true
+- name: go/cmd/hello/main.go
+  visible: true
+- name: go/cmd/hello/main_process_test.go
+  visible: true
+- name: go/cmd/hello/main_test.go
+  visible: true
+- name: go/contract_test.go
+  visible: true
+- name: go/diagrams/flow.dot
+  visible: true
+- name: go/diagrams/flow.png
+  visible: true
+  is_binary: true
+- name: go/diagrams/flow.svg
+  visible: true
+- name: go/go.mod
+  visible: true
+- name: go/wrong-solutions/constant.go.txt
+  visible: true
+- name: go/wrong-solutions/empty-not-guest.go.txt
+  visible: true
+- name: go/wrong-solutions/no-trim.go.txt
+  visible: true
+- name: src/GoTestBridge.java
+  visible: true
+- name: test/GoContractTest.java
+  visible: true
+- name: test/GoTestBridgeTest.java
+  visible: true
+- name: go/源码定位.md
+  visible: true

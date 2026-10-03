@@ -1,0 +1,36 @@
+package lab
+
+import (
+	"context"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
+var _ = []any{context.WithTimeout, http.StatusCreated}
+
+// RequireDemoKey demonstrates control flow, not production identity/security.
+func RequireDemoKey() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// BEGIN gate
+		c.Next() // starter deliberately bypasses the gate
+		// END gate
+	}
+}
+
+// ErrorEnvelope runs after downstream work and owns unwritten errors only.
+func ErrorEnvelope() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// BEGIN errors
+		c.Next() // starter deliberately omits error rendering
+		// END errors
+	}
+}
+func RegisterOrders(router *gin.Engine, store Store, budget time.Duration) {
+	// BEGIN routes
+	_ = router
+	_ = store
+	_ = budget // starter deliberately registers no order route
+	// END routes
+}

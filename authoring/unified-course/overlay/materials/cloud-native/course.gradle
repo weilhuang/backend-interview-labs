@@ -1,0 +1,129 @@
+import java.time.Duration
+import org.gradle.api.tasks.testing.TestResult
+
+// Apply once from the unified root build before root test aggregates are registered.
+// This adapter owns ONLY C11-01..03. C11-04+ and all other material adapters are independent.
+def material = rootProject.file('materials/cloud-native')
+def manifest = new groovy.json.JsonSlurper().parse(new File(material, 'gradle/bridge-inputs.json'))
+def expectedTasks = ['C11-01', 'C11-02', 'C11-03']
+if (manifest.schema_version != 1 || manifest.tasks*.task_id != expectedTasks) {
+    throw new GradleException('Incomplete or unrecognized C11 native bridge manifest')
+}
+def expectedMain = ['AddressPolicy.java', 'CloudNativeApp.java', 'CloudPolicy.java', 'Inventory.java', 'RedisClient.java', 'RedisDiagnostic.java']
+if (manifest.shared_main_files != expectedMain) throw new GradleException('C11 shared source allowlist drift')
+def expectedOverlays = ['C11-01': null, 'C11-02': 'CloudPolicy.java', 'C11-03': 'AddressPolicy.java']
+
+def requireFile = { File input ->
+    if (!input.isFile()) throw new GradleException('Missing C11 bridge input; INVALID_ENV is not PASS: ' + input)
+}
+manifest.tasks.each { spec ->
+    def module = rootProject.findProject(spec.gradle_project)
+    if (module == null || module.projectDir.canonicalFile != rootProject.file(spec.task_path).canonicalFile) {
+        throw new GradleException('C11 project mapping mismatch: ' + spec.gradle_project)
+    }
+    if (spec.learner_java != expectedOverlays[spec.task_id]) throw new GradleException('C11 learner overlay mismatch')
+    requireFile(new File(module.projectDir, 'test/LabCheckTest.java'))
+    configure(module) {
+        apply plugin: 'java'
+        group = 'dev.weil.backendlabs'
+        version = '0.1.0'
+        repositories { mavenCentral() }
+        java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+        dependencies {
+            testImplementation platform('org.junit:junit-bom:5.11.4')
+            testImplementation 'org.junit.jupiter:junit-jupiter'
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+        }
+        sourceSets {
+            main { java.setSrcDirs([]); resources.setSrcDirs([]) }
+            test {
+                java.setSrcDirs(['test'])
+                java.include('LabCheckTest.java')
+                resources.setSrcDirs([])
+            }
+        }
+        if (spec.learner_java != null) {
+            requireFile(new File(module.projectDir, spec.learner_java))
+            requireFile(new File(material, 'test-java/labs/PolicyContractTest.java'))
+            def sharedNames = expectedMain.findAll { it != spec.learner_java }
+            sharedNames.each { requireFile(new File(material, 'src/labs/' + it)) }
+            // Per-project Sync output: exactly one learner class + five allowlisted shared classes.
+            // Never add projectDir, answers/, starter/, wrong/, or all materials as source roots.
+            def stagedMain = layout.buildDirectory.dir('generated/c11-main')
+            def stage = tasks.register('stageCloudNativeMain', Sync) {
+                into(stagedMain)
+                duplicatesStrategy = DuplicatesStrategy.FAIL
+                from(new File(material, 'src')) { include(sharedNames.collect { 'labs/' + it }) }
+                from(new File(module.projectDir, spec.learner_java)) { into('labs') }
+                doFirst {
+                    requireFile(new File(module.projectDir, spec.learner_java))
+                    sharedNames.each { requireFile(new File(material, 'src/labs/' + it)) }
+                }
+                doLast {
+                    def observed = module.fileTree(stagedMain.get().asFile).files.collect {
+                        stagedMain.get().asFile.toPath().relativize(it.toPath()).toString().replace('\\', '/')
+                    }.sort()
+                    def expected = expectedMain.collect { 'labs/' + it }.sort()
+                    if (observed != expected) throw new GradleException('C11 isolated source set mismatch: ' + observed)
+                }
+            }
+            sourceSets.main.java.setSrcDirs([stagedMain])
+            sourceSets.main.java.include('labs/*.java')
+            sourceSets.test.java.srcDir(new File(material, 'test-java'))
+            sourceSets.test.java.include('labs/PolicyContractTest.java')
+            tasks.named('compileJava') { dependsOn(stage) }
+        } else {
+            requireFile(new File(module.projectDir, 'Dockerfile'))
+            requireFile(new File(material, 'tests/check_task.py'))
+            requireFile(new File(material, '.dockerignore'))
+            requireFile(new File(material, 'container/entrypoint.sh'))
+        }
+        tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 21 }
+        // A verification dependency runs even when Gradle would otherwise mark Test NO-SOURCE.
+        def requireCompiledBridge = tasks.register('requireCloudNativeBridge') {
+            dependsOn(tasks.named('testClasses'))
+            doLast {
+                def present = sourceSets.test.output.classesDirs.files.any { new File(it, 'LabCheckTest.class').isFile() }
+                if (!present) throw new GradleException('No compiled visible C11 bridge; zero tests is not PASS')
+            }
+        }
+        tasks.withType(Test).configureEach {
+            dependsOn(requireCompiledBridge)
+            useJUnitPlatform()
+            include('LabCheckTest.class')
+            filter { failOnNoMatchingTests = true }
+            maxHeapSize = '128m'
+            maxParallelForks = 1
+            timeout = Duration.ofSeconds(45)
+            outputs.upToDateWhen { false }
+            outputs.cacheIf { false }
+            systemProperty 'course.taskId', spec.task_id
+            systemProperty 'course.taskDir', module.projectDir.absolutePath
+            systemProperty 'course.materialsDir', material.absolutePath
+            systemProperty 'course.python', providers.gradleProperty('pythonExecutable').orElse('python3').get()
+            inputs.file(new File(module.projectDir, 'test/LabCheckTest.java'))
+            if (spec.learner_java == null) {
+                inputs.files(new File(module.projectDir, 'Dockerfile'), new File(material, 'tests/check_task.py'),
+                             new File(material, '.dockerignore'), new File(material, 'container/entrypoint.sh'))
+            }
+            testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+            afterTest { descriptor, result ->
+                if (result.resultType == TestResult.ResultType.FAILURE) {
+                    def lines = (result.exception?.message ?: 'C11 contract failed').split('\n', -1)
+                    println "#educational_plugin FAILED + ${lines[0]}"
+                    lines.drop(1).each { println "#educational_plugin${it}" }
+                    println ''
+                }
+            }
+            afterSuite { descriptor, result ->
+                if (descriptor.parent == null && (result.testCount == 0 || result.skippedTestCount > 0)) {
+                    throw new GradleException('Zero or skipped C11 visible tests; NOT_RUN is not PASS')
+                }
+            }
+        }
+        tasks.register('unitTest') {
+            description = spec.check_scope
+            dependsOn(tasks.named('test'))
+        }
+    }
+}

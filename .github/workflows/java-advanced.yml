@@ -7,7 +7,7 @@ permissions:
 jobs:
   check:
     name: real-${{ matrix.course }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -17,22 +17,22 @@ jobs:
       run:
         working-directory: courses/${{ matrix.course }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
           distribution: temurin
           java-version: '21'
       - name: 缓存依赖下载（不缓存测试结果或构建输出）
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
             ~/.gradle/caches/modules-2
             ~/.gradle/wrapper
           key: ${{ runner.os }}-jdk21-deps-v1-java-advanced-${{ github.job }}-${{ hashFiles('**/*.gradle', '**/*.gradle.kts', '**/gradle.properties', '**/gradle.lockfile', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-jdk21-deps-v1-java-advanced-${{ github.job }}-
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
         with:
           python-version: '3.12'
       - name: 记录真实JDK与Gradle版本
@@ -67,19 +67,23 @@ jobs:
             --java-home "$JAVA_HOME" --timeout 600 \
             --report "build/quality/$ACADEMY_KEY-roundtrip.json" \
             --work-dir "build/quality/$ACADEMY_KEY-roundtrip"
-      - name: 保留每课程的独立验证报告
+      - name: 收集有界脱敏CI证据
+        id: collect_evidence
+        env:
+          EVIDENCE_JOB_STATUS: ${{ job.status }}
         if: always()
-        uses: actions/upload-artifact@v4
+        timeout-minutes: 1
+        working-directory: ${{ github.workspace }}
+        run: |
+          python scripts/ci/collect_evidence.py --repo "$GITHUB_WORKSPACE" \
+            --job-status "$EVIDENCE_JOB_STATUS" \
+            --profile "${{ matrix.course }}" \
+            --output "$RUNNER_TEMP/ci-evidence-${{ matrix.course }}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+      - name: 保留每课程的独立验证报告
+        if: always() && steps.collect_evidence.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: ${{ matrix.course }}-jdk21-reports-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            build/quality/${{ matrix.course }}-roundtrip.json
-            build/quality/${{ matrix.course }}-roundtrip/**/source-manifest.json
-            build/quality/${{ matrix.course }}-roundtrip/**/*.log
-            build/quality/${{ matrix.course }}-roundtrip/**/build/test-results/
-            courses/${{ matrix.course }}/build/verification/
-            courses/${{ matrix.course }}/build/diagnostics/
-            courses/${{ matrix.course }}/**/build/reports/tests/
-            courses/${{ matrix.course }}/**/build/test-results/
+          path: ${{ runner.temp }}/ci-evidence-${{ matrix.course }}-${{ github.run_id }}-${{ github.run_attempt }}/
           retention-days: 7
           if-no-files-found: error

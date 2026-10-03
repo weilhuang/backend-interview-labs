@@ -77,8 +77,11 @@ class ReplicationIntegrationTest {
       assertThrows(redis.clients.jedis.exceptions.JedisConnectionException.class, () -> {
         try (var p = primary.connect()) { p.ping(); }
       });
-      try (var r = replica.connect()) {
+      // 只给仍存活副本的连接握手/PING有界准备机会，学生提升逻辑只执行一次。
+      try (var r = replica.connectReady("primary.crash后、promote前的存活副本")) {
         Replication.promoteIsolatedReplica(r);
+        assertEquals("master", Replication.info(r.info("replication")).get("role"),
+            "必须真正提升为主节点；仅关闭replica-read-only不满足故障转移契约");
         assertEquals("写入已确认", r.get(key));
         r.set(key, "提升后可写");
         assertEquals("提升后可写", r.get(key));

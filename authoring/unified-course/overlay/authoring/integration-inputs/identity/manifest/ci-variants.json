@@ -1,0 +1,568 @@
+{
+  "schema": 1,
+  "basis": "Reviewed actual Temurin 21.0.12.1+1 / Gradle 8.10.2 runs, including exact business failure messages; every CI run must regenerate evidence.",
+  "variants": {
+    "table": {
+      "policy_path": "identity/01-policy/lab/reference/table/Policy.java",
+      "policy_sha256": "50529a83ee26f43589238846126be0e3606da733e9648c05f3684e232207987d",
+      "expected_exit": 0,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        },
+        "service": {
+          "labs.identity.IdentityHttpTest": [
+            "rolesFromOtherTenantDoNotLeak",
+            "crossTenantAdminDeniedEvenWithForgedHeaders",
+            "readerCannotWriteAndStateStaysUnchanged",
+            "readerCanReadOwnTenant",
+            "editorCanApproveOwnTenantAndMutationIsVisible",
+            "wrongAudienceFailsBeforeBusinessAuthorization",
+            "noTokenIs401"
+          ],
+          "labs.identity.IdentityTokenDecoderTest": [
+            "unknownKidsCannotExhaustRemoteWithUnboundedFetches",
+            "rejectsForgedSignature",
+            "insecureNonLoopbackEndpointIsRejected",
+            "attackerJkuCannotChooseTrustSource",
+            "validatesRealSignatureAndTrustedClaims",
+            "rotationRefreshesOnceAndOverlapsOldKey",
+            "missingExpiryIsRejected",
+            "noneAndAlgorithmConfusionAreRejected",
+            "jwksOutageRejectsUnknownKeyButKnownCachedKeyStillVerifies",
+            "rejectsWrongIssuerAudienceExpiryFutureNbfAndIdToken"
+          ],
+          "labs.identity.LdapSafetyTest": [
+            "injectionAndEmptyBindRemainRejected"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {},
+      "http_observed": 200,
+      "method_calls": 35
+    },
+    "explicit": {
+      "policy_path": "identity/01-policy/lab/reference/explicit/Policy.java",
+      "policy_sha256": "5fa2f6ec17cfe81551cb575da7667c34a4392367bc9387a5379c2a840ad974da",
+      "expected_exit": 0,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        },
+        "service": {
+          "labs.identity.IdentityHttpTest": [
+            "rolesFromOtherTenantDoNotLeak",
+            "crossTenantAdminDeniedEvenWithForgedHeaders",
+            "readerCannotWriteAndStateStaysUnchanged",
+            "readerCanReadOwnTenant",
+            "editorCanApproveOwnTenantAndMutationIsVisible",
+            "wrongAudienceFailsBeforeBusinessAuthorization",
+            "noTokenIs401"
+          ],
+          "labs.identity.IdentityTokenDecoderTest": [
+            "unknownKidsCannotExhaustRemoteWithUnboundedFetches",
+            "rejectsForgedSignature",
+            "insecureNonLoopbackEndpointIsRejected",
+            "attackerJkuCannotChooseTrustSource",
+            "validatesRealSignatureAndTrustedClaims",
+            "rotationRefreshesOnceAndOverlapsOldKey",
+            "missingExpiryIsRejected",
+            "noneAndAlgorithmConfusionAreRejected",
+            "jwksOutageRejectsUnknownKeyButKnownCachedKeyStillVerifies",
+            "rejectsWrongIssuerAudienceExpiryFutureNbfAndIdToken"
+          ],
+          "labs.identity.LdapSafetyTest": [
+            "injectionAndEmptyBindRemainRejected"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {},
+      "http_observed": 200,
+      "method_calls": 35
+    },
+    "starter": {
+      "policy_path": "identity/01-policy/lab/src/labs/identity/Policy.java",
+      "policy_sha256": "4ff71da32fa7a38e225849646a887249870ea34a0a89778d1eb5742dc6741e33",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|denialPrecedence": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|fixedDecisionReasons": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|invalidSubjectId": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|rolesAreEmptyOrImmutable": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|policyMatrixContract": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|invalidSubjectTenant": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceId": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|missingResource": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|unknownActionsFailClosed": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceTenant": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "unit|labs.identity.PolicyTest|unauthenticatedInputs": {
+          "type": "java.lang.UnsupportedOperationException",
+          "message": "java.lang.UnsupportedOperationException: 请实现默认拒绝与租户角色授权"
+        },
+        "http|labs.identity.IdentityNetworkTest|realHttpRequestEnforcesAuthenticationTenantAndWriteRole": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15_HTTP_OWN_ORDER_200 ==> expected: <200> but was: <403>"
+        }
+      },
+      "http_observed": 403,
+      "method_calls": 15
+    },
+    "token-means-admin": {
+      "policy_path": "identity/01-policy/lab/mutants/token-means-admin/Policy.java",
+      "policy_sha256": "8b1cc4b9e5245dbe3b19577d69e23ee16722e603510cbb74558d3b88cab9eb85",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|denialPrecedence": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|fixedDecisionReasons": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=ROLE_DENIED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidSubjectId": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|rolesAreEmptyOrImmutable": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=ROLE_DENIED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|policyMatrixContract": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=ROLE_DENIED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidSubjectTenant": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceId": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|missingResource": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|unknownActionsFailClosed": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNKNOWN_ACTION]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceTenant": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|unauthenticatedInputs": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "http|labs.identity.IdentityNetworkTest|realHttpRequestEnforcesAuthenticationTenantAndWriteRole": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: expected: <403 FORBIDDEN> but was: <200 OK>"
+        }
+      },
+      "http_observed": 200,
+      "method_calls": 15
+    },
+    "missing-tenant-check": {
+      "policy_path": "identity/01-policy/lab/mutants/missing-tenant-check/Policy.java",
+      "policy_sha256": "d74e83bf7d998fc619cfd83f199631e66c47cbeea5fbb9c22e085953be299a4f",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|denialPrecedence": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=TENANT_MISMATCH]> but was: <Decision[allowed=false, reason=UNKNOWN_ACTION]>"
+        },
+        "unit|labs.identity.PolicyTest|fixedDecisionReasons": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=TENANT_MISMATCH]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|policyMatrixContract": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=TENANT_MISMATCH]> but was: <Decision[allowed=false, reason=ROLE_DENIED]>"
+        },
+        "http|labs.identity.IdentityNetworkTest|realHttpRequestEnforcesAuthenticationTenantAndWriteRole": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: expected: <403 FORBIDDEN> but was: <200 OK>"
+        }
+      },
+      "http_observed": 200,
+      "method_calls": 15
+    },
+    "admin-any-action": {
+      "policy_path": "identity/01-policy/lab/mutants/admin-any-action/Policy.java",
+      "policy_sha256": "35788a894ab965a9302321a4e57870d75c1f1c86d78d8f2b989229f273d61385",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|policyMatrixContract": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNKNOWN_ACTION]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|unknownActionsFailClosed": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNKNOWN_ACTION]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        }
+      },
+      "http_observed": 200,
+      "method_calls": 15
+    },
+    "wrong-reasons": {
+      "policy_path": "identity/01-policy/lab/mutants/wrong-reasons/Policy.java",
+      "policy_sha256": "1353d26fd49aec3672d040c776fd1cb337a75aeffbd7879fb9218846b6b3a2fe",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|denialPrecedence": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|fixedDecisionReasons": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=true, reason=ALLOW]> but was: <Decision[allowed=true, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidSubjectId": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|rolesAreEmptyOrImmutable": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=ROLE_DENIED]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|policyMatrixContract": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=ROLE_DENIED]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidSubjectTenant": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceId": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|missingResource": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|unknownActionsFailClosed": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNKNOWN_ACTION]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceTenant": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=false, reason=WRONG]>"
+        },
+        "unit|labs.identity.PolicyTest|unauthenticatedInputs": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=false, reason=WRONG]>"
+        }
+      },
+      "http_observed": 200,
+      "method_calls": 15
+    },
+    "empty-identifiers": {
+      "policy_path": "identity/01-policy/lab/mutants/empty-identifiers/Policy.java",
+      "policy_sha256": "527a74569b5cec59ab776f20aadd034ebfa8215a047d2bb83f7ddcfaf9858160",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|invalidSubjectId": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=UNAUTHENTICATED]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        },
+        "unit|labs.identity.PolicyTest|invalidResourceId": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=MISSING_ATTRIBUTE]> but was: <Decision[allowed=true, reason=ALLOW]>"
+        }
+      },
+      "http_observed": 200,
+      "method_calls": 15
+    },
+    "wrong-precedence": {
+      "policy_path": "identity/01-policy/lab/mutants/wrong-precedence/Policy.java",
+      "policy_sha256": "b4ffc07212fc8685f85905cac2602e7e135930e00662adf36cb875d667765fd7",
+      "expected_exit": 1,
+      "groups": {
+        "unit": {
+          "labs.identity.PolicyTest": [
+            "denialPrecedence",
+            "fixedDecisionReasons",
+            "invalidSubjectId",
+            "rolesAreEmptyOrImmutable",
+            "policyMatrixContract",
+            "invalidSubjectTenant",
+            "invalidResourceId",
+            "missingResource",
+            "unknownActionsFailClosed",
+            "invalidResourceTenant",
+            "unauthenticatedInputs"
+          ]
+        },
+        "http": {
+          "labs.identity.IdentityNetworkTest": [
+            "realHttpRequestEnforcesAuthenticationTenantAndWriteRole",
+            "suppliedChineseFrontendIsServedWithoutSecrets"
+          ],
+          "labs.identity.ProductionPolicyOriginTest": [
+            "productionJarContainsNoReferenceAnswers",
+            "loadedPolicyComesFromExactlyTheLearnerJar"
+          ]
+        }
+      },
+      "expected_failures": {
+        "unit|labs.identity.PolicyTest|denialPrecedence": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=TENANT_MISMATCH]> but was: <Decision[allowed=false, reason=UNKNOWN_ACTION]>"
+        },
+        "unit|labs.identity.PolicyTest|policyMatrixContract": {
+          "type": "org.opentest4j.AssertionFailedError",
+          "message": "org.opentest4j.AssertionFailedError: C15-POLICY: allowed与固定reason必须共同满足合同 ==> expected: <Decision[allowed=false, reason=TENANT_MISMATCH]> but was: <Decision[allowed=false, reason=UNKNOWN_ACTION]>"
+        }
+      },
+      "http_observed": 200,
+      "method_calls": 15
+    }
+  }
+}

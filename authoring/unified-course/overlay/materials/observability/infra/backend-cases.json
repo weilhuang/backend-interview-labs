@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "status": "IMPLEMENTED_UNTESTED",
+  "cases": [
+    {
+      "id": "OTEL-01",
+      "assert": "POST checkout=200; query exact returned trace_id; exactly checkout SERVER + inventory CLIENT + inventory SERVER; parent IDs connect",
+      "runtime_status": "NOT_RUN",
+      "automated_scope": "HTTP response and Jaeger trace semantic/topology checks only",
+      "metrics_check": "NOT_RUN",
+      "metrics_check_implemented": false
+    },
+    {
+      "id": "OTEL-02",
+      "assert": "POST fail=503; three necessary spans carry ERROR; metric count increases once for checkout and once for inventory",
+      "runtime_status": "NOT_RUN",
+      "automated_scope": "HTTP response and Jaeger trace semantic/topology checks only",
+      "metrics_check": "NOT_RUN",
+      "metrics_check_implemented": false
+    },
+    {
+      "id": "OTEL-03",
+      "assert": "POST retry=200 attempts=2; five spans; checkout count=1 inventory count=2; do not call attempts duplicate transactions",
+      "runtime_status": "NOT_RUN",
+      "automated_scope": "HTTP response and Jaeger trace semantic/topology checks only",
+      "metrics_check": "NOT_RUN",
+      "metrics_check_implemented": false
+    },
+    {
+      "id": "OTEL-04",
+      "assert": "bad traceparent request still=200 with fresh nonzero trace_id",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "OTEL-05",
+      "assert": "parent sampled=00: business=200; exported trace absent after observation window; logs still exist; absence is expected sampling, not backend PASS",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "OTEL-06",
+      "assert": "stop only this project's collector; repeated checkout remain bounded; capture SDK export failure stderr; restart collector; new run traces queryable; report lost interval without fabricating backfill",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "OTEL-07",
+      "assert": "stop only this project's jaeger; collector queue/failure counters recorded; restart before 30s retry limit then query surviving trace; after limit report loss",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "ELK-01",
+      "assert": "unfiltered full-index match_all search with track_total_hits=true; exact total=2 and full page=2; required field types and event time order verified",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "ELK-02",
+      "assert": "bad JSON/time/schema inputs dropped before backend; exactly three constant rejection markers in complete Logstash self-logs; no synthetic secret in any output/stdout/stderr/log rotation",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "ELK-03",
+      "assert": "replay identical NDJSON event_id leaves one document; writing different event_id creates another",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "ELK-04",
+      "assert": "unknown fields do not expand mapping; missing required event_id dropped with fixed rejection marker",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "SKY-01",
+      "assert": "native agent alone produces expected HTTP/SQL trace; no OTEL javaagent attached",
+      "runtime_status": "NOT_RUN"
+    },
+    {
+      "id": "SKY-02",
+      "assert": "10.3.0 OTLP trace conversion requires otlp-traces plus Zipkin receive/query and Lens; verify losses explicitly; standard UI result cannot stand in",
+      "runtime_status": "NOT_RUN"
+    }
+  ]
+}

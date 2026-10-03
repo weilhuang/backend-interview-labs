@@ -1,0 +1,71 @@
+{
+  "type": "edu",
+  "custom_name": "C11-05 稳定地址、配置变化和秘密边界",
+  "files": [
+    {
+      "name": "AppConfig.java",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 0,
+          "length": 2220,
+          "placeholder_text": "package labs;\n\nimport java.nio.file.*;\nimport java.io.IOException;\nimport java.util.Map;\n\n/** C11-05：不记录、不返回密码；环境配置是启动快照，公告文件是每次请求读取。 */\npublic record AppConfig(String redisHost, int redisPort, String redisPassword,\n                        String namespace, String greeting, Path bannerFile,\n                        long startupDelayMs, String release) {\n    public static AppConfig load(Map<String,String> env) throws IOException {\n        String host = \"localhost\"; // TODO 使用注入的Service名\n        if (!host.matches(\"[a-z0-9][a-z0-9.-]{0,250}\") || host.equals(\"localhost\") || host.equals(\"127.0.0.1\"))\n            throw new IllegalArgumentException(\"INVALID_REDIS_HOST\");\n        int port = Integer.parseInt(env.getOrDefault(\"REDIS_PORT\", \"6379\"));\n        if (port < 1 || port > 65535) throw new IllegalArgumentException(\"INVALID_REDIS_PORT\");\n        String password = Files.readString(Path.of(env.getOrDefault(\"REDIS_PASSWORD_FILE\", \"/run/secrets/password\"))).strip();\n        if (password.length() < 16 || password.length() > 128) throw new IllegalArgumentException(\"INVALID_SECRET_LENGTH\");\n        String greeting = safeLabel(env.getOrDefault(\"GREETING\", \"hello-v1\"));\n        long delay = Long.parseLong(env.getOrDefault(\"STARTUP_DELAY_MS\", \"8000\"));\n        if (delay < 0 || delay > 30000) throw new IllegalArgumentException(\"INVALID_STARTUP_DELAY\");\n        String release = safeLabel(Files.readString(Path.of(env.getOrDefault(\"RELEASE_FILE\", \"/opt/app/release\"))).strip());\n        String namespace = env.getOrDefault(\"LAB_NAMESPACE\", \"c11-kind-demo\");\n        if (!namespace.matches(\"c11-[a-z0-9-]{1,48}\")) throw new IllegalArgumentException(\"INVALID_NAMESPACE\");\n        return new AppConfig(host, port, password, namespace, greeting,\n                Path.of(env.getOrDefault(\"BANNER_FILE\", \"/etc/course/banner\")), delay, release);\n    }\n    static String safeLabel(String value) {\n        if (!value.matches(\"[a-zA-Z0-9_-]{1,40}\")) throw new IllegalArgumentException(\"INVALID_PUBLIC_LABEL\");\n        return value;\n    }\n    public String banner() throws IOException { return safeLabel(Files.readString(bannerFile).strip()); }\n    @Override public String toString() { return \"AppConfig[redacted]\"; }\n}\n"
+        }
+      ]
+    },
+    {
+      "name": "answers/AppConfig.java",
+      "visible": true
+    },
+    {
+      "name": "answers/config.yaml",
+      "visible": true
+    },
+    {
+      "name": "answers/rbac.yaml",
+      "visible": true
+    },
+    {
+      "name": "answers/service.yaml",
+      "visible": true
+    },
+    {
+      "name": "config.yaml",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 0,
+          "length": 172,
+          "placeholder_text": "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: orders-config\n# 仅非敏感配置；密码由driver在内存中生成，通过stdin创建Secret。\ndata:\n  redis-host: localhost\n  greeting: hello-v1\n  banner: banner-v1\n"
+        }
+      ]
+    },
+    {
+      "name": "observations.md",
+      "visible": true
+    },
+    {
+      "name": "rbac.yaml",
+      "visible": true
+    },
+    {
+      "name": "service.yaml",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 0,
+          "length": 172,
+          "placeholder_text": "apiVersion: v1\nkind: Service\nmetadata:\n  name: orders\nspec:\n  type: ClusterIP\n  selector:\n    app: order-api\n  ports:\n    - name: http\n      port: 8080\n      targetPort: http\n"
+        }
+      ]
+    },
+    {
+      "name": "solution.md",
+      "visible": true
+    },
+    {
+      "name": "test/LabCheckTest.java",
+      "visible": true
+    }
+  ]
+}

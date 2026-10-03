@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520">
+<rect width="1120" height="520" fill="#f4f7fb"/><style>text{font-family:Arial,'Noto Sans CJK SC',sans-serif;fill:#19304d}.title{font-size:25px;font-weight:700}.label{font-size:18px}.small{font-size:15px}rect.box{fill:white;stroke:#4c7198;stroke-width:2}</style>
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#477199"/></marker></defs>
+<text x="32" y="44" class="title">C15：先认证，再对具体订单授权</text>
+<rect x="32" y="84" width="220" height="105" rx="12" class="box"/><text x="48" y="118" class="label">浏览器 / 完整调用方</text><text x="48" y="150" class="small">合成 Bearer token</text><text x="48" y="175" class="small">按钮不构成权限边界</text>
+<rect x="306" y="84" width="242" height="105" rx="12" class="box"/><text x="324" y="118" class="label">Spring 认证链</text><text x="324" y="150" class="small">固定 JWKS → 验签</text><text x="324" y="175" class="small">iss / aud / exp / nbf / typ</text>
+<rect x="602" y="84" width="230" height="105" rx="12" class="box"/><text x="620" y="118" class="label">可信主体 + 服务端资源</text><text x="620" y="150" class="small">当前 tenant 的 roles</text><text x="620" y="175" class="small">仓库内真实订单 tenant</text>
+<rect x="602" y="261" width="230" height="112" rx="12" class="box"/><text x="620" y="297" class="label">Policy.authorize</text><text x="620" y="328" class="small">同租户 → 已知动作</text><text x="620" y="353" class="small">角色矩阵 → 默认拒绝</text>
+<rect x="889" y="261" width="198" height="112" rx="12" class="box"/><text x="908" y="297" class="label">业务操作</text><text x="908" y="328" class="small">允许：200</text><text x="908" y="353" class="small">检查后才改变状态</text>
+<path d="M252 137H302 M548 137H598 M717 189V257 M832 317H885" stroke="#477199" stroke-width="3" marker-end="url(#arrow)" fill="none"/>
+<rect x="307" y="262" width="240" height="111" rx="12" fill="#ffeded" stroke="#ad4251"/><text x="325" y="298" class="label">失败必须可解释</text><text x="325" y="329" class="small">凭证不可信 → 401</text><text x="325" y="354" class="small">已登录但无权限 → 403</text>
+<path d="M425 189V258 M602 318H551" stroke="#ad4251" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+<text x="32" y="436" class="label">LDAP → Keycloak → 登录会话 → Access token 是另一条身份生命周期链</text><text x="32" y="469" class="small">首片验证策略与JWT合同；真实目录、浏览器SSO、联邦撤权与原生Academy仍需独立验收</text>
+</svg>

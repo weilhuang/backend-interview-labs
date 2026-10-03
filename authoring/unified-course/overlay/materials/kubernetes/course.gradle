@@ -1,0 +1,4 @@
+def modules = rootProject.file('authoring/course-map.json')
+def mapped = new groovy.json.JsonSlurper().parse(modules).tasks.findAll { it.path ==~ /c11-cloud-native\/0[456]-.*/ }
+if (mapped.size() != 3) throw new GradleException('Expected exactly three Kubernetes task mappings')
+mapped.each { item -> configure(project(item.gradle_project)) { apply from: rootProject.file('materials/kubernetes/task.gradle') } }

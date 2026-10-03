@@ -1,0 +1,7 @@
+# 可见错误解
+
+这两个Java文件均保持类名ProbePolicy，供复制到题目ProbePolicy.java后运行公开Java合同和真实Kind场景。dependency-liveness把下游坏当成本进程坏；always-ready让未seed、排空、合成未就绪仍通过探针。主程序向live传上一次ready/业务检查取得的依赖状态，live本身不做网络I/O；正确策略应忽略该状态。
+
+还提供每课默认错误starter。Python公开测试动态构造hostPath、特权容器、陌生image、外部namespace、扩大RBAC和公网Service等安全反例，保证driver拒绝它们而不实际创建危险资源。
+
+本次没有运行这些Java错误解或Kind；其运行验证状态都是NOT_RUN。不能用Python字符串扫描代替Java行为或Kubernetes结果。

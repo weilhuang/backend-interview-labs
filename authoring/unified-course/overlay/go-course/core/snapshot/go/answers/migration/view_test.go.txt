@@ -1,0 +1,19 @@
+package shipping
+
+import("reflect";"testing";ownership "academy.example/go-ownership")
+
+func TestShippingViewTransfer(t *testing.T) {
+	t.Run("nil",func(t *testing.T){if View(nil)!=nil{t.Fatal("nil输入须保留nil")}})
+	t.Run("empty",func(t *testing.T){if got:=View([]ownership.Order{{ID:"无明细"}});got==nil||len(got)!=0{t.Fatal("非nil输入无明细时须返回非nil空结果")}})
+	t.Run("order",func(t *testing.T){
+	 src:=[]ownership.Order{{ID:"A",Lines:[]ownership.Line{{SKU:"书",Quantity:2},{SKU:"笔",Quantity:3}}},{ID:"B",Lines:[]ownership.Line{{SKU:"纸",Quantity:1}}}}
+	 want:=[]Line{{"A","书",2},{"A","笔",3},{"B","纸",1}}
+	 if got:=View(src);!reflect.DeepEqual(got,want){t.Fatalf("顺序或字段不符: %#v",got)}
+	})
+	t.Run("isolation",func(t *testing.T){
+	 src:=[]ownership.Order{{ID:"A",Lines:[]ownership.Line{{SKU:"书",Quantity:2,Tags:[]string{"原价"}}},Metadata:map[string]string{"status":"待付款"}}}
+	 dst:=View(src);src[0].Lines[0].Quantity=99;src[0].Lines[0].Tags[0]="活动";src[0].Metadata["status"]="已付款"
+	 if len(dst)!=1||dst[0].Quantity!=2{t.Fatal("修改输入不得污染发货视图")}
+	 dst[0].SKU="快照修改";if src[0].Lines[0].SKU!="书"{t.Fatal("修改视图不得污染输入")}
+	})
+}

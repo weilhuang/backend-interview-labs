@@ -1,0 +1,19 @@
+digraph G {
+ rankdir=TB; bgcolor="#f7fafc"; pad=0.25; nodesep=0.35; ranksep=0.3;
+ graph [fontname="Noto Sans CJK SC",label="Gin：进入链与错误回卷",fontsize=20,labelloc=t];
+ node [shape=box,style="rounded,filled",fillcolor="#e8f0ff",fontname="Noto Sans CJK SC",fontsize=12,margin="0.2,0.1"];
+ edge [fontname="Noto Sans CJK SC",fontsize=11,color="#435671"];
+ server [label="http.Server → gin.Engine\n方法与路径匹配"];
+ outer [label="ErrorEnvelope：c.Next()"];
+ recover [label="Recovery → body-limit"];
+ gate [label="/v1 组：RequireDemoKey\n失败：c.Error + Abort + return"];
+ route [label="POST /orders\nShouldBindWith → 请求 context → Store"];
+ ok [label="成功：写 201 JSON"];
+ err [label="失败：c.Error → 回卷\n未知错误 / panic 统一脱敏",fillcolor="#fff1d6"];
+ boundary [label="ErrorEnvelope 回到 Next 后\n有错误且未提交：写一次 JSON\n已经提交：保留原响应",fillcolor="#e2f7ec"];
+ server -> outer -> recover -> gate -> route -> ok;
+ gate -> err [label="拒绝"];
+ route -> err [label="返回错误"];
+ err -> boundary [color="#ab6500"];
+ ok -> boundary [style=dashed,label="已提交守卫"];
+}

@@ -1,0 +1,97 @@
+import java.util.jar.JarFile
+// 身份课程独立源码草稿；所有运行验证状态单独报告。
+
+configure([project(':identity-01-policy-lab'), project(':identity-resource-server')]) {
+    repositories { mavenCentral() }
+    apply plugin: 'java'
+    java { toolchain { languageVersion=JavaLanguageVersion.of(rootProject.property('javaVersion') as Integer) } }
+    tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8'; options.release=21; options.compilerArgs += '-parameters' }
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform(); maxParallelForks=1; maxHeapSize='384m'
+        ignoreFailures=false
+        jvmArgs '-XX:ActiveProcessorCount=2'
+        testLogging { events 'failed','skipped'; exceptionFormat='full' }
+        afterTest { descriptor,result ->
+            if(result.resultType==TestResult.ResultType.FAILURE) {
+                def lines=(result.exception?.message ?: '身份契约失败').split('\n',-1)
+                println "#educational_plugin FAILED + ${lines[0]}"
+                lines.drop(1).each { println "#educational_plugin${it}" }
+                println ''
+            }
+        }
+    }
+    dependencyLocking { lockAllConfigurations(); lockMode=LockMode.STRICT }
+}
+def learner=project(':identity-01-policy-lab')
+configure(learner) {
+    sourceSets { main.java.setSrcDirs(['src']); test.java.setSrcDirs(['test']) }
+    dependencies {
+        testImplementation platform("org.springframework.boot:spring-boot-dependencies:${rootProject.property('springBootVersion')}")
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+    tasks.register('usage',JavaExec) { dependsOn classes;classpath=sourceSets.main.runtimeClasspath;mainClass='labs.identity.Usage' }
+    tasks.named('jar') { archiveBaseName='identity-learner-policy' }
+}
+def policyJar=learner.tasks.named('jar',Jar)
+def service=project(':identity-resource-server')
+configure(service) {
+    def learnerPolicyArtifact=files(policyJar.flatMap { it.archiveFile }).builtBy(policyJar)
+    dependencies {
+        // 显式选jar产物，而不是默认project依赖的classes目录变体。Policy本身只依赖JDK。
+        implementation learnerPolicyArtifact
+        implementation platform("org.springframework.boot:spring-boot-dependencies:${rootProject.property('springBootVersion')}")
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+    tasks.withType(Test).configureEach {
+        dependsOn policyJar
+        systemProperty 'identity.expectedPolicyJar',policyJar.get().archiveFile.get().asFile.absolutePath
+    }
+    tasks.register('verifyProductionPolicyJar') {
+        dependsOn tasks.named('classes'), policyJar
+        doLast {
+            if(file('src/main/java/labs/identity/Policy.java').exists()) throw new GradleException('服务不准有本地Policy源副本')
+            if(sourceSets.main.output.classesDirs.files.any { new File(it,'labs/identity/Policy.class').exists() })
+                throw new GradleException('服务输出目录存在重复Policy.class')
+            def actual=[]
+            sourceSets.main.runtimeClasspath.files.each { f ->
+                if(f.isDirectory() && new File(f,'labs/identity/Policy.class').exists()) actual << f.canonicalFile
+                if(f.isFile() && f.name.endsWith('.jar')) {
+                    new JarFile(f).withCloseable { jar ->
+                        if(jar.getEntry('labs/identity/Policy.class')!=null) actual << f.canonicalFile
+                    }
+                }
+            }
+            def expected=policyJar.get().archiveFile.get().asFile.canonicalFile
+            if(actual!=[expected]) throw new GradleException("运行classpath必须只有学员Policy jar；实际="+actual)
+        }
+    }
+    tasks.named('test') {
+        dependsOn tasks.named('verifyProductionPolicyJar')
+        exclude '**/IdentityNetworkTest.class'
+    }
+    tasks.register('httpAcceptance',Test) {
+        description='真Tomcat HTTP和实际Policy类来源；任何失败使Gradle失败'
+        dependsOn tasks.named('testClasses'), tasks.named('verifyProductionPolicyJar')
+        testClassesDirs=sourceSets.test.output.classesDirs
+        classpath=sourceSets.test.runtimeClasspath
+        include '**/IdentityNetworkTest.class','**/ProductionPolicyOriginTest.class'
+        ignoreFailures=false
+        systemProperty 'identity.probe.wrongAudience',rootProject.hasProperty('identityHttpNegative').toString()
+    }
+    tasks.register('run',JavaExec) {
+        dependsOn tasks.named('classes'),tasks.named('verifyProductionPolicyJar')
+        classpath=sourceSets.main.runtimeClasspath;mainClass='labs.identity.IdentityApplication'
+        args '--spring.profiles.active=fixture'
+    }
+}
+// 关键：原生学员test结束后必须执行实际HTTP门禁；finalizer的失败不能被吞掉。
+learner.tasks.named('test') { finalizedBy service.tasks.named('httpAcceptance') }
+tasks.register('identityCheck') { dependsOn learner.tasks.named('test'),service.tasks.named('test') }
+
+apply from: rootProject.file('materials/identity/gate_receipts.gradle')
+

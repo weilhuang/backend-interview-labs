@@ -1,0 +1,13 @@
+{
+  "target_course": "courses/backend-interview",
+  "status": "SOURCE_DRAFT_RUNTIME_NOT_RUN",
+  "shared_project": "materials/cloud-native",
+  "apply_policy": "Copy the shared project into a new task-specific build context and overlay only the declared editable file; never mutate the shared reference project",
+  "tasks": [
+    {"id": "C11-01", "path": "c11-cloud-native/01-images/01-build-and-stop", "editable": "Dockerfile", "build_context_target": "container/Dockerfile"},
+    {"id": "C11-02", "path": "c11-cloud-native/02-compose/01-ready-and-seed", "editable": "CloudPolicy.java", "build_context_target": "src/labs/CloudPolicy.java"},
+    {"id": "C11-03", "path": "c11-cloud-native/03-network/01-service-discovery", "editable": "AddressPolicy.java", "build_context_target": "src/labs/AddressPolicy.java"}
+  ],
+  "required_but_missing": ["Visible JUnit bridge", "Total-course Gradle integration", "Strict dependency locks", "Bounded environment lifecycle adapter"],
+  "native_check": "NOT_RUN"
+}

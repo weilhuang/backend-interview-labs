@@ -1,0 +1,754 @@
+{
+  "schema_version": 1,
+  "commands": {
+    "c00/01-workspace/lab/task.md": [
+      ":c00-01-workspace-lab:run",
+      ":c00-01-workspace-lab:test"
+    ],
+    "c00/02-values/lab/task.md": [
+      ":c00-02-values-lab:run",
+      ":c00-02-values-lab:test"
+    ],
+    "c00/03-parsing/lab/task.md": [
+      ":c00-03-parsing-lab:run",
+      ":c00-03-parsing-lab:test"
+    ],
+    "c00/04-generics/lab/task.md": [
+      ":c00-04-generics-lab:run",
+      ":c00-04-generics-lab:test"
+    ],
+    "c00/05-io/lab/task.md": [
+      ":c00-05-io-lab:run",
+      ":c00-05-io-lab:test"
+    ],
+    "c00/06-debug/lab/task.md": [
+      ":c00-06-debug-lab:run",
+      ":c00-06-debug-lab:test"
+    ],
+    "c00/07-algorithms/lab/task.md": [
+      ":c00-07-algorithms-lab:run",
+      ":c00-07-algorithms-lab:test"
+    ],
+    "c00/08-capstone/lab/task.md": [
+      ":c00-08-capstone-lab:cli",
+      ":c00-08-capstone-lab:run",
+      ":c00-08-capstone-lab:test"
+    ],
+    "c01/01-views/lab/task.md": [
+      ":c01-01-views-lab:run",
+      ":c01-01-views-lab:test"
+    ],
+    "c01/02-array-list/lab/task.md": [
+      ":c01-02-array-list-lab:run",
+      ":c01-02-array-list-lab:test"
+    ],
+    "c01/03-linked/lab/task.md": [
+      ":c01-03-linked-lab:run",
+      ":c01-03-linked-lab:test"
+    ],
+    "c01/04-hash-map/lab/task.md": [
+      ":c01-04-hash-map-lab:run",
+      ":c01-04-hash-map-lab:test"
+    ],
+    "c01/05-real-hash-map/lab/task.md": [
+      ":c01-05-real-hash-map-lab:run",
+      ":c01-05-real-hash-map-lab:test"
+    ],
+    "c01/06-ordered/lab/task.md": [
+      ":c01-06-ordered-lab:run",
+      ":c01-06-ordered-lab:test"
+    ],
+    "c01/07-iterators/lab/task.md": [
+      ":c01-07-iterators-lab:run",
+      ":c01-07-iterators-lab:test"
+    ],
+    "c01/08-query-project/lab/task.md": [
+      ":c01-08-query-project-lab:run",
+      ":c01-08-query-project-lab:test"
+    ],
+    "capstone/stages/01-contract/task.md": [
+      ":capstone-stages-01-contract:test",
+      ":capstone-stages-01-contract:usage"
+    ],
+    "capstone/stages/02-reliability/task.md": [
+      ":capstone-stages-02-reliability:integrationTest",
+      ":capstone-stages-02-reliability:test",
+      ":capstone-stages-02-reliability:usage"
+    ],
+    "capstone/stages/03-delivery/task.md": [
+      ":capstone-stages-03-delivery:integrationTest",
+      ":capstone-stages-03-delivery:test",
+      ":capstone-stages-03-delivery:usage"
+    ],
+    "capstone/stages/04-recovery/task.md": [
+      ":capstone-stages-04-recovery:integrationTest",
+      ":capstone-stages-04-recovery:test",
+      ":capstone-stages-04-recovery:usage"
+    ],
+    "capstone/stages/05-defense/task.md": [
+      ":capstone-stages-05-defense:integrationTest",
+      ":capstone-stages-05-defense:test",
+      ":capstone-stages-05-defense:usage"
+    ],
+    "distributed-course/services/01-failure-model/task.md": [
+      ":distributed-course-services-01-failure-model:integrationTest",
+      ":distributed-course-services-01-failure-model:run",
+      ":distributed-course-services-01-failure-model:test"
+    ],
+    "distributed-course/services/02-grpc/task.md": [
+      ":distributed-course-services-02-grpc:integrationTest",
+      ":distributed-course-services-02-grpc:run",
+      ":distributed-course-services-02-grpc:test"
+    ],
+    "distributed-course/services/03-dubbo/task.md": [
+      ":distributed-course-services-03-dubbo:integrationTest",
+      ":distributed-course-services-03-dubbo:run",
+      ":distributed-course-services-03-dubbo:test"
+    ],
+    "distributed-course/services/04-resilience/task.md": [
+      ":distributed-course-services-04-resilience:integrationTest",
+      ":distributed-course-services-04-resilience:run",
+      ":distributed-course-services-04-resilience:test"
+    ],
+    "distributed-course/services/05-idempotency/task.md": [
+      ":distributed-course-services-05-idempotency:integrationTest",
+      ":distributed-course-services-05-idempotency:run",
+      ":distributed-course-services-05-idempotency:test"
+    ],
+    "distributed-course/services/06-transactions/task.md": [
+      ":distributed-course-services-06-transactions:integrationTest",
+      ":distributed-course-services-06-transactions:run",
+      ":distributed-course-services-06-transactions:test",
+      ":distributed-course-services-06-transactions:unitTest"
+    ],
+    "distributed-course/services/07-outbox-cache/task.md": [
+      ":distributed-course-services-07-outbox-cache:integrationTest",
+      ":distributed-course-services-07-outbox-cache:run",
+      ":distributed-course-services-07-outbox-cache:test",
+      ":distributed-course-services-07-outbox-cache:unitTest"
+    ],
+    "distributed-course/services/08-capacity/task.md": [
+      ":distributed-course-services-08-capacity:integrationTest",
+      ":distributed-course-services-08-capacity:run",
+      ":distributed-course-services-08-capacity:test"
+    ],
+    "framework-course/01-boot/01-configuration/task.md": [
+      ":framework-course-01-boot-01-configuration:run",
+      ":framework-course-01-boot-01-configuration:test",
+      ":framework-course-01-boot-01-configuration:usage"
+    ],
+    "framework-course/01-boot/02-http-contract/task.md": [
+      ":framework-course-01-boot-02-http-contract:run",
+      ":framework-course-01-boot-02-http-contract:test",
+      ":framework-course-01-boot-02-http-contract:usage"
+    ],
+    "framework-course/01-boot/03-transactions/task.md": [
+      ":framework-course-01-boot-03-transactions:run",
+      ":framework-course-01-boot-03-transactions:test",
+      ":framework-course-01-boot-03-transactions:usage"
+    ],
+    "framework-course/01-boot/04-test-layers/task.md": [
+      ":framework-course-01-boot-04-test-layers:run",
+      ":framework-course-01-boot-04-test-layers:test",
+      ":framework-course-01-boot-04-test-layers:usage"
+    ],
+    "framework-course/01-boot/05-security/task.md": [
+      ":framework-course-01-boot-05-security:run",
+      ":framework-course-01-boot-05-security:test",
+      ":framework-course-01-boot-05-security:usage"
+    ],
+    "framework-course/01-boot/06-runtime-lifecycle/task.md": [
+      ":framework-course-01-boot-06-runtime-lifecycle:run",
+      ":framework-course-01-boot-06-runtime-lifecycle:test",
+      ":framework-course-01-boot-06-runtime-lifecycle:usage"
+    ],
+    "framework-course/01-boot/07-integrated-service/task.md": [
+      ":framework-course-01-boot-07-integrated-service:run",
+      ":framework-course-01-boot-07-integrated-service:test",
+      ":framework-course-01-boot-07-integrated-service:usage"
+    ],
+    "framework-course/02-source/08-container-di/task.md": [
+      ":framework-course-02-source-08-container-di:run",
+      ":framework-course-02-source-08-container-di:test",
+      ":framework-course-02-source-08-container-di:usage"
+    ],
+    "framework-course/02-source/09-bean-lifecycle/task.md": [
+      ":framework-course-02-source-09-bean-lifecycle:run",
+      ":framework-course-02-source-09-bean-lifecycle:test",
+      ":framework-course-02-source-09-bean-lifecycle:usage"
+    ],
+    "framework-course/02-source/10-circular-boundary/task.md": [
+      ":framework-course-02-source-10-circular-boundary:run",
+      ":framework-course-02-source-10-circular-boundary:test",
+      ":framework-course-02-source-10-circular-boundary:usage"
+    ],
+    "framework-course/02-source/11-aop-proxy/task.md": [
+      ":framework-course-02-source-11-aop-proxy:run",
+      ":framework-course-02-source-11-aop-proxy:test",
+      ":framework-course-02-source-11-aop-proxy:usage"
+    ],
+    "framework-course/02-source/12-transaction-source/task.md": [
+      ":framework-course-02-source-12-transaction-source:run",
+      ":framework-course-02-source-12-transaction-source:test",
+      ":framework-course-02-source-12-transaction-source:usage"
+    ],
+    "framework-course/02-source/13-mvc-source/task.md": [
+      ":framework-course-02-source-13-mvc-source:run",
+      ":framework-course-02-source-13-mvc-source:test",
+      ":framework-course-02-source-13-mvc-source:usage"
+    ],
+    "framework-course/02-source/14-autoconfiguration/task.md": [
+      ":framework-course-02-source-14-autoconfiguration:run",
+      ":framework-course-02-source-14-autoconfiguration:test",
+      ":framework-course-02-source-14-autoconfiguration:usage"
+    ],
+    "juc/01-publication/lab/task.md": [
+      ":juc-01-publication-lab:run",
+      ":juc-01-publication-lab:test"
+    ],
+    "juc/02-cancellation/lab/task.md": [
+      ":juc-02-cancellation-lab:run",
+      ":juc-02-cancellation-lab:test"
+    ],
+    "juc/03-bounded-buffer/lab/task.md": [
+      ":juc-03-bounded-buffer-lab:run",
+      ":juc-03-bounded-buffer-lab:test"
+    ],
+    "juc/04-aqs/lab/task.md": [
+      ":juc-04-aqs-lab:run",
+      ":juc-04-aqs-lab:test"
+    ],
+    "juc/05-atomics/lab/task.md": [
+      ":juc-05-atomics-lab:run",
+      ":juc-05-atomics-lab:test"
+    ],
+    "juc/06-executor/lab/task.md": [
+      ":juc-06-executor-lab:run",
+      ":juc-06-executor-lab:test"
+    ],
+    "juc/07-futures/lab/task.md": [
+      ":juc-07-futures-lab:run",
+      ":juc-07-futures-lab:test"
+    ],
+    "juc/08-virtual-threads/lab/task.md": [
+      ":juc-08-virtual-threads-lab:run",
+      ":juc-08-virtual-threads-lab:test"
+    ],
+    "jvm/01-loading/lab/task.md": [
+      ":jvm-01-loading-lab:run",
+      ":jvm-01-loading-lab:test"
+    ],
+    "jvm/02-lifecycle/lab/task.md": [
+      ":jvm-02-lifecycle-lab:run",
+      ":jvm-02-lifecycle-lab:test"
+    ],
+    "jvm/03-gc/lab/task.md": [
+      ":jvm-03-gc-lab:run",
+      ":jvm-03-gc-lab:test"
+    ],
+    "jvm/04-diagnostics/lab/task.md": [
+      ":jvm-04-diagnostics-lab:run",
+      ":jvm-04-diagnostics-lab:test"
+    ],
+    "jvm/05-migration/lab/task.md": [
+      ":jvm-05-migration-lab:run",
+      ":jvm-05-migration-lab:test"
+    ],
+    "jvm/06-java21/lab/task.md": [
+      ":jvm-06-java21-lab:run",
+      ":jvm-06-java21-lab:test"
+    ],
+    "jvm/07-java25/lab/task.md": [
+      ":jvm-07-java25-lab:run",
+      ":jvm-07-java25-lab:test"
+    ],
+    "kafka/01-contract/practice/task.md": [
+      ":kafka-01-contract-practice:run",
+      ":kafka-01-contract-practice:test"
+    ],
+    "kafka/02-producer/practice/task.md": [
+      ":kafka-02-producer-practice:run",
+      ":kafka-02-producer-practice:test"
+    ],
+    "kafka/03-inbox/practice/task.md": [
+      ":kafka-03-inbox-practice:run",
+      ":kafka-03-inbox-practice:test"
+    ],
+    "kafka/04-rebalance/practice/task.md": [
+      ":kafka-04-rebalance-practice:run",
+      ":kafka-04-rebalance-practice:test"
+    ],
+    "kafka/05-transactions/practice/task.md": [
+      ":kafka-05-transactions-practice:run",
+      ":kafka-05-transactions-practice:test"
+    ],
+    "kafka/06-recovery/practice/task.md": [
+      ":kafka-06-recovery-practice:run",
+      ":kafka-06-recovery-practice:test"
+    ],
+    "materials/backend-capstone/README.md": [
+      ":capstone-stages-01-contract:test",
+      ":capstone-stages-02-reliability:integrationTest",
+      ":capstone-stages-02-reliability:test",
+      ":capstone-stages-02-reliability:usage",
+      ":capstone-stages-03-delivery:integrationTest",
+      ":capstone-stages-03-delivery:test",
+      ":capstone-stages-04-recovery:integrationTest",
+      ":capstone-stages-04-recovery:test",
+      ":capstone-stages-05-defense:integrationTest",
+      ":capstone-stages-05-defense:test"
+    ],
+    "materials/backend-capstone/THIRD_PARTY_NOTICES.md": [],
+    "materials/backend-capstone/docs/前端使用.md": [],
+    "materials/backend-capstone/docs/故障演练.md": [],
+    "materials/backend-capstone/docs/源码与版本.md": [],
+    "materials/backend-capstone/docs/界面证据/README.md": [],
+    "materials/backend-capstone/docs/答辩与盲测标准解.md": [],
+    "materials/backend-capstone/中文阶段报告.md": [],
+    "materials/distributed-systems/README.md": [
+      ":distributed-course-services-01-failure-model:run",
+      ":distributed-course-services-01-failure-model:test",
+      ":distributed-course-services-01-failure-model:unitTest",
+      ":distributed-course-services-02-grpc:run",
+      ":distributed-course-services-02-grpc:test",
+      ":distributed-course-services-02-grpc:unitTest",
+      ":distributed-course-services-03-dubbo:run",
+      ":distributed-course-services-03-dubbo:test",
+      ":distributed-course-services-03-dubbo:unitTest",
+      ":distributed-course-services-04-resilience:test",
+      ":distributed-course-services-04-resilience:unitTest",
+      ":distributed-course-services-05-idempotency:integrationTest",
+      ":distributed-course-services-05-idempotency:test",
+      ":distributed-course-services-05-idempotency:unitTest",
+      ":distributed-course-services-06-transactions:integrationTest",
+      ":distributed-course-services-06-transactions:test",
+      ":distributed-course-services-06-transactions:unitTest",
+      ":distributed-course-services-07-outbox-cache:integrationTest",
+      ":distributed-course-services-07-outbox-cache:test",
+      ":distributed-course-services-07-outbox-cache:unitTest",
+      ":distributed-course-services-08-capacity:integrationTest",
+      ":distributed-course-services-08-capacity:test",
+      ":distributed-course-services-08-capacity:unitTest"
+    ],
+    "materials/distributed-systems/THIRD_PARTY_NOTICES.md": [],
+    "materials/distributed-systems/docs/保证边界与故障矩阵.md": [],
+    "materials/distributed-systems/docs/源码路线.md": [],
+    "materials/distributed-systems/docs/环境与发行.md": [],
+    "materials/distributed-systems/中文阶段报告.md": [],
+    "materials/java-concurrency/README.md": [
+      ":juc-01-publication-lab:clean",
+      ":juc-01-publication-lab:run",
+      ":juc-01-publication-lab:test",
+      ":juc-02-cancellation-lab:clean",
+      ":juc-02-cancellation-lab:test",
+      ":juc-03-bounded-buffer-lab:clean",
+      ":juc-03-bounded-buffer-lab:test",
+      ":juc-04-aqs-lab:clean",
+      ":juc-04-aqs-lab:test",
+      ":juc-05-atomics-lab:clean",
+      ":juc-05-atomics-lab:test",
+      ":juc-06-executor-lab:clean",
+      ":juc-06-executor-lab:test",
+      ":juc-07-futures-lab:clean",
+      ":juc-07-futures-lab:test",
+      ":juc-08-virtual-threads-lab:clean",
+      ":juc-08-virtual-threads-lab:test"
+    ],
+    "materials/java-concurrency/THIRD_PARTY_NOTICES.md": [],
+    "materials/java-concurrency/docs/实际调试记录.md": [
+      ":juc-04-aqs-lab:classes"
+    ],
+    "materials/java-concurrency/docs/源码路线图.md": [],
+    "materials/java-concurrency/docs/证据模板.md": [],
+    "materials/java-concurrency/docs/诊断证据.md": [],
+    "materials/java-concurrency/阶段报告.md": [],
+    "materials/java-foundations/README.md": [
+      ":c00-01-workspace-lab:run",
+      ":c00-01-workspace-lab:test",
+      ":c00-02-values-lab:test",
+      ":c00-03-parsing-lab:test",
+      ":c00-04-generics-lab:test",
+      ":c00-05-io-lab:test",
+      ":c00-06-debug-lab:test",
+      ":c00-07-algorithms-lab:test",
+      ":c00-08-capstone-lab:cli",
+      ":c00-08-capstone-lab:run",
+      ":c00-08-capstone-lab:test",
+      ":c01-01-views-lab:test",
+      ":c01-02-array-list-lab:test",
+      ":c01-03-linked-lab:test",
+      ":c01-04-hash-map-lab:test",
+      ":c01-05-real-hash-map-lab:test",
+      ":c01-06-ordered-lab:test",
+      ":c01-07-iterators-lab:test",
+      ":c01-08-query-project-lab:run",
+      ":c01-08-query-project-lab:test",
+      ":java-foundations-benchmark:jmh"
+    ],
+    "materials/java-foundations/THIRD_PARTY_NOTICES.md": [],
+    "materials/java-foundations/benchmark/实验设计.md": [
+      ":java-foundations-benchmark:jmh"
+    ],
+    "materials/java-foundations/benchmark/短探索记录.md": [],
+    "materials/java-foundations/docs/HashMap实际调试.md": [],
+    "materials/java-foundations/docs/源码与评阅.md": [],
+    "materials/java-foundations/docs/范围对照.md": [],
+    "materials/java-foundations/中文阶段报告.md": [],
+    "materials/java-frameworks/README.md": [
+      ":framework-course-01-boot-01-configuration:test",
+      ":framework-course-01-boot-01-configuration:usage",
+      ":framework-course-01-boot-02-http-contract:run",
+      ":framework-course-01-boot-02-http-contract:test",
+      ":framework-course-01-boot-03-transactions:integrationTest",
+      ":framework-course-01-boot-03-transactions:test",
+      ":framework-course-01-boot-04-test-layers:test",
+      ":framework-course-01-boot-05-security:test",
+      ":framework-course-01-boot-06-runtime-lifecycle:test",
+      ":framework-course-01-boot-07-integrated-service:run",
+      ":framework-course-01-boot-07-integrated-service:test",
+      ":framework-course-02-source-08-container-di:test",
+      ":framework-course-02-source-09-bean-lifecycle:test",
+      ":framework-course-02-source-10-circular-boundary:test",
+      ":framework-course-02-source-11-aop-proxy:test",
+      ":framework-course-02-source-12-transaction-source:test",
+      ":framework-course-02-source-13-mvc-source:test",
+      ":framework-course-02-source-14-autoconfiguration:test"
+    ],
+    "materials/java-frameworks/THIRD_PARTY_NOTICES.md": [],
+    "materials/java-frameworks/docs/云端验收复现.md": [
+      ":framework-course-01-boot-01-configuration:test",
+      ":framework-course-01-boot-01-configuration:verificationClasspath",
+      ":framework-course-01-boot-02-http-contract:test",
+      ":framework-course-01-boot-02-http-contract:verificationClasspath",
+      ":framework-course-01-boot-03-transactions:compileIntegrationTestJava",
+      ":framework-course-01-boot-03-transactions:integrationTest",
+      ":framework-course-01-boot-03-transactions:test",
+      ":framework-course-01-boot-03-transactions:verificationClasspath",
+      ":framework-course-01-boot-04-test-layers:test",
+      ":framework-course-01-boot-04-test-layers:verificationClasspath",
+      ":framework-course-01-boot-05-security:test",
+      ":framework-course-01-boot-05-security:verificationClasspath",
+      ":framework-course-01-boot-06-runtime-lifecycle:test",
+      ":framework-course-01-boot-06-runtime-lifecycle:verificationClasspath",
+      ":framework-course-01-boot-07-integrated-service:test",
+      ":framework-course-01-boot-07-integrated-service:verificationClasspath",
+      ":framework-course-02-source-08-container-di:test",
+      ":framework-course-02-source-08-container-di:verificationClasspath",
+      ":framework-course-02-source-09-bean-lifecycle:test",
+      ":framework-course-02-source-09-bean-lifecycle:verificationClasspath",
+      ":framework-course-02-source-10-circular-boundary:test",
+      ":framework-course-02-source-10-circular-boundary:verificationClasspath",
+      ":framework-course-02-source-11-aop-proxy:test",
+      ":framework-course-02-source-11-aop-proxy:verificationClasspath",
+      ":framework-course-02-source-12-transaction-source:test",
+      ":framework-course-02-source-12-transaction-source:verificationClasspath",
+      ":framework-course-02-source-13-mvc-source:test",
+      ":framework-course-02-source-13-mvc-source:verificationClasspath",
+      ":framework-course-02-source-14-autoconfiguration:test",
+      ":framework-course-02-source-14-autoconfiguration:verificationClasspath"
+    ],
+    "materials/java-frameworks/docs/前端使用.md": [
+      ":framework-course-01-boot-02-http-contract:run",
+      ":framework-course-01-boot-07-integrated-service:run"
+    ],
+    "materials/java-frameworks/docs/源码与版本.md": [],
+    "materials/java-frameworks/docs/课程覆盖与验收边界.md": [],
+    "materials/java-frameworks/shared/README.md": [],
+    "materials/java-frameworks/中文阶段报告.md": [],
+    "materials/java-jvm/README.md": [
+      ":jvm-01-loading-lab:run",
+      ":jvm-01-loading-lab:test",
+      ":jvm-02-lifecycle-lab:test",
+      ":jvm-03-gc-lab:test",
+      ":jvm-04-diagnostics-lab:test",
+      ":jvm-05-migration-lab:test",
+      ":jvm-06-java21-lab:test",
+      ":jvm-07-java25-lab:test"
+    ],
+    "materials/java-jvm/THIRD_PARTY_NOTICES.md": [],
+    "materials/java-jvm/diagnostics/CPU热点事故档案.md": [],
+    "materials/java-jvm/diagnostics/事故档案模板.md": [],
+    "materials/java-jvm/diagnostics/对象保留事故档案.md": [],
+    "materials/java-jvm/diagnostics/监视器竞争事故档案.md": [],
+    "materials/java-jvm/diagnostics/线程池饱和事故档案.md": [],
+    "materials/java-jvm/docs/源码阅读清单.md": [],
+    "materials/java-jvm/docs/评阅标准.md": [],
+    "materials/java-jvm/阶段报告.md": [],
+    "materials/messaging/README.md": [
+      ":kafka-01-contract-practice:run",
+      ":kafka-01-contract-practice:test",
+      ":kafka-02-producer-practice:test",
+      ":kafka-03-inbox-practice:test",
+      ":kafka-04-rebalance-practice:test",
+      ":kafka-05-transactions-practice:test",
+      ":kafka-06-recovery-practice:test",
+      ":rocketmq-01-routing-practice:test",
+      ":rocketmq-02-retry-practice:test",
+      ":rocketmq-03-order-delay-practice:test",
+      ":rocketmq-04-transactions-practice:test",
+      ":rocketmq-05-storage-practice:test",
+      ":rocketmq-06-comparison-practice:test"
+    ],
+    "materials/messaging/THIRD_PARTY_NOTICES.md": [],
+    "materials/messaging/验证报告.md": [],
+    "materials/mysql-engineering/README.md": [
+      ":mysql-01-model-01-order-contract:reset",
+      ":mysql-01-model-01-order-contract:run",
+      ":mysql-01-model-01-order-contract:test",
+      ":mysql-01-model-01-order-contract:unitTest",
+      ":mysql-02-index-02-plan-evidence:test",
+      ":mysql-02-index-02-plan-evidence:unitTest",
+      ":mysql-03-query-03-pagination:test",
+      ":mysql-03-query-03-pagination:unitTest",
+      ":mysql-04-isolation-04-mvcc:test",
+      ":mysql-04-isolation-04-mvcc:unitTest",
+      ":mysql-05-locks-05-deadlock:test",
+      ":mysql-05-locks-05-deadlock:unitTest",
+      ":mysql-06-recovery-06-durability:test",
+      ":mysql-06-recovery-06-durability:unitTest",
+      ":mysql-07-stock-07-inventory:test",
+      ":mysql-07-stock-07-inventory:unitTest"
+    ],
+    "materials/mysql-engineering/SOURCES.md": [],
+    "materials/mysql-engineering/THIRD_PARTY_NOTICES.md": [],
+    "materials/mysql-engineering/shared/README.md": [],
+    "materials/mysql-engineering/中文阶段报告.md": [],
+    "materials/redis-engineering/README.md": [
+      ":redis-course-redis-01-structures:integrationTest",
+      ":redis-course-redis-01-structures:run",
+      ":redis-course-redis-01-structures:test",
+      ":redis-course-redis-01-structures:unitTest",
+      ":redis-course-redis-02-expiry:integrationTest",
+      ":redis-course-redis-02-expiry:test",
+      ":redis-course-redis-02-expiry:unitTest",
+      ":redis-course-redis-03-stampede:integrationTest",
+      ":redis-course-redis-03-stampede:test",
+      ":redis-course-redis-03-stampede:unitTest",
+      ":redis-course-redis-04-consistency:integrationTest",
+      ":redis-course-redis-04-consistency:test",
+      ":redis-course-redis-04-consistency:unitTest",
+      ":redis-course-redis-05-replication:integrationTest",
+      ":redis-course-redis-05-replication:test",
+      ":redis-course-redis-05-replication:unitTest",
+      ":redis-course-redis-06-leases:integrationTest",
+      ":redis-course-redis-06-leases:test",
+      ":redis-course-redis-06-leases:unitTest",
+      ":redis-course-redis-07-resilience:integrationTest",
+      ":redis-course-redis-07-resilience:test",
+      ":redis-course-redis-07-resilience:unitTest"
+    ],
+    "materials/redis-engineering/SOURCES.md": [],
+    "materials/redis-engineering/THIRD_PARTY_NOTICES.md": [],
+    "materials/redis-engineering/shared/README.md": [],
+    "materials/redis-engineering/中文阶段报告.md": [
+      ":redis-course-redis-01-structures:test",
+      ":redis-course-redis-01-structures:unitTest",
+      ":redis-course-redis-02-expiry:test",
+      ":redis-course-redis-02-expiry:unitTest",
+      ":redis-course-redis-03-stampede:test",
+      ":redis-course-redis-03-stampede:unitTest",
+      ":redis-course-redis-04-consistency:test",
+      ":redis-course-redis-04-consistency:unitTest",
+      ":redis-course-redis-05-replication:test",
+      ":redis-course-redis-05-replication:unitTest",
+      ":redis-course-redis-06-leases:test",
+      ":redis-course-redis-06-leases:unitTest",
+      ":redis-course-redis-07-resilience:test",
+      ":redis-course-redis-07-resilience:unitTest"
+    ],
+    "mysql/01-model/01-order-contract/answer.md": [
+      ":mysql-01-model-01-order-contract:test"
+    ],
+    "mysql/01-model/01-order-contract/task.md": [
+      ":mysql-01-model-01-order-contract:run",
+      ":mysql-01-model-01-order-contract:test",
+      ":mysql-01-model-01-order-contract:unitTest"
+    ],
+    "mysql/02-index/02-plan-evidence/answer.md": [
+      ":mysql-02-index-02-plan-evidence:test"
+    ],
+    "mysql/02-index/02-plan-evidence/task.md": [
+      ":mysql-02-index-02-plan-evidence:run",
+      ":mysql-02-index-02-plan-evidence:test",
+      ":mysql-02-index-02-plan-evidence:unitTest"
+    ],
+    "mysql/03-query/03-pagination/answer.md": [
+      ":mysql-03-query-03-pagination:test"
+    ],
+    "mysql/03-query/03-pagination/task.md": [
+      ":mysql-03-query-03-pagination:run",
+      ":mysql-03-query-03-pagination:test",
+      ":mysql-03-query-03-pagination:unitTest"
+    ],
+    "mysql/04-isolation/04-mvcc/answer.md": [
+      ":mysql-04-isolation-04-mvcc:test"
+    ],
+    "mysql/04-isolation/04-mvcc/task.md": [
+      ":mysql-04-isolation-04-mvcc:run",
+      ":mysql-04-isolation-04-mvcc:test",
+      ":mysql-04-isolation-04-mvcc:unitTest"
+    ],
+    "mysql/05-locks/05-deadlock/answer.md": [
+      ":mysql-05-locks-05-deadlock:test"
+    ],
+    "mysql/05-locks/05-deadlock/task.md": [
+      ":mysql-05-locks-05-deadlock:run",
+      ":mysql-05-locks-05-deadlock:test",
+      ":mysql-05-locks-05-deadlock:unitTest"
+    ],
+    "mysql/06-recovery/06-durability/answer.md": [
+      ":mysql-06-recovery-06-durability:test"
+    ],
+    "mysql/06-recovery/06-durability/task.md": [
+      ":mysql-06-recovery-06-durability:run",
+      ":mysql-06-recovery-06-durability:test",
+      ":mysql-06-recovery-06-durability:unitTest"
+    ],
+    "mysql/07-stock/07-inventory/answer.md": [
+      ":mysql-07-stock-07-inventory:test"
+    ],
+    "mysql/07-stock/07-inventory/task.md": [
+      ":mysql-07-stock-07-inventory:run",
+      ":mysql-07-stock-07-inventory:test",
+      ":mysql-07-stock-07-inventory:unitTest"
+    ],
+    "redis-course/redis/01-structures/solution.md": [],
+    "redis-course/redis/01-structures/task.md": [
+      ":redis-course-redis-01-structures:run",
+      ":redis-course-redis-01-structures:test",
+      ":redis-course-redis-01-structures:unitTest"
+    ],
+    "redis-course/redis/02-expiry/solution.md": [],
+    "redis-course/redis/02-expiry/task.md": [
+      ":redis-course-redis-02-expiry:run",
+      ":redis-course-redis-02-expiry:test",
+      ":redis-course-redis-02-expiry:unitTest"
+    ],
+    "redis-course/redis/03-stampede/solution.md": [],
+    "redis-course/redis/03-stampede/task.md": [
+      ":redis-course-redis-03-stampede:run",
+      ":redis-course-redis-03-stampede:test",
+      ":redis-course-redis-03-stampede:unitTest"
+    ],
+    "redis-course/redis/04-consistency/solution.md": [],
+    "redis-course/redis/04-consistency/task.md": [
+      ":redis-course-redis-04-consistency:run",
+      ":redis-course-redis-04-consistency:test",
+      ":redis-course-redis-04-consistency:unitTest"
+    ],
+    "redis-course/redis/05-replication/solution.md": [],
+    "redis-course/redis/05-replication/task.md": [
+      ":redis-course-redis-05-replication:run",
+      ":redis-course-redis-05-replication:test",
+      ":redis-course-redis-05-replication:unitTest"
+    ],
+    "redis-course/redis/06-leases/solution.md": [],
+    "redis-course/redis/06-leases/task.md": [
+      ":redis-course-redis-06-leases:run",
+      ":redis-course-redis-06-leases:test",
+      ":redis-course-redis-06-leases:unitTest"
+    ],
+    "redis-course/redis/07-resilience/solution.md": [],
+    "redis-course/redis/07-resilience/task.md": [
+      ":redis-course-redis-07-resilience:run",
+      ":redis-course-redis-07-resilience:test",
+      ":redis-course-redis-07-resilience:unitTest"
+    ],
+    "rocketmq/01-routing/practice/task.md": [
+      ":rocketmq-01-routing-practice:run",
+      ":rocketmq-01-routing-practice:test"
+    ],
+    "rocketmq/02-retry/practice/task.md": [
+      ":rocketmq-02-retry-practice:run",
+      ":rocketmq-02-retry-practice:test"
+    ],
+    "rocketmq/03-order-delay/practice/task.md": [
+      ":rocketmq-03-order-delay-practice:run",
+      ":rocketmq-03-order-delay-practice:test"
+    ],
+    "rocketmq/04-transactions/practice/task.md": [
+      ":rocketmq-04-transactions-practice:run",
+      ":rocketmq-04-transactions-practice:test"
+    ],
+    "rocketmq/05-storage/practice/task.md": [
+      ":rocketmq-05-storage-practice:run",
+      ":rocketmq-05-storage-practice:test"
+    ],
+    "rocketmq/06-comparison/practice/task.md": [
+      ":rocketmq-06-comparison-practice:run",
+      ":rocketmq-06-comparison-practice:test"
+    ],
+    "shared/README.md": [],
+    "c11-cloud-native/01-images/01-build-and-stop/task.md": [
+      ":c11-cloud-native-01-images-01-build-and-stop:test"
+    ],
+    "c11-cloud-native/02-compose/01-ready-and-seed/task.md": [
+      ":c11-cloud-native-02-compose-01-ready-and-seed:test"
+    ],
+    "c11-cloud-native/03-network/01-service-discovery/task.md": [
+      ":c11-cloud-native-03-network-01-service-discovery:test"
+    ],
+    "c11-cloud-native/04-kubernetes-basics/01-probes-and-replicas/task.md": [
+      ":c11-cloud-native-04-kubernetes-basics-01-probes-and-replicas:test"
+    ],
+    "c11-cloud-native/05-kubernetes-config/01-dns-config-secrets/task.md": [
+      ":c11-cloud-native-05-kubernetes-config-01-dns-config-secrets:test"
+    ],
+    "c11-cloud-native/06-kubernetes-release/01-rollout-and-resources/task.md": [
+      ":c11-cloud-native-06-kubernetes-release-01-rollout-and-resources:test"
+    ],
+    "go-course/core/greeting/task.md": [
+      ":go-course-core-greeting:test"
+    ],
+    "go-course/core/order-total/task.md": [
+      ":go-course-core-order-total:test"
+    ],
+    "go-course/core/quantity/task.md": [
+      ":go-course-core-quantity:test"
+    ],
+    "go-course/core/snapshot/task.md": [
+      ":go-course-core-snapshot:test"
+    ],
+    "identity/01-policy/lab/task.md": [
+      ":identity-01-policy-lab:test",
+      ":identity-01-policy-lab:usage"
+    ],
+    "identity/01-policy/lab/资料/调用链与排错.md": [
+      ":identity-01-policy-lab:test",
+      ":identity-resource-server:run"
+    ],
+    "observability/first-slice/metrics/solution.md": [
+      ":observability-first-slice-metrics:test"
+    ],
+    "observability/first-slice/metrics/task.md": [
+      ":observability-first-slice-metrics:test"
+    ],
+    "observability/first-slice/safe-events/solution.md": [
+      ":observability-first-slice-safe-events:test",
+      ":observability-first-slice-safe-events:usage"
+    ],
+    "observability/first-slice/safe-events/task.md": [
+      ":observability-first-slice-safe-events:test",
+      ":observability-first-slice-safe-events:usage"
+    ],
+    "observability/first-slice/trace-context/solution.md": [
+      ":observability-first-slice-trace-context:run",
+      ":observability-first-slice-trace-context:test"
+    ],
+    "observability/first-slice/trace-context/task.md": [
+      ":observability-first-slice-trace-context:run",
+      ":observability-first-slice-trace-context:test"
+    ],
+    "go-course/http/request-lifecycle/task.md": [
+      ":go-course-http-request-lifecycle:test"
+    ],
+    "go-course/http/gin-pipeline/task.md": [
+      ":go-course-http-gin-pipeline:test"
+    ]
+  },
+  "known_legacy_display_messages": [
+    "messaging Usage.java 的原样输出",
+    "JVM Java25EvidenceUsage.java 的原样输出"
+  ],
+  "native_execution": "NOT_RUN"
+}

@@ -1,0 +1,2 @@
+package ownership
+func SnapshotOrders(src []Order) []Order { return src }

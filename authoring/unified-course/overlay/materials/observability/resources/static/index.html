@@ -1,0 +1,6 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>C12 一次请求的三种证据</title>
+<style>body{font:18px/1.7 system-ui;max-width:850px;margin:50px auto;padding:16px;background:#f6f8fa;color:#1c2b39}button{font:inherit;padding:9px 18px;margin:6px}pre{white-space:pre-wrap;background:white;padding:20px;border:1px solid #ccd}small{display:block}</style>
+<h1>一次请求，三种证据</h1><p>前端已经写好。先点击一次正常请求，再用返回的 trace ID 去对照 JSON 日志和真实链路后端。</p>
+<button data-case="ok">正常结账</button><button data-case="fail">库存失败</button><button data-case="retry">第一次失败后重试</button>
+<small>仅合成商品 book；不输入账号、密码或个人信息。页面展示真实 HTTP 结果，不生成假图表。</small><pre id="out" aria-live="polite">尚未发送请求</pre>
+<script>document.querySelectorAll('button').forEach(b=>b.onclick=async()=>{b.disabled=true;const out=document.querySelector('#out');try{const t=performance.now();const r=await fetch('/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sku:'book',scenario:b.dataset.case})});out.textContent=JSON.stringify({http_status:r.status,trace_id:r.headers.get('X-Trace-Id'),browser_elapsed_ms:Math.round(performance.now()-t),body:await r.json()},null,2);}catch(e){out.textContent='请求失败：'+e.message;}finally{b.disabled=false;}});</script></html>

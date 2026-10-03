@@ -1,0 +1,48 @@
+{
+  "type": "edu",
+  "custom_name": "C11-04 从一个进程到会自愈的服务",
+  "files": [
+    {
+      "name": "ProbePolicy.java",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 0,
+          "length": 610,
+          "placeholder_text": "package labs;\n\n/** C11-04：纯策略易于公开测试，实际状态由KubernetesApp采集。 */\npublic final class ProbePolicy {\n    private ProbePolicy() {}\n    public static boolean startup(boolean initialized) { return initialized; }\n    public static boolean live(boolean localFailure, boolean dependencyHealthy) {\n        return dependencyHealthy; // 下游故障不是重启本进程的理由。\n    }\n    public static boolean ready(boolean initialized, boolean dependencyHealthy,\n                                boolean seeded, boolean draining, boolean forcedNotReady) {\n        return true;\n    }\n}\n"
+        }
+      ]
+    },
+    {
+      "name": "answers/ProbePolicy.java",
+      "visible": true
+    },
+    {
+      "name": "answers/deployment.yaml",
+      "visible": true
+    },
+    {
+      "name": "deployment.yaml",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 0,
+          "length": 3103,
+          "placeholder_text": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: orders\nspec:\n  replicas: 2\n  revisionHistoryLimit: 3\n  minReadySeconds: 3\n  progressDeadlineSeconds: 90\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxUnavailable: 0\n      maxSurge: 1\n  selector:\n    matchLabels:\n      app: orders\n  template:\n    metadata:\n      labels:\n        app: orders\n    spec:\n      serviceAccountName: orders\n      automountServiceAccountToken: false\n      terminationGracePeriodSeconds: 10\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n        runAsGroup: 10001\n        fsGroup: 10001\n        seccompProfile:\n          type: RuntimeDefault\n      containers:\n        - name: api\n          image: ${APP_IMAGE}\n          imagePullPolicy: Never\n          ports:\n            - name: http\n              containerPort: 8080\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n            capabilities:\n              drop: [ALL]\n          resources:\n            requests:\n              cpu: 100m\n              memory: 128Mi\n            limits:\n              cpu: 500m\n              memory: 256Mi\n          env:\n            - name: REDIS_HOST\n              valueFrom:\n                configMapKeyRef:\n                  name: orders-config\n                  key: redis-host\n            - name: REDIS_PORT\n              value: '6379'\n            - name: REDIS_PASSWORD_FILE\n              value: /run/secrets/password\n            - name: GREETING\n              valueFrom:\n                configMapKeyRef:\n                  name: orders-config\n                  key: greeting\n            - name: STARTUP_DELAY_MS\n              value: '8000'\n            - name: LAB_NAMESPACE\n              valueFrom:\n                fieldRef:\n                  fieldPath: metadata.namespace\n          startupProbe:\n            httpGet:\n              path: /startup\n              port: http\n            periodSeconds: 1\n            timeoutSeconds: 1\n            failureThreshold: 3\n          readinessProbe:\n            httpGet:\n              path: /live\n              port: http\n            periodSeconds: 2\n            timeoutSeconds: 2\n            failureThreshold: 2\n          livenessProbe:\n            httpGet:\n              path: /live\n              port: http\n            periodSeconds: 2\n            timeoutSeconds: 1\n            failureThreshold: 3\n          volumeMounts:\n            - name: tmp\n              mountPath: /tmp\n            - name: secret\n              mountPath: /run/secrets\n              readOnly: true\n            - name: banner\n              mountPath: /etc/course\n              readOnly: true\n      volumes:\n        - name: tmp\n          emptyDir:\n            sizeLimit: 32Mi\n        - name: secret\n          secret:\n            secretName: redis-auth\n            defaultMode: 0440\n            items:\n              - key: password\n                path: password\n        - name: banner\n          configMap:\n            name: orders-config\n            items:\n              - key: banner\n                path: banner\n"
+        }
+      ]
+    },
+    {
+      "name": "observations.md",
+      "visible": true
+    },
+    {
+      "name": "solution.md",
+      "visible": true
+    },
+    {
+      "name": "test/LabCheckTest.java",
+      "visible": true
+    }
+  ]
+}

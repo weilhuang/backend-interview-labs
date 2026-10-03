@@ -3,7 +3,8 @@
 from pathlib import Path
 import json,re,subprocess,os,argparse,yaml
 R=Path(__file__).resolve().parents[1]
-parser=argparse.ArgumentParser();parser.add_argument('--jdk',default=os.environ.get('JAVA_HOME','/workspace/shared/toolchains/jdk-21'));parser.add_argument('--module',choices=list({t['name'] for t in json.loads((R/'authoring/manifest.json').read_text())}));args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--jdk',default=os.environ.get('JAVA_HOME'));parser.add_argument('--module',choices=list({t['name'] for t in json.loads((R/'authoring/manifest.json').read_text())}));args=parser.parse_args()
+if not args.jdk:parser.error('请用 --jdk 或 JAVA_HOME 指定完整 JDK21')
 J=Path(args.jdk)/'bin';tasks=json.loads((R/'authoring/manifest.json').read_text())
 CASES={
 '01-failure-model':('src/labs/distributed/Lab.java','state = Knowledge.UNKNOWN;','state = Knowledge.NOT_SENT;','return available.compareTo(cap) < 0 ? available : cap;','return java.util.stream.Stream.of(available, cap).min(Duration::compareTo).orElseThrow();',['labs.distributed.LabTest']),

@@ -1,0 +1,12 @@
+package ownership
+
+// SnapshotOrders 返回可独立修改的订单快照。完整契约见 task.md 的 C1–C6。
+// 起点刻意只复制顶层：能编译、能运行，观察嵌套字段被污染后逐层修复。
+func SnapshotOrders(src []Order) []Order {
+	if src == nil {
+		return nil
+	}
+	dst := make([]Order, len(src))
+	copy(dst, src)
+	return dst
+}
