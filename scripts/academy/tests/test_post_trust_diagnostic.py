@@ -50,6 +50,16 @@ class ObserverTests(ObserverFixture):
         self.assertEqual(report['status'],'COLLECTED_NOT_ACCEPTANCE');self.assertEqual(report['stacks']['samples'][0]['source_id'],1)
         self.assertEqual(self.screen.call_count,1);self.assertEqual(self.screen.call_args.kwargs['diagnostic_deadline'],190)
         self.tick(obj,102);self.assertEqual(self.screen.call_count,1)
+    def test_rounded_sixty_second_tick_is_not_assumed_to_reach_fallback(self):
+        start=200.00000000000003;rounded=start+diagnostic.FALLBACK_SECONDS
+        self.assertLess(rounded-start,diagnostic.FALLBACK_SECONDS)
+        observer=self.observer(start=start);original_deadline=observer.deadline
+        self.tick(observer,rounded);self.assertFalse(observer.done);self.screen.assert_not_called()
+        self.tick(observer,observer.start+61);self.assertTrue(observer.done)
+        report=diagnostic.raw_json(self.root/diagnostic.REPORT)
+        self.assertEqual(report['capture_trigger'],'FALLBACK_60_SECONDS')
+        self.assertEqual(report['elapsed_seconds'],61);self.assertEqual(observer.deadline,original_deadline)
+
     def test_no_new_dump_falls_back_at_sixty_seconds(self):
         obj=self.observer();self.dump(2,self.wall-1);self.tick(obj,159);self.assertFalse(obj.done)
         self.tick(obj,160);report=diagnostic.raw_json(self.root/diagnostic.REPORT)
@@ -262,6 +272,15 @@ class ComposedOwnerHandoffTests(TrustFixture):
             self.assertEqual((self.root/diagnostic.BUDGET_OWNER).read_bytes(),before)
 
     def test_actual_owner_anchor_collector_and_stage5_use_one_deadline(self):
+        self.check_actual_handoff(clock_offset=0,capture_elapsed=61)
+
+    def test_actual_handoff_with_fractional_clock_offset_and_slower_tick(self):
+        self.check_actual_handoff(clock_offset=.125,capture_elapsed=75)
+
+    def test_actual_handoff_near_observer_deadline_keeps_original_budget(self):
+        self.check_actual_handoff(clock_offset=17.75,capture_elapsed=89)
+
+    def check_actual_handoff(self,*,clock_offset,capture_elapsed):
         import plugin_agreement as plugin
         owner=ui_session.process_info(os.getpid());record=ui_session.budget_record(owner,900)
         ui_session.put(self.root/'ui-deadline.json',record);diagnostic.bind_budget_owner(self.root)
@@ -284,7 +303,7 @@ class ComposedOwnerHandoffTests(TrustFixture):
             def verify():
                 self.assertTrue(ui_session.matching(meta,fd));self.assertEqual(ui_session.process_info(owner['pid']),owner)
             identity.verify=verify
-            now=time.monotonic();wall=time.time_ns();clock=[now]
+            now=time.monotonic()+clock_offset;wall=time.time_ns();clock=[now]
             directory=self.run/'validate-profile/log/bg-wa';directory.mkdir(parents=True)
             actions=[]
             def screen(action,path,*args,**kwargs):
@@ -292,11 +311,21 @@ class ComposedOwnerHandoffTests(TrustFixture):
                 if action in plugin.ACTIONS.values():Path(args[1]).write_text(action+'\n')
             with patch.object(diagnostic.time,'monotonic',side_effect=lambda:clock[0]),patch.object(diagnostic.time,'time_ns',return_value=wall):
                 observer=diagnostic.Observer(self.root,identity,record['monotonic_deadline'])
-                clock[0]+=60;observer.tick(child,screen,identity)
-                self.assertTrue(observer.done)
+                original_deadline=observer.deadline
+                clock[0]=observer.start+30;observer.tick(child,screen,identity)
+                self.assertFalse(observer.done);self.assertEqual(actions,[])
+                # Explicit progress past 60, below 90: adding exactly 60 can round down.
+                clock[0]=observer.start+capture_elapsed
+                self.assertGreater(clock[0]-observer.start,diagnostic.FALLBACK_SECONDS)
+                self.assertLess(clock[0],original_deadline)
+                observer.tick(child,screen,identity)
+                self.assertTrue(observer.done);self.assertEqual(observer.deadline,original_deadline)
                 diagnostic.wait_collect(self.root,'123','1')  # Actual strict collector, not mocked.
                 report=diagnostic.raw_json(self.root/'post-trust-artifact'/diagnostic.REPORT)
                 self.assertEqual(report['budget_owner']['record'],record)
+                self.assertEqual(report['capture_trigger'],'FALLBACK_60_SECONDS')
+                self.assertEqual(report['elapsed_seconds'],capture_elapsed)
+                self.assertEqual(report['effective_deadline'],min(observer.start+90,record['monotonic_deadline']))
                 self.assertNotEqual(record['monotonic_deadline'],int(meta['start_time'])/os.sysconf('SC_CLK_TCK')+900)
                 original=plugin.publish;owned=type('FixtureOwned',(),{'scan':lambda _self:verify()})()
                 def publish(path,raw):
