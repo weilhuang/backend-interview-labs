@@ -1,0 +1,24 @@
+# 已退役的 R2 tar/gzip 交接测试
+
+`r2_tar_environment_acceptance.py.txt` 将原始 R2 测试模块逐字节保留为历史文本。该文件不参与 unittest 测试发现，也不会被导入或执行。原始 R2 工作副本同样保持不变。
+
+原有自定义 tar/gzip/PAX 格式已退役，改用 ZIP_STORED。针对压缩格式与 PAX 的独立审查尚未完成；格式退役不代表这些未知项通过验收。原格式专用检查不再适用于新格式。ZIP 恶意归档与元数据、资源耗尽、竞态及其他安全边界仍未得到全面验证。
+
+以下 15 项测试已退役，不计为通过，也不计为跳过。当前生效的 `test_stored_handoff.py` 覆盖 6 个普通、可信生产方场景下的功能用例，单独统计。与格式无关的环境及发布测试保持原样并继续生效。合成夹具辅助类以 `HandoffFixture` 名称继续使用。
+
+已退役的测试方法：
+- HandoffTests.test_roundtrip_preserves_regular_bytes_and_noexec_mode
+- HandoffTests.test_traversal_absolute_backslash_private_paths_rejected
+- HandoffTests.test_link_and_special_entries_rejected
+- HandoffTests.test_duplicate_missing_and_changed_file_rejected
+- HandoffTests.test_setuid_and_group_writable_rejected
+- HandoffTests.test_mode_drift_rejected_even_safe_mode
+- HandoffTests.test_foreign_commit_run_attempt_rejected
+- HandoffTests.test_existing_destination_or_symlink_rejected
+- HandoffTests.test_source_symlink_and_changed_plaintext_rejected
+- SupplementalSafetyTests.test_unsafe_pax_metadata_rejected
+- SupplementalSafetyTests.test_duplicate_manifest_json_key_rejected
+- SupplementalSafetyTests.test_manifest_added_unknown_file_still_rejected
+- IndependentReviewRegressionTests.test_oversized_pax_rejected_before_tarfile_parser
+- IndependentReviewRegressionTests.test_gzip_total_expansion_bound_includes_headers_and_metadata
+- IndependentReviewRegressionTests.test_contiguous_and_sparse_tar_types_not_regular

@@ -1,8 +1,27 @@
+# 后端面试实验室：单一100题课程源码 Draft
+
+当前统一入口：15章节、100题、159练习区。先阅读[公开整合阶段报告](docs/统一100题公开整合阶段报告.md)和[可复现作者输入](authoring/unified-course/README.md)。
+
+```bash
+python -m pip install -r scripts/quality/requirements.txt
+PYTHONDONTWRITEBYTECODE=1 python scripts/build_unified_course.py --output build/backend-interview --report build/unified-generation.json
+```
+
+生成目录必须是新的；在生成根使用JDK21、固定Gradle8.10.2以及按题环境。普通学习副本不是官方ZIP。Actions只在完整原生和真实环境门禁全通过后提供单一可导入发行ZIP；当前仍是Draft，未宣称完整V2或完整验收通过。最终发行门禁明确BLOCKED，尚待实现真实Check/Reset、原生负例与扩展环境生命周期三类证据验证器。
+
+## 原仓库说明与作者资料
+
+下面保留原作者项目与历史阶段入口；学习者统一使用上面的生成根，历史通过记录不能替代本提交验收。
+
 # Backend Interview Labs
 
 面向 Java 后端面试的中文动手课程。以 JetBrains Academy 课程为学习入口，配合独立基础设施实验。
 
 ## 从这里开始
+
+- [单一 V1 Academy 课程入口：11 章节、84 任务](docs/统一课程入口.md)
+- [统一 V1 阶段报告与未完成门禁](docs/统一V1阶段报告.md)
+- [Actions 官方课程产物与下载边界](docs/Actions下载官方Academy课程.md)
 
 - [完整课程目录：16 门课程、113 个实验单元](docs/curriculum/01-full-curriculum.md)
 - [独立的 14 天面试优先路线](docs/curriculum/02-fourteen-day-priority-route.md)
@@ -20,7 +39,7 @@
 - [日期化质量摘要与本地归档证据](docs/quality/release-readiness-20261001.json)
 - [逐课制作/原生验证矩阵](docs/curriculum/09-v1-progress.md)
 
-最新交付方向改为：先由GitHub Actions打包提供产物，不再通过聊天上传；随后把全部V1整合为**单一Academy课程和统一环境**。总课整合正在推进，Actions调用Academy官方自动导出的方式仍在研究，尚未实现或验收；普通源码ZIP不能替代官方课程归档。
+当前交付方向为 **单一 Academy 课程和统一环境**，通过 GitHub Actions 提供产物。统一生成器及官方导出基础流水线已实现并通过静态检查；统一课程包含 11 章节、84 任务、136 练习区，固定 JDK 21。官方原生与真实统一 Docker 验收仍为 NOT_RUN，最终 ZIP 发布门禁保持 BLOCKED。详见[本阶段报告](docs/统一V1阶段报告.md)；普通源码 ZIP 不能替代官方课程归档。
 
 最近完整绿基线[f5b0d49的CI](https://github.com/weilhuang/backend-interview-labs/actions/runs/36780139579)包含12个实际测试job和10课三阶段。后续已修复C10“XA未实现却原生显示Correct”和C14“参考源码重复索引”的问题，新包原生证据已补齐到下列明确范围；新构建真实Docker CI仍未运行，不能继承旧绿。发布后以[PR #1](https://github.com/weilhuang/backend-interview-labs/pull/1)对应提交的实际结果为准。
 

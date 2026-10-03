@@ -1,0 +1,299 @@
+{
+  "schema": 2,
+  "repository_root": "courses/identity-labs",
+  "status": "LOCAL_JAVA_VERIFIED_CI_CANDIDATE_NOT_RUN",
+  "files_exclude_this_manifest": true,
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "21992aeb6353f0f4ee96f9cdb8d21a99df6a3825e23970eea9f40971cf9c8805",
+      "bytes": 107
+    },
+    {
+      "path": "README.md",
+      "sha256": "20e6b1739a1f201361209c777b6b5daa331bd47986b84517c9f8b2eafff1a911",
+      "bytes": 4329
+    },
+    {
+      "path": "build.gradle",
+      "sha256": "f5b78cafcfd66f11508c06c70f9e43fc8d6e70a8d749be3c84b2933ab054a34d",
+      "bytes": 5662
+    },
+    {
+      "path": "gate-contract.json",
+      "sha256": "8aa63a50e08d11d216468c4b81f7066dac412d8926d9ee8693b5294226398c65",
+      "bytes": 2026
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "b671b03f1330489649048ef9b39d2b650cecc24c470f84d5743a4c98c0df468e",
+      "bytes": 144
+    },
+    {
+      "path": "identity/01-policy/lab/gradle.lockfile",
+      "sha256": "1f91c1662aa8ffa6bf5423cb507ab520647793944e1eb886033c63b8ceae85b1",
+      "bytes": 1105
+    },
+    {
+      "path": "identity/01-policy/lab/mutants/admin-any-action/Policy.java",
+      "sha256": "35788a894ab965a9302321a4e57870d75c1f1c86d78d8f2b989229f273d61385",
+      "bytes": 1803
+    },
+    {
+      "path": "identity/01-policy/lab/mutants/empty-identifiers/Policy.java",
+      "sha256": "527a74569b5cec59ab776f20aadd034ebfa8215a047d2bb83f7ddcfaf9858160",
+      "bytes": 1692
+    },
+    {
+      "path": "identity/01-policy/lab/mutants/missing-tenant-check/Policy.java",
+      "sha256": "d74e83bf7d998fc619cfd83f199631e66c47cbeea5fbb9c22e085953be299a4f",
+      "bytes": 1650
+    },
+    {
+      "path": "identity/01-policy/lab/mutants/token-means-admin/Policy.java",
+      "sha256": "8b1cc4b9e5245dbe3b19577d69e23ee16722e603510cbb74558d3b88cab9eb85",
+      "bytes": 1051
+    },
+    {
+      "path": "identity/01-policy/lab/mutants/wrong-precedence/Policy.java",
+      "sha256": "b4ffc07212fc8685f85905cac2602e7e135930e00662adf36cb875d667765fd7",
+      "bytes": 1726
+    },
+    {
+      "path": "identity/01-policy/lab/mutants/wrong-reasons/Policy.java",
+      "sha256": "1353d26fd49aec3672d040c776fd1cb337a75aeffbd7879fb9218846b6b3a2fe",
+      "bytes": 1727
+    },
+    {
+      "path": "identity/01-policy/lab/reference/explicit/Policy.java",
+      "sha256": "5fa2f6ec17cfe81551cb575da7667c34a4392367bc9387a5379c2a840ad974da",
+      "bytes": 1402
+    },
+    {
+      "path": "identity/01-policy/lab/reference/table/Policy.java",
+      "sha256": "50529a83ee26f43589238846126be0e3606da733e9648c05f3684e232207987d",
+      "bytes": 1726
+    },
+    {
+      "path": "identity/01-policy/lab/src/labs/identity/Policy.java",
+      "sha256": "4ff71da32fa7a38e225849646a887249870ea34a0a89778d1eb5742dc6741e33",
+      "bytes": 1215
+    },
+    {
+      "path": "identity/01-policy/lab/src/labs/identity/Usage.java",
+      "sha256": "7d0a70b41f635e049bc9166d6f0557bfdf6ddb05b4955a4aec0f0251e8921097",
+      "bytes": 558
+    },
+    {
+      "path": "identity/01-policy/lab/task-info.yaml",
+      "sha256": "8a5be9ae0d2c530f9bfa247202448d0e1e6273c978f8a7e1322d461e8345fe15",
+      "bytes": 1898
+    },
+    {
+      "path": "identity/01-policy/lab/task.md",
+      "sha256": "c37df36acb997012cc45ebde80896aca3dbdd58904cbff58a7da9b7461de92b2",
+      "bytes": 4058
+    },
+    {
+      "path": "identity/01-policy/lab/test/labs/identity/PolicyTest.java",
+      "sha256": "57dcb3003112a55f8540a1f13f3c0e68fb1daee2540e051c8f687da2b9dab736",
+      "bytes": 5080
+    },
+    {
+      "path": "identity/01-policy/lab/答案.md",
+      "sha256": "39b7bf49c78dc423585c6ee73dc5b5b08538e0870f39b44b4e7446aaadb1bae0",
+      "bytes": 2284
+    },
+    {
+      "path": "identity/01-policy/lab/资料/identity-call-chain.svg",
+      "sha256": "98470136dcfd9a5df18693e950f400ac22e2d55cdfafa2a44c21e4a874a7fefa",
+      "bytes": 2730
+    },
+    {
+      "path": "identity/01-policy/lab/资料/先修与身份概念卡.md",
+      "sha256": "2338af50df94ba9f9cca28f9988ba12971f68b8140f4b2d79c8485e5fd933ad6",
+      "bytes": 9302
+    },
+    {
+      "path": "identity/01-policy/lab/资料/协议与版本核查.md",
+      "sha256": "beb6eb5569fb625b4437a3d8745899d75dd60932681e4ce47fa3741c9b78e48d",
+      "bytes": 1882
+    },
+    {
+      "path": "identity/01-policy/lab/资料/源码锚点与面试迁移.md",
+      "sha256": "0634b572b49a3a5af46ba1ce80525047a956630195b09f65745769b8dabfc720",
+      "bytes": 3471
+    },
+    {
+      "path": "identity/01-policy/lab/资料/调用链与排错.md",
+      "sha256": "e51b1e058810491875a844172eaba4656f695bec94bdffcda7692c6d6af8e0a5",
+      "bytes": 2798
+    },
+    {
+      "path": "manifest/ci-variants.json",
+      "sha256": "cb515cf00982f5953a9de558fe8b78e24180f53bff3ece359a2c762a2407b3f2",
+      "bytes": 28576
+    },
+    {
+      "path": "materials/identity/identity-lab/gradle.lockfile",
+      "sha256": "e9ba38009bbf248b5e5c697d572ab96c1c05b7fa9e5c95ab806a14d581013ff2",
+      "bytes": 8502
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/java/labs/identity/IdentityApplication.java",
+      "sha256": "8d4ed86cf3248adebeef63dcb68b69baf6d49c699ca025ba68b23da61eb0038b",
+      "bytes": 306
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/java/labs/identity/IdentityTokenDecoder.java",
+      "sha256": "8ed9c0ca0c7bc6eadac7dc396abfe9edea0bfb3b2a206e5f5dca8bc5a0953231",
+      "bytes": 3991
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/java/labs/identity/LdapSafety.java",
+      "sha256": "6427ed4f9b117ebd60177d3c8cff7ef6a19d1691d1cf743391d6182b48a486c1",
+      "bytes": 1114
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/java/labs/identity/OrderController.java",
+      "sha256": "e8e3088d1120bb0137d826c4763f0edd32ffe03b7a8ee92030d26769e07257df",
+      "bytes": 1871
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/java/labs/identity/SecurityConfig.java",
+      "sha256": "fe7173ed561fa50d291ff619ee67f4285b5e12744fd28e16cba41db6a0ef4726",
+      "bytes": 1518
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/java/labs/identity/TrustedSubject.java",
+      "sha256": "cd610ff6f313a0ef3f30ef11130b1063f254d67fd94c823f0a1cafbfb273a0f1",
+      "bytes": 834
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/resources/application-fixture.properties",
+      "sha256": "d5cba8a0bd6e073bb1bced0a3ea3ef868d7aeb5d86a5debe9d19b38d5ad162c0",
+      "bytes": 270
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/resources/application.properties",
+      "sha256": "637e25d9e3da48c602125df376d9849643e62471d6248cc0fc841284d49b4d40",
+      "bytes": 384
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/resources/static/app.js",
+      "sha256": "79a49fbc8253cf3667e0bc2fcadec9fe38541fd1fbbd0befb47238d5f59b15d1",
+      "bytes": 1227
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/resources/static/index.html",
+      "sha256": "b86e163a426141520e2f63995032d8d826b8046257cdd573ec94b83e7b21f989",
+      "bytes": 1419
+    },
+    {
+      "path": "materials/identity/identity-lab/src/main/resources/static/style.css",
+      "sha256": "c07f2af0c4e895cfb9df50f7a0cf1f19f7680ec38b96228f0d105a1314090fd6",
+      "bytes": 888
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityHttpTest.java",
+      "sha256": "4ab3d45bb2f065efd872a98f1be3f15f0310d8251e472e256afd21620e0d99fc",
+      "bytes": 3637
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityNetworkTest.java",
+      "sha256": "40ba2af502c5c9efa5431ae9e9d0dd3467e79b747fd0311624ac2ba89af816f2",
+      "bytes": 3933
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/java/labs/identity/IdentityTokenDecoderTest.java",
+      "sha256": "9f3423b837aef06d40eb57dbec5c87bae954cdd557c4b97497eb7a0b3559ed0d",
+      "bytes": 4745
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/java/labs/identity/LdapSafetyTest.java",
+      "sha256": "f0be5412e2fb9e1fa4ea52fa028215dc78b1792780bace123ffee007e91ad045",
+      "bytes": 617
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/java/labs/identity/ProductionPolicyOriginTest.java",
+      "sha256": "2ee05e84b0d6f81b71391a53ebb3f43d565a88b666c32f27285aa54807d7cf7b",
+      "bytes": 1841
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/java/labs/identity/TokenFixture.java",
+      "sha256": "063a98eb3602e4d12ad2dd06fc1ab932e7f83253b293730adf68ccd8c9d1284b",
+      "bytes": 2880
+    },
+    {
+      "path": "materials/identity/identity-lab/src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker",
+      "sha256": "8eca853a5a457f17e0479b71dfbe95f2a13aff9eeff250261ecdc8ca9b847a6a",
+      "bytes": 20
+    },
+    {
+      "path": "scripts/gate_receipts.gradle",
+      "sha256": "4abc0403fb360304c81222cab4d128002d0b26a3b44694b88310189cb51bafd8",
+      "bytes": 3203
+    },
+    {
+      "path": "scripts/owned_process.py",
+      "sha256": "7df04650ba87f28a7e7db103985a2c600fcb16eb3f17f402b365805e7c0067f8",
+      "bytes": 8574
+    },
+    {
+      "path": "scripts/verify_ci.py",
+      "sha256": "fe1c70d381b77e5ba466eb6926972395a017b0bae3b5201388072af88e892a74",
+      "bytes": 21870
+    },
+    {
+      "path": "scripts/verify_finalizedby_gate.py",
+      "sha256": "cfc1cdb4309b5146675252570f6e4e1ae33590ef019e54ec39bc30cbe70b8186",
+      "bytes": 15958
+    },
+    {
+      "path": "settings.gradle",
+      "sha256": "23bb384dd34d8f7814b5df26626338d6ae23336a0238c3dd67828c2d6b7480e0",
+      "bytes": 265
+    },
+    {
+      "path": "tests/test_ci.py",
+      "sha256": "91635e097ba5a62f3638e2e923cc4f85a267617cb000f258df7cd146c14653c4",
+      "bytes": 20219
+    },
+    {
+      "path": "tests/test_gate_mock.py",
+      "sha256": "2a78c8990fdb1208d22f346c5d2f6da07855a2d8f782b316b6d6ed496eaf5c35",
+      "bytes": 11559
+    },
+    {
+      "path": "tests/test_source_contracts.py",
+      "sha256": "112b6a33f0ea203c1278f1118eea25a91ca9819316e22a4aacdbef551a6870c4",
+      "bytes": 4786
+    },
+    {
+      "path": "validation/current-java-summary.json",
+      "sha256": "ca4e19445916986da15e15f52e2d599a8711b1b04fdce59f3148e4a2fc6a9f29",
+      "bytes": 4626
+    },
+    {
+      "path": "阶段报告.md",
+      "sha256": "653ad06965dc712c8ae6e519df14d13e2d4a85df378523fd6437bb2c446ec3a4",
+      "bytes": 9310
+    }
+  ],
+  "workflow": {
+    "path": ".github/workflows/identity-java.yml",
+    "sha256": "b5cbc11a1aa77e8e21c5069b0830bca51c55a4a6f5d13a946cc7f658af1bc588"
+  },
+  "preserved_local_evidence": {
+    "r3_source_manifest_sha256": "69dfb4ee6363bc969e315e52e3e6757b91e87c45de1e067c561b477203592929",
+    "two_correct_implementations": "35 method calls / 33 unique methods each; zero failure/error/skip",
+    "r3_actual_strict_gate": "three scenarios passed; only the designated expected200/observed401 failure in the negative run"
+  },
+  "candidate_checks": {
+    "with_locks_python_top_level_tests": 47,
+    "new_java_execution": "NOT_RUN",
+    "github_actions_execution": "NOT_RUN"
+  },
+  "owned_process_module_sha256": "7df04650ba87f28a7e7db103985a2c600fcb16eb3f17f402b365805e7c0067f8",
+  "boundary": "Business Java/Gradle and fixed locks retain accepted bytes. Metadata/docs/new CI change the whole-tree hash; prior Java evidence is not represented as a run of this whole candidate."
+}

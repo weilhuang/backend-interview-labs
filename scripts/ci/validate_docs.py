@@ -4,9 +4,12 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import importlib.util
 from pathlib import Path
 import re
 import subprocess
+import sys
+import tempfile
 import unicodedata
 from urllib.parse import unquote, urlsplit
 
@@ -70,6 +73,22 @@ def validate(root: Path, files: list[str]) -> dict:
             if not target.is_relative_to(root):
                 errors.append(f'{name}: link escapes repository {href}')
                 continue
+            # These template links describe the generated course layout. Resolve only
+            # the two exact known links to their tracked author sources; generated
+            # courses are checked independently at their own root with no mapping.
+            template_sources = {
+                '../shared/versions.env': 'infra/versions.env',
+                '../materials/backend-capstone/docs/前端使用.md': 'courses/backend-capstone/docs/前端使用.md',
+            }
+            if name == 'scripts/unified-environment/docs/统一环境.md' and parsed.path in template_sources:
+                source = template_sources[parsed.path]
+                target = (root / source).resolve()
+                if not target.is_relative_to(root):
+                    errors.append(f'{name}: template source escapes repository {href}')
+                    continue
+                if source not in known or not target.is_file():
+                    errors.append(f'{name}: missing tracked template source {href}')
+                    continue
             rel = target.relative_to(root).as_posix()
             if rel not in known and not any(value.startswith(rel.rstrip('/') + '/') for value in known):
                 errors.append(f'{name}: missing tracked link target {href}')
@@ -80,6 +99,40 @@ def validate(root: Path, files: list[str]) -> dict:
             'checked_links': checked, 'external_http_reachability': 'NOT_RUN', 'errors': errors}
 
 
+
+def validate_repository(root: Path, files: list[str]) -> dict:
+    """Partial authoring overlays are checked only in their sealed generated layout."""
+    prefix = 'authoring/unified-course/overlay/'
+    overlay = [name for name in files if name.startswith(prefix)]
+    ordinary = [name for name in files if not name.startswith(prefix)]
+    report = validate(root, ordinary)
+    if not overlay:
+        return report
+    required = {'authoring/unified-course/manifest.json', 'scripts/build_unified_course.py'}
+    if not required <= set(files):
+        report['errors'].append('Unified overlay requires its tracked sealed manifest and builder')
+        report['status'] = 'failed'
+        return report
+    try:
+        sys.path.insert(0, str(root.resolve() / 'scripts'))
+        spec = importlib.util.spec_from_file_location('public_docs_builder', root / 'scripts/build_unified_course.py')
+        builder = importlib.util.module_from_spec(spec); spec.loader.exec_module(builder)
+        with tempfile.TemporaryDirectory(prefix='course-doc-links-') as temp:
+            output = Path(temp) / 'course'
+            generation = builder.build(root, output)
+            generated = validate(output, list(builder.manifest(output)))
+            if generation['status'] != 'PASS' or generated['errors']:
+                raise ValueError('Generated overlay documentation failed')
+            report['checked_links'] += generated['checked_links']
+            report['generated_course'] = {'status': 'passed', 'tasks': generation['tasks'],
+                'source_manifest_sha256': generation['source_manifest_sha256'],
+                'checked_links': generated['checked_links']}
+    except Exception as error:
+        report['errors'].append('Unified overlay generation/link gate failed: ' + type(error).__name__ + ': ' + str(error))
+    report['status'] = 'failed' if report['errors'] else 'passed'
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path('.'))
@@ -87,7 +140,7 @@ def main() -> int:
     parser.add_argument('--files-json', type=Path, help='Optional tracked path inventory for source snapshots without .git')
     args = parser.parse_args()
     files = json.loads(args.files_json.read_text()) if args.files_json else [x.decode() for x in subprocess.check_output(['git', 'ls-files', '-z'], cwd=args.root).split(b'\0') if x]
-    report = validate(args.root, files)
+    report = validate_repository(args.root, files)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(json.dumps(report, ensure_ascii=False, indent=2))

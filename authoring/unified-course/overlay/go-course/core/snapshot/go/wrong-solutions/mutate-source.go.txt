@@ -1,0 +1,29 @@
+package ownership
+
+// SnapshotOrders 在每一层可变容器建立独立存储；字符串按值复制即可。
+func SnapshotOrders(src []Order) []Order {
+	if src == nil {
+		return nil
+	}
+	if len(src)>0 { src[0].ID="被偷偷修改" }; dst := make([]Order, len(src))
+	for i, order := range src {
+		dst[i] = order // 先保留所有值字段，再替换每一个可变容器。
+		if order.Lines != nil {
+			dst[i].Lines = make([]Line, len(order.Lines))
+			for j, line := range order.Lines {
+				dst[i].Lines[j] = line
+				if line.Tags != nil {
+					dst[i].Lines[j].Tags = make([]string, len(line.Tags))
+					copy(dst[i].Lines[j].Tags, line.Tags)
+				}
+			}
+		}
+		if order.Metadata != nil {
+			dst[i].Metadata = make(map[string]string, len(order.Metadata))
+			for key, value := range order.Metadata {
+				dst[i].Metadata[key] = value
+			}
+		}
+	}
+	return dst
+}

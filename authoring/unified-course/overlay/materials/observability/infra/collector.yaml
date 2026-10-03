@@ -1,0 +1,59 @@
+# Review candidate only; validate using frozen binary before any real execution.
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 192
+    spike_limit_mib: 48
+  transform/allowlist:
+    error_mode: propagate
+    trace_statements:
+      - keep_keys(resource.attributes, ["service.name"])
+      - keep_keys(span.attributes, ["http.request.method", "http.route", "http.response.status_code", "url.scheme", "server.address", "server.port", "error.type", "lab.attempt"])
+    metric_statements:
+      - keep_keys(resource.attributes, ["service.name"])
+      - keep_keys(datapoint.attributes, ["http.request.method", "http.route", "http.response.status_code", "url.scheme", "error.type"])
+  batch:
+    timeout: 1s
+    send_batch_size: 128
+    send_batch_max_size: 256
+exporters:
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true # isolated teaching bridge only; not a production TLS recommendation
+    timeout: 2s
+    sending_queue:
+      enabled: true
+      num_consumers: 2
+      queue_size: 64 # batches, NOT span count or bytes
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 5s
+      max_elapsed_time: 30s
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    resource_to_telemetry_conversion:
+      enabled: false
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/allowlist, batch]
+      exporters: [otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, transform/allowlist, batch]
+      exporters: [prometheus]
+  telemetry:
+    logs:
+      level: info

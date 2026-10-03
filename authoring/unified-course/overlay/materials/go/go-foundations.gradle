@@ -1,0 +1,48 @@
+// 独立adapter提案；尚未执行主课程Gradle接入验收，不修改其他任务。
+def goModules = [':go-course-core-greeting':'go-course/core/greeting', ':go-course-core-quantity':'go-course/core/quantity', ':go-course-core-order-total':'go-course/core/order-total']
+goModules.each { modulePath, relativeDir ->
+    def module = rootProject.findProject(modulePath)
+    if (module == null || module.projectDir.canonicalFile != rootProject.file(relativeDir).canonicalFile)
+        throw new GradleException('Go 项目映射不符合合同: ' + modulePath)
+    configure(module) {
+        apply plugin: 'java'
+        repositories { mavenCentral() }
+        java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+        sourceSets {
+            main { java.setSrcDirs(['src']); resources.setSrcDirs([]) }
+            test { java.setSrcDirs(['test']); resources.setSrcDirs([]) }
+        }
+        dependencies {
+            testImplementation platform('org.junit:junit-bom:5.11.4')
+            testImplementation 'org.junit.jupiter:junit-jupiter'
+            testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
+        }
+        dependencyLocking { lockAllConfigurations(); lockMode = LockMode.STRICT }
+        tasks.withType(JavaCompile).configureEach { options.release = 21; options.encoding = 'UTF-8' }
+        def commandName = ['greeting':'hello', 'quantity':'quantity', 'order-total':'order'][relativeDir.tokenize('/').last()]
+        def contractSources = tasks.register('verifyGoContractSources') {
+            doLast {
+                ['src/GoTestBridge.java', 'test/GoContractTest.java', 'test/GoTestBridgeTest.java',
+                 'go/go.mod', 'go/exercise.go', 'go/contract_test.go',
+                 'go/cmd/' + commandName + '/main.go',
+                 'go/cmd/' + commandName + '/main_test.go',
+                 'go/cmd/' + commandName + '/main_process_test.go'].each { path ->
+                    if (!project.file(path).isFile()) throw new GradleException('NOT_RUN: 缺少 Go 合同文件 ' + path)
+                }
+            }
+        }
+        tasks.withType(Test).configureEach {
+            dependsOn contractSources
+            useJUnitPlatform()
+            maxParallelForks = 1
+            maxHeapSize = '384m'
+            jvmArgs '-XX:ActiveProcessorCount=2'
+            testLogging { events 'failed', 'skipped'; exceptionFormat 'full' }
+            afterSuite { descriptor, result ->
+                if (descriptor.parent == null && (result.testCount != 3 || result.skippedTestCount != 0))
+                    throw new GradleException('NOT_RUN: Go 入口必须执行完整 3 项 JUnit，且不得跳过')
+            }
+        }
+        apply from: project.file('build.gradle.fragment')
+    }
+}

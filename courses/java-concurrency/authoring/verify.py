@@ -34,9 +34,10 @@ def validate():
  return found
 
 def main():
- parser=argparse.ArgumentParser();parser.add_argument('--junit-console',type=Path,required=True);parser.add_argument('--java-home',type=Path,default=Path(os.environ.get('JAVA_HOME','/workspace/shared/toolchains/jdk-21')));parser.add_argument('--metadata-only',action='store_true');args=parser.parse_args()
+ parser=argparse.ArgumentParser();parser.add_argument('--junit-console',type=Path,required=True);parser.add_argument('--java-home',type=Path,default=Path(os.environ['JAVA_HOME']) if os.environ.get('JAVA_HOME') else None);parser.add_argument('--metadata-only',action='store_true');args=parser.parse_args()
  validate()
  if args.metadata_only:print('静态元数据通过；未运行IDE');return
+ if args.java_home is None:parser.error('请用 --java-home 或 JAVA_HOME 指定完整 JDK21')
  jar=args.junit_console.resolve();assert hashlib.sha256(jar.read_bytes()).hexdigest()=='b016ef6b1c3454d6d7c2c88ce081dabf289699686af6622d6e4e2e1b54b4a2fc'
  javac=args.java_home/'bin/javac';java=args.java_home/'bin/java'
  version=subprocess.check_output([str(java),'-version'],stderr=subprocess.STDOUT,text=True);assert 'version "21' in version

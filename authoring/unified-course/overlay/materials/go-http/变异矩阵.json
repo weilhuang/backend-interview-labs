@@ -1,0 +1,114 @@
+[
+  {
+    "task": "request-lifecycle",
+    "variant": "no-body-limit",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/no-body-limit.go.txt",
+    "expected_test": "TestRequestContract/over_byte_limit",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "request-lifecycle",
+    "variant": "accept-trailing",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/accept-trailing.go.txt",
+    "expected_test": "TestRequestContract/extra_value",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "request-lifecycle",
+    "variant": "ignore-parent",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/ignore-parent.go.txt",
+    "expected_test": "TestContextContract/already_canceled",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "request-lifecycle",
+    "variant": "skip-validation",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/skip-validation.go.txt",
+    "expected_test": "TestRequestContract/zero_quantity",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "request-lifecycle",
+    "variant": "omit-cancel",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/omit-cancel.go.txt",
+    "expected_test": "TestContextContract/inherits_and_releases",
+    "expected_diagnostic": "CONTEXT cancel not released",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "return-without-abort",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/return-without-abort.go.txt",
+    "expected_test": "TestGinPipeline/unauthorized_stops_chain",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "errors-before-next",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/errors-before-next.go.txt",
+    "expected_test": "TestGinPipeline/unknown_error_redacted",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "overwrite-response",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/overwrite-response.go.txt",
+    "expected_test": "TestGinPipeline/committed_response_not_overwritten",
+    "expected_diagnostic": "GIN_DOUBLE_WRITE",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "missing-group-gate",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/missing-group-gate.go.txt",
+    "expected_test": "TestGinPipeline/unauthorized_stops_chain",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "ignore-parent",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/ignore-parent.go.txt",
+    "expected_test": "TestContextContract/already_canceled",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "request-lifecycle",
+    "variant": "corrupt-input",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/corrupt-input.go.txt",
+    "expected_test": "TestRequestContract/trim",
+    "expected_diagnostic": "REQUEST_FORWARDING",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "request-lifecycle",
+    "variant": "omit-postcheck",
+    "file": "go-course/http/request-lifecycle/go/wrong-solutions/omit-postcheck.go.txt",
+    "expected_test": "TestContextContract/canceled_after_store_success",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "corrupt-input",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/corrupt-input.go.txt",
+    "expected_test": "TestRequestContract/trim",
+    "expected_diagnostic": "REQUEST_FORWARDING",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  },
+  {
+    "task": "gin-pipeline",
+    "variant": "omit-postcheck",
+    "file": "go-course/http/gin-pipeline/go/wrong-solutions/omit-postcheck.go.txt",
+    "expected_test": "TestContextContract/canceled_after_store_success",
+    "expected_diagnostic": "HTTP_STATUS",
+    "expected_exit": "nonzero business assertion; compile must pass"
+  }
+]

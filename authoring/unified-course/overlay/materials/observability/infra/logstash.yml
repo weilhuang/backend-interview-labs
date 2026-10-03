@@ -1,0 +1,7 @@
+# Mandatory teaching settings: DEBUG/TRACE may expose the event BEFORE redaction.
+pipeline.workers: 1
+pipeline.ordered: true
+log.level: info
+log.format: json
+config.debug: false
+path.logs: /fixture/self-logs

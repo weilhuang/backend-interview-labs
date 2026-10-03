@@ -1,0 +1,33 @@
+{
+  "type": "edu",
+  "custom_name": "C11-06 发布不是apply成功：预算、阻断、回滚",
+  "files": [
+    {
+      "name": "answers/deployment.yaml",
+      "visible": true
+    },
+    {
+      "name": "deployment.yaml",
+      "visible": true,
+      "placeholders": [
+        {
+          "offset": 0,
+          "length": 3103,
+          "placeholder_text": "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: orders\nspec:\n  replicas: 2\n  revisionHistoryLimit: 3\n  minReadySeconds: 3\n  progressDeadlineSeconds: 90\n  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxUnavailable: 1\n      maxSurge: 0\n  selector:\n    matchLabels:\n      app: orders\n  template:\n    metadata:\n      labels:\n        app: orders\n    spec:\n      serviceAccountName: orders\n      automountServiceAccountToken: false\n      terminationGracePeriodSeconds: 10\n      securityContext:\n        runAsNonRoot: true\n        runAsUser: 10001\n        runAsGroup: 10001\n        fsGroup: 10001\n        seccompProfile:\n          type: RuntimeDefault\n      containers:\n        - name: api\n          image: ${APP_IMAGE}\n          imagePullPolicy: Never\n          ports:\n            - name: http\n              containerPort: 8080\n          securityContext:\n            allowPrivilegeEscalation: false\n            readOnlyRootFilesystem: true\n            capabilities:\n              drop: [ALL]\n          resources:\n            requests:\n              cpu: 10m\n              memory: 32Mi\n            limits:\n              cpu: 500m\n              memory: 256Mi\n          env:\n            - name: REDIS_HOST\n              valueFrom:\n                configMapKeyRef:\n                  name: orders-config\n                  key: redis-host\n            - name: REDIS_PORT\n              value: '6379'\n            - name: REDIS_PASSWORD_FILE\n              value: /run/secrets/password\n            - name: GREETING\n              valueFrom:\n                configMapKeyRef:\n                  name: orders-config\n                  key: greeting\n            - name: STARTUP_DELAY_MS\n              value: '8000'\n            - name: LAB_NAMESPACE\n              valueFrom:\n                fieldRef:\n                  fieldPath: metadata.namespace\n          startupProbe:\n            httpGet:\n              path: /startup\n              port: http\n            periodSeconds: 1\n            timeoutSeconds: 1\n            failureThreshold: 30\n          readinessProbe:\n            httpGet:\n              path: /ready\n              port: http\n            periodSeconds: 2\n            timeoutSeconds: 2\n            failureThreshold: 2\n          livenessProbe:\n            httpGet:\n              path: /live\n              port: http\n            periodSeconds: 2\n            timeoutSeconds: 1\n            failureThreshold: 3\n          volumeMounts:\n            - name: tmp\n              mountPath: /tmp\n            - name: secret\n              mountPath: /run/secrets\n              readOnly: true\n            - name: banner\n              mountPath: /etc/course\n              readOnly: true\n      volumes:\n        - name: tmp\n          emptyDir:\n            sizeLimit: 32Mi\n        - name: secret\n          secret:\n            secretName: redis-auth\n            defaultMode: 0440\n            items:\n              - key: password\n                path: password\n        - name: banner\n          configMap:\n            name: orders-config\n            items:\n              - key: banner\n                path: banner\n"
+        }
+      ]
+    },
+    {
+      "name": "observations.md",
+      "visible": true
+    },
+    {
+      "name": "solution.md",
+      "visible": true
+    },
+    {
+      "name": "test/LabCheckTest.java",
+      "visible": true
+    }
+  ]
+}
