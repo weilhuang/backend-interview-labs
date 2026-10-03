@@ -36,6 +36,7 @@ OPERATIONS={'INITIALIZE','OPEN_WORKER_STREAMS','SPAWN_CHILD','REGISTER_ROOT','PO
 DIAGNOSTIC_CODES={'UNCLASSIFIED_EXCEPTION','OWNERSHIP_UNVERIFIED','PROCESS_METADATA_LIMIT','REGISTRATION_DEADLINE',
                   'CHILD_ENUMERATION_BUDGET','CHILD_METADATA_LIMIT','CHILD_COUNT_LIMIT','REGISTERED_COUNT_LIMIT',
                   'REGISTERED_CLEANUP_INCOMPLETE','CANCELLED','OUTER_DEADLINE','INITIALIZATION_DEADLINE'}
+DIAGNOSTIC_CODES.update({'TASK_ENTRY_LIMIT','SCAN_DEADLINE'})
 EXCEPTION_TYPES={name for name,value in vars(builtins).items() if isinstance(value,type) and issubclass(value,BaseException)} | {'GateError','BoundaryError','TimeoutExpired','JSONDecodeError','UnknownException'}
 STATUSES={'result.json':{'PASS','FAILED'},'launch-result.json':{'CHECKPOINT_REACHED_NOT_ACCEPTANCE','FAILED'},
           'cleanup-result.json':{'UNKNOWN','COMMAND_COMPLETED_NOT_CHILD_CLEANUP_PROOF','FAILED'}}
@@ -58,6 +59,33 @@ def supervisor_json(data):
         return result
     def invalid_constant(value):raise ValueError('nonfinite supervisor diagnostic number')
     return json.loads(data,object_pairs_hook=unique,parse_constant=invalid_constant)
+
+def scan_facts_document(value,code):
+    fields={'task_entries_observed','task_entry_limit','child_candidates_seen','scan_started_monotonic_ns',
+            'sampled_monotonic_ns','deadline_monotonic_ns','elapsed_monotonic_ns','deadline_expired',
+            'parent_identity_sha256','parent_role','parent_identity_check'}
+    if type(value) is not dict or set(value)!=fields:raise ValueError('invalid scan fields')
+    result=dict(value)
+    for name in ('scan_started_monotonic_ns','sampled_monotonic_ns','deadline_monotonic_ns','elapsed_monotonic_ns'):
+        if type(value[name]) is not int or not 0<=value[name]<=2**63-1:raise ValueError('invalid scan time')
+    if type(value['task_entry_limit']) is not int or value['task_entry_limit']!=1024:raise ValueError('invalid task limit')
+    for name,low,high in (('task_entries_observed',1,1025),('child_candidates_seen',0,512)):
+        if type(value[name]) is not int or not low<=value[name]<=high:raise ValueError('invalid scan count')
+    if type(value['deadline_expired']) is not bool:raise ValueError('invalid scan deadline flag')
+    if type(value['parent_identity_sha256']) is not str or not re.fullmatch(r'[0-9a-f]{64}',value['parent_identity_sha256']):raise ValueError('invalid parent digest')
+    enum_value(value['parent_role'],{'SUPPLIED_PARENT','DIRECT_CHILD','DESCENDANT'})
+    enum_value(value['parent_identity_check'],{'CALLER_SUPPLIED','MATCHED_BEFORE_SCAN'})
+    if value['sampled_monotonic_ns']<value['scan_started_monotonic_ns']:raise ValueError('invalid scan ordering')
+    if value['elapsed_monotonic_ns']!=value['sampled_monotonic_ns']-value['scan_started_monotonic_ns']:raise ValueError('invalid scan elapsed time')
+    if value['deadline_expired'] and value['sampled_monotonic_ns']<value['deadline_monotonic_ns']:raise ValueError('invalid expired deadline')
+    if not value['deadline_expired'] and value['sampled_monotonic_ns']>value['deadline_monotonic_ns']:raise ValueError('invalid live deadline')
+    if (value['parent_role']=='SUPPLIED_PARENT') != (value['parent_identity_check']=='CALLER_SUPPLIED'):raise ValueError('invalid parent proof classification')
+    if code=='TASK_ENTRY_LIMIT':
+        if value['task_entries_observed']!=1025:raise ValueError('invalid task limit branch')
+    elif code=='SCAN_DEADLINE':
+        if value['task_entries_observed']>1024 or not value['deadline_expired']:raise ValueError('invalid deadline branch')
+    else:raise ValueError('invalid scan branch')
+    return result
 
 def supervisor_document(value,source_name):
     """Only these typed scalar facts may cross the public artifact boundary."""
@@ -84,6 +112,10 @@ def supervisor_document(value,source_name):
                      'exception_type':enum_value(item.get('exception_type'),EXCEPTION_TYPES),
                      'code':enum_value(item.get('code'),DIAGNOSTIC_CODES)}
         if 'errno' in item:result[key]['errno']=optional_integer(item['errno'],1,4095)
+        if 'scan_facts' in item:
+            result[key]['scan_facts']=scan_facts_document(item['scan_facts'],result[key]['code'])
+        elif result[key]['code'] in ('TASK_ENTRY_LIMIT','SCAN_DEADLINE'):
+            raise ValueError('missing scan measurements')
     if source_name=='result.json':
         result.setdefault('exit_code',None);result.setdefault('cleanup_verified',None)
     return result

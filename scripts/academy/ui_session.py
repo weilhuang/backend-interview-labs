@@ -34,6 +34,10 @@ def exception_diagnostic(exc, operation):
            '原官方执行60分钟总预算耗尽':'OUTER_DEADLINE',
            '监督预算未初始化':'INITIALIZATION_DEADLINE'}
     result['code']=codes.get(exc.args[0] if exc.args and isinstance(exc.args[0],str) else '', 'UNCLASSIFIED_EXCEPTION')
+    if (isinstance(exc,RuntimeError) and exc.args==('自有子链枚举预算耗尽',)
+            and getattr(exc,'scan_code',None) in ('TASK_ENTRY_LIMIT','SCAN_DEADLINE')):
+        result['code']=exc.scan_code
+        result['scan_facts']=dict(exc.scan_facts)
     return result
 
 
@@ -57,13 +61,33 @@ def matching(meta,fd):
     except (FileNotFoundError,ProcessLookupError):return False
 
 
+def child_scan_error(parent,deadline,started,sampled,count,candidates,code):
+    """Only fixed scalar measurements; no /proc content or action authority."""
+    identity={key:parent[key] for key in ('pid','ppid','pgrp','session','start_time','uid')}
+    birth_hash=hashlib.sha256(b'ACADEMY_OWNED_SCAN_PARENT_V1\0'+json.dumps(
+        identity,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    started_ns=int(started*1_000_000_000);sampled_ns=int(sampled*1_000_000_000)
+    exc=RuntimeError('自有子链枚举预算耗尽');exc.scan_code=code
+    exc.scan_facts={'task_entries_observed':count,'task_entry_limit':1024,
+        'child_candidates_seen':len(candidates),'scan_started_monotonic_ns':started_ns,
+        'sampled_monotonic_ns':sampled_ns,'deadline_monotonic_ns':int(deadline*1_000_000_000),
+        'elapsed_monotonic_ns':max(0,sampled_ns-started_ns),
+        'deadline_expired':sampled>=deadline,'parent_identity_sha256':birth_hash,
+        'parent_role':'SUPPLIED_PARENT','parent_identity_check':'CALLER_SUPPLIED'}
+    return exc
+
+
 def direct_candidates(parent,deadline):
     # 只读取已核验父进程的task/children；不读取全系统进程表。
     tasks=Path(f"/proc/{parent['pid']}/task")
-    result=set();count=0
+    result=set();count=0;started=time.monotonic()
     for task in tasks.iterdir():
         count+=1
-        if count>1024 or time.monotonic()>=deadline:raise RuntimeError('自有子链枚举预算耗尽')
+        if count>1024:
+            raise child_scan_error(parent,deadline,started,time.monotonic(),count,result,'TASK_ENTRY_LIMIT')
+        sampled=time.monotonic()
+        if sampled>=deadline:
+            raise child_scan_error(parent,deadline,started,sampled,count,result,'SCAN_DEADLINE')
         try:
             value=(task/'children').read_text()
             if len(value)>65536:raise RuntimeError('自有子链元数据过大')
@@ -101,6 +125,11 @@ class Owned:
             if not matching(parent,parent_fd):continue
             try:candidates=direct_candidates(parent,self.deadline)
             except (FileNotFoundError,ProcessLookupError):continue
+            except RuntimeError as exc:
+                if getattr(exc,'scan_code',None) in ('TASK_ENTRY_LIMIT','SCAN_DEADLINE'):
+                    exc.scan_facts['parent_role']='DIRECT_CHILD' if parent['ppid']==os.getpid() else 'DESCENDANT'
+                    exc.scan_facts['parent_identity_check']='MATCHED_BEFORE_SCAN'
+                raise
             for pid in candidates:
                 if time.monotonic()>=self.deadline:raise TimeoutError('子进程登记预算耗尽')
                 if len(self.members)>=512:raise RuntimeError('已登记进程上限')
