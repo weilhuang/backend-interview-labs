@@ -14,6 +14,8 @@ from safe_io import read_regular, validate_directory, new_directory
 from ui_control import read_ui_budget, fetch_control, read_ui_deadline, NoRedirect
 import project_trust as trust
 import trust_window as window
+import modal_window
+import modal_pixels
 
 ACTIONS={5:'CHECK_ACADEMY_PLUGIN_ONLY',6:'AGREE_ACADEMY_PLUGIN_ONLY'}
 PROTOCOL='ACADEMY_PLUGIN_ONLY_THEN_SCOPED_PROFILE_TERMINAL_ACK_V2'
@@ -24,7 +26,8 @@ LEGAL_ID={'plugin_version':'1.3','privacy_version':'3.2','documents_sha256':LEGA
     'verification_scope':'REVIEWED_OFFICIAL_PDF_BYTES_ONLY','html_semantics':'NOT_VERIFIED',
     'pinned_ui_links_sha256':'d4f3690da95d7e618590d5b41e6bdb3c85f7a93ac70ac28920c1bbbdcdf9105a'}
 FIELDS=trust.CONTEXT_FIELDS|{'schema','stage','action','protocol','terminal_stage','legal_identity','plugin_binary_sha256',
-    'screenshot_sha256','display_binding_sha256','window_identity','preceding_receipt_sha256'}
+    'screenshot_sha256','display_binding_sha256','window_identity','preceding_receipt_sha256',
+    'comparison_mode','window_proof_sha256','dialog_pixel_sha256'}
 STATUS='UI_ACTION_PERFORMED_NOT_COURSE_ACCEPTANCE'
 
 def require(ok):
@@ -37,7 +40,8 @@ def review(stage):
     return {'dialog':'ACADEMY_PLUGIN_AGREEMENT','plugin_checked':stage==6,'ai_training_checked':False,
         'scope':'CURRENT100_BASE_PLUGIN_ONLY','button':'BASE_PLUGIN_CHECKBOX' if stage==5 else 'AGREE',
         'agree_enabled':stage==6,'known_terms_mismatch':False,'new_terms_observed':False,
-        'legal_basis':'REVIEWED_PLUGIN_1_3_PRIVACY_3_2_PDFS'}
+        'legal_basis':'REVIEWED_PLUGIN_1_3_PRIVACY_3_2_PDFS',
+        'complete_dialog_visible':True,'dialog_unobscured':True,'all_decision_controls_inside':True}
 
 def pins():
     raw=read_regular(Path(__file__).with_name('academy-legal.json'),limit=16384)
@@ -83,6 +87,46 @@ def verify_plugin(root,idea):
     require(lines==['idea.plugins.path='+str(plugins)])
     return PLUGIN_SHA
 
+def read_modal(folder,request):
+    """Fixed no-follow sidecar; the entire graph stays out of small control records."""
+    raw=read_regular(folder/'modal-proof.json',limit=modal_window.MAX_PROOF_BYTES)
+    require(digest(raw)==request['window_proof_sha256'])
+    proof=modal_window.validate(json_read(raw),request['action'])
+    require(proof['window_identity']==request['window_identity'])
+    image=read_regular(folder/'before.png',limit=2*1024*1024)
+    require(digest(image)==request['screenshot_sha256'])
+    require(modal_pixels.pixel_hash(image,request['window_identity'])==request['dialog_pixel_sha256'])
+    return proof
+
+FAILURE_FIELDS={'schema','action','phase','reason','dispatch_state','approved_full_sha256','approved_dialog_sha256',
+    'approved_proof_sha256','current_full_sha256','current_dialog_sha256','current_proof_sha256','private_frame_status'}
+def collect_failure(folder,expected):
+    """Typed evidence only. A changed frame is NEVER cleared for public upload here."""
+    value=json_read(read_regular(folder/'comparison-failure.json',limit=4096))
+    require(type(value) is dict and set(value)==FAILURE_FIELDS and type(value['schema']) is int and value['schema']==1)
+    require(value['action']==expected['action'])
+    require(value['phase'] in ('INITIAL_ONE','INITIAL_TWO','FINAL_PROBE','FINAL_PIXELS','PRE_PRESS','POST_PRESS'))
+    require(value['reason'] in ('MODAL_PIXELS_CHANGED','WINDOW_PROOF_UNAVAILABLE','OWNERSHIP_OR_ACTION_UNAVAILABLE','CANCELLED'))
+    require(value['dispatch_state'] in ('NO_INPUT_DISPATCHED','DISPATCH_STARTED'))
+    require(value['private_frame_status'] in ('RETAINED_PRIVATE_ONLY','UNAVAILABLE'))
+    require(value['approved_full_sha256']==expected['screenshot_sha256'])
+    for key,bound in [('approved_dialog_sha256','dialog_pixel_sha256'),('approved_proof_sha256','window_proof_sha256')]:
+        require(value[key] is None or value[key]==expected[bound])
+    for key in ('current_full_sha256','current_dialog_sha256','current_proof_sha256'):
+        if value[key] is not None:trust.token(value[key],r'[0-9a-f]{64}')
+    if value['reason']=='MODAL_PIXELS_CHANGED':
+        require(value['phase'] in ('INITIAL_ONE','INITIAL_TWO','FINAL_PIXELS') and value['dispatch_state']=='NO_INPUT_DISPATCHED')
+        require(value['current_full_sha256'] is not None and value['current_dialog_sha256'] is not None)
+        require(value['current_dialog_sha256']!=expected['dialog_pixel_sha256'])
+    require((value['phase']=='POST_PRESS')==(value['dispatch_state']=='DISPATCH_STARTED'))
+    if value['private_frame_status']=='RETAINED_PRIVATE_ONLY':require(value['current_full_sha256'] is not None)
+    control_raw=read_regular(folder/'control.json',limit=4096);validate_control(json_read(control_raw),expected)
+    # Never open or export the private frame, even when its digest appears in the receipt.
+    return {**value,'run_id':expected['run_id'],'run_attempt':expected['run_attempt'],'stage':expected['stage'],
+        'request_sha256':digest(read_regular(folder/'request.json',limit=4096)),'control_sha256':digest(control_raw),
+        'tested_sha':expected['tested_sha'],'source_tree':expected['source_tree'],'archive_sha256':expected['archive_sha256'],
+        'failure_image_public':'NOT_CLEARED','status':'DIAGNOSTIC_NOT_ACCEPTANCE'}
+
 def request_document(value):
     require(type(value) is dict and set(value)==FIELDS)
     trust.validate_context({k:value[k] for k in trust.CONTEXT_FIELDS})
@@ -91,15 +135,16 @@ def request_document(value):
     require(value['protocol']==PROTOCOL and type(value['terminal_stage']) is int and value['terminal_stage']==TERMINAL_STAGE)
     require(type(value['legal_identity']) is dict and value['legal_identity']==LEGAL_ID)
     require(value['plugin_binary_sha256']==PLUGIN_SHA)
-    for key in ('screenshot_sha256','display_binding_sha256','preceding_receipt_sha256'):trust.token(value[key],r'[0-9a-f]{64}')
-    window.validate(value['window_identity'],ACTIONS[stage]);return value
+    for key in ('screenshot_sha256','display_binding_sha256','preceding_receipt_sha256','window_proof_sha256','dialog_pixel_sha256'):trust.token(value[key],r'[0-9a-f]{64}')
+    require(value['comparison_mode']==modal_pixels.MODE)
+    window.validate(value['window_identity'],ACTIONS[stage]);modal_pixels.rectangle(value['window_identity']);return value
 
 def validate_control(value,expected):
     request_document(expected)
     require(type(value) is dict and set(value)==FIELDS|{'visual_review'})
     visual=value['visual_review'];required=review(expected['stage'])
     require(type(visual) is dict and set(visual)==set(required) and visual==required)
-    for name in ('plugin_checked','ai_training_checked','agree_enabled','known_terms_mismatch','new_terms_observed'):require(type(visual[name]) is bool)
+    for name in ('plugin_checked','ai_training_checked','agree_enabled','known_terms_mismatch','new_terms_observed','complete_dialog_visible','dialog_unobscured','all_decision_controls_inside'):require(type(visual[name]) is bool)
     request_document({k:value[k] for k in FIELDS})
     require({k:value[k] for k in FIELDS}==expected);return value
 
@@ -119,7 +164,8 @@ def preceding(root,stage,expected_context):
         require(type(value) is dict and set(value)==trust.REQUEST_FIELDS|{'visual_review','after_sha256','status'})
         trust.validate_control({k:value[k] for k in trust.REQUEST_FIELDS|{'visual_review'}},request)
         require(value['status']==STATUS);trust.token(value['after_sha256'],r'[0-9a-f]{64}')
-    else:receipt_document(value,request)
+    else:
+        receipt_document(value,request);read_modal(root/f'stage-{previous}',request)
     require({k:request[k] for k in trust.CONTEXT_FIELDS}==expected_context)
     require(digest(read_regular(root/f'stage-{previous}/after.png',limit=2*1024*1024))==value['after_sha256'])
     require(digest(read_regular(root/'display-binding.properties',limit=4096))==request['display_binding_sha256'])
@@ -129,7 +175,7 @@ def window_probe(pid,action,environment,runner=None):
     require(action in ACTIONS.values())
     result=(runner or subprocess.run)([sys.executable,__file__,'observe-window','--pid',str(pid),'--stage',str(next(k for k,v in ACTIONS.items() if v==action))],
         env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=2,check=True)
-    require(len(result.stdout)<=2048);return window.validate(json_read(result.stdout),action)
+    require(len(result.stdout)<=modal_window.MAX_PROOF_BYTES);return modal_window.validate(json_read(result.stdout),action)
 
 def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,environment,runner=None):
     stage_number(stage);require(time.monotonic()<deadline and proc.poll() is None)
@@ -141,10 +187,13 @@ def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,envir
     screen('SNAPSHOT',folder/'before.png');identity.verify()
     require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==win)
     raw=read_regular(folder/'before.png',limit=2*1024*1024);clean_png(raw)
+    proof=win;win=proof['window_identity'];proof_raw=encode(proof)
     expected=request_document({**expected_context,'schema':1,'stage':stage,'action':action,'protocol':PROTOCOL,'terminal_stage':TERMINAL_STAGE,
         'legal_identity':legal,'plugin_binary_sha256':plugin,'preceding_receipt_sha256':prior,
-        'screenshot_sha256':digest(raw),'display_binding_sha256':digest(read_regular(identity.binding,limit=4096)),'window_identity':win})
-    publish(folder/'window-identity.json',encode(win));publish(folder/'request.json',encode(expected))
+        'screenshot_sha256':digest(raw),'display_binding_sha256':digest(read_regular(identity.binding,limit=4096)),'window_identity':win,
+        'comparison_mode':modal_pixels.MODE,'window_proof_sha256':digest(proof_raw),'dialog_pixel_sha256':modal_pixels.pixel_hash(raw,win)})
+    require(len(encode({**expected,'visual_review':review(stage),'after_sha256':'f'*64,'status':STATUS,'legal_rechecked':True}))<=4096)
+    publish(folder/'modal-proof.json',proof_raw);publish(folder/'window-identity.json',encode(win));publish(folder/'request.json',encode(expected))
     while not (folder/'control.json').exists():
         require(proc.poll() is None)
         if time.monotonic()>=deadline:raise TimeoutError('900秒UI总预算耗尽')
@@ -154,7 +203,8 @@ def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,envir
     require(trust.context(root,command,idea)==expected_context and preceding(root,stage,expected_context)==prior)
     verify_plugin(root,idea);require(verify_legal(deadline,**({'runner':runner} if runner else {}))==legal)
     require(digest(read_regular(identity.binding,limit=4096))==expected['display_binding_sha256'])
-    identity.verify();require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==win)
+    identity.verify();require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==proof)
+    read_modal(folder,expected)
     require(time.monotonic()<deadline and proc.poll() is None)
     screen(action,folder/'after.png',expected['screenshot_sha256'],folder/'performed.txt')
     require(read_regular(folder/'performed.txt',limit=64)==(action+'\n').encode())
@@ -163,14 +213,14 @@ def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,envir
 
 def receive(root,stage):
     stage_number(stage);expected=request_document(trust.read_json(root/f'stage-{stage}/request.json',4096))
-    require(expected['stage']==stage and trust.context(root)=={k:expected[k] for k in trust.CONTEXT_FIELDS})
+    require(expected['stage']==stage and trust.context(root)=={k:expected[k] for k in trust.CONTEXT_FIELDS});read_modal(root/f'stage-{stage}',expected)
     require(preceding(root,stage,{k:expected[k] for k in trust.CONTEXT_FIELDS})==expected['preceding_receipt_sha256'])
     budget,deadline=read_ui_budget(root);output=root/f'stage-{stage}/control.json'
     require(not output.exists() and not output.is_symlink())
     while time.monotonic()<deadline:
         value=fetch_control(os.environ['GITHUB_REPOSITORY'],expected['run_id'],expected['run_attempt'],stage,os.environ['GH_TOKEN'],min(5,deadline-time.monotonic()))
         if value is not None:
-            validate_control(value,expected);read_ui_deadline(root,expected=budget);require(time.monotonic()<deadline);publish(output,encode(value));return
+            validate_control(value,expected);read_modal(root/f'stage-{stage}',expected);read_ui_deadline(root,expected=budget);require(time.monotonic()<deadline);publish(output,encode(value));return
         time.sleep(min(2,max(0,deadline-time.monotonic())))
     raise TimeoutError('UI总预算耗尽；未写插件协议动作记录')
 
@@ -180,10 +230,15 @@ def collect(root,stage,run_id,attempt):
     require(expected['stage']==stage and expected['run_id']==run_id and expected['run_attempt']==attempt)
     require(root.name=='academy-ui-'+run_id+'-'+attempt)
     require(preceding(root,stage,{k:expected[k] for k in trust.CONTEXT_FIELDS})==expected['preceding_receipt_sha256'])
+    proof=read_modal(folder,expected)
     raw=read_regular(folder/'before.png',limit=2*1024*1024);require(digest(raw)==expected['screenshot_sha256']);clean=clean_png(raw)
     prefix=f'plugin-stage-{stage}'
     mapping={'schema':1,'before_raw_sha256':digest(raw),'before_uploaded_sha256':digest(clean),'after_raw_sha256':None,'after_uploaded_sha256':None}
-    files={prefix+'-request.json':encode(expected),prefix+'-before.png':clean,prefix+'-images.json':encode(mapping)}
+    files={prefix+'-request.json':encode(expected),prefix+'-before.png':clean,prefix+'-images.json':encode(mapping),prefix+'-modal-proof.json':encode(proof)}
+    try:files[prefix+'-comparison-failure.json']=encode(collect_failure(folder,expected))
+    except FileNotFoundError:pass
+    except (ValueError,OSError):
+        files[prefix+'-comparison-failure.json']=encode({'schema':1,'status':'INVALID_OPTIONAL_DIAGNOSTIC','stage':stage,'failure_image_public':'NOT_CLEARED'})
     try:receipt=receipt_document(trust.read_json(folder/'receipt.json',4096),expected)
     except FileNotFoundError:return files
     after=read_regular(folder/'after.png',limit=2*1024*1024);require(digest(after)==receipt['after_sha256']);clean_after=clean_png(after)
@@ -211,8 +266,10 @@ def verify_window(root,expected_path):
     require(preceding(root,stage,{k:request[k] for k in trust.CONTEXT_FIELDS})==request['preceding_receipt_sha256'])
     expected=window.validate(trust.read_json(expected_path,2048),ACTIONS[stage]);require(expected==request['window_identity'])
     require(digest(read_regular(root/'display-binding.properties',limit=4096))==request['display_binding_sha256'])
-    deadline=read_ui_deadline(root);require(time.monotonic()<deadline)
-    require(window.observe(expected['pid'],ACTIONS[stage])==expected);require(time.monotonic()<deadline)
+    budget,deadline=read_ui_budget(root);require(time.monotonic()<deadline)
+    proof=read_modal(root/f'stage-{stage}',request)
+    require(modal_window.observe(expected['pid'],ACTIONS[stage])==proof);read_ui_deadline(root,expected=budget);require(time.monotonic()<deadline)
+    return 'MODAL1 '+' '.join(str(v) for v in modal_pixels.rectangle(expected))+' '+request['dialog_pixel_sha256']+' '+request['screenshot_sha256']+' '+request['window_proof_sha256']
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('mode',choices=['receive','observe-window','verify-window','stage-artifact','complete','legal-body-check'])
@@ -222,8 +279,8 @@ if __name__=='__main__':
     if a.mode=='legal-body-check':print(json.dumps(fetch_legal(a.deadline),separators=(',',':')))
     elif a.mode=='receive':receive(a.root,a.stage)
     elif a.mode=='stage-artifact':stage_artifact(a.root,a.stage,a.phase,a.run_id,a.run_attempt)
-    elif a.mode=='observe-window':print(json.dumps(window.observe(a.pid,ACTIONS[stage_number(a.stage)]),separators=(',',':')))
-    elif a.mode=='verify-window':verify_window(a.root,a.expected)
+    elif a.mode=='observe-window':print(json.dumps(modal_window.observe(a.pid,ACTIONS[stage_number(a.stage)]),separators=(',',':')))
+    elif a.mode=='verify-window':print(verify_window(a.root,a.expected))
     else:
         stage_number(a.stage);deadline=read_ui_deadline(a.root)
         while not (a.root/f'stage-{a.stage}/receipt.json').exists():

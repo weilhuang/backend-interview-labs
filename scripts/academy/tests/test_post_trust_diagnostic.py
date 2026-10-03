@@ -337,7 +337,7 @@ class ComposedOwnerHandoffTests(TrustFixture):
                 idea=self.temp/'idea';command=[str(idea/'bin/idea'),'validateCourse',str(self.run/'validation'),'--archive',str(self.archive),
                     '--tests','true','--links','true','--output-format','json','--output',str(self.run/'evidence/official-validation.json')]
                 before=(self.root/'ui-deadline.json').read_bytes()
-                with patch.object(plugin,'verify_plugin',return_value=plugin.PLUGIN_SHA),patch.object(plugin,'verify_legal',return_value=plugin.LEGAL_ID),patch.object(plugin,'window_probe',return_value=window),patch.object(plugin,'publish',side_effect=publish):
+                with patch.object(plugin,'verify_plugin',return_value=plugin.PLUGIN_SHA),patch.object(plugin,'verify_legal',return_value=plugin.LEGAL_ID),patch.object(plugin,'window_probe',return_value=__import__('test_modal_window').proof_fixture(plugin.ACTIONS[5],window)),patch.object(plugin,'publish',side_effect=publish):
                     plugin.checkpoint(self.root,5,child,screen,identity,owned,ui_control.read_ui_deadline(self.root),command,idea,{})
                 receipt=plugin.collect(self.root,5,'123','1')['plugin-stage-5-receipt.json']
                 self.assertEqual(json.loads(receipt)['status'],plugin.STATUS)

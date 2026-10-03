@@ -163,7 +163,8 @@ def preceding(root,stage):
     previous=stage_number(stage)-1
     raw=read_regular(root/f'stage-{previous}/receipt.json',limit=4096)
     expected=json_read(read_regular(root/f'stage-{previous}/request.json',limit=4096))
-    if previous==6:plugin.receipt_document(json_read(raw),expected)
+    if previous==6:
+        plugin.receipt_document(json_read(raw),expected);plugin.read_modal(root/'stage-6',expected)
     else:receipt_document(json_read(raw),expected)
     require({k:expected[k] for k in trust.CONTEXT_FIELDS}==trust.context(root))
     return digest(raw)

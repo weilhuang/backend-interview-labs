@@ -10,6 +10,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import profile_control as control
 import plugin_agreement as plugin
 from test_project_trust import TrustFixture
+from test_modal_window import proof_fixture
 
 
 class ProfileControlFixture(TrustFixture):
@@ -22,9 +23,11 @@ class ProfileControlFixture(TrustFixture):
         self.projection.start();self.addCleanup(self.projection.stop)
         previous={**self.context,'schema':1,'stage':6,'action':plugin.ACTIONS[6],
                   'protocol':plugin.PROTOCOL,'terminal_stage':plugin.TERMINAL_STAGE,'legal_identity':plugin.LEGAL_ID,
-                  'plugin_binary_sha256':plugin.PLUGIN_SHA,'screenshot_sha256':'a'*64,'display_binding_sha256':'b'*64,
-                  'window_identity':self.window,'preceding_receipt_sha256':'c'*64}
-        (self.root/'stage-6').mkdir();self.write(self.root/'stage-6/request.json',previous)
+                  'plugin_binary_sha256':plugin.PLUGIN_SHA,'screenshot_sha256':control.digest(self.image),'display_binding_sha256':'b'*64,
+                  'window_identity':self.window,'preceding_receipt_sha256':'c'*64,
+                  'comparison_mode':plugin.modal_pixels.MODE,'window_proof_sha256':control.digest(control.encode(proof_fixture(plugin.ACTIONS[6],self.window))),
+                  'dialog_pixel_sha256':plugin.modal_pixels.pixel_hash(self.image,self.window)}
+        (self.root/'stage-6').mkdir();(self.root/'stage-6/before.png').write_bytes(self.image);(self.root/'stage-6/modal-proof.json').write_bytes(control.encode(proof_fixture(plugin.ACTIONS[6],self.window)));self.write(self.root/'stage-6/request.json',previous)
         receipt={**previous,'visual_review':plugin.review(6),'after_sha256':'d'*64,'status':plugin.STATUS,'legal_rechecked':True}
         self.write(self.root/'stage-6/receipt.json',receipt)
         _,candidate_sha,_,public_sha=control.candidate(self.root)

@@ -289,7 +289,7 @@ class IntegrationStructureTests(unittest.TestCase):
     def test_robot_only_one_fixed_trust_button_with_rechecks(self):
         source=(Path(trust.__file__).parent/'probes/AgreementUi.java').read_text()
         self.assertIn('case "TRUST_VALIDATION_PROJECT": x=596; y=517;',source)
-        self.assertEqual(source.count('verifyTrustWindow(args);'),2)
+        self.assertEqual(source.count('verifyTrustWindow(args,false);'),2)
         self.assertEqual(source.count('robot.mousePress('),1);self.assertEqual(source.count('robot.mouseRelease('),1)
         sequence=source[source.index('static void finalTrustClick'):source.index('private static byte[] capture')]
         self.assertIn('finalProbe.run();',sequence);self.assertLess(sequence.index('finalProbe.run();'),sequence.index('sha(image.read())'));self.assertLess(sequence.index('sha(image.read())'),sequence.index('click.run();'))

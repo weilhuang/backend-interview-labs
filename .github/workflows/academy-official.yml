@@ -116,6 +116,9 @@ jobs:
           assert shutil.disk_usage(os.environ['RUNNER_TEMP']).free >= 10*1024**3, 'Less than 10 GiB free before install'
           PY
           if [ '${{ (github.event_name == 'push' && github.ref == 'refs/heads/academy-validation/full') || inputs.display == 'xvfb' }}' = true ]; then command -v xvfb-run; fi
+          if [ '${{ github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation') }}' = true ]; then
+            python scripts/academy/modal_fixture.py --report "$EVIDENCE_DIR/modal-window-fixture.json"
+          fi
       - name: 下载固定官方 IDEA 和 Academy 并校验 SHA256
         timeout-minutes: 7
         run: bash scripts/academy/install_toolchain.sh "$TOOLCHAIN_DIR" > "$EVIDENCE_DIR/install.log" 2>&1
@@ -344,6 +347,7 @@ jobs:
             ${{ env.UI_RUN }}/plugin-5-review-artifact/plugin-stage-5-before.png
             ${{ env.UI_RUN }}/plugin-5-review-artifact/plugin-stage-5-request.json
             ${{ env.UI_RUN }}/plugin-5-review-artifact/plugin-stage-5-images.json
+            ${{ env.UI_RUN }}/plugin-5-review-artifact/plugin-stage-5-modal-proof.json
             ${{ env.UI_RUN }}/plugin-5-review-artifact/plugin-stage-5-review-target.json
       - name: 第5阶段等待新审图批准后执行单个基础插件动作
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
@@ -375,6 +379,7 @@ jobs:
             ${{ env.UI_RUN }}/plugin-5-receipt-artifact/plugin-stage-5-request.json
             ${{ env.UI_RUN }}/plugin-5-receipt-artifact/plugin-stage-5-receipt.json
             ${{ env.UI_RUN }}/plugin-5-receipt-artifact/plugin-stage-5-images.json
+            ${{ env.UI_RUN }}/plugin-5-receipt-artifact/plugin-stage-5-modal-proof.json
       - name: 第6阶段等待基础插件协议画面（AI保持关闭）
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
         timeout-minutes: 2
@@ -398,6 +403,7 @@ jobs:
             ${{ env.UI_RUN }}/plugin-6-review-artifact/plugin-stage-6-before.png
             ${{ env.UI_RUN }}/plugin-6-review-artifact/plugin-stage-6-request.json
             ${{ env.UI_RUN }}/plugin-6-review-artifact/plugin-stage-6-images.json
+            ${{ env.UI_RUN }}/plugin-6-review-artifact/plugin-stage-6-modal-proof.json
             ${{ env.UI_RUN }}/plugin-6-review-artifact/plugin-stage-6-review-target.json
       - name: 第6阶段等待新审图批准后执行单个基础插件动作
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))
@@ -429,6 +435,7 @@ jobs:
             ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-request.json
             ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-receipt.json
             ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-images.json
+            ${{ env.UI_RUN }}/plugin-6-receipt-artifact/plugin-stage-6-modal-proof.json
       - name: 第7阶段等待并严格投影当前profile准备画面
         id: profile_7_review
         if: success() && (github.ref == 'refs/heads/academy-validation/full' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'full-validation'))

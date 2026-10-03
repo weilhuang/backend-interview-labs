@@ -3,12 +3,14 @@
 import argparse
 import builtins
 import json
+import os
 from pathlib import Path
 import re
 from thread_diagnostics import NAME as THREAD_NAME, MAX_OUTPUT as THREAD_LIMIT, strict_json as thread_json, validate_document as thread_document
 from display_diagnostic import collect as collect_display, REPORT_NAME as DISPLAY_REPORT
 from project_trust import collect as collect_project_trust
 from plugin_agreement import collect as collect_plugin_agreement
+from modal_fixture import NAME as MODAL_FIXTURE_NAME, report_document as modal_fixture_report
 from profile_control import collect as collect_profile_control
 from restart_session import collect as collect_restart_result
 from post_trust_diagnostic import collect as collect_post_trust, REPORT as POST_TRUST_REPORT, collect_budget_owner, BUDGET_OWNER
@@ -20,7 +22,7 @@ NAMES={'summary.json','toolchain.json','source-ci.json','generation.json','sourc
        'export.stdout.log','export.stderr.log','validate.stdout.log','validate.stderr.log',
        'export-idea.log','validate-idea.log','export-idea-pretermination.log','validate-idea-pretermination.log','gradle-jvm.jsonl','gradle-jvm-gate.json','unified-source-validation.json','release-gate.json'}
 NAMES.add(THREAD_NAME)
-BOOTSTRAP_NAMES={'source-ci.json','bootstrap.json','install.log','go-bootstrap.json'}
+BOOTSTRAP_NAMES={'source-ci.json','bootstrap.json','install.log','go-bootstrap.json',MODAL_FIXTURE_NAME}
 SUPERVISOR_NAMES={'result.json':'supervisor-result.json','launch-result.json':'supervisor-launch.json',
                   'cleanup-result.json':'supervisor-cleanup.json','worker.stdout.log':'supervisor-worker.stdout.log',
                   'worker.stderr.log':'supervisor-worker.stderr.log','supervisor.log':'supervisor.log'}
@@ -149,7 +151,12 @@ def collect(run,evidence,bootstrap=None,ui_root=None,job_status=None,cleanup_exi
             from hashlib import sha256
             original_sha=sha256(data).hexdigest()
             try:
-                if name==THREAD_NAME:
+                if name==MODAL_FIXTURE_NAME:
+                    from display_diagnostic import json_read
+                    value=modal_fixture_report(json_read(data))
+                    if any(value[key]!=os.environ.get(env) for key,env in [('run_id','GITHUB_RUN_ID'),('run_attempt','GITHUB_RUN_ATTEMPT'),('tested_sha','GITHUB_SHA')]):raise ValueError('synthetic fixture binding mismatch')
+                    data=(json.dumps(value,ensure_ascii=True,indent=2)+'\n').encode()
+                elif name==THREAD_NAME:
                     data=(json.dumps(thread_document(thread_json(data)),ensure_ascii=True,indent=2)+'\n').encode()
                     if len(data)>THREAD_LIMIT:raise ValueError('thread diagnostic output limit')
                 elif name.endswith('.log'):

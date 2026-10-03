@@ -74,13 +74,106 @@ class AgreementUi {
             }
         }
     }
-    private static void verifyTrustWindow(String[] args) throws Exception {
+    static final class ModalComparison {
+        final int x,y,width,height;
+        final String dialogSha,fullSha,proofSha;
+        final String line;
+        ModalComparison(String value,String approvedFull) {
+            if (!value.matches("MODAL1 [0-9]{1,4} [0-9]{1,3} [0-9]{1,4} [0-9]{1,3} [0-9a-f]{64} [0-9a-f]{64} [0-9a-f]{64}\\n")) throw new IllegalArgumentException("模态证明格式不符");
+            String[] fields=value.trim().split(" ");x=Integer.parseInt(fields[1]);y=Integer.parseInt(fields[2]);width=Integer.parseInt(fields[3]);height=Integer.parseInt(fields[4]);
+            if (x<0 || y<0 || width<1 || height<1 || x+width>1280 || y+height>900 || !fields[6].equals(approvedFull)) throw new IllegalArgumentException("模态证明边界不符");
+            dialogSha=fields[5];fullSha=fields[6];proofSha=fields[7];line=value;
+        }
+        String hash(byte[] raw) throws Exception { return modalHash(raw,new Rectangle(x,y,width,height)); }
+    }
+    static byte[] pixelPng(byte[] raw) throws Exception {
+        if (raw.length>2*1024*1024 || raw.length<8 || !java.util.Arrays.equals(java.util.Arrays.copyOf(raw,8),new byte[]{(byte)137,80,78,71,13,10,26,10})) throw new IllegalArgumentException("PNG界限不符");
+        var out=new ByteArrayOutputStream();out.write(raw,0,8);int at=8,count=0;boolean idat=false,end=false;
+        while (at<raw.length) {
+            if (++count>256 || at+12>raw.length) throw new IllegalArgumentException("PNG块界限不符");
+            int n=java.nio.ByteBuffer.wrap(raw,at,4).getInt();
+            if (n<0 || n>raw.length-at-12) throw new IllegalArgumentException("PNG块长度不符");
+            String kind=new String(raw,at+4,4,java.nio.charset.StandardCharsets.US_ASCII);
+            var crc=new java.util.zip.CRC32();crc.update(raw,at+4,n+4);
+            if (crc.getValue()!=Integer.toUnsignedLong(java.nio.ByteBuffer.wrap(raw,at+8+n,4).getInt())) throw new IllegalArgumentException("PNG校验不符");
+            if (kind.equals("IHDR")) {
+                var b=java.nio.ByteBuffer.wrap(raw,at+8,n);
+                if (count!=1 || n!=13 || b.getInt()!=1280 || b.getInt()!=900 || b.get()!=8) throw new IllegalArgumentException("PNG格式不符");
+                int color=b.get();if ((color!=2 && color!=6) || b.get()!=0 || b.get()!=0 || b.get()!=0) throw new IllegalArgumentException("PNG颜色格式不符");
+                out.write(raw,at,n+12);
+            } else if (kind.equals("IDAT")) { idat=true;out.write(raw,at,n+12); }
+            else if (kind.equals("IEND")) { if (n!=0 || !idat || at+n+12!=raw.length) throw new IllegalArgumentException("PNG结束不符");out.write(raw,at,n+12);end=true; }
+            else if (raw[at+4]<'a' || raw[at+4]>'z') throw new IllegalArgumentException("未知PNG关键块");
+            at+=n+12;
+        }
+        if (!end) throw new IllegalArgumentException("PNG不完整");return out.toByteArray();
+    }
+    static String modalHash(byte[] raw,Rectangle rectangle) throws Exception {
+        if (rectangle.x<0 || rectangle.y<0 || rectangle.width<1 || rectangle.height<1 || rectangle.x+rectangle.width>1280 || rectangle.y+rectangle.height>900) throw new IllegalArgumentException("模态区域越界");
+        var image=ImageIO.read(new java.io.ByteArrayInputStream(pixelPng(raw)));
+        if (image==null || image.getWidth()!=1280 || image.getHeight()!=900) throw new IllegalArgumentException("PNG像素不符");
+        var hash=MessageDigest.getInstance("SHA-256");hash.update("ACADEMY_OWNED_PLUGIN_DIALOG_RGB_V1\0".getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+        hash.update(java.nio.ByteBuffer.allocate(16).putInt(rectangle.x).putInt(rectangle.y).putInt(rectangle.width).putInt(rectangle.height).array());
+        for(int y=0;y<900;y++) for(int x=0;x<1280;x++) {
+            int value=image.getRGB(x,y);if ((value>>>24)!=255) throw new IllegalArgumentException("PNG透明像素不符");
+            if(rectangle.contains(x,y)) { hash.update((byte)(value>>>16));hash.update((byte)(value>>>8));hash.update((byte)value); }
+        }
+        return HexFormat.of().formatHex(hash.digest());
+    }
+    static final class PluginComparisonState {
+        ModalComparison approved;
+        String phase="INITIAL_ONE",reason="WINDOW_PROOF_UNAVAILABLE",dispatch="NO_INPUT_DISPATCHED";
+        byte[] frame;
+        String currentDialog,currentProof;
+        void compare(byte[] current) throws Exception {
+            frame=current;currentDialog=approved.hash(current);reason="MODAL_PIXELS_CHANGED";
+            if (!currentDialog.equals(approved.dialogSha)) throw new IllegalStateException("完整插件协议弹窗像素变化");
+            frame=null;currentDialog=null;reason="OWNERSHIP_OR_ACTION_UNAVAILABLE";
+        }
+        void probe(String[] args) throws Exception {
+            reason="WINDOW_PROOF_UNAVAILABLE";currentProof=null;
+            ModalComparison current=new ModalComparison(verifyTrustWindow(args,true),args[2]);
+            if (approved!=null && !approved.line.equals(current.line)) throw new IllegalStateException("模态批准证明变化");
+            approved=current;currentProof=current.proofSha;reason="OWNERSHIP_OR_ACTION_UNAVAILABLE";
+        }
+        void failure(String[] args,Path binding,Exception error) {
+            String retained="UNAVAILABLE";
+            if (error instanceof InterruptedException) reason="CANCELLED";
+            try {
+                if (frame!=null) { verifyOwned(binding);pixelPng(frame);privateWrite(Path.of(args[1]).resolveSibling("comparison-failure-private.png"),frame);retained="RETAINED_PRIVATE_ONLY"; }
+            } catch (Exception ignored) { /* Never substitute another image or publish this private frame. */ }
+            try {
+                String currentFull=frame==null?null:sha(frame);
+                String record="{\"schema\":1,\"action\":"+quoted(args[0])+",\"phase\":"+quoted(phase)+",\"reason\":"+quoted(reason)+",\"dispatch_state\":"+quoted(dispatch)
+                    +",\"approved_full_sha256\":"+quoted(args[2])+",\"approved_dialog_sha256\":"+quoted(approved==null?null:approved.dialogSha)+",\"approved_proof_sha256\":"+quoted(approved==null?null:approved.proofSha)
+                    +",\"current_full_sha256\":"+quoted(currentFull)+",\"current_dialog_sha256\":"+quoted(currentDialog)+",\"current_proof_sha256\":"+quoted(currentProof)+",\"private_frame_status\":"+quoted(retained)+"}\n";
+                privateWrite(Path.of(args[1]).resolveSibling("comparison-failure.json"),record.getBytes(java.nio.charset.StandardCharsets.US_ASCII));
+            } catch (Exception ignored) { /* Optional diagnostics never replace the original failure or grant input. */ }
+        }
+    }
+    static void pluginInitialComparisons(PluginComparisonState state,CheckedStep probe,CheckedStep ownership,Snapshot image) throws Exception {
+        probe.run();ownership.run();state.phase="INITIAL_ONE";state.compare(image.read());state.phase="INITIAL_TWO";state.compare(image.read());
+    }
+    static void pluginFinalComparison(PluginComparisonState state,CheckedStep probe,Snapshot image,CheckedStep click) throws Exception {
+        state.phase="FINAL_PROBE";probe.run();state.phase="FINAL_PIXELS";state.compare(image.read());state.phase="PRE_PRESS";click.run();
+    }
+    static String quoted(String value) { return value==null?"null":"\""+value+"\""; }
+    static void privateWrite(Path path,byte[] raw) throws Exception {
+        Path parent=path.getParent();
+        for(Path p=parent;p!=null;p=p.getParent()) if(Files.isSymbolicLink(p)) throw new IllegalStateException("诊断目录不符");
+        Path tmp=Files.createTempFile(parent,".comparison-",".pending",java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rw-------")));
+        try { Files.write(tmp,raw);Files.createLink(path,tmp); } finally { Files.deleteIfExists(tmp); }
+    }
+    private static String verifyTrustWindow(String[] args,boolean plugin) throws Exception {
         // A fixed read-only companion checks only the current owned-display window.
         // The path/arguments are generated locally, never taken from a control record.
         Process probe = new ProcessBuilder(args[4], args[5], "verify-window", "--expected", args[6], "--root", args[7])
-            .redirectOutput(ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
+            .redirectOutput(plugin ? ProcessBuilder.Redirect.PIPE : ProcessBuilder.Redirect.DISCARD).redirectError(ProcessBuilder.Redirect.DISCARD).start();
         try {
-            if (!probe.waitFor(3, TimeUnit.SECONDS) || probe.exitValue()!=0) throw new IllegalStateException("窗口或本次信任绑定变化");
+            if (!probe.waitFor(plugin ? 2 : 3, TimeUnit.SECONDS) || probe.exitValue()!=0) throw new IllegalStateException("窗口或本次信任绑定变化");
+            if (!plugin) return "";
+            byte[] raw=probe.getInputStream().readNBytes(301);if(raw.length>300 || probe.getInputStream().read()!=-1) throw new IllegalStateException("模态证明输出过大");
+            return new String(raw,java.nio.charset.StandardCharsets.US_ASCII);
         } finally {
             // This handle is solely the directly spawned read-only probe, never a PID lookup.
             if (probe.isAlive()) { probe.destroyForcibly(); probe.waitFor(1, TimeUnit.SECONDS); }
@@ -122,27 +215,38 @@ class AgreementUi {
                 break;
             default: throw new IllegalArgumentException("不支持的动作");
         }
-        // 同一调用中再次全图比对；任何动态变化均拒绝，不做坐标猜测或自动适配。
-        if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("当前画面与批准画面不同");
-        if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("再次采集画面不同");
-        verifyOwned(binding);
-        CheckedStep click = () -> {
-            if (terminal) { robot.keyPress(KeyEvent.VK_ENTER); robot.keyRelease(KeyEvent.VK_ENTER); }
-            else { robot.mousePress(InputEvent.BUTTON1_DOWN_MASK); robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); }
-        };
-        if (bound) {
-            verifyTrustWindow(args);
-            finalTrustClick(() -> { verifyTrustWindow(args); verifyOwned(binding); },
-                () -> capture(robot,bounds),args[2],() -> {
-                    if (!terminal) robot.mouseMove(x,y);
-                    if (profile || terminal) profileClick(() -> verifyOwned(binding), () -> {
+        PluginComparisonState modal=plugin ? new PluginComparisonState() : null;
+        try {
+            if (plugin) pluginInitialComparisons(modal,()->modal.probe(args),()->verifyOwned(binding),()->capture(robot,bounds));
+            else {
+                if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("当前画面与批准画面不同");
+                if (!sha(capture(robot,bounds)).equals(args[2])) throw new IllegalStateException("再次采集画面不同");
+            }
+            verifyOwned(binding);
+            CheckedStep click = () -> {
+                if (plugin) { modal.dispatch="DISPATCH_STARTED";modal.phase="POST_PRESS"; }
+                if (terminal) { robot.keyPress(KeyEvent.VK_ENTER); robot.keyRelease(KeyEvent.VK_ENTER); }
+                else { robot.mousePress(InputEvent.BUTTON1_DOWN_MASK); robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); }
+            };
+            if (plugin) {
+                pluginFinalComparison(modal,()->{modal.probe(args);modal.probe(args);verifyOwned(binding);},()->capture(robot,bounds),()->{
+                    // No blocking companion after the exact complete-dialog comparison.
+                    robot.mouseMove(x,y);
+                    profileClick(() -> verifyOwned(binding), () -> {
                         if (Files.exists(Path.of(args[7]).resolve("cancelled.json"))) throw new InterruptedException("本次准备已取消");
                     },click);
-                    else { verifyOwned(binding);click.run(); }
                 });
-        } else {
-            robot.mouseMove(x,y); verifyOwned(binding); click.run();
-        }
+            } else if (bound) {
+                verifyTrustWindow(args,false);
+                finalTrustClick(() -> { verifyTrustWindow(args,false); verifyOwned(binding); },
+                    () -> capture(robot,bounds),args[2],() -> {
+                        if (!terminal) robot.mouseMove(x,y);
+                        if (profile || terminal) profileClick(() -> verifyOwned(binding), () -> {
+                            if (Files.exists(Path.of(args[7]).resolve("cancelled.json"))) throw new InterruptedException("本次准备已取消");
+                        },click);
+                        else { verifyOwned(binding);click.run(); }
+                    });
+            } else { robot.mouseMove(x,y); verifyOwned(binding); click.run(); }
         if (install || terminal) {
             // The armed normal vendor action may close this IDE immediately.
             // Record only dispatch. New process/context/images prove outcome.
@@ -153,5 +257,6 @@ class AgreementUi {
         verifyOwned(binding);
         Files.write(Path.of(args[1]),capture(robot,bounds),StandardOpenOption.CREATE_NEW);
         Files.writeString(Path.of(args[3]),args[0]+"\n",StandardOpenOption.CREATE_NEW);
+        } catch (Exception error) { if(plugin) modal.failure(args,binding,error);throw error; }
     }
 }

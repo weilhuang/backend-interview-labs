@@ -6,6 +6,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 import plugin_agreement as plugin
 import project_trust as trust
 from test_project_trust import TrustFixture
+from test_modal_window import proof_fixture
 
 class PluginFixture(TrustFixture):
     def setUp(self):
@@ -18,10 +19,13 @@ class PluginFixture(TrustFixture):
         return {**self.context,'schema':1,'stage':stage,'action':plugin.ACTIONS[stage],'protocol':plugin.PROTOCOL,'terminal_stage':plugin.TERMINAL_STAGE,
             'legal_identity':dict(plugin.LEGAL_ID),'plugin_binary_sha256':plugin.PLUGIN_SHA,
             'preceding_receipt_sha256':plugin.preceding(self.root,stage,self.context),
-            'screenshot_sha256':trust.digest(self.image),'display_binding_sha256':trust.digest((self.root/'display-binding.properties').read_bytes()),'window_identity':self.window}
+            'screenshot_sha256':trust.digest(self.image),'display_binding_sha256':trust.digest((self.root/'display-binding.properties').read_bytes()),'window_identity':self.window,
+            'comparison_mode':plugin.modal_pixels.MODE,'window_proof_sha256':trust.digest(trust.encode(proof_fixture(plugin.ACTIONS[stage],self.window))),
+            'dialog_pixel_sha256':plugin.modal_pixels.pixel_hash(self.image,self.window)}
     def stage(self,stage=5,complete=False):
         request=self.make_request(stage);folder=self.root/f'stage-{stage}';folder.mkdir()
         self.write(folder/'request.json',request);(folder/'before.png').write_bytes(self.image)
+        (folder/'modal-proof.json').write_bytes(trust.encode(proof_fixture(plugin.ACTIONS[stage],self.window)))
         if complete:
             (folder/'after.png').write_bytes(self.image)
             self.write(folder/'receipt.json',{**request,'visual_review':plugin.review(stage),'after_sha256':trust.digest(self.image),'status':plugin.STATUS,'legal_rechecked':True})
@@ -122,7 +126,7 @@ class ReceiverTests(PluginFixture):
 class ArtifactTests(PluginFixture):
     def test_fresh_projection_only_and_sanitized_image_hash_mapping(self):
         self.stage();plugin.stage_artifact(self.root,5,'review','123','1');out=self.root/'plugin-5-review-artifact'
-        self.assertEqual(len(list(out.iterdir())),4)
+        self.assertEqual(len(list(out.iterdir())),5)
         for path in out.iterdir():self.assertNotIn(b'PRIVATE_',path.read_bytes())
         self.assertEqual(trust.read_json(out/'plugin-stage-5-images.json')['before_raw_sha256'],self.request['screenshot_sha256'])
     def test_receipt_requires_real_stage_and_cannot_reuse_output(self):
@@ -165,7 +169,7 @@ class CheckpointTests(PluginFixture):
                 value={**json.loads(raw),'visual_review':plugin.review(5)}
                 if mode=='ai':value['visual_review']['ai_training_checked']=True
                 original(path.with_name('control.json'),trust.encode(value))
-        with patch.object(plugin,'verify_plugin',return_value=plugin.PLUGIN_SHA),patch.object(plugin,'verify_legal',side_effect=InterruptedError if mode=='cancel' else lambda *_:dict(plugin.LEGAL_ID)),patch.object(plugin,'window_probe',return_value=self.window),patch.object(plugin,'publish',side_effect=publish),patch.object(plugin.time,'monotonic',return_value=50):
+        with patch.object(plugin,'verify_plugin',return_value=plugin.PLUGIN_SHA),patch.object(plugin,'verify_legal',side_effect=InterruptedError if mode=='cancel' else lambda *_:dict(plugin.LEGAL_ID)),patch.object(plugin,'window_probe',return_value=proof_fixture(plugin.ACTIONS[5],self.window)),patch.object(plugin,'publish',side_effect=publish),patch.object(plugin.time,'monotonic',return_value=50):
             try:plugin.checkpoint(self.root,5,proc,screen,identity,owned,100,[],self.temp,{})
             except BaseException:
                 self.assertNotIn(plugin.ACTIONS[5],actions);raise
@@ -186,14 +190,14 @@ class FinalProbeTests(PluginFixture):
         self.stage();self.write(self.root/'stage-5/control.json',self.approval);self.write(self.root/'stage-5/window-identity.json',self.window)
     def test_current_window_and_deadline_rechecked_after_metadata_probe(self):
         self.prepare()
-        with patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',side_effect=[98,100]),patch.object(plugin.window,'observe',return_value=self.window),self.assertRaises(ValueError):plugin.verify_window(self.root,self.root/'stage-5/window-identity.json')
+        with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',side_effect=[98,100]),patch.object(plugin.modal_window,'observe',return_value=proof_fixture(plugin.ACTIONS[5],self.window)),self.assertRaises(ValueError):plugin.verify_window(self.root,self.root/'stage-5/window-identity.json')
     def test_wrong_path_or_window_never_authorizes_click(self):
         self.prepare()
         with self.assertRaises(ValueError):plugin.verify_window(self.root,self.root/'stage-4/window-identity.json')
-        with patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin.window,'observe',return_value={**self.window,'pid':101}),self.assertRaises(ValueError):plugin.verify_window(self.root,self.root/'stage-5/window-identity.json')
+        with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin.modal_window,'observe',return_value=proof_fixture(plugin.ACTIONS[5],{**self.window,'pid':101})),self.assertRaises(ValueError):plugin.verify_window(self.root,self.root/'stage-5/window-identity.json')
     def test_metadata_probe_cancellation_propagates(self):
         self.prepare()
-        with patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin.window,'observe',side_effect=InterruptedError),self.assertRaises(InterruptedError):plugin.verify_window(self.root,self.root/'stage-5/window-identity.json')
+        with patch.object(plugin,'read_ui_budget',return_value=({'monotonic_deadline':100},100)),patch.object(plugin,'read_ui_deadline',return_value=100),patch.object(plugin.time,'monotonic',return_value=50),patch.object(plugin.modal_window,'observe',side_effect=InterruptedError),self.assertRaises(InterruptedError):plugin.verify_window(self.root,self.root/'stage-5/window-identity.json')
 
 class WorkflowBoundaryTests(unittest.TestCase):
     def test_exact_review_and_receipt_outputs_require_fresh_projection(self):
