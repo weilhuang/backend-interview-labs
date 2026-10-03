@@ -73,7 +73,7 @@ class RestartHarness(TrustFixture):
                 patch.object(ui_control,'EUA_SHA256',hashlib.sha256(b'fixture').hexdigest()),patch.object(session.signal,'signal'),
                 patch.object(session.time,'monotonic',side_effect=now),patch.object(session.time,'sleep'),patch.object(ui,'put',side_effect=put),
                 patch.object(session.trust,'context',return_value=context),patch.object(diagnostic,'context',return_value=context),patch.object(session.trust,'checkpoint'),
-                patch.object(session.plugin,'checkpoint'),patch.object(ui,'PostTrustObserver',return_value=observer),
+                patch.object(session.plugin,'checkpoint',new=self._diagnostic_checkpoint) if fail_at=='real-plugin-failure' else patch.object(session.plugin,'checkpoint'),patch.object(ui,'PostTrustObserver',return_value=observer),
                 patch.object(ui,'optional_display_diagnostic',side_effect=InterruptedError('synthetic') if fail_at=='capture' else None),
                 patch.object(session.os,'readlink',return_value='/sdk/idea/bin/idea'),patch.object(profile,'prepare',return_value={'parser':{'route':'TERMINAL_SUDO','expected_helpers':{}}}),
                 patch.object(profile,'verify_installed',return_value={'status':'INSTALLED_VERIFIED','exact_name_count':1}),
@@ -152,7 +152,7 @@ class CompositionTests(RestartHarness):
 class RestartReceiptTests(unittest.TestCase):
     def value(self):
         return {'schema':1,'protocol':session.PROTOCOL,'status':'FRESH_VALIDATION_EXITED_NOT_ACCEPTANCE','operation':'COMPLETED',
-                'error_code':'NONE','detail_code':'NONE','detail_step':'NONE','cancelled':False,'phase2_started':True,'phase2_exit':0,
+                'error_code':'NONE','detail_code':'NONE','detail_step':'NONE','exception_class':'NONE','agreement_failure':None,'cancelled':False,'phase2_started':True,'phase2_exit':0,
                 'preparation_cleanup':True,'validation_cleanup':True,'profile_verified':True,'restart_context_verified':True,
                 'validation_context_verified':True,'restart_provenance':'OBSERVED_RESTARTER_EXEC','registered_processes':10,'course_acceptance':'NOT_RUN'}
     def test_valid_receipt_still_is_not_course_acceptance(self):session.validate_result(self.value())

@@ -30,6 +30,69 @@ FIELDS=trust.CONTEXT_FIELDS|{'schema','stage','action','protocol','terminal_stag
     'comparison_mode','window_proof_sha256','dialog_pixel_sha256'}
 STATUS='UI_ACTION_PERFORMED_NOT_COURSE_ACCEPTANCE'
 
+# Diagnostics never carry exception text, child stderr, commands, or window titles.
+EXCEPTION_CLASSES={'NONE','InterruptedError','TimeoutError','TimeoutExpired','CalledProcessError',
+    'ValueError','OSError','TypeError','AttributeError','KeyError','ImportError','NameError',
+    'MemoryError','RecursionError','SystemExit','FamilyError','ProfileError','ModalProbeFailure','OTHER'}
+EXCEPTION_CLASSES.update({'FileNotFoundError','FileExistsError','ProcessLookupError','PermissionError',
+    'NotADirectoryError','IsADirectoryError','BrokenPipeError','RuntimeError','NotImplementedError',
+    'AssertionError','JSONDecodeError'})
+CHECKPOINT_STEPS={'START','CONTEXT','PLUGIN_BINARY','PDF_CHECK','PRECEDING_RECEIPT','CREATE_STAGE',
+    'DISPLAY_BEFORE_PROBE','MODAL_PROBE_BEFORE_SNAPSHOT','SNAPSHOT','DISPLAY_AFTER_SNAPSHOT',
+    'MODAL_PROBE_AFTER_SNAPSHOT','SNAPSHOT_DECODE','REQUEST_ENCODE','REQUEST_PUBLISH',
+    'CONTROL_WAIT','CONTROL_VALIDATE','CONTEXT_RECHECK','PLUGIN_RECHECK','PDF_RECHECK',
+    'DISPLAY_RECHECK','MODAL_PROBE_BEFORE_ACTION','APPROVED_IMAGE_RECHECK','ACTION',
+    'PERFORMED_RECEIPT','AFTER_IMAGE','RECEIPT_PUBLISH'}
+FAILURE_REASONS={'CANCELLED','SUBPROCESS_TIMEOUT','SUBPROCESS_EXIT','MODAL_PROBE_REJECTED',
+    'BOUNDARY_REJECTED','UNCLASSIFIED_EXCEPTION'}
+CHECKPOINT_FAILURE_FIELDS={'schema','status','stage','step','context','exception_class','reason',
+    'probe_exit_code','modal_failure','request_state','action_invoked'}
+
+def exception_class(exc):
+    name=type(exc).__name__
+    return name if name in EXCEPTION_CLASSES and name!='NONE' else 'OTHER'
+
+class ModalProbeFailure(ValueError):
+    def __init__(self,exit_code,document=None):
+        self.exit_code=exit_code
+        self.document=document
+        super().__init__('MODAL_PROBE_REJECTED')
+
+def checkpoint_failure_document(value):
+    require(type(value) is dict and set(value)==CHECKPOINT_FAILURE_FIELDS)
+    require(type(value['schema']) is int and value['schema']==1 and value['status']=='FAILED_NOT_ACCEPTANCE')
+    stage_number(value['stage'])
+    for key,allowed in [('step',CHECKPOINT_STEPS),('exception_class',EXCEPTION_CLASSES-{'NONE'}),('reason',FAILURE_REASONS)]:
+        require(type(value[key]) is str and value[key] in allowed)
+    require(value['context'] is None or type(value['context']) is dict)
+    if value['context'] is not None:trust.validate_context(value['context'])
+    else:require(value['step'] in ('START','CONTEXT'))
+    code=value['probe_exit_code'];require(code is None or type(code) is int and -127<=code<=255 and code!=0)
+    if code is not None:require(value['reason'] in ('SUBPROCESS_EXIT','MODAL_PROBE_REJECTED'))
+    if value['modal_failure'] is not None:
+        require(value['reason']=='MODAL_PROBE_REJECTED' and code is not None)
+        modal_window.failure_document(value['modal_failure'])
+    require(type(value['request_state']) is str and value['request_state'] in ('NOT_ATTEMPTED','ATTEMPTED_UNCONFIRMED','PUBLISHED'))
+    if value['request_state']=='ATTEMPTED_UNCONFIRMED':require(value['step']=='REQUEST_PUBLISH')
+    require(type(value['action_invoked']) is bool)
+    require(not value['action_invoked'] or value['request_state']=='PUBLISHED')
+    if value['action_invoked']:require(value['step'] in ('ACTION','PERFORMED_RECEIPT','AFTER_IMAGE','RECEIPT_PUBLISH'))
+    require(len(encode(value))<=4096)
+    return value
+
+def checkpoint_failure(progress,exc):
+    code=getattr(exc,'returncode',None) if isinstance(exc,subprocess.CalledProcessError) else None
+    modal=None
+    if isinstance(exc,ModalProbeFailure):code=exc.exit_code;modal=exc.document
+    if type(code) is not int or not -127<=code<=255 or code==0:code=None
+    reason=('CANCELLED' if isinstance(exc,InterruptedError) else
+        'SUBPROCESS_TIMEOUT' if isinstance(exc,(TimeoutError,subprocess.TimeoutExpired)) else
+        'MODAL_PROBE_REJECTED' if isinstance(exc,ModalProbeFailure) else
+        'SUBPROCESS_EXIT' if isinstance(exc,subprocess.CalledProcessError) else
+        'BOUNDARY_REJECTED' if isinstance(exc,(ValueError,OSError)) else 'UNCLASSIFIED_EXCEPTION')
+    return checkpoint_failure_document({'schema':1,'status':'FAILED_NOT_ACCEPTANCE',**progress,
+        'exception_class':exception_class(exc),'reason':reason,'probe_exit_code':code,'modal_failure':modal})
+
 def require(ok):
     if not ok:raise ValueError('invalid plugin-only agreement binding')
 def stage_number(stage):
@@ -174,42 +237,72 @@ def preceding(root,stage,expected_context):
 def window_probe(pid,action,environment,runner=None):
     require(action in ACTIONS.values())
     result=(runner or subprocess.run)([sys.executable,__file__,'observe-window','--pid',str(pid),'--stage',str(next(k for k,v in ACTIONS.items() if v==action))],
-        env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=2,check=True)
+        env=environment,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=2,check=False)
+    require(type(result.returncode) is int and -127<=result.returncode<=255)
+    if result.returncode:
+        document=None
+        try:
+            require(type(result.stdout) is bytes and len(result.stdout)<=2048)
+            document=modal_window.failure_document(json_read(result.stdout))
+        except (ValueError,TypeError,KeyError):pass
+        raise ModalProbeFailure(result.returncode,document)
     require(len(result.stdout)<=modal_window.MAX_PROOF_BYTES);return modal_window.validate(json_read(result.stdout),action)
 
-def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,environment,runner=None):
+def checkpoint(root,stage,proc,screen,identity,owned,deadline,command,idea,environment,runner=None,progress=None):
+    progress={} if progress is None else progress
+    progress.clear();progress.update(stage=stage,step='START',context=None,request_state='NOT_ATTEMPTED',action_invoked=False)
     stage_number(stage);require(time.monotonic()<deadline and proc.poll() is None)
-    expected_context=trust.context(root,command,idea)
-    plugin=verify_plugin(root,idea);legal=verify_legal(deadline,**({'runner':runner} if runner else {}))
+    progress['step']='CONTEXT';expected_context=trust.context(root,command,idea);progress['context']=expected_context
+    progress['step']='PLUGIN_BINARY';plugin=verify_plugin(root,idea)
+    progress['step']='PDF_CHECK';legal=verify_legal(deadline,**({'runner':runner} if runner else {}))
+    progress['step']='PRECEDING_RECEIPT'
     prior=preceding(root,stage,expected_context)
+    progress['step']='CREATE_STAGE'
     folder=root/f'stage-{stage}';new_directory(folder)
-    action=ACTIONS[stage];identity.verify();win=window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))
-    screen('SNAPSHOT',folder/'before.png');identity.verify()
+    action=ACTIONS[stage];progress['step']='DISPLAY_BEFORE_PROBE';identity.verify()
+    progress['step']='MODAL_PROBE_BEFORE_SNAPSHOT';win=window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))
+    progress['step']='SNAPSHOT';screen('SNAPSHOT',folder/'before.png')
+    progress['step']='DISPLAY_AFTER_SNAPSHOT';identity.verify()
+    progress['step']='MODAL_PROBE_AFTER_SNAPSHOT'
     require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==win)
+    progress['step']='SNAPSHOT_DECODE'
     raw=read_regular(folder/'before.png',limit=2*1024*1024);clean_png(raw)
     proof=win;win=proof['window_identity'];proof_raw=encode(proof)
+    progress['step']='REQUEST_ENCODE'
     expected=request_document({**expected_context,'schema':1,'stage':stage,'action':action,'protocol':PROTOCOL,'terminal_stage':TERMINAL_STAGE,
         'legal_identity':legal,'plugin_binary_sha256':plugin,'preceding_receipt_sha256':prior,
         'screenshot_sha256':digest(raw),'display_binding_sha256':digest(read_regular(identity.binding,limit=4096)),'window_identity':win,
         'comparison_mode':modal_pixels.MODE,'window_proof_sha256':digest(proof_raw),'dialog_pixel_sha256':modal_pixels.pixel_hash(raw,win)})
     require(len(encode({**expected,'visual_review':review(stage),'after_sha256':'f'*64,'status':STATUS,'legal_rechecked':True}))<=4096)
-    publish(folder/'modal-proof.json',proof_raw);publish(folder/'window-identity.json',encode(win));publish(folder/'request.json',encode(expected))
+    progress['step']='REQUEST_PUBLISH'
+    publish(folder/'modal-proof.json',proof_raw);publish(folder/'window-identity.json',encode(win))
+    progress['request_state']='ATTEMPTED_UNCONFIRMED';publish(folder/'request.json',encode(expected))
+    progress['request_state']='PUBLISHED';progress['step']='CONTROL_WAIT'
     while not (folder/'control.json').exists():
         require(proc.poll() is None)
         if time.monotonic()>=deadline:raise TimeoutError('900秒UI总预算耗尽')
         owned.scan();time.sleep(.2)
-    approved=validate_control(trust.read_json(folder/'control.json',4096),expected)
+    progress['step']='CONTROL_VALIDATE';approved=validate_control(trust.read_json(folder/'control.json',4096),expected)
     require(time.monotonic()<deadline and proc.poll() is None)
+    progress['step']='CONTEXT_RECHECK'
     require(trust.context(root,command,idea)==expected_context and preceding(root,stage,expected_context)==prior)
-    verify_plugin(root,idea);require(verify_legal(deadline,**({'runner':runner} if runner else {}))==legal)
+    progress['step']='PLUGIN_RECHECK';verify_plugin(root,idea)
+    progress['step']='PDF_RECHECK';require(verify_legal(deadline,**({'runner':runner} if runner else {}))==legal)
+    progress['step']='DISPLAY_RECHECK'
     require(digest(read_regular(identity.binding,limit=4096))==expected['display_binding_sha256'])
-    identity.verify();require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==proof)
+    identity.verify();progress['step']='MODAL_PROBE_BEFORE_ACTION'
+    require(window_probe(identity.metadata['ide']['pid'],action,environment,**({'runner':runner} if runner else {}))==proof)
+    progress['step']='APPROVED_IMAGE_RECHECK'
     read_modal(folder,expected)
     require(time.monotonic()<deadline and proc.poll() is None)
+    progress['step']='ACTION';progress['action_invoked']=True
     screen(action,folder/'after.png',expected['screenshot_sha256'],folder/'performed.txt')
+    progress['step']='PERFORMED_RECEIPT'
     require(read_regular(folder/'performed.txt',limit=64)==(action+'\n').encode())
-    after=read_regular(folder/'after.png',limit=2*1024*1024);clean_png(after)
+    progress['step']='AFTER_IMAGE';after=read_regular(folder/'after.png',limit=2*1024*1024);clean_png(after)
+    progress['step']='RECEIPT_PUBLISH'
     publish(folder/'receipt.json',encode(receipt_document({**approved,'after_sha256':digest(after),'status':STATUS,'legal_rechecked':True},expected)))
+    progress.clear()
 
 def receive(root,stage):
     stage_number(stage);expected=request_document(trust.read_json(root/f'stage-{stage}/request.json',4096))
@@ -279,7 +372,12 @@ if __name__=='__main__':
     if a.mode=='legal-body-check':print(json.dumps(fetch_legal(a.deadline),separators=(',',':')))
     elif a.mode=='receive':receive(a.root,a.stage)
     elif a.mode=='stage-artifact':stage_artifact(a.root,a.stage,a.phase,a.run_id,a.run_attempt)
-    elif a.mode=='observe-window':print(json.dumps(modal_window.observe(a.pid,ACTIONS[stage_number(a.stage)]),separators=(',',':')))
+    elif a.mode=='observe-window':
+        try:print(json.dumps(modal_window.observe(a.pid,ACTIONS[stage_number(a.stage)]),separators=(',',':')))
+        except InterruptedError:raise
+        except Exception as exc:
+            print(json.dumps(modal_window.failure_from_exception(exc),separators=(',',':')))
+            raise SystemExit(2) from None
     elif a.mode=='verify-window':print(verify_window(a.root,a.expected))
     else:
         stage_number(a.stage);deadline=read_ui_deadline(a.root)

@@ -280,6 +280,151 @@ class ProofSchemaTests(unittest.TestCase):
             self.valid()
 
 
+class FailureDiagnosticTests(unittest.TestCase):
+    def document(self, **changes):
+        return {"schema": 1, "reason": "WINDOW_PROOF_UNAVAILABLE", "call_site": "ATTR_X",
+                "exception_class": "ProofError", "facts": {"x": -1, "root_child": 1}, **changes}
+
+    def failure(self, proof):
+        with self.assertRaises(modal.ProofError) as raised:
+            modal.validate(proof, proof["action"])
+        document = modal.failure_from_exception(raised.exception)
+        self.assertEqual(document, modal.failure_document(document))
+        self.assertLessEqual(len(json.dumps(document).encode("ascii")) + 1, modal.MAX_FAILURE_BYTES)
+        return document
+
+    def test_roundtrip_is_closed_detached_and_bounded(self):
+        original = self.document()
+        result = modal.failure_document(original)
+        self.assertEqual(result, original)
+        self.assertIsNot(result, original)
+        self.assertIsNot(result["facts"], original["facts"])
+        original["facts"]["x"] = 999
+        self.assertEqual(result["facts"]["x"], -1)
+        self.assertEqual(result, json.loads(json.dumps(result)))
+        size = len(json.dumps(result, sort_keys=True, separators=(",", ":")).encode("ascii")) + 1
+        with patch.object(modal, "MAX_FAILURE_BYTES", size):
+            self.assertEqual(modal.failure_document(result), result)
+        with patch.object(modal, "MAX_FAILURE_BYTES", size - 1), self.assertRaises(ValueError):
+            modal.failure_document(result)
+
+    def test_top_level_schema_is_exact_and_never_serializes_unknown_objects(self):
+        class Trap:
+            def __str__(self):
+                raise AssertionError("must not format arbitrary objects")
+            __repr__ = __str__
+        class DictSubclass(dict):
+            pass
+        bad = [None, [], Trap(), DictSubclass(self.document()),
+               self.document(extra="private"), self.document(schema=True), self.document(schema=1.0)]
+        for key in self.document():
+            omitted = self.document()
+            omitted.pop(key)
+            bad.append(omitted)
+        for key in ("reason", "call_site", "exception_class"):
+            for value in (None, True, 1, {}, [], Trap(), "private", "x" * 100000):
+                bad.append(self.document(**{key: value}))
+        for item in bad:
+            with self.subTest(kind=type(item).__name__), self.assertRaisesRegex(ValueError, "^INVALID_FAILURE_DOCUMENT$"):
+                modal.failure_document(item)
+
+    def test_facts_reject_nested_unknown_oversized_and_loose_types(self):
+        class IntSubclass(int):
+            pass
+        class StrSubclass(str):
+            pass
+        class DictSubclass(dict):
+            pass
+        bad = [None, [], DictSubclass(x=1), {"x": {"private": "payload"}}, {"x": [1]},
+               {"x": True}, {"x": False}, {"x": "1"}, {"x": 1.0}, {"x": None},
+               {"x": IntSubclass(1)}, {StrSubclass("x"): 1}, {"x": 2**31},
+               {"x": -(2**31) - 1}, {"x": 10**10000}, {"shape_kind": 3},
+               {"unknown": 1}, {"x" * 100000: 1}, {"x": "private" * 100000},
+               {key: 0 for key in list(modal._FACT_LIMITS)[:modal.MAX_FAILURE_FACTS + 1]}]
+        for facts in bad:
+            with self.subTest(kind=type(facts).__name__), self.assertRaisesRegex(ValueError, "^INVALID_FAILURE_DOCUMENT$"):
+                modal.failure_document(self.document(facts=facts))
+        for key in ("title", "message", "path", "env", "stderr", "command", "pid", "window_id"):
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                modal.failure_document(self.document(facts={key: 1}))
+
+    def test_all_enum_codes_are_explicit_and_constructor_cannot_accept_raw_text(self):
+        for site in modal._FAILURE_SITES:
+            self.assertEqual(modal.failure_document(self.document(call_site=site))["call_site"], site)
+        for reason in modal._FAILURE_REASONS:
+            self.assertEqual(modal.failure_from_exception(modal.ProofError(reason))["reason"], reason)
+        for kwargs in ({"reason": "private exception text"}, {"call_site": "/private/path"},
+                       {"facts": {"stderr": "private"}}, {"exception_class": "PrivateCustomError"}):
+            with self.assertRaisesRegex(ValueError, "^INVALID_FAILURE_DOCUMENT$"):
+                modal.ProofError(**kwargs)
+
+    def test_exception_projection_uses_only_fixed_types_and_preserves_no_message(self):
+        class PrivateCustomError(Exception):
+            def __str__(self):
+                raise AssertionError("must not inspect exception text")
+        for cls, category in ((ValueError, "ValueError"), (TypeError, "TypeError"),
+                              (OSError, "OSError"), (AttributeError, "AttributeError"),
+                              (PrivateCustomError, "OTHER")):
+            result = modal.failure_from_exception(cls("secret /path DISPLAY=:999 command stderr"))
+            self.assertEqual(result, self.document(call_site="UNEXPECTED_EXCEPTION",
+                                                    exception_class=category, facts={}))
+        error = modal.ProofError("INPUT_ROUTE_CHANGED", "SHAPE_INPUT", {"shape_kind": 2})
+        self.assertEqual(modal.failure_from_exception(error)["facts"], {"shape_kind": 2})
+        error.facts["raw_message"] = "private"
+        result = modal.failure_from_exception(error)
+        self.assertEqual(result["call_site"], "UNEXPECTED_EXCEPTION")
+        self.assertEqual(result["facts"], {})
+        self.assertNotIn("private", json.dumps(result))
+
+    def test_root_child_outside_screen_has_exact_geometry_and_no_metadata(self):
+        for changes, site in (({"x": -1}, "ATTR_X"), ({"y": -1}, "ATTR_Y"),
+                              ({"x": 1279, "width": 2}, "ROOT_CHILD_BOUNDS")):
+            proof = proof_fixture()
+            proof["root_children"].append({**_record(99, 0, 0, 1, 1, pid=123,
+                                                     title_sha256="f" * 64), **changes})
+            result = self.failure(proof)
+            self.assertEqual(result["call_site"], site)
+            self.assertEqual(result["facts"]["root_child"], 1)
+            self.assertEqual(result["facts"]["node_index"], 1)
+            self.assertNotIn("pid", result["facts"])
+            self.assertNotIn("title_sha256", result["facts"])
+
+    def test_shape_failure_keeps_only_fixed_kind_and_numeric_rectangle_relation(self):
+        for kind, code, number in (("bounding", "SHAPE_BOUNDING", 0), ("input", "SHAPE_INPUT", 2),
+                                    ("clip", "SHAPE_CLIP", 1)):
+            proof = proof_fixture()
+            proof["dialog_tree"][0]["shape"][kind][2] = 519
+            result = self.failure(proof)
+            self.assertEqual(result["reason"], "INPUT_ROUTE_CHANGED")
+            self.assertEqual(result["call_site"], code)
+            self.assertEqual(result["facts"]["shape_kind"], number)
+            self.assertEqual((result["facts"]["width"], result["facts"]["actual_width"]), (520, 519))
+
+    def test_signed_proxy_intersection_and_focus_relation_remain_distinct(self):
+        proof = proof_fixture()
+        add_child(proof, _record(57, -1, -1, 2, 2, window_class=2))
+        result = self.failure(proof)
+        self.assertEqual(result["call_site"], "INPUTONLY_INTERSECTION")
+        self.assertEqual({key: result["facts"][key] for key in ("x", "y", "overlap_width", "overlap_height")},
+                         {"x": -1, "y": -1, "overlap_width": 1, "overlap_height": 1})
+        proof = proof_fixture()
+        add_child(proof, _record(57, -1, -1, 1, 1, window_class=2, map_state=0))
+        proof["focus_path"] = [56, 57]
+        result = self.failure(proof)
+        self.assertEqual(result["call_site"], "FOCUS_MAP_STATE")
+        self.assertEqual((result["facts"]["x"], result["facts"]["y"], result["facts"]["map_state"]), (-1, -1, 0))
+
+    def test_higher_root_sibling_identifies_stack_and_overlap_relation(self):
+        proof = proof_fixture()
+        proof["root_children"].append(_record(99, 850, 500, 2, 2))
+        result = self.failure(proof)
+        self.assertEqual(result["reason"], "WINDOW_OCCLUDED")
+        self.assertEqual(result["call_site"], "ROOT_STACK_OVERLAP")
+        self.assertEqual(result["facts"], {"root_index": 1, "modal_index": 0,
+                                          "map_state": 2, "window_class": 1,
+                                          "overlap_width": 2, "overlap_height": 2})
+
+
 class ObservationTests(unittest.TestCase):
     def setUp(self):
         self.proof = proof_fixture()
@@ -362,6 +507,27 @@ class ObservationTests(unittest.TestCase):
                 modal.observe(100, self.proof["action"])
             self.assertNotIn("private", str(raised.exception))
 
+    def test_interrupted_error_propagates_without_diagnostic_conversion(self):
+        error = InterruptedError("private cancellation")
+        with patch.dict(modal.os.environ, {"DISPLAY": ":100"}, clear=True), \
+             patch.object(modal, "_X11", side_effect=error), self.assertRaises(InterruptedError) as raised:
+            modal.observe(100, self.proof["action"])
+        self.assertIs(raised.exception, error)
+        with self.assertRaises(InterruptedError) as raised:
+            modal.failure_from_exception(error)
+        self.assertIs(raised.exception, error)
+
+    def test_library_exception_class_survives_without_its_text(self):
+        for cls in (OSError, AttributeError):
+            with patch.dict(modal.os.environ, {"DISPLAY": ":100"}, clear=True), \
+                 patch.object(modal, "_X11", side_effect=cls("secret /path")), \
+                 self.assertRaises(modal.ProofError) as raised:
+                modal.observe(100, self.proof["action"])
+            result = modal.failure_from_exception(raised.exception)
+            self.assertEqual(result["call_site"], "OBSERVE_EXCEPTION")
+            self.assertEqual(result["exception_class"], cls.__name__)
+            self.assertNotIn("secret", json.dumps(result))
+
     def test_descendant_traversal_stops_at_total_count_and_depth_caps(self):
         for deep in (False, True):
             proof = copy.deepcopy(self.proof)
@@ -432,8 +598,12 @@ class XlibAdapterTests(unittest.TestCase):
                 count._obj.value = number
                 return C.cast(C.c_void_p(1), C.POINTER(modal._Rectangle))
             adapter.ext.XShapeGetRectangles.side_effect = retrieve
-            with patch.object(modal.time, "monotonic", return_value=10), self.assertRaises(ValueError):
+            with patch.object(modal.time, "monotonic", return_value=10), self.assertRaises(modal.ProofError) as raised:
                 adapter.shape(56, 1)
+            result = modal.failure_from_exception(raised.exception)
+            self.assertEqual(result["call_site"], "X_SHAPE_RECTANGLES")
+            self.assertEqual(result["facts"], {"shape_kind": 0, "count": number,
+                                              "window_class": 1, "has_pointer": 1})
             adapter.x.XFree.assert_called_once()
 
     def test_oversized_tree_refused_before_pointer_read_and_freed(self):
@@ -456,6 +626,27 @@ class XlibAdapterTests(unittest.TestCase):
         adapter.error = False
         with patch.object(modal.time, "monotonic", side_effect=[19.9, 20]), self.assertRaises(ValueError):
             adapter.sync()
+
+    def test_attribute_acquisition_failure_distinguishes_call_and_class_depth(self):
+        adapter = self.adapter()
+        adapter.x.XGetWindowAttributes.return_value = 0
+        with patch.object(modal.time, "monotonic", return_value=10), self.assertRaises(modal.ProofError) as raised:
+            adapter.attributes(56, 10)
+        self.assertEqual(modal.failure_from_exception(raised.exception)["call_site"], "X_ATTRIBUTES_CALL")
+        def attributes(connection, window, value):
+            value._obj.root = 10
+            value._obj.window_class = 1
+            value._obj.depth = 8
+            value._obj.width = 1
+            value._obj.height = 1
+            return 1
+        adapter.x.XGetWindowAttributes.side_effect = attributes
+        with patch.object(modal.time, "monotonic", return_value=10), self.assertRaises(modal.ProofError) as raised:
+            adapter.attributes(56, 10)
+        result = modal.failure_from_exception(raised.exception)
+        self.assertEqual(result["call_site"], "X_ATTR_CLASS_DEPTH")
+        self.assertEqual(result["facts"]["depth"], 8)
+        self.assertEqual(result["facts"]["window_class"], 1)
 
     def test_property_absence_is_explicit_and_malformed_or_truncated_metadata_rejected(self):
         for kind in ("absent", "oversized", "wrong_format", "wrong_type", "multiple_pid"):
@@ -483,8 +674,13 @@ class XlibAdapterTests(unittest.TestCase):
                 if kind == "absent":
                     self.assertIsNone(adapter.property(56, b"_NET_WM_PID", 32, b"CARDINAL"))
                 else:
-                    with self.assertRaises(ValueError):
+                    with self.assertRaises(modal.ProofError) as raised:
                         adapter.property(56, b"_NET_WM_PID", 32, b"CARDINAL")
+                    expected_site = {"oversized": "X_PROPERTY_REPLY", "wrong_format": "X_PROPERTY_TYPE",
+                                     "wrong_type": "X_PROPERTY_TYPE", "multiple_pid": "X_PROPERTY_PID"}[kind]
+                    result = modal.failure_from_exception(raised.exception)
+                    self.assertEqual(result["call_site"], expected_site)
+                    self.assertNotIn("pid", result["facts"])
             adapter.x.XFree.assert_called_once()
 
 

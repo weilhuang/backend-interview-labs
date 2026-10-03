@@ -23,7 +23,8 @@ PROTOCOL=control.PROTOCOL
 RESULT='restart-result.json'
 RESULT_FIELDS={'schema','protocol','status','operation','error_code','detail_code','detail_step','cancelled','phase2_started','phase2_exit',
                'preparation_cleanup','validation_cleanup','profile_verified','restart_context_verified',
-               'validation_context_verified','restart_provenance','registered_processes','course_acceptance'}
+               'validation_context_verified','restart_provenance','registered_processes','course_acceptance',
+               'exception_class','agreement_failure'}
 OPERATIONS={'INITIALIZE','PREPARATION','AGREEMENTS','PROFILE_PREVIEW','PROFILE_CLICK','INSTALL_COMPLETION','TERMINAL_ACK','RESTART',
             'RESTART_REVIEW','PREPARATION_CLEANUP','FRESH_VALIDATION','VALIDATION_REVIEW','VALIDATION_WAIT','FINAL_CLEANUP','COMPLETED'}
 ERRORS={'NONE','FAMILY_ERROR','PROFILE_ERROR','CANCELLED','TIMEOUT','BOUNDARY_ERROR','UNEXPECTED_ERROR'}
@@ -41,6 +42,10 @@ def validate_result(value):
     require(type(value['detail_code']) is str and value['detail_code'] in FAMILY_CODES | PROFILE_CODES | {'NONE','UNKNOWN'})
     require(type(value['detail_step']) is str and value['detail_step'] in PROFILE_STEPS | {'NONE','FAMILY','UNKNOWN'})
     require(value['course_acceptance']=='NOT_RUN')
+    require(type(value['exception_class']) is str and value['exception_class'] in plugin.EXCEPTION_CLASSES)
+    if value['agreement_failure'] is not None:
+        plugin.checkpoint_failure_document(value['agreement_failure'])
+        require(value['status']=='FAILED' and value['exception_class']==value['agreement_failure']['exception_class'])
     for key in ('cancelled','phase2_started','profile_verified','restart_context_verified','validation_context_verified'):
         require(type(value[key]) is bool)
     require(value['restart_provenance'] in ('NONE','OBSERVED_RESTARTER_EXEC','CLOSED_FAMILY_ADOPTED_EXEC'))
@@ -52,7 +57,8 @@ def validate_result(value):
             and value['preparation_cleanup'] is True and value['validation_cleanup'] is True
             and all(value[k] for k in ('phase2_started','profile_verified','restart_context_verified','validation_context_verified'))
             and value['restart_provenance']!='NONE'
-            and value['error_code']=='NONE' and value['operation']=='COMPLETED')
+            and value['error_code']=='NONE' and value['operation']=='COMPLETED'
+            and value['exception_class']=='NONE' and value['agreement_failure'] is None)
     return value
 
 
@@ -107,7 +113,9 @@ def display_session(root,idea,command):
     result={'schema':1,'protocol':PROTOCOL,'status':'FAILED','operation':'INITIALIZE','error_code':'NONE','detail_code':'NONE','detail_step':'NONE',
             'cancelled':False,'phase2_started':False,'phase2_exit':None,'preparation_cleanup':None,
             'validation_cleanup':None,'profile_verified':False,'restart_context_verified':False,
-            'validation_context_verified':False,'restart_provenance':'NONE','registered_processes':0,'course_acceptance':'NOT_RUN'}
+            'validation_context_verified':False,'restart_provenance':'NONE','registered_processes':0,'course_acceptance':'NOT_RUN',
+            'exception_class':'NONE','agreement_failure':None}
+    agreement_progress={}
     family=None;identity=None;current=None;cancellation=Cancellation();installed=None;terminal=None
     def cancel(*_):
         cancellation.set('SIGNAL_CANCELLED')
@@ -195,7 +203,8 @@ def display_session(root,idea,command):
         observer=ui.PostTrustObserver(root,identity,ui_deadline)
         while not observer.done:
             family.check();require(current.poll() is None);observer.tick(current,screen,identity);time.sleep(.2)
-        for stage in (5,6):plugin.checkpoint(root,stage,current,screen,identity,family,ui_deadline,command,idea,helper_env,runner=family.run)
+        for stage in (5,6):
+            plugin.checkpoint(root,stage,current,screen,identity,family,ui_deadline,command,idea,helper_env,runner=family.run,progress=agreement_progress)
         result['operation']='PROFILE_PREVIEW'
         identity.verify();executable=Path(os.readlink(f'/proc/{current.pid}/exe'))
         proposal=profile.prepare(executable,idea,runner=family.run,env=environment);identity.verify()
@@ -270,6 +279,9 @@ def display_session(root,idea,command):
         require(type(current.returncode) is int and current.returncode==0)
     except BaseException as exc:
         cancellation.set('SESSION_FAILED')
+        result['exception_class']=plugin.exception_class(exc)
+        if agreement_progress:
+            result['agreement_failure']=plugin.checkpoint_failure(agreement_progress,exc)
         detail=getattr(exc,'code','UNKNOWN')
         result['detail_code']=detail if type(detail) is str and detail in FAMILY_CODES | profile.CODES else 'UNKNOWN'
         step=getattr(exc,'step','UNKNOWN')
@@ -300,4 +312,8 @@ def display_session(root,idea,command):
 
 
 def collect(root):
-    return encode(validate_result(json_read(read_regular(root/RESULT,limit=8192))))
+    value=validate_result(json_read(read_regular(root/RESULT,limit=8192)))
+    diagnostic=value['agreement_failure']
+    if diagnostic is not None and diagnostic['context'] is not None:
+        require(diagnostic['context']==trust.context(root))
+    return encode(value)

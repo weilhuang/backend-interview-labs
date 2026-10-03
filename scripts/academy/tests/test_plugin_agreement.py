@@ -213,7 +213,7 @@ class WorkflowBoundaryTests(unittest.TestCase):
                 self.assertNotIn('*',upload['with']['path']);self.assertEqual(upload['with']['retention-days'],1)
     def test_source_and_timing_and_security_surfaces_are_narrow(self):
         repo=Path(plugin.__file__).parents[2];session=(repo/'scripts/academy/restart_session.py').read_text();helper=(repo/'scripts/academy/probes/AgreementUi.java').read_text()
-        self.assertIn('for stage in (5,6):',session);self.assertIn('plugin.checkpoint(root,stage,current,screen,identity,family,ui_deadline,command,idea,helper_env,runner=family.run)',session)
+        self.assertIn('for stage in (5,6):',session);self.assertIn('plugin.checkpoint(root,stage,current,screen,identity,family,ui_deadline,command,idea,helper_env,runner=family.run,progress=agreement_progress)',session)
         self.assertIn('case "INSTALL_SCOPED_APPARMOR_PROFILE"',helper);self.assertNotIn('case "DISABLE_SANDBOX"',helper)
         self.assertIn('if (bound)',helper);self.assertIn('finalTrustClick',helper)
 
